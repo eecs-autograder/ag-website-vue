@@ -1,6 +1,6 @@
 import { Component, Vue } from 'vue-property-decorator';
 
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     AGTestSuite,
@@ -17,17 +17,16 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked,
+    emitted,
     expect_html_element_has_value,
     find_by_name,
     get_validated_input_text,
+    set_data,
     set_select_object_value,
     set_validated_input_text,
     validated_input_is_valid,
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let ag_suite: AGTestSuite;
 let project: Project;
@@ -74,26 +73,12 @@ beforeEach(() => {
         student_files_needed: [student_file_1, student_file_2],
     });
 
-    sandbox_docker_image_1 = {
-        pk: 1,
-        name: "img1",
-        tag: "",
-        display_name: "Image 1"
-    };
-
-    sandbox_docker_image_2 = {
-        pk: 2,
-        name: "img2",
-        tag: "",
-        display_name: "Image 2"
-    };
-
-    sandbox_docker_image_3 = {
-        pk: 3,
-        name: "img3",
-        tag: "",
-        display_name: "Image 3"
-    };
+    sandbox_docker_image_1 = data_ut.make_sandbox_docker_image(
+        project.course, {display_name: "Image 1"});
+    sandbox_docker_image_2 = data_ut.make_sandbox_docker_image(
+        project.course, {display_name: "Image 2"});
+    sandbox_docker_image_3 = data_ut.make_sandbox_docker_image(
+        project.course, {display_name: "Image 3"});
 });
 
 test('Input property initialization and change', async () => {
@@ -122,6 +107,7 @@ test('Input property initialization and change', async () => {
     expect(inner_wrapper.vm.d_suite).not.toBe(ag_suite);
 
     outer_wrapper.vm.change_suite_field();
+    await outer_wrapper.vm.$nextTick();
 
     expect(inner_wrapper.vm.d_suite).not.toBe(original);
     expect(inner_wrapper.vm.d_suite!.name).toEqual(new_name);
@@ -140,57 +126,57 @@ describe('Field binding tests', () => {
                 ]
             }
         });
-        expect(wrapper.emitted().field_change).toBeUndefined();
+        expect(wrapper.emitted('field_change')).toBeUndefined();
     });
 
     test('suite name binding', async () => {
-        let suite_name_input = wrapper.find({ref: 'suite_name'});
-        set_validated_input_text(suite_name_input, 'Sweet Name');
+        let suite_name_input = wrapper.findComponent({ref: 'suite_name'});
+        await set_validated_input_text(suite_name_input, 'Sweet Name');
 
         expect(wrapper.vm.d_suite!.name).toEqual("Sweet Name");
         expect(validated_input_is_valid(suite_name_input)).toEqual(true);
 
-        wrapper.vm.d_suite!.name = "Thanks";
+        await set_data(wrapper, {d_suite: {name: "Thanks"}});
         expect(get_validated_input_text(suite_name_input)).toEqual("Thanks");
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Suite name cannot be empty - violates condition', async () => {
-        let suite_name_input = wrapper.find({ref: 'suite_name'});
+        let suite_name_input = wrapper.findComponent({ref: 'suite_name'});
         expect(validated_input_is_valid(suite_name_input)).toBe(true);
 
         set_validated_input_text(suite_name_input, '');
         expect(validated_input_is_valid(suite_name_input)).toBe(false);
 
-        expect(wrapper.emitted().field_change).toBeUndefined();
+        expect(wrapper.emitted('field_change')).toBeUndefined();
     });
 
-    test('deferred binding', () => {
-        let synchronous_checkbox = wrapper.find('#synchronous-or-deferred');
+    test('deferred binding', async () => {
+        let synchronous_checkbox = wrapper.find('[data-testid=synchronous_or_deferred]');
 
-        synchronous_checkbox.setChecked(true);
+        await synchronous_checkbox.setChecked(true);
         expect(wrapper.vm.d_suite!.deferred).toEqual(false);
 
-        synchronous_checkbox.setChecked(false);
+        await synchronous_checkbox.setChecked(false);
         expect(wrapper.vm.d_suite!.deferred).toEqual(true);
 
-        synchronous_checkbox.setChecked(true);
+        await synchronous_checkbox.setChecked(true);
         expect(wrapper.vm.d_suite!.deferred).toEqual(false);
 
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
 
-        wrapper.vm.d_suite!.deferred = true;
+        await set_data(wrapper, {d_suite: {deferred: true}});
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(false);
 
-        wrapper.vm.d_suite!.deferred = false;
+        await set_data(wrapper, {d_suite: {deferred: false}});
         expect(checkbox_is_checked(synchronous_checkbox)).toEqual(true);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('sandbox_docker_image binding', async () => {
-        let sandbox_docker_image_input = wrapper.find({ref: 'sandbox_docker_image'});
+        let sandbox_docker_image_input = wrapper.findComponent({ref: 'sandbox_docker_image'});
         set_select_object_value(sandbox_docker_image_input, sandbox_docker_image_2.pk);
         await wrapper.vm.$nextTick();
 
@@ -204,11 +190,11 @@ describe('Field binding tests', () => {
         expect_html_element_has_value(
             sandbox_docker_image_input.find('.select'), sandbox_docker_image_3.pk.toString());
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Toggle allow_network_access', async () => {
-        let allow_network_access_toggle = wrapper.find({ref: 'allow_network_access'});
+        let allow_network_access_toggle = wrapper.findComponent({ref: 'allow_network_access'});
 
         wrapper.vm.d_suite!.allow_network_access = true;
         await wrapper.vm.$nextTick();
@@ -225,59 +211,44 @@ describe('Field binding tests', () => {
 
         expect(wrapper.vm.d_suite!.allow_network_access).toEqual(true);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
-    test('Read-only instructor files binding', () => {
-        let read_only_checkbox = wrapper.find('#read-only-instructor-files');
+    test('Read-only instructor files binding', async () => {
+        let read_only_checkbox = wrapper.find('[data-testid=read_only_instructor_files]');
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(true);
 
-        read_only_checkbox.setChecked(false);
+        await read_only_checkbox.setChecked(false);
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(false);
 
-        read_only_checkbox.setChecked(true);
+        await read_only_checkbox.setChecked(true);
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(true);
 
-        read_only_checkbox.setChecked(false);
+        await read_only_checkbox.setChecked(false);
         expect(wrapper.vm.d_suite!.read_only_instructor_files).toEqual(false);
 
         expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
 
-        wrapper.vm.d_suite!.read_only_instructor_files = true;
+        await set_data(wrapper, {d_suite: {read_only_instructor_files: true}});
         expect(checkbox_is_checked(read_only_checkbox)).toEqual(true);
 
-        wrapper.vm.d_suite!.read_only_instructor_files = false;
+        await set_data(wrapper, {d_suite: {read_only_instructor_files: false}});
         expect(checkbox_is_checked(read_only_checkbox)).toEqual(false);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Adding an instructor file', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).vm;
-        expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
-
-        let search_bar = wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "a";
+        let dropdown_typeahead = wrapper.findComponent({ref: 'instructor_files_typeahead'});
+        dropdown_typeahead.vm.$emit('item_selected', instructor_file_3);
         await wrapper.vm.$nextTick();
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
-
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
-
         expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(3);
-        expect(wrapper.vm.d_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
-        expect(wrapper.vm.d_suite!.instructor_files_needed[1]).toEqual(instructor_file_2);
-        expect(wrapper.vm.d_suite!.instructor_files_needed[2]).toEqual(instructor_file_3);
+        expect(wrapper.vm.d_suite!.instructor_files_needed).toEqual([
+            instructor_file_1, instructor_file_2, instructor_file_3
+        ]);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Removing an instructor file', async () => {
@@ -294,13 +265,12 @@ describe('Field binding tests', () => {
         expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(1);
         expect(wrapper.vm.d_suite!.instructor_files_needed[0]).toEqual(instructor_file_1);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('InstructorFile filter function on dropdown typeahead', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'instructor_files_typeahead'}
-        ).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'instructor_files_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
 
         dropdown_typeahead.filter_text = "a";
@@ -323,7 +293,7 @@ describe('Field binding tests', () => {
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_1);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('instructor_files_available', async () => {
@@ -344,35 +314,20 @@ describe('Field binding tests', () => {
             [instructor_file_2, instructor_file_3]
         );
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Adding a student file', async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).vm;
-        expect(dropdown_typeahead.choices).toEqual([student_file_3]);
-
-        let search_bar = wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).find('input');
-        search_bar.trigger("click");
-
-        dropdown_typeahead.filter_text = "a";
+        let dropdown_typeahead = wrapper.findComponent({ref: 'student_files_typeahead'});
+        dropdown_typeahead.vm.$emit('item_selected', student_file_3);
         await wrapper.vm.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
-
-        search_bar.trigger('keydown', {code: 'Enter'});
-        await dropdown_typeahead.$nextTick();
 
         expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(3);
         expect(wrapper.vm.d_suite!.student_files_needed[0]).toEqual(student_file_1);
         expect(wrapper.vm.d_suite!.student_files_needed[1]).toEqual(student_file_2);
         expect(wrapper.vm.d_suite!.student_files_needed[2]).toEqual(student_file_3);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('Removing a student file', async () => {
@@ -389,13 +344,12 @@ describe('Field binding tests', () => {
         expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(1);
         expect(wrapper.vm.d_suite!.student_files_needed[0]).toEqual(student_file_1);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('ExpectedStudentFile filter function on dropdown typeahead',  async () => {
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find(
-            {ref: 'student_files_typeahead'}
-        ).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'student_files_typeahead'}).vm;
         expect(dropdown_typeahead.choices).toEqual([student_file_3]);
 
         dropdown_typeahead.filter_text = "e";
@@ -418,7 +372,7 @@ describe('Field binding tests', () => {
         expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
         expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_1);
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
     test('expected_student_files_available', async () => {
@@ -439,6 +393,6 @@ describe('Field binding tests', () => {
             [student_file_2, student_file_3]
         );
 
-        expect(wrapper.emitted().field_change[0][0]).toEqual(wrapper.vm.d_suite);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 });

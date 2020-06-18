@@ -28,7 +28,7 @@ function make_wrapper() {
     });
 }
 
-describe('app.vue tests', () => {
+describe('Breadcrumb and global error tests', () => {
     let wrapper: Wrapper<App>;
     let user: User;
 
@@ -106,12 +106,14 @@ describe('app.vue tests', () => {
     });
 
     test('Global errors displayed', async () => {
-        expect(wrapper.find({ref: 'global_errors'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({ref: 'global_errors'}).element).not.toBeVisible();
         GlobalErrorsSubject.get_instance().report_error(new HttpError(401, 'log in plz'));
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'global_errors'}).isVisible()).toBe(true);
-        expect((<APIErrors> wrapper.find({ref: 'global_errors'}).vm).d_api_errors.length).toBe(1);
+        expect(wrapper.findComponent({ref: 'global_errors'}).element).toBeVisible();
+        expect(
+            (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).d_api_errors.length
+        ).toBe(1);
     });
 });
 
@@ -121,10 +123,11 @@ test('API error handled in login', async () => {
 
     let wrapper = make_wrapper();
     expect(await wait_for_load(wrapper)).toBe(true);
-    wrapper.find({ref: 'login_button'}).trigger('click');
-    await wrapper.vm.$nextTick();
+    await wrapper.find('[data-testid=login_button]').trigger('click');
 
-    expect((<APIErrors> wrapper.find({ref: 'global_errors'}).vm).d_api_errors.length).toBe(1);
+    expect(
+        (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).d_api_errors.length
+    ).toBe(1);
 });
 
 describe('Login tests', () => {
@@ -142,30 +145,46 @@ describe('Login tests', () => {
         expect(authenticate_stub.calledOnceWith(fake_token_val)).toBe(true);
     });
 
-    test('Token cookie unavailable, auth redirect called on button click', async () => {
-        let location_assign_stub = sinon.stub(window.location, 'assign');
-        sinon.stub(cookie, 'get_cookie').returns(null);
-        let authenticate_stub = sinon.stub(HttpClient.get_instance(), 'authenticate');
-        let fake_redirect_url = '/oauth2/something/or/other/';
-        sinon.stub(User, 'get_current').rejects(
-            new HttpError(
-                401, '', '/url/',
-                {'www-authenticate': `Redirect_to: ${fake_redirect_url}`}
-            )
-        );
+    describe('Auth redirect tests', () => {
+        let window_location = window.location;
+        let location_assign_stub: sinon.SinonSpy;
 
-        let wrapper = make_wrapper();
-        expect(await wait_for_load(wrapper)).toBe(true);
+        beforeEach(() => {
+            delete window.location;
+            location_assign_stub = sinon.spy();
+            // @ts-ignore
+            window.location = {assign: location_assign_stub};
+        });
 
-        expect(location_assign_stub.callCount).toEqual(0);
-        expect(wrapper.vm.globals.current_user).toBeNull();
+        afterEach(() => {
+            window.location = window_location;
+        });
 
-        wrapper.find({ref: 'login_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        test('Token cookie unavailable, auth redirect called on button click', async () => {
+            // let location_assign_stub = sinon.stub(window.location, 'assign');
+            sinon.stub(cookie, 'get_cookie').returns(null);
+            let authenticate_stub = sinon.stub(HttpClient.get_instance(), 'authenticate');
+            let fake_redirect_url = '/oauth2/something/or/other/';
+            sinon.stub(User, 'get_current').rejects(
+                new HttpError(
+                    401, '', '/url/',
+                    {'www-authenticate': `Redirect_to: ${fake_redirect_url}`}
+                )
+            );
 
-        expect(location_assign_stub.calledOnceWith(fake_redirect_url)).toBe(true);
-        expect(authenticate_stub.callCount).toEqual(0);
-        expect(wrapper.vm.globals.current_user).toBeNull();
+            let wrapper = make_wrapper();
+            expect(await wait_for_load(wrapper)).toBe(true);
+
+            expect(location_assign_stub.callCount).toEqual(0);
+            expect(wrapper.vm.globals.current_user).toBeNull();
+
+            wrapper.find('[data-testid=login_button]').trigger('click');
+            await wrapper.vm.$nextTick();
+
+            expect(location_assign_stub.calledOnceWith(fake_redirect_url)).toBe(true);
+            expect(authenticate_stub.callCount).toEqual(0);
+            expect(wrapper.vm.globals.current_user).toBeNull();
+        });
     });
 
     test('Auth token bad, token cookie deleted', async () => {
@@ -193,7 +212,7 @@ test('Logout', async () => {
     expect(await wait_for_load(wrapper)).toBe(true);
     expect(wrapper.find('#welcome').exists()).toBe(false);
 
-    wrapper.find({ref: 'logout_button'}).trigger('click');
+    await wrapper.find('[data-testid=logout_button]').trigger('click');
     expect(delete_cookie_stub.calledOnce).toBe(true);
 
     expect(wrapper.vm.globals.current_user).toBeNull();

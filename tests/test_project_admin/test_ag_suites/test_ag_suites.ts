@@ -14,6 +14,7 @@ import {
     set_validated_input_text,
     validated_input_is_valid,
     wait_for_load,
+    wait_until,
 } from '@/tests/utils';
 
 
@@ -33,7 +34,7 @@ function make_wrapper() {
 beforeEach(() => {
     project = data_ut.make_project(data_ut.make_course().pk);
 
-    get_sandbox_docker_images = sinon.stub(ag_cli, 'get_sandbox_docker_images').returns(
+    get_sandbox_docker_images = sinon.stub(ag_cli.SandboxDockerImage, 'get_images').returns(
         Promise.resolve([])
     );
     get_all_suites_from_project = sinon.stub(ag_cli.AGTestSuite, 'get_all_from_project').rejects();
@@ -50,51 +51,54 @@ describe('Creating ag_test_suite', () => {
 
     test('d_new_ag_test_suite_name binding', async () => {
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
 
-        wrapper.find('#add-ag-test-suite-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-button').trigger('click');
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
 
-        let d_new_ag_test_suite_name_input = wrapper.find({ref: 'new_ag_test_suite_name'});
+        let d_new_ag_test_suite_name_input = wrapper.findComponent({ref: 'new_ag_test_suite_name'});
 
-        set_validated_input_text(d_new_ag_test_suite_name_input, "Suite I");
+        await set_validated_input_text(d_new_ag_test_suite_name_input, "Suite I");
         expect(validated_input_is_valid(d_new_ag_test_suite_name_input)).toBe(true);
         expect(wrapper.vm.d_new_ag_test_suite_name).toEqual("Suite I");
 
         wrapper.vm.d_new_ag_test_suite_name = "Suite II";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(d_new_ag_test_suite_name_input)).toEqual("Suite II");
     });
 
     test('Creating a suite - successfully', async () => {
         let create_ag_suite_stub = sinon.stub(ag_cli.AGTestSuite, 'create').callsFake(
-            () => ag_cli.AGTestSuite.notify_ag_test_suite_created(new_suite)
+            () => {
+                ag_cli.AGTestSuite.notify_ag_test_suite_created(new_suite);
+                return Promise.resolve(new_suite);
+            }
         );
 
         let new_suite = data_ut.make_ag_test_suite(project.pk);
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
 
-        wrapper.find('#add-ag-test-suite-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-button').trigger('click');
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
 
         wrapper.vm.d_new_ag_test_suite_name = "Sweet";
-        wrapper.find('#add-ag-test-suite-form').trigger('submit');
         await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-form').trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_adding_suite)).toBe(true);
 
         expect(create_ag_suite_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_new_ag_test_suite_name).toBe("");
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(1);
         expect(wrapper.vm.d_active_ag_test_suite).toEqual(new_suite);
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
     });
 
     test('Creating a suite - unsuccessfully', async () => {
@@ -108,26 +112,26 @@ describe('Creating ag_test_suite', () => {
         );
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(false);
 
-        wrapper.find('#add-ag-test-suite-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-button').trigger('click');
 
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
 
         wrapper.vm.d_new_ag_test_suite_name = "Sweet";
-        wrapper.find('#add-ag-test-suite-form').trigger('submit');
         await wrapper.vm.$nextTick();
+        await wrapper.find('#add-ag-test-suite-form').trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_adding_suite)).toBe(true);
 
         expect(create_ag_suite_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
     });
 });
 
@@ -300,7 +304,7 @@ test('Update suites order', async () => {
     let wrapper = make_wrapper();
     await wrapper.vm.$nextTick();
 
-    wrapper.find({ref: 'ag_test_suite_order'}).vm.$emit('change');
+    wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('change');
     await wrapper.vm.$nextTick();
     expect(
         order_stub.calledOnceWith(project.pk, suites.map(suite => suite.pk))
@@ -839,7 +843,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').element).toBeDisabled();
     });
 
     test('prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, ' +
@@ -852,7 +856,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').element).toBeDisabled();
     });
 
     test("prev_ag_test_case_is_available (false) - suite index != 0, case index is 0, " +
@@ -865,7 +869,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').element).toBeDisabled();
     });
 
     test("prev_ag_test_case_is_available (true) - suite index != 0, case index is 0, " +
@@ -875,7 +879,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').element).not.toBeDisabled();
     });
 
     test('prev_ag_test_case_is_available (false) - suite index is 0, case index != 0, ' +
@@ -885,7 +889,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#prev-ag-test-case-button').element).toBeDisabled();
     });
 
     test('prev_ag_test_case_is_available (true) - suite index is 0, case index != 0, prev ' +
@@ -895,7 +899,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.prev_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').element).not.toBeDisabled();
     });
 
     test('go_to_prev_command - prev case in same suite', async () => {
@@ -904,7 +908,7 @@ describe('Next/prev test buttons', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_1);
 
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').element).not.toBeDisabled();
         wrapper.find('#prev-ag-test-case-button').trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -917,7 +921,7 @@ describe('Next/prev test buttons', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_2_case_1_command_2);
 
-        expect(wrapper.find('#prev-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#prev-ag-test-case-button').element).not.toBeDisabled();
         wrapper.find('#prev-ag-test-case-button').trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -952,7 +956,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').element).toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (true) - suite index is 0, case index is 0, next ' +
@@ -962,7 +966,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').element).not.toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (false) - suite is the last suite, case is the ' +
@@ -972,7 +976,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').element).toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (false) - suite is not the last suite, ' +
@@ -984,7 +988,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').element).toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (false) - suite is not the last suite, case is ' +
@@ -994,7 +998,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(false);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('#next-ag-test-case-button').element).toBeDisabled();
     });
 
     test('next_ag_test_case_is_available (true) - suite is not the last suite, case is' +
@@ -1004,7 +1008,7 @@ describe('Next/prev test buttons', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.next_ag_test_case_is_available).toBe(true);
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').element).not.toBeDisabled();
     });
 
     test('go_to_next_command - next case in same suite', async () => {
@@ -1013,7 +1017,7 @@ describe('Next/prev test buttons', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_1_command_1);
 
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').element).not.toBeDisabled();
         wrapper.find('#next-ag-test-case-button').trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -1026,7 +1030,7 @@ describe('Next/prev test buttons', () => {
 
         expect(wrapper.vm.d_active_ag_test_command).toEqual(suite_1_case_2_command_2);
 
-        expect(wrapper.find('#next-ag-test-case-button').is('[disabled]')).toBe(false);
+        expect(wrapper.find('#next-ag-test-case-button').element).not.toBeDisabled();
         wrapper.find('#next-ag-test-case-button').trigger('click');
         await wrapper.vm.$nextTick();
 

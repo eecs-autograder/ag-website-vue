@@ -52,7 +52,7 @@
       <div class="show-more-button-container" v-if="d_num_lines_rendered < left.length">
         <button type="button"
                 class="blue-button"
-                ref="show_more_button"
+                data-testid="show_more_button"
                 @click="render_more_lines">
           Show more
         </button>

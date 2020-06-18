@@ -54,7 +54,7 @@
 
     <modal v-if="d_show_empty_files_found_in_upload_attempt_modal"
            @close="d_show_empty_files_found_in_upload_attempt_modal = false"
-           ref="empty_file_found_in_upload_attempt_modal"
+           data-testid="empty_file_found_in_upload_attempt_modal"
            size="large"
            :include_closing_x="false">
       <div class="modal-header">Empty Files detected</div>
@@ -89,6 +89,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { ArraySet } from '@/array_set';
 import Modal from '@/components/modal.vue';
+
+import { assert_not_null } from '../utils';
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -146,6 +148,7 @@ export default class FileUpload extends Vue {
     if (event.target === null) {
       throw new Error("Target is null");
     }
+    assert_not_null(event.dataTransfer);
     for (let file of event.dataTransfer.files) {
       this.add_or_update_file(file);
       this.check_for_emptiness(file);
@@ -187,6 +190,7 @@ export default class FileUpload extends Vue {
   on_file_hover(event: DragEvent) {
     event.stopPropagation();
     event.preventDefault();
+    assert_not_null(event.dataTransfer);
     event.dataTransfer.dropEffect = 'copy';
   }
 

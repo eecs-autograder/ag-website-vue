@@ -7,7 +7,7 @@ import SubmissionSelector from '@/components/project_admin/rerun_submissions/sub
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, wait_for_load } from '@/tests/utils';
+import { checkbox_is_checked, emitted, wait_for_load } from '@/tests/utils';
 
 let group: ag_cli.Group;
 let submissions: ag_cli.Submission[];
@@ -37,58 +37,60 @@ test('Member names and submissions displayed', async () => {
     expect(wrapper.findAll('.member-name').at(0).text()).toEqual(group.member_names[0] + ',');
     expect(wrapper.findAll('.member-name').at(1).text()).toEqual(group.member_names[1]);
 
-    expect(wrapper.findAll({ref: 'submission_checkbox'}).length).toEqual(submissions.length);
+    expect(
+        wrapper.findAllComponents({ref: 'submission_checkbox'}).length
+    ).toEqual(submissions.length);
 });
 
 test('Toggle submission', async () => {
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(0);
-    expect(wrapper.emitted().submissions_selected).toBeUndefined();
-    expect(wrapper.emitted().submissions_unselected).toBeUndefined();
+    expect(wrapper.emitted('submissions_selected')).toBeUndefined();
+    expect(wrapper.emitted('submissions_unselected')).toBeUndefined();
 
     wrapper.findAll('.checkbox').at(1).setChecked(true);
     expect(wrapper.vm.d_selected_submissions.data).toEqual([submissions[1]]);
-    expect(wrapper.emitted().submissions_selected).toEqual([[[submissions[1]]]]);
-    expect(wrapper.emitted().submissions_unselected).toBeUndefined();
+    expect(emitted(wrapper, 'submissions_selected')).toEqual([[[submissions[1]]]]);
+    expect(wrapper.emitted('submissions_unselected')).toBeUndefined();
 
     wrapper.findAll('.checkbox').at(2).setChecked(true);
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(2);
     expect(wrapper.vm.d_selected_submissions.has(submissions[1])).toBe(true);
     expect(wrapper.vm.d_selected_submissions.has(submissions[2])).toBe(true);
-    expect(wrapper.emitted().submissions_selected[1]).toEqual([[submissions[2]]]);
-    expect(wrapper.emitted().submissions_unselected).toBeUndefined();
+    expect(emitted(wrapper, 'submissions_selected')[1]).toEqual([[submissions[2]]]);
+    expect(wrapper.emitted('submissions_unselected')).toBeUndefined();
 
     wrapper.findAll('.checkbox').at(1).setChecked(false);
     expect(wrapper.vm.d_selected_submissions.data).toEqual([submissions[2]]);
-    expect(wrapper.emitted().submissions_selected.length).toEqual(2);
-    expect(wrapper.emitted().submissions_unselected).toEqual([[[submissions[1]]]]);
+    expect(emitted(wrapper, 'submissions_selected').length).toEqual(2);
+    expect(emitted(wrapper, 'submissions_unselected')).toEqual([[[submissions[1]]]]);
 });
 
 test('Select all and clear all', async () => {
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(0);
-    expect(wrapper.emitted().submissions_selected).toBeUndefined();
-    expect(wrapper.emitted().submissions_unselected).toBeUndefined();
+    expect(wrapper.emitted('submissions_selected')).toBeUndefined();
+    expect(wrapper.emitted('submissions_unselected')).toBeUndefined();
 
-    wrapper.find({ref: 'select_all_button'}).trigger('click');
+    wrapper.find('[data-testid=select_all_button]').trigger('click');
     await wrapper.vm.$nextTick();
     for (let checkbox of wrapper.findAll('.checkbox').wrappers) {
         expect(checkbox_is_checked(checkbox)).toBe(true);
     }
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(submissions.length);
-    expect(wrapper.emitted().submissions_selected).toEqual([[submissions]]);
-    expect(wrapper.emitted().submissions_unselected).toBeUndefined();
+    expect(emitted(wrapper, 'submissions_selected')).toEqual([[submissions]]);
+    expect(wrapper.emitted('submissions_unselected')).toBeUndefined();
 
-    wrapper.find({ref: 'clear_all_button'}).trigger('click');
+    wrapper.find('[data-testid=clear_all_button]').trigger('click');
     await wrapper.vm.$nextTick();
     for (let checkbox of wrapper.findAll('.checkbox').wrappers) {
         expect(checkbox_is_checked(checkbox)).toBe(false);
     }
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(0);
-    expect(wrapper.emitted().submissions_unselected).toEqual([[submissions]]);
-    expect(wrapper.emitted().submissions_selected).toEqual([[submissions]]);
+    expect(emitted(wrapper, 'submissions_unselected')).toEqual([[submissions]]);
+    expect(emitted(wrapper, 'submissions_selected')).toEqual([[submissions]]);
 });
 
 test('Remove group button', () => {
-    expect(wrapper.emitted().remove_group).toBeUndefined();
-    wrapper.find({ref: 'remove_group_button'}).trigger('click');
-    expect(wrapper.emitted().remove_group).toEqual([[group]]);
+    expect(wrapper.emitted('remove_group')).toBeUndefined();
+    wrapper.find('[data-testid=remove_group_button]').trigger('click');
+    expect(emitted(wrapper, 'remove_group')).toEqual([[group]]);
 });

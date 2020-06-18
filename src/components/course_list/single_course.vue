@@ -47,7 +47,7 @@
         <div class="form-field-wrapper">
           <label class="label"> Semester </label>
           <div class="dropdown">
-            <select id="semester"
+            <select data-testid="semester"
                     v-model="new_course_semester"
                     class="select">
               <option v-for="semester of semesters" :value="semester">{{semester}}</option>
@@ -92,7 +92,8 @@ import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { format_course_name, handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/error_handling';
+import { format_course_name } from '@/utils';
 import { is_not_empty, is_number, make_min_value_validator } from '@/validators';
 
 @Component({

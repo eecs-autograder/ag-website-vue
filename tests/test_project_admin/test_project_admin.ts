@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     Course,
@@ -9,16 +9,20 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
+import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
+import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
+import HandgradingSettings from '@/components/project_admin/handgrading_settings/handgrading_settings.vue';
+import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
+import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
 import ProjectAdmin from '@/components/project_admin/project_admin.vue';
+import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount, managed_shallow_mount } from '@/tests/setup';
 import { wait_for_load, wait_until } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let course = data_ut.make_course();
 
@@ -28,10 +32,6 @@ beforeEach(() => {
         Promise.resolve(data_ut.make_user_roles()));
 
     data_ut.set_global_current_course(course);
-});
-
-afterEach(() => {
-    sinon.restore();
 });
 
 // As child components of the ProjectAdmin component get merged, their methods that make api calls
@@ -64,22 +64,14 @@ describe('Changing tabs in project admin', () => {
         await wait_for_load(wrapper);
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'ProjectSettings'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'ProjectSettings'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'InstructorFiles'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'ExpectedStudentFiles'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'AGSuites'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'MutationSuites'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'EditGroups'}).exists()).toBe(false);
-        expect(wrapper.find({name: 'HandgradingSettings'}).exists()).toBe(false);
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
+        expect(wrapper.findComponent({name: 'InstructorFiles'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'ExpectedStudentFiles'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'AGSuites'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'MutationSuites'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'EditGroups'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'HandgradingSettings'}).exists()).toBe(false);
     });
 
     test('Requested tab on load', async () => {
@@ -100,114 +92,112 @@ describe('Changing tabs in project admin', () => {
         });
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'HandgradingSettings'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'HandgradingSettings'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'HandgradingSettings'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgradingSettings'}).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('handgrading');
-        expect(wrapper.find({name: 'HandgradingSettings'}).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(HandgradingSettings).vm.$props.project).toEqual(project);
     });
 
     test('Settings loaded initially, select another tab and then settings again', async () => {
         expect(
-            await wait_until(wrapper, w => w.find({name: 'ProjectSettings'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'ProjectSettings'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'ProjectSettings'}).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(ProjectSettings).vm.$props.project).toEqual(project);
 
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(1).trigger('click');
 
         expect(
-            await wait_until(wrapper, w => w.find({name: 'InstructorFiles'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'InstructorFiles'}).exists())
         ).toBe(true);
         expect(wrapper.vm.current_tab).toEqual('instructor_files');
-        expect(wrapper.find({name: 'InstructorFiles'}).isVisible()).toBe(true);
-        expect(wrapper.find({name: 'ProjectSettings'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'InstructorFiles'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'ProjectSettings'}).element).not.toBeVisible();
         expect(router_replace.calledOnce).toBe(true);
 
-        tabs.at(0).trigger('click');
-        expect(
-            await wait_until(wrapper, w => w.find({name: 'ProjectSettings'}).isVisible())
-        ).toBe(true);
+        await tabs.at(0).trigger('click');
+        expect(wrapper.findComponent(ProjectSettings).element).toBeVisible();
         expect(wrapper.vm.current_tab).toEqual('settings');
         expect(router_replace.secondCall.calledWith(
             {query: {current_tab: 'settings'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'InstructorFiles'}).isVisible()).toBe(false);
+        expect(wrapper.findComponent({name: 'InstructorFiles'}).element).not.toBeVisible();
     });
 
     test('Clicking on Instructor Files tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(1).trigger('click');
         expect(
-            await wait_until(wrapper, w => w.find({name: 'InstructorFiles'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'InstructorFiles'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'InstructorFiles'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'InstructorFiles'}).element).toBeVisible();
 
         expect(wrapper.vm.current_tab).toEqual('instructor_files');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'instructor_files'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'InstructorFiles'}).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(InstructorFiles).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Expected Student Files tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(2).trigger('click');
         expect(
-            await wait_until(wrapper, w => w.find({name: 'ExpectedStudentFiles'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'ExpectedStudentFiles'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'ExpectedStudentFiles'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'ExpectedStudentFiles'}).element).toBeVisible();
 
         expect(wrapper.vm.current_tab).toEqual('expected_student_files');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'expected_student_files'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'ExpectedStudentFiles'}).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(ExpectedStudentFiles).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Test Cases tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(3).trigger('click');
         expect(
-            await wait_until(wrapper, w => w.find({name: 'AGSuites'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'AGSuites'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'AGSuites'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'AGSuites'}).element).toBeVisible();
 
         expect(wrapper.vm.current_tab).toEqual('test_cases');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'test_cases'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'AGSuites'}).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(AGSuites).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Mutation Testing tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(4).trigger('click');
         expect(
-            await wait_until(wrapper, w => w.find({name: 'MutationSuites'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'MutationSuites'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'MutationSuites'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'MutationSuites'}).element).toBeVisible();
 
         expect(wrapper.vm.current_tab).toEqual('mutation_testing');
         expect(router_replace.firstCall.calledWith(
         {query: {current_tab: 'mutation_testing'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'MutationSuites'}).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(MutationSuites).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Edit Groups tab', async () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(5).trigger('click');
         expect(
-            await wait_until(wrapper, w => w.find({name: 'EditGroups'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'EditGroups'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'EditGroups'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'EditGroups'}).element).toBeVisible();
 
         expect(wrapper.vm.current_tab).toEqual('edit_groups');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'edit_groups'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'EditGroups'}).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(EditGroups).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Download Grades tab', async () => {
@@ -236,15 +226,15 @@ describe('Changing tabs in project admin', () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(8).trigger('click');
         expect(
-            await wait_until(wrapper, w => w.find({name: 'HandgradingSettings'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'HandgradingSettings'}).exists())
         ).toBe(true);
-        expect(wrapper.find({name: 'HandgradingSettings'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'HandgradingSettings'}).element).toBeVisible();
 
         expect(wrapper.vm.current_tab).toEqual('handgrading');
         expect(router_replace.firstCall.calledWith(
         {query: {current_tab: 'handgrading'}})
         ).toBe(true);
-        expect(wrapper.find({name: 'HandgradingSettings'}).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(HandgradingSettings).vm.$props.project).toEqual(project);
     });
 });
 
@@ -265,13 +255,13 @@ test('Project observer', async () => {
 
     let updated = new Project(project);
     updated.name = 'A new name';
-    expect(wrapper.vm.project!.name).not.toEqual(updated.name);
+    expect(wrapper.vm.d_project!.name).not.toEqual(updated.name);
     Project.notify_project_changed(updated);
-    expect(wrapper.vm.project!.name).toEqual(updated.name);
+    expect(wrapper.vm.d_project!.name).toEqual(updated.name);
 
     let other_project = data_ut.make_project(course.pk);
     Project.notify_project_changed(other_project);
-    expect(wrapper.vm.project).toEqual(updated);
+    expect(wrapper.vm.d_project).toEqual(updated);
 });
 
 describe('InstructorFileObserver tests', () => {
@@ -310,20 +300,20 @@ describe('InstructorFileObserver tests', () => {
         InstructorFile.notify_instructor_file_created(new_file);
 
         instructor_files.unshift(new_file);
-        expect(wrapper.vm.project!.instructor_files).toEqual(instructor_files);
+        expect(wrapper.vm.d_project?.instructor_files).toEqual(instructor_files);
     });
 
     test('Instructor file deleted', () => {
         InstructorFile.notify_instructor_file_deleted(instructor_files[1]);
         instructor_files.splice(1, 1);
-        expect(wrapper.vm.project!.instructor_files).toEqual(instructor_files);
+        expect(wrapper.vm.d_project?.instructor_files).toEqual(instructor_files);
     });
 
     test('Instructor file renamed', () => {
         let old_name = instructor_files[0].name;
         instructor_files[0].name = 'file4';
         InstructorFile.notify_instructor_file_renamed(instructor_files[0], old_name);
-        expect(wrapper.vm.project!.instructor_files).toEqual([
+        expect(wrapper.vm.d_project?.instructor_files).toEqual([
             instructor_files[1],
             instructor_files[2],
             instructor_files[0],
@@ -367,13 +357,13 @@ describe('ExpectedStudentFileObserver tests', () => {
         ExpectedStudentFile.notify_expected_student_file_created(new_file);
 
         expected_student_files.unshift(new_file);
-        expect(wrapper.vm.project!.expected_student_files).toEqual(expected_student_files);
+        expect(wrapper.vm.d_project?.expected_student_files).toEqual(expected_student_files);
     });
 
     test('Expected file changed', () => {
         expected_student_files[0].pattern = 'file4';
         ExpectedStudentFile.notify_expected_student_file_changed(expected_student_files[0]);
-        expect(wrapper.vm.project!.expected_student_files).toEqual([
+        expect(wrapper.vm.d_project?.expected_student_files).toEqual([
             expected_student_files[1],
             expected_student_files[2],
             expected_student_files[0],
@@ -383,7 +373,7 @@ describe('ExpectedStudentFileObserver tests', () => {
     test('Expected file deleted', () => {
         ExpectedStudentFile.notify_expected_student_file_deleted(expected_student_files[1]);
         expected_student_files.splice(1, 1);
-        expect(wrapper.vm.project!.expected_student_files).toEqual(expected_student_files);
+        expect(wrapper.vm.d_project?.expected_student_files).toEqual(expected_student_files);
     });
 });
 
@@ -416,5 +406,5 @@ test('Observer updates from other project ignored', async () => {
     ExpectedStudentFile.notify_expected_student_file_changed(expected_student_file);
     ExpectedStudentFile.notify_expected_student_file_deleted(expected_student_file);
 
-    expect(wrapper.vm.project).toEqual(project);
+    expect(wrapper.vm.d_project).toEqual(project);
 });

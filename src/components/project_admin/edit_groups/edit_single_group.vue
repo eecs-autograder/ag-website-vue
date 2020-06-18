@@ -1,5 +1,5 @@
 <template>
-  <div id="edit-single-group-component">
+  <div class="edit-single-group-component">
     <div class="created-at">
       <span class="timestamp-label">Created: </span>
       <span class="timestamp">{{format_datetime(d_group.created_at)}}</span>
@@ -13,14 +13,14 @@
                         @form_validity_changed="d_edit_group_form_is_valid = $event"
                         :ignore_group_size_limits="true">
       <template v-slot:footer>
-        <div id="datetime-picker-container" class="clearable-datetime-picker">
+        <div class="datetime-picker-container clearable-datetime-picker">
           <div class="label">Extension</div>
-          <div id="extension" class="datetime-input"
+          <div data-testid="extension" class="datetime-input"
               @click="$refs.extension_datetime_picker.toggle_visibility()">
             {{format_datetime(d_group.extended_due_date)}}
             <i class="far fa-calendar-alt"></i>
           </div>
-          <button type="button" id="revoke-extension"
+          <button type="button" data-testid="revoke_extension"
                   class="clear-button"
                   @click.stop="d_group.extended_due_date = null"
                   :disabled="d_group.extended_due_date === null">
@@ -60,7 +60,7 @@
       <button type="button"
               class="delete-button"
               @click="d_show_delete_group_modal = true"
-              ref="show_delete_modal_button">
+              data-testid="show_delete_modal_button">
         Delete
       </button>
     </div>
@@ -82,7 +82,7 @@
                 class="red-button"
                 :disabled="d_deleting"
                 @click="delete_group"
-                ref="delete_group_button">
+                data-testid="delete_group_button">
           Delete
         </button>
         <button type="button"
@@ -109,8 +109,8 @@ import Modal from '@/components/modal.vue';
 import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { make_error_handler_func } from '@/error_handling';
-import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
+import { assert_not_null, deep_copy, format_datetime, toggle } from '@/utils';
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
 @Component({
@@ -141,18 +141,7 @@ export default class EditSingleGroup extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  d_group: Group = new Group({
-    pk: 0,
-    project: 0,
-    extended_due_date: null,
-    member_names: [],
-    bonus_submissions_remaining: 0,
-    late_days_used: {},
-    num_submissions: 0,
-    num_submits_towards_limit: 0,
-    created_at: "",
-    last_modified: ""
-  });
+  d_group: Group | null = null;
 
   d_saving = false;
   d_edit_group_form_is_valid = true;
@@ -171,6 +160,7 @@ export default class EditSingleGroup extends Vue {
 
   @handle_api_errors_async(handle_save_group_error)
   async update_group() {
+    assert_not_null(this.d_group);
     try {
       this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
@@ -184,6 +174,7 @@ export default class EditSingleGroup extends Vue {
   @handle_api_errors_async(make_error_handler_func('delete_group_api_errors'))
   async delete_group() {
     return toggle(this, 'd_deleting', async () => {
+        assert_not_null(this.d_group);
         await this.d_group.pseudo_delete();
         this.d_show_delete_group_modal = false;
     });
@@ -206,7 +197,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
 @import '@/styles/modal.scss';
 @import '@/styles/components/datetime.scss';
 
-#edit-single-group-component {
+.edit-single-group-component {
   padding-top: 1rem;
 }
 
@@ -219,7 +210,7 @@ function handle_save_group_error(component: EditSingleGroup, error: unknown) {
   }
 }
 
-#datetime-picker-container {
+.datetime-picker-container {
   padding-top: 1rem;
 }
 

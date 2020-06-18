@@ -7,7 +7,7 @@
       <button type="button"
               class="flat-white-button"
               @click="d_show_create_course_modal = true"
-              ref="show_create_course_modal_button">
+              data-testid="show_create_course_modal_button">
         <i class="fas fa-plus plus"></i> New Course
       </button>
 
@@ -24,13 +24,13 @@
           <APIErrors ref="create_course_api_errors"></APIErrors>
           <div class="modal-button-footer">
             <button type="submit"
-                    ref="create_course_button"
+                    data-testid="create_course_button"
                     class="save-button"
                     :disabled="!d_new_course_form_is_valid || d_creating_course">
               Save
             </button>
             <button type="button"
-                    ref="cancel_create_course_button"
+                    data-testid="cancel_create_course_button"
                     class="white-button"
                     @click="d_show_create_course_modal = false"
                     :disabled="d_creating_course">
@@ -80,9 +80,7 @@ import {
   make_error_handler_func,
 } from '@/error_handling';
 import {
-  array_add_unique,
-  array_get_unique,
-  array_has_unique,
+  assert_not_null,
   toggle,
 } from '@/utils';
 
@@ -110,8 +108,7 @@ export default class CourseList extends Vue implements CourseObserver {
   globals!: GlobalData;
   d_globals = this.globals;
 
-  all_courses: AllCourses | null = null;
-  courses_by_term: TermCourses[] = [];
+  d_all_courses: AllCourses | null = null;
   d_can_create_courses = false;
   d_loading = true;
 
@@ -121,12 +118,12 @@ export default class CourseList extends Vue implements CourseObserver {
 
   @handle_global_errors_async
   async created() {
-    await this.get_and_sort_courses();
+    this.d_all_courses = await Course.get_courses_for_user(this.d_globals.current_user!);
     await this.d_globals.set_current_course(null);
     this.d_can_create_courses = await User.current_can_create_courses();
     Course.subscribe(this);
     this.d_loading = false;
-}
+  }
 
   beforeDestroy() {
     Course.unsubscribe(this);
@@ -141,68 +138,52 @@ export default class CourseList extends Vue implements CourseObserver {
   }
 
   is_admin(course: Course) {
-    return array_has_unique(
-      this.all_courses!.courses_is_admin_for,
-      course,
-      (course_a: Course, course_b: Course) => {
-        return course_a.name === course_b.name
-               && course_a.semester === course_b.semester
-               && course_a.year === course_b.year;
-      }
-    );
+    assert_not_null(this.d_all_courses);
+    return this.d_all_courses.courses_is_admin_for.find(
+      item => item.pk === course.pk
+    ) !== undefined;
   }
 
-  sort_into_terms(courses: Course[]) {
-    for (let course of courses) {
-      let current_term: Term = {semester: course.semester, year: course.year};
-      let term_exists = array_has_unique(
-        this.courses_by_term, current_term,
-        (item: TermCourses, term: Term) => terms_equal(item.term, term)
-      );
-      if (term_exists) {
-        let term_courses: TermCourses = array_get_unique(
-          this.courses_by_term, current_term,
-          (item: TermCourses, term: Term) => terms_equal(item.term, term)
-        );
-        array_add_unique(
-          term_courses.course_list, course, (first, second) => first.pk === second.pk);
-      }
-      else {
-        array_add_unique(
-          this.courses_by_term,
-          {term: current_term, course_list: [course]},
-          (first: TermCourses, second: TermCourses) => {
-            return terms_equal(first.term, second.term);
-          }
-        );
-      }
+  get courses_by_term(): TermCourses[] {
+    if (this.d_all_courses === null) {
+      // istanbul ignore next
+      return [];
     }
-  }
 
-  async get_and_sort_courses() {
-    this.all_courses = await Course.get_courses_for_user(this.d_globals.current_user!);
-    for (let [role, courses] of Object.entries(this.all_courses)) {
-      this.sort_into_terms(courses);
+    let result: TermCourses[] = [];
+    for (let course_list of Object.values(this.d_all_courses)) {
+      for (let course of course_list) {
+        let current_term: Term = {semester: course.semester, year: course.year};
+
+        let term_courses = result.find(item => terms_equal(item.term, current_term));
+        if (term_courses === undefined) {
+          term_courses = {term: current_term, course_list: []};
+          result.push(term_courses);
+        }
+
+        let has_course = term_courses.course_list.find(item => item.pk === course.pk) !== undefined;
+        if (!has_course) {
+          term_courses.course_list.push(course);
+        }
+      }
     }
-    this.courses_by_term.sort(term_descending);
-    for (let term_courses of this.courses_by_term) {
+
+    result.sort(term_descending);
+    for (let term_courses of result) {
       term_courses.course_list.sort((course_a: Course, course_b: Course) =>
         course_a.name.localeCompare(course_b.name, undefined, {numeric: true})
       );
     }
+
+    return result;
   }
 
   update_course_changed(course: Course): void { }
 
   update_course_created(course: Course): void {
-    this.all_courses!.courses_is_admin_for.push(course);
-    this.sort_into_terms([course]);
-    this.courses_by_term.sort(term_descending);
-    let index = this.courses_by_term.findIndex((term) => term.term.semester === course.semester
-                                                         && term.term.year === course.year);
-    this.courses_by_term[index].course_list.sort((course_a: Course, course_b: Course) =>
-      course_a.name.localeCompare(course_b.name, undefined, {numeric: true})
-    );
+    if (this.d_all_courses !== null) {
+      this.d_all_courses.courses_is_admin_for.push(course);
+    }
   }
 }
 

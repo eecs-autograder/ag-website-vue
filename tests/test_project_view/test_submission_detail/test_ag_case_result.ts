@@ -779,7 +779,7 @@ describe('AGTestCaseResult tests concerning props', () => {
             }
         });
 
-        expect(wrapper.findAll({ref: 'ag_test_command_panel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({ref: 'ag_test_command_panel'}).length).toEqual(2);
         expect(wrapper.vm.command_result_correctness(
             wrapper.vm.ag_test_case_result.ag_test_command_results[0]
         )).toEqual(CorrectnessLevel.not_available);

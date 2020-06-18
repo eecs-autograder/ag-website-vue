@@ -2,7 +2,7 @@
   <div>
     <div class="invitation-received">
       <div class="invitation-header">
-        <b>{{d_invitation.invitation_creator}}</b> has invited you to work together!
+        <b>{{d_invitation.sender_username}}</b> has invited you to work together!
       </div>
       <div class="invitation-body">
         <table class="member-table">
@@ -18,11 +18,11 @@
       </div>
 
       <div class="invitation-footer">
-        <button ref="accept_invitation_button"
+        <button data-testid="accept_invitation_button"
                 class="green-button"
                 :disabled="already_accepted || d_accepting"
                 @click="d_show_confirm_accept_invitation_modal = true"> Accept </button>
-        <button ref="reject_invitation_button"
+        <button data-testid="reject_invitation_button"
                 class="orange-button"
                 @click="d_show_confirm_reject_invitation_modal = true"> Reject </button>
       </div>
@@ -43,11 +43,11 @@
       </ul>
       <APIErrors ref="accept_invitation_api_errors"></APIErrors>
       <div class="modal-button-footer">
-        <button ref="confirm_accept_button"
+        <button data-testid="confirm_accept_button"
                 class="green-button"
                 :disabled="d_accepting"
                 @click="accept_invitation"> Accept </button>
-        <button ref="cancel_accept_button"
+        <button data-testid="cancel_accept_button"
                 class="white-button"
                 @click="d_show_confirm_accept_invitation_modal = false">
           Cancel (Do Nothing)
@@ -73,11 +73,11 @@
         </div>
         <APIErrors ref="reject_invitation_api_errors"></APIErrors>
         <div class="modal-button-footer">
-          <button ref="confirm_reject_button"
+          <button data-testid="confirm_reject_button"
                   class="orange-button"
                   :disabled="d_rejecting"
                   @click="reject_invitation"> Reject </button>
-          <button ref="cancel_reject_button"
+          <button data-testid="cancel_reject_button"
                   class="white-button"
                   @click="d_show_confirm_reject_invitation_modal = false">
             Cancel (Do Nothing)
@@ -97,7 +97,8 @@ import { Group, GroupInvitation, Project, User } from 'ag-client-typescript';
 import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import { deep_copy, handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/error_handling';
+import { deep_copy } from '@/utils';
 
 @Component({
   components: {
@@ -133,10 +134,10 @@ export default class InvitationReceived extends Vue {
   }
 
   member_acceptance_status(username: string) {
-    if (username === this.d_invitation!.invitation_creator) {
+    if (username === this.d_invitation!.sender_username) {
         return 'Sender';
     }
-    return this.d_invitation!.invitees_who_accepted.findIndex(
+    return this.d_invitation!.recipients_who_accepted.findIndex(
        (name: string) => username === name) !== -1 ? 'Accepted' : 'Pending';
   }
 
@@ -156,15 +157,15 @@ export default class InvitationReceived extends Vue {
   }
 
   get already_accepted() {
-    let index = this.d_invitation!.invitees_who_accepted.findIndex(
+    let index = this.d_invitation!.recipients_who_accepted.findIndex(
       (invitee: string) => invitee === this.d_globals.current_user!.username
     );
     return index !== -1;
   }
 
   get other_group_members() {
-    let other_invitees = [this.d_invitation!.invitation_creator];
-    this.d_invitation!.invited_usernames.forEach((invitee: string) => {
+    let other_invitees = [this.d_invitation!.sender_username];
+    this.d_invitation!.recipient_usernames.forEach((invitee: string) => {
       if (invitee !== this.d_globals.current_user!.username) {
         other_invitees.push(invitee);
       }

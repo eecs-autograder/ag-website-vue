@@ -34,11 +34,10 @@ import APIErrors from "@/components/api_errors.vue";
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { make_error_handler_func } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import {
   deep_copy,
   format_datetime_short,
-  handle_api_errors_async,
   safe_assign,
   toggle
 } from '@/utils';

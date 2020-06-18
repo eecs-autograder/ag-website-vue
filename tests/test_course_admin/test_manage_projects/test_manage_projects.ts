@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, Project, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -6,15 +6,11 @@ import * as sinon from 'sinon';
 import APIErrors from '@/components/api_errors.vue';
 import ManageProjects from '@/components/course_admin/manage_projects/manage_projects.vue';
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { find_by_name, set_validated_input_text, wait_until } from '@/tests/utils';
+import { find_by_name, set_validated_input_text, validated_input_is_valid, wait_until } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('Manage projects tests', () => {
     let component: ManageProjects;
@@ -61,36 +57,34 @@ describe('Manage projects tests', () => {
         expect(wrapper.vm.projects[0]).toEqual(project_1);
         expect(wrapper.vm.projects[1]).toEqual(project_2);
 
-        let rendered_projects = wrapper.findAll({name: 'SingleProject'});
+        let rendered_projects = wrapper.findAllComponents({name: 'SingleProject'});
         expect((<SingleProject> rendered_projects.at(0).vm).project).toEqual(project_1);
         expect((<SingleProject> rendered_projects.at(1).vm).project).toEqual(project_2);
     });
 
     test('New project name cannot be an empty string', async () => {
-        let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
-        expect(validated_input.is_valid).toBe(false);
+        let name_input = wrapper.findComponent({ref: "new_project_name"});
+        expect(validated_input_is_valid(name_input)).toBe(false);
 
-        set_validated_input_text(wrapper.find({ref: 'new_project_name'}), "   ");
-        expect(validated_input.is_valid).toBe(false);
-
-        await wrapper.vm.$nextTick();
-        expect(wrapper.find('.add-project-button').is('[disabled]')).toBe(true);
+        await set_validated_input_text(name_input, "   ");
+        expect(validated_input_is_valid(name_input)).toBe(false);
+        expect(wrapper.find('.add-project-button').element).toBeDisabled();
     });
 
     test('A project can be created and then displayed in the list of projects', async () => {
         expect(wrapper.vm.projects.length).toEqual(2);
 
-        let validated_input = <ValidatedInput> wrapper.find({ref: "new_project_name"}).vm;
-        expect(validated_input.is_valid).toBe(false);
+        let name_input = wrapper.findComponent({ref: "new_project_name"});
+        expect(validated_input_is_valid(name_input)).toBe(false);
 
-        set_validated_input_text(wrapper.find({ref: 'new_project_name'}), new_project.name);
-        expect(validated_input.is_valid).toBe(true);
+        await set_validated_input_text(name_input, new_project.name);
+        expect(validated_input_is_valid(name_input)).toBe(true);
 
         let create_project_stub = sinon.stub(Project, 'create').callsFake(() => {
             Project.notify_project_created(new_project);
             return Promise.resolve(new_project);
         });
-        wrapper.find({ref: 'new_project_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'new_project_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(create_project_stub.firstCall.calledWith(
@@ -103,8 +97,8 @@ describe('Manage projects tests', () => {
     });
 
     test('Create project API errors handled', async () => {
-        set_validated_input_text(wrapper.find({ref: "new_project_name"}), project_1.name);
-        await wrapper.vm.$nextTick();
+        await set_validated_input_text(
+            wrapper.findComponent({ref: "new_project_name"}), project_1.name);
 
         let create_project_stub = sinon.stub(Project, 'create').returns(
             Promise.reject(
@@ -114,7 +108,7 @@ describe('Manage projects tests', () => {
             )
         );
 
-        wrapper.find({ref: 'new_project_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'new_project_form'}).trigger('submit');
         expect(await wait_until(wrapper, w => !w.vm.d_adding_project)).toBe(true);
 
         expect(create_project_stub.calledOnce).toBe(true);
@@ -123,25 +117,25 @@ describe('Manage projects tests', () => {
     });
 
     test('A project can be cloned to the current course', async () => {
-        expect(wrapper.findAll({name: 'SingleProject'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SingleProject'}).length).toEqual(2);
 
         let clone = data_ut.make_project(current_course.pk, {name: 'Cloney'});
         Project.notify_project_created(clone);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'SingleProject'}).length).toEqual(3);
+        expect(wrapper.findAllComponents({name: 'SingleProject'}).length).toEqual(3);
         expect(wrapper.vm.projects[0]).toEqual(clone);
         expect(wrapper.vm.projects[1]).toEqual(project_1);
         expect(wrapper.vm.projects[2]).toEqual(project_2);
     });
 
     test('Cloned project comes from different course', async () => {
-        expect(wrapper.findAll({name: 'SingleProject'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SingleProject'}).length).toEqual(2);
 
         let clone = data_ut.make_project(another_course.pk, {name: 'Cloney'});
         Project.notify_project_created(clone);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'SingleProject'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SingleProject'}).length).toEqual(2);
     });
 });

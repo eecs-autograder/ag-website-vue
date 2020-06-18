@@ -6,11 +6,8 @@ import Roster from '@/components/course_admin/roster/roster.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
-import { get_validated_input_text, set_validated_input_text } from '@/tests/utils';
+import { emitted, get_validated_input_text, set_validated_input_text } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('Roster tests', () => {
     let wrapper: Wrapper<Roster>;
@@ -32,7 +29,6 @@ describe('Roster tests', () => {
             username: "coolmom@umich.edu",
             first_name: "Amy",
             last_name: "Poehler",
-            email: "coolmom@umich.edu",
             is_superuser: true
         });
         user_2 = new User({
@@ -40,7 +36,6 @@ describe('Roster tests', () => {
             username: "amandaplease@umich.edu",
             first_name: "Amanda",
             last_name: "Bynes",
-            email: "amandaplease@umich.edu",
             is_superuser: true
         });
         user_3 = new User({
@@ -48,7 +43,6 @@ describe('Roster tests', () => {
             username: "worldsbestboss@umich.edu",
             first_name: "Steve",
             last_name: "Carell",
-            email: "worldsbestbo$$@umich.edu",
             is_superuser: true
         });
         user_4 = new User({
@@ -56,7 +50,6 @@ describe('Roster tests', () => {
             username: "freshPrince@umich.edu",
             first_name: "Will",
             last_name: "Smith",
-            email: "freshPrince@umich.edu",
             is_superuser: true
         });
         new_user_1 = new User({
@@ -64,7 +57,6 @@ describe('Roster tests', () => {
             username: "letitsnow@umich.edu",
             first_name: "Brittany",
             last_name: "Snow",
-            email: "letitsnow@umich.edu",
             is_superuser: true
         });
         new_user_2 = new User({
@@ -72,7 +64,6 @@ describe('Roster tests', () => {
             username: "sevenEleven@umich.edu",
             first_name: "Millie",
             last_name: "Brown",
-            email: "sevenEleven@umich.edu",
             is_superuser: true
         });
 
@@ -90,7 +81,6 @@ describe('Roster tests', () => {
         validated_input_component = <ValidatedInput> wrapper.find('#add-users-input').vm;
         roster_form_component = <ValidatedForm> wrapper.find('#add-users-form').vm;
         roster_form_wrapper = <Wrapper<ValidatedForm>> wrapper.find('#add-users-form');
-        // validated_input.find('#textarea').trigger('input');
     });
 
     afterEach(() => {
@@ -121,8 +111,8 @@ describe('Roster tests', () => {
 
         expect(roster.d_roster.length).toEqual(4);
 
-        expect(wrapper.emitted().remove_user.length).toBe(1);
-        expect(wrapper.emitted().remove_user[0][0]).toEqual([user_1]);
+        expect(emitted(wrapper, 'remove_user').length).toBe(1);
+        expect(emitted(wrapper, 'remove_user')[0][0]).toEqual([user_1]);
     });
 
     test('The d_roster is updated when the value of the roster prop changes in the parent',
@@ -301,7 +291,7 @@ describe('Roster tests', () => {
          roster_form_wrapper.trigger('submit');
          await roster.$nextTick();
 
-         expect(wrapper.emitted().add_users.length).toBe(1);
+         expect(emitted(wrapper, 'add_users').length).toBe(1);
     });
 
     test('Validator function exposes addresses that do not adhere to the format specified ' +
@@ -369,14 +359,12 @@ describe('Roster tests', () => {
         expect(validated_input_component.d_input_value).toBe(username_input);
         expect(validated_input_component.d_error_msg).toContain("hollyflax");
 
-        let add_users_button = wrapper.find({ref: 'add_users_button'});
-        expect(add_users_button.is('[disabled]')).toBe(true);
-        expect(wrapper.find({ref: 'replace_users_button'}).is('[disabled]')).toBe(true);
+        let add_users_button = wrapper.find('[data-testid=add_users_button]');
+        expect(add_users_button.element).toBeDisabled();
+        expect(wrapper.find('[data-testid=replace_users_button]').element).toBeDisabled();
         expect(roster.d_form_is_valid).toEqual(false);
 
-        roster_form_wrapper.trigger('submit');
-        await roster.$nextTick();
-
+        await roster_form_wrapper.trigger('submit');
         expect(wrapper.emitted('add_users')).toBeUndefined();
     });
 
@@ -402,12 +390,12 @@ describe('Roster tests', () => {
 
         let expected_usernames = username_input.split(/\s+|\,/g).filter(
             username => username.trim() !== '');
-        expect(wrapper.emitted().add_users[0][0]).toEqual(expected_usernames);
+        expect(emitted(wrapper, 'add_users')[0][0]).toEqual(expected_usernames);
         expect(get_validated_input_text(validated_input)).toEqual(username_input);
     });
 
     test('Replace users button hidden by default', async () => {
-        expect(wrapper.find({ref: 'replace_users_button'}).exists()).toBe(false);
+        expect(wrapper.find('[data-testid=replace_users_button]').exists()).toBe(false);
     });
 
     test('Clicking replace users button emits event', async () => {
@@ -422,11 +410,10 @@ describe('Roster tests', () => {
         await wrapper.vm.$nextTick();
         expect(validated_input_component.is_valid).toBe(true);
 
-        expect(wrapper.find({ref: 'replace_users_button'}).is('[disabled]')).toBe(false);
-        wrapper.find({ref: 'replace_users_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        expect(wrapper.find('[data-testid=replace_users_button]').element).not.toBeDisabled();
+        await wrapper.find('[data-testid=replace_users_button]').trigger('click');
 
-        expect(wrapper.emitted().replace_users[0][0]).toEqual(usernames);
+        expect(emitted(wrapper, 'replace_users')[0][0]).toEqual(usernames);
 
         expect(get_validated_input_text(validated_input)).toEqual(usernames.join('\n'));
     });
@@ -434,12 +421,12 @@ describe('Roster tests', () => {
     test('Reset form', async () => {
         set_validated_input_text(validated_input, 'user@user.com');
         await wrapper.vm.$nextTick();
-        let add_users_button = wrapper.find({ref: 'add_users_button'});
-        expect(add_users_button.is('[disabled]')).toBe(false);
+        let add_users_button = wrapper.find('[data-testid=add_users_button]');
+        expect(add_users_button.element).not.toBeDisabled();
 
         wrapper.vm.reset_form();
         await wrapper.vm.$nextTick();
         expect(get_validated_input_text(validated_input)).toEqual('');
-        expect(add_users_button.is('[disabled]')).toBe(true);
+        expect(add_users_button.element).toBeDisabled();
     });
 });

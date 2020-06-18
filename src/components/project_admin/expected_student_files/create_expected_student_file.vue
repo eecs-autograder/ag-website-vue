@@ -1,7 +1,7 @@
 <template>
   <div id="create-expected-student-file-component">
       <expected-student-file-form ref="form"
-                                  @on_submit="create_expected_student_file($event)"
+                                  @submit="create_expected_student_file($event)"
                                   @on_form_validity_changed="pattern_is_valid = $event">
         <template slot="form_footer">
           <APIErrors ref="api_errors"> </APIErrors>
@@ -21,7 +21,7 @@ import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-cli
 
 import APIErrors from '@/components/api_errors.vue';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
-import { handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/error_handling';
 
 @Component({
   components: {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="panel" :class="{'active': suite_is_active}"
+    <div class="panel level-0" :class="{'active': suite_is_active}"
          @click="update_ag_test_suite_panel_when_clicked()">
       <div class="text">
         <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
@@ -138,8 +138,7 @@ import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue'
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { is_not_empty } from '@/validators';
 
 export class NewCommandFields {
@@ -351,6 +350,10 @@ function handle_create_ag_test_case_error(component: AGSuitePanel, error: unknow
 
 .add-ag-test-command-button .fa-plus {
   padding-right: .25rem;
+}
+
+.handle {
+  cursor: grabbing;
 }
 
 .duplicate-ag-test-command-msg {

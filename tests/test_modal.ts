@@ -2,8 +2,10 @@ import { mount } from '@vue/test-utils';
 
 import Modal from '@/components/modal.vue';
 
+import { emitted } from './utils';
+
 describe('Modal.vue', () => {
-    test('Open and close modal using external boolean', () => {
+    test('Open and close modal using external boolean', async () => {
         const component = {
             template:  `<modal ref="modal"
                                v-if="show_modal"
@@ -20,20 +22,24 @@ describe('Modal.vue', () => {
         };
 
         const wrapper = mount(component);
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
 
         wrapper.setData({show_modal: true});
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(true);
         wrapper.setData({show_modal: true});
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(true);
 
         wrapper.setData({show_modal: false});
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(false);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
         wrapper.setData({show_modal: false});
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(false);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
     });
 
-    test('Ensure content is only displayed if external boolean is true', () => {
+    test('Ensure content is only displayed if external boolean is true', async () => {
         const component = {
             template:  `<modal ref="modal"
                                v-if="show_modal"
@@ -50,26 +56,27 @@ describe('Modal.vue', () => {
         };
         const wrapper = mount(component);
 
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
         expect(wrapper.find('.modal-mask').exists()).toBe(false);
         expect(wrapper.find('.modal-container').exists()).toBe(false);
         expect(wrapper.find('.close-button').exists()).toBe(false);
 
         wrapper.setData({show_modal: true});
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(true);
-        expect(wrapper.find('.modal-mask').isVisible()).toBe(true);
-        expect(wrapper.find('.modal-container').isVisible()).toBe(true);
-        expect(wrapper.find('.close-button').isVisible()).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(true);
+        expect(wrapper.find('.modal-mask').element).toBeVisible();
+        expect(wrapper.find('.modal-container').element).toBeVisible();
+        expect(wrapper.find('.close-button').element).toBeVisible();
     });
 
-    test('Modal emits "close" on click of x when include_closing_x is true', () => {
+    test('Modal emits "close" on click of x when include_closing_x is true', async () => {
         const wrapper = mount(Modal);
-        expect(wrapper.emitted().close).toBeUndefined();
+        expect(wrapper.emitted('close')).toBeUndefined();
 
         let close_button = wrapper.find('.close-button');
-        close_button.trigger('click');
+        await close_button.trigger('click');
 
-        expect(wrapper.emitted('close').length).toBe(1);
+        expect(emitted(wrapper, 'close').length).toBe(1);
     });
 
     test('Modal emits "close" when clicking outside the modal and ' +
@@ -94,10 +101,10 @@ describe('Modal.vue', () => {
         expect(wrapper.emitted('close')).toBeUndefined();
 
         outside_modal.trigger('click');
-        expect(wrapper.emitted('close').length).toEqual(1);
+        expect(emitted(wrapper, 'close').length).toEqual(1);
     });
 
-    test('Modal container contains content inside parent\'s <modal></modal> tags', () => {
+    test('Modal container contains content inside parent\'s <modal></modal> tags', async () => {
         const component = {
             template:  `<modal ref="modal"
                                v-if="show_modal"
@@ -116,6 +123,7 @@ describe('Modal.vue', () => {
         const wrapper = mount(component);
 
         wrapper.setData({show_modal: true});
+        await wrapper.vm.$nextTick();
         const modal_container = wrapper.find('.modal-container');
         expect(modal_container.text()).toContain("Look at me! Text inside the modal!");
     });
@@ -154,7 +162,7 @@ describe('Modal.vue', () => {
 
     test('Using the emitted "close" event handler to toggle the external boolean ' +
          'controlling visibility of the modal',
-         () => {
+         async () => {
         const component = {
             template:  `<modal ref="modal"
                                v-if="show_modal"
@@ -172,27 +180,28 @@ describe('Modal.vue', () => {
         };
         const wrapper = mount(component);
         wrapper.setData({show_modal: true});
-
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.$data.show_modal).toBe(true);
 
         let close_button = wrapper.find('.close-button');
-        close_button.trigger('click');
+        await close_button.trigger('click');
 
         expect(wrapper.vm.$data.show_modal).toBe(false);
 
         wrapper.setData({show_modal: true});
+        await wrapper.vm.$nextTick();
 
         const outside_modal = wrapper.find('.modal-mask');
         const inside_modal = wrapper.find('.modal-container');
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(true);
         expect(wrapper.vm.$data.show_modal).toBe(true);
 
-        inside_modal.trigger('click');
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(true);
+        await inside_modal.trigger('click');
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(true);
         expect(wrapper.vm.$data.show_modal).toBe(true);
 
-        outside_modal.trigger('click');
-        expect(wrapper.find({ref: 'modal'}).exists()).toBe(false);
+        await outside_modal.trigger('click');
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
         expect(wrapper.vm.$data.show_modal).toBe(false);
     });
 });

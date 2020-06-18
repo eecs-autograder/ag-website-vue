@@ -1,10 +1,7 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import Diff from '@/components/diff.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('Diff tests', () => {
     test('Diff rendering no whitespace', async () => {
@@ -191,15 +188,15 @@ test('1000 lines initially rendered, show more button used', async () => {
 
     expect(wrapper.findAll('.diff-body tr').length).toEqual(1000);
 
-    wrapper.find({ref: 'show_more_button'}).trigger('click');
+    wrapper.find('[data-testid=show_more_button]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(wrapper.findAll('.diff-body tr').length).toEqual(2000);
 
-    wrapper.find({ref: 'show_more_button'}).trigger('click');
+    wrapper.find('[data-testid=show_more_button]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(wrapper.findAll('.diff-body tr').length).toEqual((await diff_contents).length);
 
-    expect(wrapper.find({ref: 'show_more_button'}).exists()).toBe(false);
+    expect(wrapper.find('[data-testid=show_more_button]').exists()).toBe(false);
 });
 
 type RenderedDiffCell = {line_number: number | '', prefix: '+' | '-' | '', content: string};
@@ -226,7 +223,7 @@ function do_diff_render_test(
             expected_left[i].prefix);
         expect(cells.at(1).find(visible_selector).text()).toEqual(
             expected_left[i].content);
-        expect(cells.at(1).find(hidden_selector).isVisible()).toBe(false);
+        expect(cells.at(1).find(hidden_selector).element).not.toBeVisible();
 
         expect(cells.at(2).text()).toEqual(expected_right[i].line_number.toString());
 
@@ -234,6 +231,6 @@ function do_diff_render_test(
             expected_right[i].prefix);
         expect(cells.at(3).find(visible_selector).text()).toEqual(
             expected_right[i].content);
-        expect(cells.at(3).find(hidden_selector).isVisible()).toBe(false);
+        expect(cells.at(3).find(hidden_selector).element).not.toBeVisible();
     }
 }

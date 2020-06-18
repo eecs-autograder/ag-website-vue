@@ -177,7 +177,7 @@ describe('show_setup_fieldset getter', () => {
     });
 });
 
-describe('show_buggy_implementations_fieldset getter', async () => {
+describe('show_buggy_implementations_fieldset getter', () => {
     let wrapper: Wrapper<MutationSuiteResult>;
 
     test('show_buggy_implementations_fieldset - false', async () => {

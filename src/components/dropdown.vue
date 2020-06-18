@@ -28,7 +28,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 export default class Dropdown extends Vue {
 
   @Prop({required: true, type: Array})
-  items!: object[];
+  items!: unknown[];
 
   @Prop({default: 0, type: Number})
   initial_highlighted_index!: number;
@@ -37,7 +37,7 @@ export default class Dropdown extends Vue {
   dropdown_height!: string;
 
   private d_highlighted_index = 0;
-  private d_items: object[] = [];
+  private d_items: unknown[] = [];
   private d_is_open = false;
 
   created() {
@@ -63,7 +63,7 @@ export default class Dropdown extends Vue {
   }
 
   @Watch('items')
-  on_items_changed(new_val: object[], old_val: object[]) {
+  on_items_changed(new_val: unknown[], old_val: unknown[]) {
     this.d_items = new_val;
     if (this.d_highlighted_index >= this.d_items.length && this.d_items.length > 0) {
       this.d_highlighted_index = this.d_items.length - 1;
@@ -82,9 +82,9 @@ export default class Dropdown extends Vue {
     this.d_is_open = false;
   }
 
-  choose_item_from_dropdown_menu(item_selected: object, index: number) {
+  choose_item_from_dropdown_menu(item_selected: unknown, index: number) {
     this.d_highlighted_index = index;
-    this.$emit("update_item_selected", item_selected);
+    this.$emit("item_selected", item_selected);
     this.hide();
   }
 

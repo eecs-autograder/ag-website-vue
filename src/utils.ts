@@ -71,7 +71,7 @@ export function* zip<T1, T2>(iterable1: IterableType<T1>,
         let item1 = iterator1.next();
         let item2 = iterator2.next();
 
-        stop = item1.done || item2.done;
+        stop = (item1.done ?? false) || (item2.done ?? false);
         if (!stop) {
             yield [item1.value, item2.value];
         }
@@ -85,65 +85,6 @@ export function* chain<T>(...iterables: IterableType<T>[]): IterableIterator<T> 
         }
     }
 }
-
-// array_add_unique, array_has_unique, and array_remove_unique are
-// intended to be used together to achieve Set-like behavior with an
-// array. This is a workaround until Vue implements reactivity for
-// Sets. These functions have linear complexity.
-
-type EqualityFunctionType<ItemType, SentinelType>
-    = (item: ItemType, sentinel: SentinelType) => boolean;
-
-function items_equal<T>(first: T, second: T) {
-    return first === second;
-}
-
-// Adds value to the given array if value is not already in array,
-// using the given equality comparison function.
-export function array_add_unique<ItemType>(
-        array: ItemType[], value: ItemType,
-        eq_func: EqualityFunctionType<ItemType, ItemType> = items_equal) {
-    if (!array_has_unique(array, value, eq_func)) {
-        array.push(value);
-    }
-}
-
-// Returns true if the given value is in array using the given equality
-// comparison function.
-export function array_has_unique<ItemType, SentinelType>(
-        array: ReadonlyArray<Readonly<ItemType>>, value: SentinelType,
-        eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
-    return array.find((item: ItemType) => eq_func(item, value)) !== undefined;
-}
-
-// Finds and returns the item with the given value from array.
-// Throws Error if item does not exist.
-export function array_get_unique<ItemType, SentinelType>(
-        array: ReadonlyArray<Readonly<ItemType>>, value: SentinelType,
-        eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
-    let item = array.find((elt: ItemType) => eq_func(elt, value));
-    if (item === undefined) {
-        throw new UniqueArrayError(`Item not found in array: ${value}`);
-    }
-    return item;
-}
-
-// Removes value from array. Returns true if value existed in array and was
-// removed, false otherwise.
-export function array_remove_unique<ItemType, SentinelType>(
-        array: ItemType[], value: SentinelType,
-        eq_func: EqualityFunctionType<ItemType, SentinelType> = items_equal) {
-    let index = array.findIndex((item: ItemType) => eq_func(item, value));
-    if (index !== -1) {
-        array.splice(index, 1);
-    }
-    return index !== -1;
-}
-
-export class UniqueArrayError extends Error {}
-
-// FIXME: remove
-export { handle_api_errors_async } from '@/error_handling';
 
 export function format_course_name(course: Course) {
     let result = course.name;
@@ -223,7 +164,7 @@ export function is_email(str: string): boolean {
 //   more error-prone, but has the advantage of not artificially decreasing our branch coverage.
 // Note: In test case code, using the non-null-assertion operator without calling this
 // function is OK.
-export function assert_not_null<T>(obj: T | null | undefined, msg?: string): obj is T {
+export function assert_not_null<T>(obj: T | null | undefined, msg?: string): asserts obj is T {
     // istanbul ignore next
     if (msg === undefined) {
         msg = 'Value was unexpectedly null or undefined';
@@ -236,7 +177,6 @@ export function assert_not_null<T>(obj: T | null | undefined, msg?: string): obj
     if (obj === undefined) {
         throw new NonNullAssertionError(msg);
     }
-    return true;
 }
 
 export class NonNullAssertionError extends Error {

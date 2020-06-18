@@ -4,12 +4,12 @@
     $text-padding: .375rem,
     $active-color: $light-blue,
     $active-text-color: black,
-    $icon-hover-color: darken($stormy-gray-dark, 20%),
-    $indentation: 10px,
-    $font-size: 14px,
-    // Show icons only when hovering over a panel or
-    // when a panel is accurate.
-    $hide-icons: true,
+    $level-0-padding: .375rem,
+    $indentation: .625rem,
+    $font-size: .875rem,
+    // When false, shows icons only when hovering over a panel or
+    // when a panel is active.
+    $always-show-icons: false,
 ) {
     .panel {
         * {
@@ -20,12 +20,12 @@
 
         cursor: pointer;
         font-size: $font-size;
-        align-items: flex-start;
-        justify-content: space-between;
+        align-items: center;
+        justify-content: stretch;
         width: 100%;
 
         &.level-0 {
-            padding-left: 0;
+            padding-left: $level-0-padding;
         }
         &.level-1 {
             padding-left: $indentation;
@@ -40,36 +40,28 @@
         .caret {
             // Set the width of the element wide enough so that
             // the text doesn't shift when switching from a right
-            // caret to a down caret.
-            width: $font-size;
+            // caret to a down caret. 1em will give us whatever the current
+            // font size is.
+            width: 1em;
         }
 
         .text {
-            padding: $text-padding;
-            word-break: break-word;
-            word-wrap: break-word;
+            padding: $text-padding 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
         }
 
         .icons {
             display: flex;
-            @if $hide-icons {
+            @if not $always-show-icons {
                 visibility: hidden;
             }
+            margin-left: auto;
         }
 
-        .icon {
-            padding: .375rem;
-
-            &:hover {
-                color: $icon-hover-color;
-            }
-        }
-
-        .handle {
-            cursor: grabbing;
-        }
-
-        @if $hide-icons {
+        @if not $always-show-icons {
             &:hover {
                 .icons {
                     visibility: visible;

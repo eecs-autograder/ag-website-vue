@@ -35,7 +35,7 @@
 
     <div v-if="editing" :class="(editing) ? 'form-editing' : 'form-not-editing'">
       <expected-student-file-form ref="form"
-                                  @on_submit="update_expected_student_file($event)"
+                                  @submit="update_expected_student_file($event)"
                                   :expected_student_file="expected_student_file"
                                   @on_form_validity_changed="pattern_is_valid = $event">
         <template slot="form_footer">
@@ -90,8 +90,8 @@ import { ExpectedStudentFile } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { handle_api_errors_async, safe_assign } from '@/utils';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { safe_assign } from '@/utils';
 
 @Component({
   components: {

@@ -82,11 +82,13 @@
                           @form_validity_changed="d_settings_form_is_valid = $event">
 
             <div class="checkbox-input-container">
-              <input id="publish-grades"
-                     class="checkbox"
-                     type="checkbox"
-                     v-model="d_handgrading_rubric.show_grades_and_rubric_to_students"/>
-              <label for="publish-grades" class="checkbox-label">Publish grades and rubric</label>
+              <label class="checkbox-label">
+                <input id="publish-grades"
+                       class="checkbox"
+                       type="checkbox"
+                       v-model="d_handgrading_rubric.show_grades_and_rubric_to_students"/>
+                Publish grades and rubric
+              </label>
             </div>
 
             <div class="form-field-wrapper extra-space">
@@ -121,11 +123,11 @@
             </div>
 
             <div class="checkbox-input-container">
-              <input id="handgraders-can-leave-comments"
-                     class="checkbox"
-                     type="checkbox"
-                     v-model="d_handgrading_rubric.handgraders_can_leave_comments"/>
-              <label for="handgraders-can-leave-comments" class="checkbox-label">
+              <label class="checkbox-label">
+                <input id="handgraders-can-leave-comments"
+                       class="checkbox"
+                       type="checkbox"
+                       v-model="d_handgrading_rubric.handgraders_can_leave_comments"/>
                 Handgraders can leave comments
                 <tooltip placement="top" width="large">
                   Allow handgraders to leave custom comments.
@@ -136,11 +138,11 @@
             </div>
 
             <div class="checkbox-input-container">
-              <input id="handgraders-can-adjust-points"
-                     class="checkbox"
-                     type="checkbox"
-                     v-model="d_handgrading_rubric.handgraders_can_adjust_points"/>
-              <label for="handgraders-can-adjust-points" class="checkbox-label">
+              <label class="checkbox-label">
+                <input id="handgraders-can-adjust-points"
+                       class="checkbox"
+                       type="checkbox"
+                       v-model="d_handgrading_rubric.handgraders_can_adjust_points"/>
                 Handgraders can adjust points
                 <tooltip placement="top" width="large">
                   Allow handgraders to make arbitrary total handgrading score adjustments.
@@ -153,7 +155,7 @@
             <APIErrors ref="settings_form_errors"></APIErrors>
             <div class="button-footer">
               <button class="save-button"
-                      ref="save_rubric_button"
+                      data-testid="save_rubric_button"
                       type="submit"
                       :disabled="!d_settings_form_is_valid || d_saving">Save</button>
               <last-saved
@@ -226,7 +228,7 @@
         <APIErrors ref="create_criterion_errors"></APIErrors>
         <div class="modal-button-footer">
           <button type="submit" class="save-button"
-                  ref="create_criterion_button"
+                  data-testid="create_criterion_button"
                   :disabled="d_creating_criterion
                              || !d_create_criterion_form_is_valid">Create</button>
           <button type="button" class="white-button"
@@ -245,7 +247,7 @@
         <APIErrors ref="create_annotation_errors"></APIErrors>
         <div class="modal-button-footer">
           <button type="submit" class="save-button"
-                  ref="create_annotation_button"
+                  data-testid="create_annotation_button"
                   :disabled="d_creating_annotation
                              || !d_create_annotation_form_is_valid">Create</button>
           <button type="button" class="white-button"
@@ -285,9 +287,9 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created, Mounted } from "@/lifecycle";
-import { assert_not_null, deep_copy, format_datetime, handle_api_errors_async } from "@/utils";
+import { assert_not_null, deep_copy, format_datetime } from "@/utils";
 import {
   is_integer,
   is_not_empty,
@@ -341,7 +343,7 @@ export default class HandgradingSettings extends Vue implements Created,
 
   d_override_max_points = false;
 
-  private d_loading = true;
+  d_loading = true;
   private d_mounted = false;
   d_saving = false;
   d_settings_form_is_valid = false;
@@ -445,15 +447,14 @@ export default class HandgradingSettings extends Vue implements Created,
 
   @handle_global_errors_async
   async import_rubric() {
-    if (assert_not_null(this.d_project_to_import_from)) {
-      try {
-        this.d_import_request_pending = true;
-        this.d_handgrading_rubric = await HandgradingRubric.import_from_project(
-          this.project.pk, this.d_project_to_import_from.pk);
-      }
-      finally {
-        this.d_import_request_pending = false;
-      }
+    assert_not_null(this.d_project_to_import_from);
+    try {
+      this.d_import_request_pending = true;
+      this.d_handgrading_rubric = await HandgradingRubric.import_from_project(
+        this.project.pk, this.d_project_to_import_from.pk);
+    }
+    finally {
+      this.d_import_request_pending = false;
     }
   }
 
@@ -463,9 +464,8 @@ export default class HandgradingSettings extends Vue implements Created,
       this.d_saving = true;
       (<APIErrors> this.$refs.settings_form_errors).clear();
 
-      if (assert_not_null(this.d_handgrading_rubric)) {
-        await this.d_handgrading_rubric.save();
-      }
+      assert_not_null(this.d_handgrading_rubric);
+      await this.d_handgrading_rubric.save();
     }
     finally {
       this.d_saving = false;

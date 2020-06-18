@@ -6,7 +6,7 @@
       <dropdown-typeahead
         placeholder_text="Enter a State"
         :choices="states"
-        @update_item_chosen="add_item_1($event)"
+        @item_selected="add_item_1($event)"
         :filter_fn="filter_fn_1">
         <template slot-scope="{item}">
           <span> {{item.state}}</span>
@@ -28,7 +28,7 @@
       <dropdown-typeahead
         placeholder_text="Enter a Character"
         :choices="strangers"
-        @update_item_chosen="add_item_2($event)"
+        @item_selected="add_item_2($event)"
         :filter_fn="stranger_things_filter_fn">
         <template slot-scope="{item}">
           <span> {{item.first_name}} {{item.last_name}}</span>
@@ -55,7 +55,7 @@
         typeahead_class="custom-typeahead"
         placeholder_text="Enter a Season"
         :choices="seasons"
-        @update_item_chosen="add_item_3($event)"
+        @item_selected="add_item_3($event)"
         :filter_fn="seasons_filter_fn">
         <template slot="no_matching_results">
           No Matching Results

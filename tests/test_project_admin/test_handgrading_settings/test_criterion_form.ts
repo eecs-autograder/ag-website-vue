@@ -5,7 +5,9 @@ import { Criterion } from "ag-client-typescript";
 import CriterionForm from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 
 import {
+    emitted,
     get_validated_input_text,
+    set_props,
     set_validated_input_text,
     validated_input_is_valid
 } from "@/tests/utils";
@@ -45,7 +47,7 @@ describe('CriterionForm tests', () => {
         });
     });
 
-    test('Input watcher', () => {
+    test('Input watcher', async () => {
         let wrapper = mount(CriterionForm);
         expect(wrapper.vm.d_form_data).toEqual({
             short_description: '',
@@ -53,8 +55,7 @@ describe('CriterionForm tests', () => {
             points: 0
         });
 
-        wrapper.setProps({criterion: criterion});
-
+        await set_props(wrapper, {criterion: criterion});
         expect(wrapper.vm.d_form_data).not.toBe(criterion);
 
         expect(wrapper.vm.d_form_data).toEqual({
@@ -67,68 +68,72 @@ describe('CriterionForm tests', () => {
     test('short_description binding', () => {
         let wrapper = mount(CriterionForm, {propsData: {criterion: criterion}});
         expect(
-            get_validated_input_text(wrapper.find({ref: 'short_description'}))
+            get_validated_input_text(wrapper.findComponent({ref: 'short_description'}))
         ).toEqual(criterion.short_description);
 
-        set_validated_input_text(wrapper.find({ref: 'short_description'}), 'An criterion');
+        set_validated_input_text(wrapper.findComponent({ref: 'short_description'}), 'An criterion');
         expect(wrapper.vm.d_form_data.short_description).toEqual('An criterion');
     });
 
     test('Invalid short_description empty', () => {
         let wrapper = mount(CriterionForm, {propsData: {criterion: criterion}});
-        set_validated_input_text(wrapper.find({ref: 'short_description'}), '');
-        expect(validated_input_is_valid(wrapper.find({ref: 'short_description'}))).toEqual(false);
+        set_validated_input_text(wrapper.findComponent({ref: 'short_description'}), '');
+        expect(
+            validated_input_is_valid(wrapper.findComponent({ref: 'short_description'}))
+        ).toEqual(false);
     });
 
     test('points binding', () => {
         let wrapper = mount(CriterionForm, {propsData: {criterion: criterion}});
         expect(
-            get_validated_input_text(wrapper.find({ref: 'points'}))
+            get_validated_input_text(wrapper.findComponent({ref: 'points'}))
         ).toEqual(criterion.points.toString());
 
-        set_validated_input_text(wrapper.find({ref: 'points'}), '3');
+        set_validated_input_text(wrapper.findComponent({ref: 'points'}), '3');
         expect(wrapper.vm.d_form_data.points).toEqual(3);
     });
 
     test('Invalid points empty or non integer', () => {
         let wrapper = mount(CriterionForm, {propsData: {criterion: criterion}});
-        set_validated_input_text(wrapper.find({ref: 'points'}), '');
-        expect(validated_input_is_valid(wrapper.find({ref: 'points'}))).toEqual(false);
+        set_validated_input_text(wrapper.findComponent({ref: 'points'}), '');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'points'}))).toEqual(false);
 
-        set_validated_input_text(wrapper.find({ref: 'points'}), '42');
-        expect(validated_input_is_valid(wrapper.find({ref: 'points'}))).toEqual(true);
+        set_validated_input_text(wrapper.findComponent({ref: 'points'}), '42');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'points'}))).toEqual(true);
 
-        set_validated_input_text(wrapper.find({ref: 'points'}), 'spam');
-        expect(validated_input_is_valid(wrapper.find({ref: 'points'}))).toEqual(false);
+        set_validated_input_text(wrapper.findComponent({ref: 'points'}), 'spam');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'points'}))).toEqual(false);
     });
 
     test('long_description binding', () => {
         let wrapper = mount(CriterionForm, {propsData: {criterion: criterion}});
         expect(
-            get_validated_input_text(wrapper.find({ref: 'long_description'}))
+            get_validated_input_text(wrapper.findComponent({ref: 'long_description'}))
         ).toEqual(criterion.long_description);
 
-        set_validated_input_text(wrapper.find({ref: 'long_description'}), 'Very criterion');
+        set_validated_input_text(
+            wrapper.findComponent({ref: 'long_description'}), 'Very criterion');
         expect(wrapper.vm.d_form_data.long_description).toEqual('Very criterion');
     });
 
     test('form_validity_changed', () => {
         let wrapper = mount(CriterionForm);
-        set_validated_input_text(wrapper.find({ref: 'short_description'}), 'An criterion');
-        expect(wrapper.emitted().form_validity_changed.length).toEqual(2);
-        expect(wrapper.emitted().form_validity_changed).toEqual([[false], [true]]);
+        set_validated_input_text(wrapper.findComponent({ref: 'short_description'}), 'An criterion');
+        expect(emitted(wrapper, 'form_validity_changed').length).toEqual(2);
+        expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true]]);
     });
 
     test('Submit', () => {
         let wrapper = mount(CriterionForm);
-        set_validated_input_text(wrapper.find({ref: 'short_description'}), 'An criterion');
-        set_validated_input_text(wrapper.find({ref: 'long_description'}), 'Very criterion');
-        set_validated_input_text(wrapper.find({ref: 'points'}), '12');
+        set_validated_input_text(wrapper.findComponent({ref: 'short_description'}), 'An criterion');
+        set_validated_input_text(
+            wrapper.findComponent({ref: 'long_description'}), 'Very criterion');
+        set_validated_input_text(wrapper.findComponent({ref: 'points'}), '12');
 
         wrapper.vm.submit();
-        expect(wrapper.emitted().submit.length).toEqual(1);
+        expect(emitted(wrapper, 'submit').length).toEqual(1);
         expect(
-            wrapper.emitted().submit[0][0]
+            emitted(wrapper, 'submit')[0][0]
         ).toEqual(
             {short_description: 'An criterion', long_description: 'Very criterion', points: 12}
         );
@@ -136,9 +141,10 @@ describe('CriterionForm tests', () => {
 
     test('Reset', () => {
         let wrapper = mount(CriterionForm);
-        set_validated_input_text(wrapper.find({ref: 'short_description'}), 'An criterion');
-        set_validated_input_text(wrapper.find({ref: 'long_description'}), 'Very criterion');
-        set_validated_input_text(wrapper.find({ref: 'points'}), '12');
+        set_validated_input_text(wrapper.findComponent({ref: 'short_description'}), 'An criterion');
+        set_validated_input_text(
+            wrapper.findComponent({ref: 'long_description'}), 'Very criterion');
+        set_validated_input_text(wrapper.findComponent({ref: 'points'}), '12');
 
         expect(wrapper.vm.d_form_data).toEqual({
             short_description: 'An criterion',

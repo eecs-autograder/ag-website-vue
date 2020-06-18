@@ -1,14 +1,11 @@
 import Vue from 'vue';
 import Component from 'vue-class-component';
 
-import { config, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('DropdownTypeahead.vue', () => {
     test('choices array is empty', async () => {
@@ -19,7 +16,7 @@ describe('DropdownTypeahead.vue', () => {
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @item_selected="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -42,7 +39,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
 
         expect(dropdown_typeahead.choices).toEqual(wrapper.vm.states);
 
@@ -73,7 +71,7 @@ describe('DropdownTypeahead.vue', () => {
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @item_selected="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -96,7 +94,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
         search_bar.trigger("click");
 
@@ -119,7 +118,7 @@ describe('DropdownTypeahead.vue', () => {
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @item_selected="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -143,7 +142,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
 
         expect(dropdown_typeahead.choices).toEqual(wrapper.vm.$data.states);
         expect(dropdown_typeahead.placeholder_text).toEqual("Enter a State");
@@ -159,7 +159,7 @@ describe('DropdownTypeahead.vue', () => {
                   placeholder_text="Enter a State"
                   :choices="states"
                   :filter_fn="states_filter_fn"
-                  @update_item_chosen="add_item($event)">
+                  @item_selected="add_item($event)">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -183,7 +183,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -249,7 +250,7 @@ describe('DropdownTypeahead.vue', () => {
               placeholder_text="Enter a State"
               :choices="states"
               :filter_fn="states_filter_fn"
-              @update_item_chosen="add_item($event)">
+              @item_selected="add_item($event)">
               <template slot-scope="{ item }">
                 <span> {{ item.state }}</span>
               </template>
@@ -287,7 +288,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -317,7 +319,7 @@ describe('DropdownTypeahead.vue', () => {
                               placeholder_text="Enter a Name"
                               :choices="strangers"
                               :filter_fn="stranger_things_filter_fn"
-                              @update_item_chosen="add_item($event)">
+                              @item_selected="add_item($event)">
               <template slot-scope="{ item }">
                 <span> {{ item.first_name }} {{ item.last_name}}</span>
               </template>
@@ -356,7 +358,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -410,7 +413,7 @@ describe('DropdownTypeahead.vue', () => {
                           placeholder_text="Enter a Name"
                           :choices="strangers"
                           :filter_fn="stranger_things_filter_fn"
-                          @update_item_chosen="add_item($event)">
+                          @item_selected="add_item($event)">
           <template slot-scope="{ item }">
             <span> {{ item.first_name }} {{ item.last_name}}</span>
           </template>
@@ -449,7 +452,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -493,7 +497,7 @@ describe('DropdownTypeahead.vue', () => {
                           placeholder_text="Enter a Name"
                           :choices="strangers"
                           :filter_fn="stranger_things_filter_fn"
-                          @update_item_chosen="add_item($event)">
+                          @item_selected="add_item($event)">
                         </dropdown-typeahead>
                       </div>`,
             components: {
@@ -525,7 +529,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -555,7 +560,7 @@ describe('DropdownTypeahead.vue', () => {
                       placeholder_text="Enter a Name"
                       :choices="strangers"
                       :filter_fn="stranger_things_filter_fn"
-                      @update_item_chosen="add_item($event)">
+                      @item_selected="add_item($event)">
                     </dropdown-typeahead>
                   </div>`,
             components: {
@@ -587,7 +592,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");
@@ -610,7 +616,7 @@ describe('DropdownTypeahead.vue', () => {
                           <dropdown-typeahead ref="dropdown_typeahead"
                             placeholder_text="Enter a Season"
                             :choices="seasons"
-                            @update_item_chosen="add_item_3($event)"
+                            @item_selected="add_item_3($event)"
                             :filter_fn="seasons_filter_fn">
                             <template slot="no_matching_results">
                               No Matching Results
@@ -639,7 +645,8 @@ describe('DropdownTypeahead.vue', () => {
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead = <DropdownTypeahead> wrapper.find({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead
+            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
         search_bar.trigger("click");

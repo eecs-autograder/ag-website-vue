@@ -1,6 +1,7 @@
 import Collapsible from '@/components/collapsible.vue';
 
 import { managed_mount } from '@/tests/setup';
+import { set_props } from '@/tests/utils';
 
 test('start_open true', () => {
     let wrapper = managed_mount(Collapsible, {
@@ -9,13 +10,13 @@ test('start_open true', () => {
         }
     });
 
-    expect(wrapper.find({ref: 'body'}).isVisible()).toBe(true);
+    expect(wrapper.find('[data-testid=collapsible_body]').element).toBeVisible();
 });
 
 test('start_open default false', () => {
     let wrapper = managed_mount(Collapsible);
 
-    expect(wrapper.find({ref: 'body'}).isVisible()).toBe(false);
+    expect(wrapper.find('[data-testid=collapsible_body]').element).not.toBeVisible();
 });
 
 test('include_caret default true', () => {
@@ -30,4 +31,28 @@ test('include_caret false', () => {
         }
     });
     expect(wrapper.find('.caret').exists()).toBe(false);
+});
+
+test('stay_open prevents closing when true', async () => {
+    let wrapper = managed_mount(Collapsible, {
+        propsData: {
+            stay_open: true
+        }
+    });
+
+    expect(wrapper.find('[data-testid=collapsible_body]').element).not.toBeVisible();
+
+    wrapper.vm.toggle_is_open();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('[data-testid=collapsible_body]').element).toBeVisible();
+
+    wrapper.vm.toggle_is_open();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('[data-testid=collapsible_body]').element).toBeVisible();
+
+    await set_props(wrapper, {stay_open: false});
+
+    wrapper.vm.toggle_is_open();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.find('[data-testid=collapsible_body]').element).not.toBeVisible();
 });

@@ -81,7 +81,7 @@ async function make_wrapper() {
 describe('Correctness feedback tests', () => {
     test('No correctness info available', async () => {
         let wrapper = await make_wrapper();
-        expect(wrapper.find({ref: 'correctness_section'}).exists()).toEqual(false);
+        expect(wrapper.findComponent({ref: 'correctness_section'}).exists()).toEqual(false);
     });
 
     describe('Return code correctness tests', () => {
@@ -92,14 +92,14 @@ describe('Correctness feedback tests', () => {
 
         test('Return code correctness hidden', async () => {
             let wrapper = await make_wrapper();
-            expect(wrapper.find({ref: 'correctness'}).exists()).toEqual(true);
-            expect(wrapper.find({ref: 'return_code_correctness'}).exists()).toEqual(false);
+            expect(wrapper.findComponent({ref: 'correctness'}).exists()).toEqual(true);
+            expect(wrapper.findComponent({ref: 'return_code_correctness'}).exists()).toEqual(false);
         });
 
         test('Return code correct, timeout fdbk hidden', async () => {
             ag_test_command_result.return_code_correct = true;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'return_code_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'return_code_correctness'});
             expect(section_wrapper.find('.correct-icon').exists()).toBe(true);
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(false);
             expect(section_wrapper.find('.timed-out-icon').exists()).toBe(false);
@@ -108,7 +108,7 @@ describe('Correctness feedback tests', () => {
         test('Return code incorrect, timeout fdbk hidden', async () => {
             ag_test_command_result.return_code_correct = false;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'return_code_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'return_code_correctness'});
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(true);
             expect(section_wrapper.find('.correct-icon').exists()).toBe(false);
             expect(section_wrapper.find('.timed-out-icon').exists()).toBe(false);
@@ -118,7 +118,7 @@ describe('Correctness feedback tests', () => {
             ag_test_command_result.return_code_correct = false;
             ag_test_command_result.timed_out = false;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'return_code_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'return_code_correctness'});
             expect(section_wrapper.find('.timed-out-icon').exists()).toBe(false);
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(true);
         });
@@ -127,7 +127,7 @@ describe('Correctness feedback tests', () => {
             ag_test_command_result.return_code_correct = false;
             ag_test_command_result.timed_out = true;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'return_code_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'return_code_correctness'});
             expect(section_wrapper.find('.timed-out-icon').exists()).toBe(true);
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(false);
             expect(section_wrapper.find('.correct-icon').exists()).toBe(false);
@@ -136,13 +136,13 @@ describe('Correctness feedback tests', () => {
         test('Return code correctness hidden, command did not time out', async () => {
             ag_test_command_result.timed_out = false;
             let wrapper = await make_wrapper();
-            expect(wrapper.find({ref: 'return_code_correctness'}).exists()).toBe(false);
+            expect(wrapper.findComponent({ref: 'return_code_correctness'}).exists()).toBe(false);
         });
 
         test('Return code correctness hidden, command timed out', async () => {
             ag_test_command_result.timed_out = true;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'return_code_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'return_code_correctness'});
             expect(section_wrapper.find('.timed-out-icon').exists()).toBe(true);
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(false);
             expect(section_wrapper.find('.correct-icon').exists()).toBe(false);
@@ -152,14 +152,14 @@ describe('Correctness feedback tests', () => {
             ag_test_command_result.actual_return_code = null;
             ag_test_command_result.return_code_correct = true;
             let wrapper = await make_wrapper();
-            expect(wrapper.find({ref: 'actual_return_code'}).exists()).toBe(false);
-            expect(wrapper.find({ref: 'return_code_correctness'}).exists()).toBe(true);
+            expect(wrapper.findComponent({ref: 'actual_return_code'}).exists()).toBe(false);
+            expect(wrapper.findComponent({ref: 'return_code_correctness'}).exists()).toBe(true);
         });
 
         test('Actual return code available', async () => {
             ag_test_command_result.actual_return_code = 42;
             let wrapper = await make_wrapper();
-            expect(wrapper.find({ref: 'actual_return_code'}).text()).toEqual(
+            expect(wrapper.findComponent({ref: 'actual_return_code'}).text()).toEqual(
                 'Actual exit status: 42'
             );
         });
@@ -167,14 +167,14 @@ describe('Correctness feedback tests', () => {
         test('Expected return code available, return code not checked', async () => {
             ag_test_command_result.expected_return_code = ag_cli.ExpectedReturnCode.none;
             let wrapper = await make_wrapper();
-            expect(wrapper.find({ref: 'expected_return_code'}).exists()).toBe(false);
+            expect(wrapper.findComponent({ref: 'expected_return_code'}).exists()).toBe(false);
         });
 
         test('Expected return code availble, zero expected', async () => {
             ag_test_command_result.expected_return_code = ag_cli.ExpectedReturnCode.zero;
             let wrapper = await make_wrapper();
             expect(
-                compress_whitespace(wrapper.find({ref: 'expected_return_code'}).text())
+                compress_whitespace(wrapper.findComponent({ref: 'expected_return_code'}).text())
             ).toEqual('Expected exit status: 0');
         });
 
@@ -182,7 +182,7 @@ describe('Correctness feedback tests', () => {
             ag_test_command_result.expected_return_code = ag_cli.ExpectedReturnCode.nonzero;
             let wrapper = await make_wrapper();
             expect(
-                compress_whitespace(wrapper.find({ref: 'expected_return_code'}).text())
+                compress_whitespace(wrapper.findComponent({ref: 'expected_return_code'}).text())
             ).toEqual('Expected exit status: nonzero');
         });
     });
@@ -195,14 +195,14 @@ describe('Correctness feedback tests', () => {
 
         test('Stdout correct hidden', async () => {
             let wrapper = await make_wrapper();
-            expect(wrapper.find({ref: 'correctness'}).exists()).toEqual(true);
-            expect(wrapper.find({ref: 'stdout_correctness'}).exists()).toBe(false);
+            expect(wrapper.findComponent({ref: 'correctness'}).exists()).toEqual(true);
+            expect(wrapper.findComponent({ref: 'stdout_correctness'}).exists()).toBe(false);
         });
 
         test('Stdout correct', async () => {
             ag_test_command_result.stdout_correct = true;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'stdout_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'stdout_correctness'});
             expect(section_wrapper.find('.correct-icon').exists()).toBe(true);
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(false);
         });
@@ -210,21 +210,21 @@ describe('Correctness feedback tests', () => {
         test('Stdout incorrect', async () => {
             ag_test_command_result.stdout_correct = false;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'stdout_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'stdout_correctness'});
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(true);
             expect(section_wrapper.find('.correct-icon').exists()).toBe(false);
         });
 
         test('Stderr correct hidden', async () => {
             let wrapper = await make_wrapper();
-            expect(wrapper.find({ref: 'correctness'}).exists()).toEqual(true);
-            expect(wrapper.find({ref: 'stderr_correctness'}).exists()).toBe(false);
+            expect(wrapper.findComponent({ref: 'correctness'}).exists()).toEqual(true);
+            expect(wrapper.findComponent({ref: 'stderr_correctness'}).exists()).toBe(false);
         });
 
         test('Stderr correct', async () => {
             ag_test_command_result.stderr_correct = true;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'stderr_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'stderr_correctness'});
             expect(section_wrapper.find('.correct-icon').exists()).toBe(true);
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(false);
         });
@@ -232,7 +232,7 @@ describe('Correctness feedback tests', () => {
         test('Stderr incorrect', async () => {
             ag_test_command_result.stderr_correct = false;
             let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.find({ref: 'stderr_correctness'});
+            let section_wrapper = wrapper.findComponent({ref: 'stderr_correctness'});
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(true);
             expect(section_wrapper.find('.correct-icon').exists()).toBe(false);
         });
@@ -285,7 +285,7 @@ function progress_stub_resolves<T>(
 describe('Diff tests', () => {
     test('No diffs available', async () => {
         let wrapper = await make_wrapper();
-        expect(wrapper.find({ref: 'diffs'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'diffs'}).exists()).toBe(false);
     });
 
     test('Stdout diff available', async () => {
@@ -296,13 +296,13 @@ describe('Diff tests', () => {
         let wrapper = await make_wrapper();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'diffs'}).exists()).toBe(true);
-        let diff_wrapper =  <Wrapper<Diff>> wrapper.find({ref: 'stdout_diff'});
+        expect(wrapper.findComponent({ref: 'diffs'}).exists()).toBe(true);
+        let diff_wrapper =  <Wrapper<Diff>> wrapper.findComponent({ref: 'stdout_diff'});
         expect(await wait_for_load(diff_wrapper)).toBe(true);
         expect(await diff_wrapper.vm.diff_contents).toEqual(diff);
         expect(diff_wrapper.vm.progress).not.toBeNull();
 
-        expect(wrapper.find({ref: 'stderr_diff'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'stderr_diff'}).exists()).toBe(false);
     });
 
     test('Stderr diff available', async () => {
@@ -313,12 +313,12 @@ describe('Diff tests', () => {
         let wrapper = await make_wrapper();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'diffs'}).exists()).toBe(true);
-        let diff_wrapper =  <Wrapper<Diff>> wrapper.find({ref: 'stderr_diff'});
+        expect(wrapper.findComponent({ref: 'diffs'}).exists()).toBe(true);
+        let diff_wrapper =  <Wrapper<Diff>> wrapper.findComponent({ref: 'stderr_diff'});
         expect(await diff_wrapper.vm.diff_contents).toEqual(diff);
         expect(diff_wrapper.vm.progress).not.toBeNull();
 
-        expect(wrapper.find({ref: 'stdout_diff'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'stdout_diff'}).exists()).toBe(false);
     });
 
     test('Both diffs available', async () => {
@@ -337,10 +337,10 @@ describe('Diff tests', () => {
                 wrapper, w => w.vm.d_stdout_diff !== null && w.vm.d_stderr_diff !== null)
         ).toBe(true);
 
-        let stdout_diff_wrapper =  <Wrapper<Diff>> wrapper.find({ref: 'stdout_diff'});
+        let stdout_diff_wrapper =  <Wrapper<Diff>> wrapper.findComponent({ref: 'stdout_diff'});
         expect(await stdout_diff_wrapper.vm.diff_contents).toEqual(stdout_diff);
         expect(stdout_diff_wrapper.vm.progress).not.toBeNull();
-        let stderr_diff_wrapper =  <Wrapper<Diff>> wrapper.find({ref: 'stderr_diff'});
+        let stderr_diff_wrapper =  <Wrapper<Diff>> wrapper.findComponent({ref: 'stderr_diff'});
         expect(await stderr_diff_wrapper.vm.diff_contents).toEqual(stderr_diff);
         expect(stderr_diff_wrapper.vm.progress).not.toBeNull();
     });
@@ -349,7 +349,7 @@ describe('Diff tests', () => {
 describe('Actual output tests', () => {
     test('No actual output available', async () => {
         let wrapper = await make_wrapper();
-        expect(wrapper.find({ref: 'actual_output'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'actual_output'}).exists()).toBe(false);
     });
 
     test('Actual stdout available', async () => {
@@ -361,11 +361,11 @@ describe('Actual output tests', () => {
         let wrapper = await make_wrapper();
         await wrapper.vm.$nextTick();
 
-        let stdout_wrapper = <Wrapper<ViewFile>> wrapper.find({ref: 'stdout'});
+        let stdout_wrapper = <Wrapper<ViewFile>> wrapper.findComponent({ref: 'stdout'});
         expect(await stdout_wrapper.vm.file_contents).toEqual(stdout);
         expect(stdout_wrapper.vm.progress).not.toBeNull();
 
-        expect(wrapper.find({ref: 'stderr'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'stderr'}).exists()).toBe(false);
     });
 
     test('Actual stderr available', async () => {
@@ -377,11 +377,11 @@ describe('Actual output tests', () => {
         let wrapper = await make_wrapper();
         await wrapper.vm.$nextTick();
 
-        let stderr_wrapper = <Wrapper<ViewFile>> wrapper.find({ref: 'stderr'});
+        let stderr_wrapper = <Wrapper<ViewFile>> wrapper.findComponent({ref: 'stderr'});
         expect(await stderr_wrapper.vm.file_contents).toEqual(stderr);
         expect(stderr_wrapper.vm.progress).not.toBeNull();
 
-        expect(wrapper.find({ref: 'stdout'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'stdout'}).exists()).toBe(false);
     });
 
     test('Actual stdout and stderr available', async () => {
@@ -398,11 +398,11 @@ describe('Actual output tests', () => {
                 wrapper, w => w.vm.d_stdout_content !== null && w.vm.d_stderr_content !== null)
         ).toBe(true);
 
-        let stdout_wrapper = <Wrapper<ViewFile>> wrapper.find({ref: 'stdout'});
+        let stdout_wrapper = <Wrapper<ViewFile>> wrapper.findComponent({ref: 'stdout'});
         expect(await stdout_wrapper.vm.file_contents).toEqual(stdout);
         expect(stdout_wrapper.vm.progress).not.toBeNull();
 
-        let stderr_wrapper = <Wrapper<ViewFile>> wrapper.find({ref: 'stderr'});
+        let stderr_wrapper = <Wrapper<ViewFile>> wrapper.findComponent({ref: 'stderr'});
         expect(await stderr_wrapper.vm.file_contents).toEqual(stderr);
         expect(stderr_wrapper.vm.progress).not.toBeNull();
     });
@@ -413,10 +413,11 @@ describe('Actual output tests', () => {
         let wrapper = await make_wrapper();
         await wait_fixed(wrapper, 5);
 
-        expect(wrapper.find({ref: 'actual_stderr_section'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'actual_stdout_section'}).find('.short-output').text()).toEqual(
-            'No output');
-        expect(wrapper.find({ref: 'stdout'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'actual_stderr_section'}).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'actual_stdout_section'}).find('.short-output').text()
+        ).toEqual('No output');
+        expect(wrapper.findComponent({ref: 'stdout'}).exists()).toBe(false);
     });
 
     test('Actual stderr empty', async () => {
@@ -425,10 +426,11 @@ describe('Actual output tests', () => {
         let wrapper = await make_wrapper();
         await wait_fixed(wrapper, 5);
 
-        expect(wrapper.find({ref: 'actual_stdout_section'}).exists()).toBe(false);
-        expect(wrapper.find({ref: 'actual_stderr_section'}).find('.short-output').text()).toEqual(
-            'No output');
-        expect(wrapper.find({ref: 'stderr'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'actual_stdout_section'}).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'actual_stderr_section'}).find('.short-output').text()
+        ).toEqual('No output');
+        expect(wrapper.findComponent({ref: 'stderr'}).exists()).toBe(false);
     });
 });
 

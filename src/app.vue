@@ -54,7 +54,7 @@
         <div id="current-user">
           <button @click="login"
                   type="button"
-                  ref="login_button"
+                  data-testid="login_button"
                   class="blue-button"
                   v-if="globals.current_user === null">
             Sign In
@@ -67,9 +67,14 @@
             <div class="menu">
               <div class="signed-in-as">Signed in as:</div>
               <div class="username">{{globals.current_user.username}}</div>
+              <div class="superuser-link" v-if="globals.current_user.is_superuser">
+                <router-link to="/web/superusers">
+                  Superuser Dashboard
+                </router-link>
+              </div>
               <div class="sign-out-button-wrapper">
                 <button @click="logout"
-                        ref="logout_button"
+                        data-testid="logout_button"
                         type="button"
                         class="flat-white-button">
                   Sign Out
@@ -336,13 +341,17 @@ $breadcrumb-font-size: 1.5rem;
 
   .username {
     font-size: 1rem;
-    margin-bottom: 1rem;
     font-weight: bold;
+  }
+
+  .superuser-link {
+    margin-top: .5rem;
   }
 
   .sign-out-button-wrapper {
     display: flex;
     justify-content: flex-end;
+    margin-top: 1rem;
   }
 }
 

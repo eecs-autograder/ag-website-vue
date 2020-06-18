@@ -28,7 +28,7 @@ import { Course, Group, NewGroupData, Project } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import { handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/error_handling';
 
 export interface GroupMember {
   id: number;

@@ -1,43 +1,22 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
-
 import { Course, HttpError, Semester } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import { assert_not_null } from '@/utils';
 
-import { expect_html_element_has_value, set_validated_input_text } from '@/tests/utils';
+import * as data_ut from '@/tests/data_utils';
+import { expect_html_element_has_value, set_data, set_validated_input_text, validated_input_is_valid } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
+import { managed_mount } from '../setup';
+
 
 describe('SingleCourse.vue', () => {
-    let wrapper: Wrapper<SingleCourse>;
-    let component: SingleCourse;
-    let course_1: Course;
-    let course_with_null_values: Course;
+    let course: Course;
     let clone_of_course: Course;
-    let original_match_media: (query: string) => MediaQueryList;
 
     beforeEach(() => {
-        original_match_media = window.matchMedia;
-        Object.defineProperty(window, "matchMedia", {
-            value: jest.fn(() => {
-                return {matches: true};
-            })
-        });
-
-        course_1 = new Course({
-            pk: 1, name: 'EECS 280', semester: Semester.winter, year: 2019, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
-        });
-
-        course_with_null_values = new Course({
-            pk: 1, name: 'EECS 280', semester: null, year: null, subtitle: '',
-            num_late_days: 0, allowed_guest_domain: '', last_modified: ''
-        });
+        course = data_ut.make_course();
 
         clone_of_course = new Course({
             pk: 2, name: 'EECS 280', semester: Semester.winter, year: 2020, subtitle: '',
@@ -45,399 +24,188 @@ describe('SingleCourse.vue', () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-
-        Object.defineProperty(window, "matchMedia", {
-            value: original_match_media
-        });
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-
-    test('SingleCourse data members are initialized correctly', async () => {
-        wrapper = mount(SingleCourse, {
+    function make_wrapper(course_ = course, is_admin = true) {
+        return managed_mount(SingleCourse, {
             propsData: {
-                course: course_1
+                course: course_,
+                is_admin: is_admin
             },
             stubs: ['router-link', 'router-view']
         });
-        component = wrapper.vm;
-        await component.$nextTick();
+    }
 
-        expect(component.course).toEqual(course_1);
-        expect(component.is_admin).toBe(false);
-        expect(component.new_course_year).toEqual(component.course.year);
-    });
-
-    test('If the user is an admin, they have the option to clone or edit a course',
-         async () => {
-        wrapper = mount(SingleCourse, {
+    test('SingleCourse data members are initialized from input course', async () => {
+        let wrapper = managed_mount(SingleCourse, {
             propsData: {
-                course: course_1,
-                is_admin: true
+                course: course
             },
             stubs: ['router-link', 'router-view']
         });
-        component = wrapper.vm;
-        await component.$nextTick();
 
-        expect(component.is_admin).toBe(true);
+        expect(wrapper.vm.course).toEqual(course);
+        expect(wrapper.vm.is_admin).toBe(false);
+        expect(wrapper.vm.new_course_year).toEqual(wrapper.vm.course.year);
+    });
+
+    test('SingleCourse data members use defaults when semester and year are null', async () => {
+        course.semester = null;
+        course.year = null;
+        let wrapper = make_wrapper(course, false);
+
+        expect(wrapper.vm.course).toEqual(course);
+        expect(wrapper.vm.is_admin).toBe(false);
+
+        expect(wrapper.vm.new_course_semester).toEqual(Semester.fall);
+        expect(wrapper.vm.new_course_year).toEqual((new Date()).getFullYear());
+    });
+
+    test('If the user is an admin, they have the option to clone or edit a course', async () => {
+        let wrapper = make_wrapper();
+
+        expect(wrapper.vm.is_admin).toBe(true);
         expect(wrapper.findAll('.clone-course').length).toEqual(1);
         expect(wrapper.findAll('.edit-course-settings').length).toEqual(1);
     });
 
     test('Semester binding - for clone of course', async () => {
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1,
-                is_admin: true
-            },
-            stubs: ['router-link', 'router-view']
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
+        let wrapper = make_wrapper();
 
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
+        await wrapper.find('.clone-course').trigger('click');
+        let semester_select = wrapper.find('[data-testid=semester]');
 
-        let semester_select = wrapper.find('#semester');
+        expect(wrapper.vm.new_course_semester).toEqual(course.semester);
 
-        expect(component.new_course_semester).toEqual(course_1.semester);
+        await semester_select.setValue(Semester.summer);
+        expect(wrapper.vm.new_course_semester).toEqual(Semester.summer);
 
-        semester_select.setValue(Semester.summer);
-        expect(component.new_course_semester).toEqual(Semester.summer);
+        await semester_select.setValue(Semester.winter);
+        expect(wrapper.vm.new_course_semester).toEqual(Semester.winter);
 
-        semester_select.setValue(Semester.winter);
-        expect(component.new_course_semester).toEqual(Semester.winter);
-
-        component.new_course_semester = Semester.spring;
+        await set_data(wrapper, {new_course_semester: Semester.spring});
         expect_html_element_has_value(semester_select, Semester.spring);
     });
 
-    test("If the user is not an admin, they don't have the option to clone or edit a course",
-         async () => {
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1,
-                is_admin: false
-            },
-            stubs: ['router-link', 'router-view']
-        });
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        expect(component.is_admin).toBe(false);
+    test("Clone and edit options hidden from non-admin users", async () => {
+        let wrapper = make_wrapper(course, false);
+        expect(wrapper.vm.is_admin).toBe(false);
         expect(wrapper.findAll('.clone-course').length).toEqual(0);
         expect(wrapper.findAll('.edit-course-settings').length).toEqual(0);
     });
 
-    test('SingleCourse with a Course as input whose semester and year are null',
-         async () => {
-         wrapper = mount(SingleCourse, {
-             propsData: {
-                 course: course_with_null_values
-             },
-             stubs: ['router-link', 'router-view']
-         });
-         component = wrapper.vm;
-         await component.$nextTick();
-
-         expect(component.course).toEqual(course_with_null_values);
-         expect(component.is_admin).toBe(false);
-         expect(component.new_course_semester).toEqual(Semester.fall);
-         expect(component.new_course_year).toEqual((new Date()).getFullYear());
-    });
-
     test('The newly cloned course name cannot be an empty string', async () => {
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1,
-                is_admin: true
-            },
-            stubs: ['router-link', 'router-view']
-        });
+        let wrapper = make_wrapper();
 
-        component = wrapper.vm;
-        await component.$nextTick();
+        await wrapper.find('.clone-course').trigger('click');
+        let clone_name_input = wrapper.findComponent({ref: "copy_of_course_name"});
 
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
+        await set_validated_input_text(clone_name_input, "");
 
-        let clone_name_input = <ValidatedInput> wrapper.find(
-            {ref: "copy_of_course_name"}
-        ).vm;
-
-        set_validated_input_text(wrapper.find({ref: 'copy_of_course_name'}), "");
-
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'clone_course_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_clone_course_modal).toBe(true);
-        expect(clone_name_input.is_valid).toBe(false);
+        expect(validated_input_is_valid(clone_name_input)).toBe(false);
 
-        set_validated_input_text(wrapper.find({ref: 'copy_of_course_name'}), "    ");
+        await set_validated_input_text(clone_name_input, "    ");
 
-        expect(clone_name_input.is_valid).toBe(false);
-        expect(component.clone_course_form_is_valid).toBe(false);
+        expect(validated_input_is_valid(clone_name_input)).toBe(false);
+        expect(wrapper.vm.clone_course_form_is_valid).toBe(false);
         expect(wrapper.vm.d_show_clone_course_modal).toBe(true);
     });
 
-    test('The newly cloned course year must be greater >= 2000 - violates condition',
-         async () => {
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1,
-                is_admin: true
-            },
-            stubs: ['router-link', 'router-view']
-        });
+    test('The newly cloned course year must be greater >= 2000 - violates condition', async () => {
+        let wrapper = make_wrapper();
 
-        component = wrapper.vm;
-        await component.$nextTick();
+        await wrapper.find('.clone-course').trigger('click');
+        let clone_year_input = wrapper.findComponent({ref: "copy_of_course_year"});
 
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
+        expect(wrapper.findComponent({ref: 'clone_course_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.new_course_year).toEqual(wrapper.vm.course.year);
+        expect(validated_input_is_valid(clone_year_input)).toBe(true);
 
-        let clone_year_input = <ValidatedInput> wrapper.find(
-            {ref: "copy_of_course_year"}
-        ).vm;
+        await set_validated_input_text(clone_year_input, "1999");
 
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
-        expect(component.new_course_year).toEqual(component.course.year);
-        expect(clone_year_input.is_valid).toBe(true);
-
-        set_validated_input_text(wrapper.find({ref: 'copy_of_course_year'}), "1999");
-
-        expect(clone_year_input.is_valid).toBe(false);
-        expect(component.clone_course_form_is_valid).toBe(false);
+        expect(validated_input_is_valid(clone_year_input)).toBe(false);
+        expect(wrapper.vm.clone_course_form_is_valid).toBe(false);
     });
 
-    test('The newly cloned course year must be greater >= 2000 - meets condition',
-         async () => {
-         wrapper = mount(SingleCourse, {
-             propsData: {
-                 course: course_1,
-                 is_admin: true
-             },
-             stubs: ['router-link', 'router-view']
-         });
+    test('The newly cloned course year must be greater >= 2000 - meets condition', async () => {
+        let wrapper = make_wrapper();
 
-         component = wrapper.vm;
-         await component.$nextTick();
+        await wrapper.find('.clone-course').trigger('click');
+        let clone_year_input = wrapper.findComponent({ref: "copy_of_course_year"});
 
-         wrapper.find('.clone-course').trigger('click');
-         await component.$nextTick();
+        expect(wrapper.findComponent({ref: 'clone_course_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.new_course_year).toEqual(wrapper.vm.course.year);
+        expect(validated_input_is_valid(clone_year_input)).toBe(true);
 
-         let clone_year_input = <ValidatedInput> wrapper.find(
-             {ref: "copy_of_course_year"}
-         ).vm;
-
-         expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
-         expect(component.new_course_year).toEqual(component.course.year);
-         expect(clone_year_input.is_valid).toBe(true);
-
-         set_validated_input_text(wrapper.find({ref: 'copy_of_course_year'}), "2000");
-
-         expect(clone_year_input.is_valid).toBe(true);
+        await set_validated_input_text(wrapper.findComponent({ref: 'copy_of_course_year'}), "2000");
+        expect(validated_input_is_valid(clone_year_input)).toBe(true);
     });
 
-    test('The newly cloned course year must be a number - violates condition',
-         async () => {
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1,
-                is_admin: true
-            },
-            stubs: ['router-link', 'router-view']
-        });
+    test('The newly cloned course year must be a number - violates condition', async () => {
+        let wrapper = make_wrapper();
 
-        component = wrapper.vm;
-        await component.$nextTick();
+        await wrapper.find('.clone-course').trigger('click');
+        let clone_year_input = wrapper.findComponent({ref: "copy_of_course_year"});
 
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
+        expect(wrapper.findComponent({ref: 'clone_course_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.new_course_year).toEqual(wrapper.vm.course.year);
+        expect(validated_input_is_valid(clone_year_input)).toBe(true);
 
-        let clone_year_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_year"}).vm;
-
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
-        expect(component.new_course_year).toEqual(component.course.year);
-        expect(clone_year_input.is_valid).toBe(true);
-
-        set_validated_input_text(wrapper.find({ref: 'copy_of_course_year'}), "spoon");
-
-        expect(clone_year_input.is_valid).toBe(false);
+        await set_validated_input_text(clone_year_input, "spoon");
+        expect(validated_input_is_valid(clone_year_input)).toBe(false);
     });
 
-    test('The newly cloned course year cannot be an empty string - violates condition',
-         async () => {
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1,
-                is_admin: true
-            },
-            stubs: ['router-link', 'router-view']
-        });
+    test('The newly cloned course year cannot be empty - violates condition', async () => {
+        let wrapper = make_wrapper();
 
-        component = wrapper.vm;
-        await component.$nextTick();
+        await wrapper.find('.clone-course').trigger('click');
+        let clone_year_input = wrapper.findComponent({ref: "copy_of_course_year"});
 
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
+        expect(wrapper.findComponent({ref: 'clone_course_modal'}).exists()).toBe(true);
+        expect(wrapper.vm.new_course_year).toEqual(wrapper.vm.course.year);
+        expect(validated_input_is_valid(clone_year_input)).toBe(true);
 
-        let clone_year_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_year"}).vm;
+        await set_validated_input_text(clone_year_input, "    ");
 
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
-        expect(component.new_course_year).toEqual(component.course.year);
-        expect(clone_year_input.is_valid).toBe(true);
-
-        set_validated_input_text(wrapper.find({ref: 'copy_of_course_year'}), "    ");
-
-        expect(clone_year_input.is_valid).toBe(false);
+        expect(validated_input_is_valid(clone_year_input)).toBe(false);
     });
 
-    test("When creating a clone of a course the clone's combination of " +
-         "(course name, year, semester) must be unique - violates condition",
-         async () => {
+    test("Successful clone", async () => {
+        let wrapper = make_wrapper();
 
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1,
-                is_admin: true
-            },
-            stubs: ['router-link', 'router-view']
-        });
+        let new_name = "New Course";
+        await wrapper.find('.clone-course').trigger('click');
+        let clone_name_input = wrapper.findComponent({ref: "copy_of_course_name"});
+        await set_validated_input_text(clone_name_input, new_name);
+        expect(validated_input_is_valid(clone_name_input)).toBe(true);
 
-        component = wrapper.vm;
-        await component.$nextTick();
+        let copy_course_stub = sinon.stub(wrapper.vm.course, 'copy');
+        await wrapper.findComponent({ref: 'clone_course_form'}).trigger('submit');
 
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
+        assert_not_null(course.semester);
+        assert_not_null(course.year);
+        expect(copy_course_stub.firstCall.calledWith(
+            new_name, course.semester, course.year
+        )).toBe(true);
+        expect(wrapper.findComponent({ref: 'clone_course_modal'}).exists()).toBe(false);
+    });
 
-        let clone_name_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_name"}).vm;
-        let clone_year_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_year"}).vm;
+    test("API errors handled", async () => {
+        let wrapper = make_wrapper();
 
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
+        await wrapper.find('.clone-course').trigger('click');
+        let clone_name_input = wrapper.findComponent({ref: "copy_of_course_name"});
+        await set_validated_input_text(clone_name_input, "Some course name");
+        expect(validated_input_is_valid(clone_name_input)).toBe(true);
 
-        set_validated_input_text(
-            wrapper.find({ref: 'copy_of_course_name'}), component.course.name);
-
-        component.new_course_semester = course_1.semester !== null
-                                            ? course_1.semester : Semester.winter;
-
-        expect(clone_name_input.is_valid).toBe(true);
-        expect(clone_year_input.is_valid).toBe(true);
-        expect(component.new_course_name).toEqual(component.course.name);
-        expect(component.new_course_semester).toEqual(component.course.semester);
-        expect(component.new_course_year).toEqual(component.course.year);
-
-        let copy_course_stub = sinon.stub(component.course, 'copy').returns(
-            Promise.reject(
-                new HttpError(
-                    400,
-                    {__all__: "A course with this name, semester, and year already exists."}
-                )
-            )
+        let copy_course_stub = sinon.stub(wrapper.vm.course, 'copy').rejects(
+            new HttpError(400, {__all__: "This data is bad."})
         );
+        await wrapper.findComponent({ref: 'clone_course_form'}).trigger('submit');
 
-        wrapper.find({ref: 'clone_course_form'}).trigger('submit');
-        await component.$nextTick();
-
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(copy_course_stub.calledOnce);
         expect(api_errors.d_api_errors.length).toBe(1);
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
-    });
-
-    test("Cloning a course whose semester and year are null",
-         async () => {
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_with_null_values,
-                is_admin: true
-            },
-            stubs: ['router-link', 'router-view']
-        });
-
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
-
-        let clone_name_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_name"}).vm;
-        let clone_year_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_year"}).vm;
-
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
-
-        set_validated_input_text(wrapper.find({ref: 'copy_of_course_name'}), "New Course");
-
-        let current_year = (new Date()).getFullYear();
-
-        expect(clone_name_input.is_valid).toBe(true);
-        expect(clone_year_input.is_valid).toBe(true);
-        expect(component.new_course_name).toEqual("New Course");
-        expect(component.new_course_semester).toEqual(Semester.fall);
-        expect(component.new_course_year).toEqual(current_year);
-        expect(component.clone_course_form_is_valid).toBe(true);
-
-        let copy_course_stub = sinon.stub(component.course, 'copy');
-        wrapper.find({ref: 'clone_course_form'}).trigger('submit');
-        await component.$nextTick();
-
-        expect(copy_course_stub.firstCall.calledWith(
-            "New Course", Semester.fall, current_year
-        )).toBe(true);
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(false);
-        expect(component.new_course_name).toEqual("New Course");
-        expect(component.new_course_semester).toEqual(Semester.fall);
-        expect(component.new_course_year).toEqual(current_year);
-     });
-
-    test("When creating a clone of a course the clone's combination of " +
-         "(course name, year, semester) must be unique - meets condition",
-         async () => {
-
-        wrapper = mount(SingleCourse, {
-            propsData: {
-                course: course_1,
-                is_admin: true
-            },
-            stubs: ['router-link', 'router-view']
-        });
-
-        component = wrapper.vm;
-        await component.$nextTick();
-
-        wrapper.find('.clone-course').trigger('click');
-        await component.$nextTick();
-
-        let clone_name_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_name"}).vm;
-        let clone_year_input = <ValidatedInput> wrapper.find({ref: "copy_of_course_year"}).vm;
-
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(true);
-        expect(wrapper.vm.d_show_clone_course_modal).toBe(true);
-
-        set_validated_input_text(wrapper.find({ref: 'copy_of_course_name'}), "New Course");
-
-        expect(clone_name_input.is_valid).toBe(true);
-        expect(clone_year_input.is_valid).toBe(true);
-        expect(component.new_course_name).toEqual("New Course");
-        expect(component.new_course_semester).toEqual(course_1.semester);
-        expect(component.new_course_year).toEqual(course_1.year);
-        expect(component.clone_course_form_is_valid).toBe(true);
-
-        let copy_course_stub = sinon.stub(component.course, 'copy');
-        wrapper.find({ref: 'clone_course_form'}).trigger('submit');
-        await component.$nextTick();
-
-        expect(copy_course_stub.firstCall.calledWith(
-            "New Course", course_1.semester, course_1.year
-        )).toBe(true);
-        expect(wrapper.find({ref: 'clone_course_modal'}).exists()).toBe(false);
-        expect(wrapper.vm.d_show_clone_course_modal).toBe(false);
-        expect(component.new_course_name).toEqual("New Course");
-        expect(component.new_course_semester).toEqual(course_1.semester);
-        expect(component.new_course_year).toEqual(course_1.year);
+        expect(wrapper.findComponent({ref: 'clone_course_modal'}).exists()).toBe(true);
     });
 });

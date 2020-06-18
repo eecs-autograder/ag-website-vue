@@ -1,6 +1,6 @@
 import { Component, Vue } from "vue-property-decorator";
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 
@@ -10,9 +10,6 @@ import { is_number } from "@/validators";
 
 import { get_validated_input_text, set_validated_input_text, sleep } from './utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('ValidatedForm.vue', () => {
     test('is_valid returns true only if all ValidatedInputs are valid ', async () => {
@@ -44,7 +41,7 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const form = wrapper.find({ref: 'form'});
+        const form = wrapper.findComponent({ref: 'form'});
         const form_vm = <ValidatedForm> form.vm;
 
         await wrapper.vm.$nextTick();
@@ -76,7 +73,7 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const form_vm = <ValidatedForm> wrapper.find({ref: 'form'}).vm;
+        const form_vm = <ValidatedForm> wrapper.findComponent({ref: 'form'}).vm;
 
         expect(form_vm.d_validated_inputs.length).toBe(0);
         expect(form_vm.is_valid).toBe(true);
@@ -109,13 +106,13 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const form = wrapper.find({ref: 'form'});
+        const form = wrapper.findComponent({ref: 'form'});
         const form_vm = <ValidatedForm> form.vm;
 
         expect(form_vm.d_validated_inputs.length).toBe(1);
         expect(form_vm.is_valid).toBe(true);
 
-        const validated_input = wrapper.find({ref: 'validated_input_1'});
+        const validated_input = wrapper.findComponent({ref: 'validated_input_1'});
         set_validated_input_text(validated_input, "invalid");
         expect(form_vm.is_valid).toBe(false);
 
@@ -159,7 +156,7 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const form = wrapper.find({ref: 'form'});
+        const form = wrapper.findComponent({ref: 'form'});
         const form_vm = <ValidatedForm> form.vm;
 
         expect(form_vm.d_validated_inputs.length).toBe(3);
@@ -208,7 +205,8 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const validated_input = <ValidatedInput> wrapper.find({ref: 'validated_input_1'}).vm;
+        const validated_input = <ValidatedInput> wrapper.findComponent(
+            {ref: 'validated_input_1'}).vm;
         expect(validated_input.register).toBeDefined();
     });
 
@@ -239,8 +237,8 @@ describe('ValidatedForm.vue', () => {
         };
 
         let wrapper = mount(component);
-        let form_vm = <ValidatedForm> wrapper.find({ref: 'form'}).vm;
-        let validated_input = wrapper.find({ref: 'validated_input'});
+        let form_vm = <ValidatedForm> wrapper.findComponent({ref: 'form'}).vm;
+        let validated_input = wrapper.findComponent({ref: 'validated_input'});
 
         expect(form_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.form_is_valid).toBe(true);
@@ -288,9 +286,9 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const form = <Wrapper<ValidatedForm>> wrapper.find({ref: 'form'});
-        const input1 = <Wrapper<ValidatedInput>> wrapper.find({ref: 'validated_input1'});
-        const input2 = <Wrapper<ValidatedInput>> wrapper.find({ref: 'validated_input2'});
+        const form = <Wrapper<ValidatedForm>> wrapper.findComponent({ref: 'form'});
+        const input1 = <Wrapper<ValidatedInput>> wrapper.findComponent({ref: 'validated_input1'});
+        const input2 = <Wrapper<ValidatedInput>> wrapper.findComponent({ref: 'validated_input2'});
 
         expect(form.vm.is_valid).toBe(false);
         expect(input1.vm.d_show_warnings).toBe(false);
@@ -331,10 +329,10 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        const form_vm = <ValidatedForm> wrapper.find({ref: 'form'}).vm;
-        const vinput1 = wrapper.find({ref: 'validated_input_1'});
+        const form_vm = <ValidatedForm> wrapper.findComponent({ref: 'form'}).vm;
+        const vinput1 = wrapper.findComponent({ref: 'validated_input_1'});
         const vinput1_vm = <ValidatedInput> vinput1.vm;
-        const vinput2 =  wrapper.find({ref: 'validated_input_2'});
+        const vinput2 =  wrapper.findComponent({ref: 'validated_input_2'});
         const vinput2_vm = <ValidatedInput> vinput2.vm;
 
         expect(form_vm.is_valid).toBe(false);
@@ -397,7 +395,7 @@ describe('ValidatedForm.vue', () => {
 
         const wrapper = mount(WrapperComponent);
 
-        let form = <Wrapper<ValidatedForm>> wrapper.find({ref: 'form'});
+        let form = <Wrapper<ValidatedForm>> wrapper.findComponent({ref: 'form'});
         expect(form.vm.is_valid).toEqual(false);
         expect(wrapper.findAll('.validated-input').length).toEqual(2);
 
@@ -422,7 +420,7 @@ describe('ValidatedForm.vue', () => {
         expect(form.vm.is_valid).toEqual(false);
     });
 
-    test('Submit event not emitted when form invalid', () => {
+    test('Submit event not emitted when form invalid', async () => {
         let submit_handler = sinon.stub();
 
         const component = {
@@ -448,7 +446,7 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        let form = <Wrapper<ValidatedForm>> wrapper.find({ref: 'form'});
+        let form = <Wrapper<ValidatedForm>> wrapper.findComponent({ref: 'form'});
 
         expect(form.vm.is_valid).toEqual(true);
 
@@ -456,6 +454,7 @@ describe('ValidatedForm.vue', () => {
         expect(submit_handler.calledOnce).toEqual(true);
 
         wrapper.setData({value: 'not number'});
+        await wrapper.vm.$nextTick();
 
         expect(form.vm.is_valid).toEqual(false);
 
@@ -488,7 +487,7 @@ describe('ValidatedForm.vue', () => {
         };
 
         const wrapper = mount(component);
-        wrapper.find({ref: 'form'}).find('form').trigger('submit');
+        wrapper.findComponent({ref: 'form'}).find('form').trigger('submit');
 
         expect(submit_handler.calledOnce).toEqual(true);
     });

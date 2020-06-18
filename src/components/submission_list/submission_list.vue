@@ -30,6 +30,7 @@
           <template v-for="(submission, index) of d_submissions">
             <div v-if="index !== 0" class="divider"></div>
             <submission-panel
+              data-testid="all_submissions_submission_panel"
               :submission="d_ultimate_submission !== null
                               && d_ultimate_submission.pk === submission.pk
                             ? d_ultimate_submission : submission"
@@ -254,7 +255,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
         total_points: 0,
         total_points_possible: 0,
         ag_test_suite_results: [],
-        student_test_suite_results: [],
+        mutation_test_suite_results: [],
       },
       ...JSON.parse(JSON.stringify(submission))
     };

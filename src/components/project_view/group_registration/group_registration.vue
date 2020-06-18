@@ -40,7 +40,7 @@
                 <th class="table-cell"> Member Name </th>
                 <th class="table-cell"> Status </th>
               </tr>
-              <tr v-for="(username, index) of invitation_sent.invited_usernames">
+              <tr v-for="(username, index) of invitation_sent.recipient_usernames">
                 <td class="table-cell">{{username}}</td>
                 <td class="table-cell">{{invitee_acceptance_status(username)}}</td>
               </tr>
@@ -129,7 +129,7 @@
       <div class="modal-header"> Delete Invitation </div>
       Are you sure you want to <b>delete</b> your invitation to:
       <ul v-if="invitation_sent !== null" class="list-of-usernames">
-        <li v-for="(username, index) of invitation_sent.invited_usernames"
+        <li v-for="(username, index) of invitation_sent.recipient_usernames"
             class="username">
           {{username}}
         </li>
@@ -163,8 +163,7 @@ import { GroupMember } from "@/components/project_admin/edit_groups/create_singl
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 
 @Component({
   components: {
@@ -242,7 +241,7 @@ export default class GroupRegistration extends Vue {
   }
 
   invitee_acceptance_status(username: string) {
-    return this.invitation_sent!.invitees_who_accepted.findIndex(
+    return this.invitation_sent!.recipients_who_accepted.findIndex(
         (name: string) => username === name) !== -1 ? 'Accepted' : 'Pending';
   }
 

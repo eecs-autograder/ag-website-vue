@@ -22,7 +22,7 @@ beforeEach(() => {
 });
 
 describe('SingleAnnotation tests', () => {
-    test('Input value and watcher', () => {
+    test('Input value and watcher', async () => {
         const wrapper = mount(SingleAnnotation, {propsData: {annotation: annotation}});
         expect(wrapper.vm.d_annotation).not.toBe(annotation);
         expect(wrapper.vm.d_annotation).toEqual(annotation);
@@ -37,15 +37,17 @@ describe('SingleAnnotation tests', () => {
             last_modified: ''
         });
         wrapper.setProps({annotation: other});
+        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_annotation).not.toBe(other);
         expect(wrapper.vm.d_annotation).toEqual(other);
     });
 
-    test('Toggle edit mode', () => {
+    test('Toggle edit mode', async () => {
         const wrapper = mount(SingleAnnotation, {propsData: {annotation: annotation}});
-        expect(wrapper.find({ref: 'annotation_form'}).exists()).toEqual(false);
+        expect(wrapper.findComponent({ref: 'annotation_form'}).exists()).toEqual(false);
         wrapper.vm.d_edit_mode = true;
-        expect(wrapper.find({ref: 'annotation_form'}).exists()).toEqual(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findComponent({ref: 'annotation_form'}).exists()).toEqual(true);
     });
 
     test('Short description displyed', () => {
@@ -53,25 +55,28 @@ describe('SingleAnnotation tests', () => {
         expect(wrapper.find('.short-description').text()).toEqual(annotation.short_description);
     });
 
-    test('Deduction and max_deduction displayed', () => {
+    test('Deduction and max_deduction displayed', async () => {
         annotation.max_deduction = null;
         const wrapper = mount(SingleAnnotation, {propsData: {annotation: annotation}});
         expect(wrapper.find('.deduction').text()).toEqual('-4 points');
 
         wrapper.vm.d_annotation.deduction = -1;
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('.deduction').text()).toEqual('-1 point');
 
         wrapper.vm.d_annotation.max_deduction = -3;
+        await wrapper.vm.$nextTick();
         expect(
             wrapper.find('.deduction').text().replace(/\s+/g, ' ')
         ).toEqual('-1 point (-3 max)');
     });
 
-    test('Long description displayed when not empty', () => {
+    test('Long description displayed when not empty', async () => {
         const wrapper = mount(SingleAnnotation, {propsData: {annotation: annotation}});
         expect(wrapper.find('.long-description').text()).toEqual(annotation.long_description);
 
         wrapper.vm.d_annotation.long_description = '';
+        await wrapper.vm.$nextTick();
         expect(wrapper.find('.long-description').exists()).toEqual(false);
     });
 });
@@ -87,21 +92,17 @@ describe('Save annotation tests', () => {
         save_stub = sinon.stub(wrapper.vm.d_annotation, 'save').returns(Promise.resolve());
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     test('Save', async () => {
         expect(wrapper.vm.d_annotation_form_is_valid).toEqual(true);
 
-        (<AnnotationForm> wrapper.find({ref: 'annotation_form'}).vm).d_form_data = {
+        (<AnnotationForm> wrapper.findComponent({ref: 'annotation_form'}).vm).d_form_data = {
             short_description: 'new short description',
             deduction: -7,
             max_deduction: -14,
             long_description: 'new long description',
         };
 
-        wrapper.find({ref: 'annotation_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'annotation_form'}).trigger('submit');
 
         await wrapper.vm.$nextTick();
 
@@ -120,7 +121,7 @@ describe('Save annotation tests', () => {
         wrapper.setProps({annotation: new_input});
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_annotation_form_is_valid).toEqual(false);
-        expect(wrapper.find('.save-button').is('[disabled]')).toEqual(true);
+        expect(wrapper.find('.save-button').element).toBeDisabled();
     });
 
     test('API error', async () => {
@@ -128,11 +129,11 @@ describe('Save annotation tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'save_annotation_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'save_annotation_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(0);
 
         expect(wrapper.vm.d_annotation_form_is_valid).toEqual(true);
-        wrapper.find({ref: 'annotation_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'annotation_form'}).trigger('submit');
 
         await wrapper.vm.$nextTick();
 
@@ -152,31 +153,31 @@ describe('Delete annotation tests', () => {
     test('Delete', async () => {
         wrapper.find('.delete-icon').trigger('click');
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'delete_annotation_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(true);
 
         wrapper.find('.delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(delete_stub.calledOnce).toEqual(true);
-        expect(wrapper.find({ref: 'delete_annotation_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(false);
     });
 
     test('Cancel delete', async () => {
         wrapper.find('.delete-icon').trigger('click');
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'delete_annotation_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(true);
 
         wrapper.find('.cancel-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(delete_stub.called).toEqual(false);
-        expect(wrapper.find({ref: 'delete_annotation_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(false);
     });
 
     test('API error', async () => {
         wrapper.find('.delete-icon').trigger('click');
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'delete_annotation_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(true);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'delete_annotation_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_annotation_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(0);
 
         delete_stub.returns(Promise.reject(new HttpError(403, 'Permission denied')));
@@ -184,6 +185,6 @@ describe('Delete annotation tests', () => {
         wrapper.find('.delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(api_errors.d_api_errors.length).toEqual(1);
-        expect(wrapper.find({ref: 'delete_annotation_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(true);
     });
 });

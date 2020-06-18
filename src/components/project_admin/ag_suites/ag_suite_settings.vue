@@ -1,9 +1,9 @@
 <template>
-  <div id="ag-test-suite-settings-component" v-if="d_ag_test_suite !== null">
+  <div v-if="d_ag_test_suite !== null">
     <div v-if="!d_loading">
       <!------------------------ Suite Settings ------------------------------------->
 
-      <validated-form id="ag-test-suite-settings-form"
+      <validated-form data-testid="ag_test_suite_settings_form"
                       autocomplete="off"
                       spellcheck="false"
                       @submit="save_ag_test_suite_settings"
@@ -193,10 +193,9 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
   AGTestSuite,
   ExpectedStudentFile,
-  get_sandbox_docker_images,
   InstructorFile,
   Project,
-  SandboxDockerImageData
+  SandboxDockerImage,
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -212,9 +211,13 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
+import {
+  handle_api_errors_async,
+  handle_global_errors_async,
+  make_error_handler_func
+} from '@/error_handling';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { deep_copy, format_datetime, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
@@ -249,7 +252,7 @@ export default class AGSuiteSettings extends Vue {
   }
 
   d_ag_test_suite: AGTestSuite | null = null;
-  d_docker_images: SandboxDockerImageData[] = [];
+  d_docker_images: SandboxDockerImage[] = [];
   d_loading = true;
   d_saving = false;
   d_settings_form_is_valid = true;
@@ -264,7 +267,9 @@ export default class AGSuiteSettings extends Vue {
   @handle_global_errors_async
   async created() {
     this.d_ag_test_suite = deep_copy(this.ag_test_suite, AGTestSuite);
-    this.d_docker_images = await get_sandbox_docker_images();
+    let global_images = await SandboxDockerImage.get_images(null);
+    let course_images = await SandboxDockerImage.get_images(this.project.course);
+    this.d_docker_images = global_images.concat(course_images);
     this.d_loading = false;
   }
 

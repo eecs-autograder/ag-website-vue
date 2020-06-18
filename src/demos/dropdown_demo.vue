@@ -10,7 +10,7 @@
                 :items="menu_items"
                 :initial_highlighted_index="5"
                 dropdown_height="200px"
-                @update_item_selected="add_item_1($event)">
+                @item_selected="add_item_1($event)">
         <template slot="header">
           <p tabindex="0" class="header-para">
             {{selected_menu_item.option}}
@@ -28,7 +28,7 @@
     <div class="surround-2">
       <dropdown ref="dropdown_menu_ex_2"
                 :items="names"
-                @update_item_selected="add_item_2($event)">
+                @item_selected="add_item_2($event)">
         <template slot="header">
           <button class="header-button">
             Menu On A Button
@@ -48,7 +48,7 @@
       <p> {{some_word}}</p>
       <dropdown ref="dropdown_menu_ex_3"
                 :items="names"
-                @update_item_selected="add_item_3($event)">
+                @item_selected="add_item_3($event)">
         <template slot="header">
           <input type=text
                  name="some_word_stuff"

@@ -14,10 +14,10 @@
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
-          <span class="collapse-show-button" @click="d_collapsed = !d_collapsed">
+          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars"></i>
           </span>
-          <span class="header-text"
+          <span class="sidebar-header-text"
                 v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
         </div>
 
@@ -49,10 +49,11 @@ import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import ViewFile from '@/components/view_file.vue';
+import { handle_api_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { SafeMap } from '@/safe_map';
-import { array_get_unique, array_has_unique, array_remove_unique, handle_api_errors_async, toggle } from '@/utils';
+import { toggle } from '@/utils';
 
 import SingleInstructorFile from './single_instructor_file.vue';
 
@@ -96,21 +97,12 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
 
   @handle_api_errors_async(handle_file_upload_errors)
   add_instructor_files(files: File[]) {
+    this.d_upload_progress = null;
     (<APIErrors> this.$refs.api_errors).clear();
     return toggle(this, 'd_uploading', async () => {
       for (let file of files) {
-        let file_already_exists = array_has_unique(
-          this.instructor_files,
-          file.name,
-          (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
-        );
-
-        if (file_already_exists) {
-          let file_to_update = array_get_unique(
-            this.instructor_files,
-            file.name,
-            (file_a: InstructorFile, file_name_to_add: string) => file_a.name === file_name_to_add
-          );
+        let file_to_update = this.instructor_files.find(item => item.name === file.name);
+        if (file_to_update !== undefined) {
           await file_to_update.set_content(file, (event: ProgressEvent) => {
             if (event.lengthComputable) {
               this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
@@ -118,7 +110,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
           });
         }
         else {
-          let file_to_add = await InstructorFile.create(
+          await InstructorFile.create(
             this.project.pk, file.name, file, (event: ProgressEvent) => {
               if (event.lengthComputable) {
                 this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
@@ -184,6 +176,7 @@ $border-color: hsl(220, 40%, 94%);
   $sidebar-width: 300px,
   $sidebar-header-height: 2.25rem,
   $border-color: $border-color,
+  $include-top-border: true,
   $background-color: white,
   $active-color: $pebble-light
 );
@@ -199,22 +192,13 @@ $border-color: hsl(220, 40%, 94%);
   font-size: 1.125rem;
 }
 
-.collapse-show-button {
-  cursor: pointer;
-  background: white;
-  border: none;
+.sidebar-collapse-button {
   color: $ocean-blue;
   outline: none;
-  padding: 0 .5rem;
-  font-size: 1rem;
-}
 
-.collapse-show-button:hover {
-  color: darken($ocean-blue, 10);
-}
-
-.header-text {
-  padding-right: .5rem;
+  &:hover {
+    color: darken($ocean-blue, 10);
+  }
 }
 
 .sidebar-item {

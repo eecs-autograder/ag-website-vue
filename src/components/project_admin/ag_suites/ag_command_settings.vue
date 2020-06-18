@@ -333,42 +333,42 @@
                 ref="diff_options">
         <legend class="legend"> Diff Options </legend>
         <div class="checkbox-input-container">
-          <input id="ignore-case"
-                 type="checkbox"
-                 class="checkbox"
-                 v-model="d_ag_test_command.ignore_case">
-          <label class="checkbox-label"
-                  for="ignore-case"> Ignore case sensitivity
+          <label class="checkbox-label">
+            <input id="ignore-case"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_command.ignore_case">
+            Ignore case
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input id="ignore-whitespace"
-                 type="checkbox"
-                 class="checkbox"
-                 v-model="d_ag_test_command.ignore_whitespace">
-          <label class="checkbox-label"
-                  for="ignore-whitespace"> Ignore whitespace
+          <label class="checkbox-label">
+            <input id="ignore-whitespace"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_command.ignore_whitespace">
+            Ignore whitespace
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input id="ignore-whitespace-changes"
-                 type="checkbox"
-                 class="checkbox"
-                 v-model="d_ag_test_command.ignore_whitespace_changes">
-          <label class="checkbox-label"
-                  for="ignore-whitespace-changes"> Ignore whitespace changes
+          <label class="checkbox-label">
+            <input id="ignore-whitespace-changes"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_command.ignore_whitespace_changes">
+            Ignore whitespace changes
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input id="ignore-blank-lines"
-                 type="checkbox"
-                 class="checkbox"
-                 v-model="d_ag_test_command.ignore_blank_lines">
-          <label class="checkbox-label"
-                  for="ignore-blank-lines"> Ignore blank lines
+          <label class="checkbox-label">
+            <input id="ignore-blank-lines"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_ag_test_command.ignore_blank_lines">
+            Ignore blank lines
           </label>
         </div>
       </fieldset>
@@ -413,12 +413,12 @@
           </template>
           <template slot="settings">
             <div id="first-failure-checkbox-wrapper" class="checkbox-input-container">
-              <input id="first-failure-config-enabled"
-                     type="checkbox"
-                     @change="toggle_first_failure_feedback"
-                     class="checkbox"
-                     :checked="d_ag_test_command.first_failed_test_normal_fdbk_config !== null">
-              <label for="first-failure-config-enabled">
+              <label>
+                <input id="first-failure-config-enabled"
+                       type="checkbox"
+                       @change="toggle_first_failure_feedback"
+                       class="checkbox"
+                       :checked="d_ag_test_command.first_failed_test_normal_fdbk_config !== null">
                 Enabled
               </label>
             </div>
@@ -591,16 +591,19 @@ import {
   AGTestCommandFeedbackPreset,
   FeedbackConfigLabel,
   FeedbackDescriptions,
-  hyphenate
 } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
+import {
+  handle_api_errors_async,
+  handle_global_errors_async,
+  make_error_handler_func
+} from '@/error_handling';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { deep_copy, format_datetime, toggle } from '@/utils';
 import {
   is_integer,
   is_not_empty,
@@ -626,7 +629,6 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
   }
 })
 export default class AGTestCommandSettings extends Vue {
-
   @Prop({required: true, type: AGTestCommand})
   ag_test_command!: AGTestCommand;
 

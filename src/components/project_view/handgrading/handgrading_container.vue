@@ -3,12 +3,12 @@
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div class="sidebar-header" :class="{'sidebar-header-closed': d_group_sidebar_collapsed}">
-          <div class="collapse-sidebar-button"
+          <div class="sidebar-collapse-button"
                 @click="d_group_sidebar_collapsed = !d_group_sidebar_collapsed">
             <i class="fas fa-bars"></i>
           </div>
           <template v-if="!d_group_sidebar_collapsed">
-            <div class="header-text">
+            <div class="sidebar-header-text">
               {{project.max_group_size === 1 ? 'Students' : 'Groups'}}
             </div>
             <div class="progress dropdown" v-if="!d_loading_result_summaries">
@@ -20,11 +20,13 @@
 
               <div id="filter-menu" class="menu">
                 <div class="checkbox-input-container">
-                  <input v-model="d_include_staff"
-                          id="include-staff"
-                          type="checkbox"
-                          class="checkbox">
-                  <label for="include-staff">Include Staff</label>
+                  <label>
+                    <input v-model="d_include_staff"
+                           id="include-staff"
+                           type="checkbox"
+                           class="checkbox">
+                    Include Staff
+                  </label>
                 </div>
 
                 <div id="select-status">
@@ -287,13 +289,12 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
     let to_update = this.d_result_summaries.find(
       summary => summary.pk === handgrading_result.group);
 
-    if (assert_not_null(to_update)) {
-      to_update.handgrading_result = {
-        finished_grading: handgrading_result.finished_grading,
-        total_points: handgrading_result.total_points,
-        total_points_possible: handgrading_result.total_points_possible,
-      };
-    }
+    assert_not_null(to_update);
+    to_update.handgrading_result = {
+      finished_grading: handgrading_result.finished_grading,
+      total_points: handgrading_result.total_points,
+      total_points_possible: handgrading_result.total_points_possible,
+    };
   }
 
   update_handgrading_result_deleted(handgrading_result: ag_cli.HandgradingResult): void {
@@ -316,7 +317,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 }
 
 .loading {
-  padding: 10px;
+  padding: .625rem;
   width: 100%;
   text-align: center;
 }
@@ -341,22 +342,8 @@ $active-color: $light-blue;
 .sidebar-container {
   .sidebar-menu {
     .sidebar-header {
-      padding: .25rem .5rem;
-      display: flex;
-      align-items: center;
-
       // Create a new stacking context
       z-index: inherit;
-
-      .collapse-sidebar-button:hover {
-        color: $stormy-gray-dark;
-        cursor: pointer;
-      }
-
-      .header-text {
-        font-size: 1.125rem;
-        margin: 0 .5rem;
-      }
 
       .progress {
         margin-left: auto;
@@ -365,14 +352,7 @@ $active-color: $light-blue;
       }
     }
 
-    .sidebar-header-closed {
-      border-bottom: 1px solid $border-color;
-    }
-
-    border-top: none;
-    border-left: none;
-    border-bottom: none;
-
+    // This is specific to this component.
     .sidebar-footer {
       position: fixed;
       bottom: 0;

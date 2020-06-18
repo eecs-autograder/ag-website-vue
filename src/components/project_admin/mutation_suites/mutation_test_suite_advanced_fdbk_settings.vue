@@ -2,12 +2,12 @@
   <div class="edit-feedback">
     <div id="edit-feedback-toggle-zone" v-if="d_feedback_config !== null">
       <div class="non-advanced checkbox-input-container">
-        <input :id="`${hyphenate(config_name)}-mutation-suite-visible`"
-                type="checkbox"
-                @change="$emit('input', d_feedback_config)"
-                class="checkbox"
-                v-model="d_feedback_config.visible">
-        <label :for="`${hyphenate(config_name)}-mutation-suite-visible`">
+        <label class="label">
+          <input data-testid="mutation_suite_is_visible"
+                 type="checkbox"
+                 @change="$emit('input', d_feedback_config)"
+                 class="checkbox"
+                 v-model="d_feedback_config.visible">
           Suite is Visible
         </label>
       </div>
@@ -19,151 +19,154 @@
       </div>
       <div v-if="d_is_open" class="advanced-settings">
         <div class="form-field-wrapper">
-          <label> Bugs Exposed </label>
-          <br>
-          <select ref="bugs_exposed_fdbk_level_select"
-                  :id="`${hyphenate(config_name)}-bugs-exposed-fdbk-level`"
-                  v-model="d_feedback_config.bugs_exposed_fdbk_level"
-                  @change="$emit('input', d_feedback_config)"
-                  class="select">
-            <option :value="BugsExposedFeedbackLevel.no_feedback">
-              Hide
-            </option>
-            <option :value="BugsExposedFeedbackLevel.num_bugs_exposed">
-              Num bugs exposed
-            </option>
-            <option :value="BugsExposedFeedbackLevel.exposed_bug_names">
-              Exposed bug names
-            </option>
-          </select>
+          <label>
+            Bugs Exposed
+            <br>
+            <select data-testid="bugs_exposed_fdbk_level"
+                    v-model="d_feedback_config.bugs_exposed_fdbk_level"
+                    @change="$emit('input', d_feedback_config)"
+                    class="select">
+              <option :value="BugsExposedFeedbackLevel.no_feedback">
+                Hide
+              </option>
+              <option :value="BugsExposedFeedbackLevel.num_bugs_exposed">
+                Num bugs exposed
+              </option>
+              <option :value="BugsExposedFeedbackLevel.exposed_bug_names">
+                Exposed bug names
+              </option>
+            </select>
+          </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-invalid-test-names`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_invalid_test_names">
-          <label :for="`${hyphenate(config_name)}-show-invalid-test-names`">
+          <label class="label">
+            <input data-testid="show_invalid_test_names"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_invalid_test_names">
             Show False Positive Student Tests
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-points`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_points">
-          <label :for="`${hyphenate(config_name)}-show-points`"> Show Points </label>
+          <label class="label">
+            <input data-testid="show_points"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_points">
+            Show Points
+          </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-setup-return-code`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_setup_return_code">
-          <label :for="`${hyphenate(config_name)}-show-setup-return-code`">
+          <label class="label">
+            <input data-testid="show_setup_return_code"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_setup_return_code">
             Show Setup Return Code
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-setup-stdout`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_setup_stdout">
-          <label :for="`${hyphenate(config_name)}-show-setup-stdout`">
+          <label class="label">
+            <input data-testid="show_setup_stdout"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_setup_stdout">
             Show Setup Stdout
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-setup-stderr`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_setup_stderr">
-          <label :for="`${hyphenate(config_name)}-show-setup-stderr`">
+          <label class="label">
+            <input data-testid="show_setup_stderr"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_setup_stderr">
             Show Setup Stderr
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-get-test-names-return-code`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_get_test_names_return_code">
-          <label :for="`${hyphenate(config_name)}-show-get-test-names-return-code`">
+          <label class="label">
+            <input data-testid="show_test_name_discovery_return_code"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_get_test_names_return_code">
             Show Test Name Discovery Return Code
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-get-test-names-stdout`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_get_test_names_stdout">
-          <label :for="`${hyphenate(config_name)}-show-get-test-names-stdout`">
+          <label class="label">
+            <input data-testid="show_test_name_discovery_stdout"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_get_test_names_stdout">
             Show Test Name Discovery Stdout
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-get-test-names-stderr`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_get_test_names_stderr">
-          <label :for="`${hyphenate(config_name)}-show-get-test-names-stderr`">
+          <label class="label">
+            <input data-testid="show_test_name_discovery_stderr"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_get_test_names_stderr">
             Show Test Name Discovery Stderr
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-validity-check-stdout`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_validity_check_stdout">
-          <label :for="`${hyphenate(config_name)}-show-validity-check-stdout`">
+          <label class="label">
+            <input data-testid="show_validity_check_stdout"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_validity_check_stdout">
             Show Validity Check Stdout
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-validity-check-stderr`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_validity_check_stderr">
-          <label :for="`${hyphenate(config_name)}-show-validity-check-stderr`">
+          <label class="label">
+            <input data-testid="show_validity_check_stderr"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_validity_check_stderr">
             Show Validity Check Stderr
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-grade-buggy-impls-stdout`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_grade_buggy_impls_stdout">
-          <label :for="`${hyphenate(config_name)}-show-grade-buggy-impls-stdout`">
+          <label class="label">
+            <input data-testid="show_grade_buggy_impls_stdout"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_grade_buggy_impls_stdout">
             Show Buggy Impls Stdout
           </label>
         </div>
 
         <div class="checkbox-input-container">
-          <input :id="`${hyphenate(config_name)}-show-grade-buggy-impls-stderr`"
-                 type="checkbox"
-                 @change="$emit('input', d_feedback_config)"
-                 class="checkbox"
-                 v-model="d_feedback_config.show_grade_buggy_impls_stderr">
-          <label :for="`${hyphenate(config_name)}-show-grade-buggy-impls-stderr`">
+          <label class="label">
+            <input data-testid="show_grade_buggy_impls_stderr"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_grade_buggy_impls_stderr">
             Show Buggy Impls Stderr
           </label>
         </div>
@@ -180,8 +183,6 @@ import {
   MutationTestSuiteFeedbackConfig
 } from 'ag-client-typescript';
 
-import { hyphenate } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
-
 @Component
 export default class EditFeedbackSettingsMutationSuite extends Vue {
 
@@ -195,7 +196,6 @@ export default class EditFeedbackSettingsMutationSuite extends Vue {
   d_is_open = false;
 
   readonly BugsExposedFeedbackLevel = BugsExposedFeedbackLevel;
-  readonly hyphenate = hyphenate;
 
   @Watch('value')
   on_value_changed(new_value: MutationTestSuiteFeedbackConfig,

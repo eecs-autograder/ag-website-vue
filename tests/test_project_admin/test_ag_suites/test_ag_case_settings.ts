@@ -55,33 +55,35 @@ describe('AG test case settings form tests', () => {
         sinon.restore();
     });
 
-    test('case name binding', () => {
-       let case_name_input = wrapper.find({ref: 'name'});
+    test('case name binding', async () => {
+        let case_name_input = wrapper.findComponent({ref: 'name'});
 
-       set_validated_input_text(case_name_input, "Case 1");
-       expect(validated_input_is_valid(case_name_input)).toBe(true);
-       expect(component.d_ag_test_case!.name).toEqual("Case 1");
+        set_validated_input_text(case_name_input, "Case 1");
+        await wrapper.vm.$nextTick();
+        expect(validated_input_is_valid(case_name_input)).toBe(true);
+        expect(component.d_ag_test_case!.name).toEqual("Case 1");
 
-       component.d_ag_test_case!.name = "Case 2";
-       expect(get_validated_input_text(case_name_input)).toEqual("Case 2");
+        component.d_ag_test_case!.name = "Case 2";
+        await wrapper.vm.$nextTick();
+        expect(get_validated_input_text(case_name_input)).toEqual("Case 2");
     });
 
     test('error - case name is blank', async () => {
-        set_validated_input_text(wrapper.find({ref: "name"}), 'Rain');
+        set_validated_input_text(wrapper.findComponent({ref: "name"}), 'Rain');
         await component.$nextTick();
 
-        expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(false);
+        expect(wrapper.findComponent({ref: 'save_button'}).element).not.toBeDisabled();
 
-        set_validated_input_text(wrapper.find({ref: "name"}), ' ');
+        set_validated_input_text(wrapper.findComponent({ref: "name"}), ' ');
         await component.$nextTick();
 
-        expect(wrapper.find({ref: 'save_button'}).is('[disabled]')).toBe(true);
+        expect(wrapper.findComponent({ref: 'save_button'}).element).toBeDisabled();
     });
 
     test('save d_ag_case - successful', async () => {
         let save_case_stub = sinon.stub(component.d_ag_test_case!, 'save');
 
-        wrapper.find({ref: 'ag_test_case_settings_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'ag_test_case_settings_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_case_stub.calledOnce).toBe(true);
@@ -97,11 +99,11 @@ describe('AG test case settings form tests', () => {
             )
         );
 
-        wrapper.find({ref: 'ag_test_case_settings_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'ag_test_case_settings_form'}).trigger('submit');
         await component.$nextTick();
 
         expect(save_case_stub.calledOnce).toBe(true);
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
@@ -109,13 +111,13 @@ describe('AG test case settings form tests', () => {
          'one command',
          async () => {
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(0);
-        expect(wrapper.find({ref: 'fdbk_panels'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'fdbk_panels'}).exists()).toBe(false);
 
         wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
         await component.$nextTick();
 
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(2);
-        expect(wrapper.find({ref: 'fdbk_panels'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'fdbk_panels'}).exists()).toBe(true);
 
         let case_3 = data_ut.make_ag_test_case(ag_test_suite.pk);
         case_3.ag_test_commands = [
@@ -126,7 +128,7 @@ describe('AG test case settings form tests', () => {
         await component.$nextTick();
 
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(1);
-        expect(wrapper.find({ref: 'fdbk_panels'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'fdbk_panels'}).exists()).toBe(false);
     });
 
     test('update config settings in ag_case_config_panel - changes reflected in ' +
@@ -135,14 +137,14 @@ describe('AG test case settings form tests', () => {
         wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
         await component.$nextTick();
 
-        let past_limit_config_panel = wrapper.find({ref: 'past_limit'});
+        let past_limit_config_panel = wrapper.findComponent({ref: 'past_limit'});
         let past_limit_config_panel_component
             = <AGTestCaseFdbkConfigPanel>  past_limit_config_panel.vm;
 
         expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(false);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(false);
 
-        wrapper.find('#past-limit-case-visible').setChecked(true);
+        await wrapper.findAll('[data-testid=is_visible]').at(2).setChecked(true);
 
         expect(past_limit_config_panel_component.d_feedback_config!.visible).toBe(true);
         expect(component.d_ag_test_case!.past_limit_submission_fdbk_config.visible).toBe(true);
@@ -154,7 +156,7 @@ describe('AG test case settings form tests', () => {
             component.d_ag_test_case!.past_limit_submission_fdbk_config.show_individual_commands
         ).toBe(false);
 
-        wrapper.find('#past-limit-show-individual-commands').setChecked(true);
+        await wrapper.findAll('[data-testid=show_individual_commands]').at(2).setChecked(true);
 
         expect(
             past_limit_config_panel_component.d_feedback_config!.show_individual_commands
@@ -166,8 +168,7 @@ describe('AG test case settings form tests', () => {
 
     test('Checkboxes in ag case config panels do not react to changes in other panels',
          async () => {
-        wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
-        await component.$nextTick();
+        await wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
 
         expect(component.d_ag_test_case!.normal_fdbk_config.show_individual_commands).toBe(false);
         expect(
@@ -180,7 +181,7 @@ describe('AG test case settings form tests', () => {
             component.d_ag_test_case!.staff_viewer_fdbk_config.show_individual_commands
         ).toBe(false);
 
-        wrapper.find('#student-lookup-show-individual-commands').setChecked(true);
+        await wrapper.findAll('[data-testid=show_individual_commands]').at(3).setChecked(true);
 
         expect(component.d_ag_test_case!.normal_fdbk_config.show_individual_commands).toBe(false);
         expect(

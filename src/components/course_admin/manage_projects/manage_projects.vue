@@ -56,9 +56,9 @@ import SingleProject from '@/components/course_admin/manage_projects/single_proj
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
-import { handle_api_errors_async, toggle } from '@/utils';
+import { toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({

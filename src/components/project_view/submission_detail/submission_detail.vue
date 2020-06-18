@@ -161,9 +161,9 @@
 
     <mutation-suite-results
       ref="mutation_suite_results"
-      v-if="submission_result.student_test_suite_results.length"
+      v-if="submission_result.mutation_test_suite_results.length"
       :submission="submission"
-      :mutation_test_suite_results="submission_result.student_test_suite_results"
+      :mutation_test_suite_results="submission_result.mutation_test_suite_results"
       :fdbk_category="feedback_category">
     </mutation-suite-results>
 
@@ -239,9 +239,9 @@ import MutationSuiteResults from '@/components/project_view/submission_detail/mu
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 import ViewFile from '@/components/view_file.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
-import { handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { OpenFilesMixin } from '@/open_files_mixin';
-import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { format_datetime, toggle } from '@/utils';
 
 @Component({
   components: {
@@ -371,6 +371,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
 
   @handle_global_errors_async
   private download_file(filename: string) {
+    this.d_download_progress = null;
     return toggle(this, 'd_downloading_file', async () => {
       let content = this.submission.get_file_content(filename, (event) => {
         if (event.lengthComputable) {

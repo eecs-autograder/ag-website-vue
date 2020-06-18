@@ -1,12 +1,9 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import {  mount, Wrapper } from '@vue/test-utils';
 
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
-import { expect_html_element_has_value, set_validated_input_text, sleep } from './utils';
+import { emitted, expect_html_element_has_value, set_validated_input_text, sleep } from './utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 const IS_NUMBER = (value: string): ValidatorResponse => {
     return {
@@ -51,7 +48,7 @@ describe('ValidatedInput.vue', () => {
         expect(input.attributes().placeholder).toEqual("Please enter a number");
     });
 
-    test('Validated input uses default when from_string_fn not present', () => {
+    test('Validated input uses default when from_string_fn not present', async () => {
         const component = {
             template:  `<validated-input ref="validated_input_1" v-model="my_input"
                                          :validators="[(v) => {
@@ -70,18 +67,19 @@ describe('ValidatedInput.vue', () => {
         };
 
         const wrapper = mount(component);
-        const validated_input = wrapper.find({ref: 'validated_input_1'});
+        const validated_input = wrapper.findComponent({ref: 'validated_input_1'});
         const validated_input_vm = <ValidatedInput> validated_input.vm;
         expect(validated_input_vm.d_input_value).toEqual("hello");
 
         // Changing variable in parent component should update variable in child component
         validated_input.setProps({value: "hey"});
+        await wrapper.vm.$nextTick();
         expect(validated_input_vm.d_input_value).toEqual("hey");
 
         // Changing input in child component should update variable in parent component
         // (this time, using default from_string_fn)
-        (<HTMLInputElement> validated_input.find('input').element).value = "yo";
-        validated_input.find('input').trigger('input');
+        validated_input.find('input').setValue("yo");
+        await wrapper.vm.$nextTick();
 
         expect(validated_input_vm.d_input_value).toEqual("yo");
         expect(wrapper.vm.$data.my_input).toEqual("yo");
@@ -109,7 +107,7 @@ describe('ValidatedInput.vue', () => {
 
         const wrapper = mount(component);
 
-        const validated_input = wrapper.find({ref: 'validated_input_1'});
+        const validated_input = wrapper.findComponent({ref: 'validated_input_1'});
         const validated_input_vm = <ValidatedInput> validated_input.vm;
 
         expect(validated_input_vm.d_input_value).toEqual("hello");
@@ -152,11 +150,10 @@ describe('ValidatedInput.vue', () => {
         };
 
         const wrapper = mount(component);
-        const validated_input = wrapper.find({ref: 'validated_input_1'});
+        const validated_input = wrapper.findComponent({ref: 'validated_input_1'});
 
         // Make a change in the input so that error messages are initially displayed
-        (<HTMLInputElement> wrapper.find('input').element).value = "hello";
-        wrapper.find('input').trigger('input');
+        wrapper.find('input').setValue("hello");
         await wrapper.vm.$nextTick();
 
         // Make sure second error message is displayed after delay
@@ -167,8 +164,8 @@ describe('ValidatedInput.vue', () => {
         expect(error_msg).toEqual(expected_error_msg);
 
         // Change input to fail first validator
-        (<HTMLInputElement> validated_input.find('input').element).value = "yo";
-        validated_input.find('input').trigger('input');
+        validated_input.find('input').setValue("yo");
+        await wrapper.vm.$nextTick();
 
         // Even though both validators fail, only FIRST error should be displayed
         error_msg = validated_input.find('.error-text').text();
@@ -216,7 +213,7 @@ describe('ValidatedInput.vue', () => {
 
         const wrapper = mount(component);
 
-        const v_input = wrapper.find({ref: 'v1'});
+        const v_input = wrapper.findComponent({ref: 'v1'});
         expect(v_input.find('.error-text').exists()).toBe(false);
 
         // Change input to pass validator
@@ -399,28 +396,26 @@ describe('ValidatedInput.vue', () => {
         };
 
         let wrapper = mount(component);
-        let vinput = wrapper.find({ref: 'vinput'});
+        let vinput = wrapper.findComponent({ref: 'vinput'});
         let vinput_vm = <ValidatedInput> vinput.vm;
 
         expect(vinput_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.input_is_valid).toBe(true);
 
-        (<HTMLInputElement> vinput.find('input').element).value = "42";
-        vinput.find('input').trigger('input');
+        vinput.find('input').setValue("42");
+        await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(true);
         expect(wrapper.vm.$data.input_is_valid).toBe(true);
 
-        (<HTMLInputElement> vinput.find('input').element).value = "invalid";
-        vinput.find('input').trigger('input');
+        vinput.find('input').setValue("invalid");
         await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(false);
         expect(wrapper.vm.$data.input_is_valid).toBe(false);
 
         // Back to valid
-        (<HTMLInputElement> vinput.find('input').element).value = "3";
-        vinput.find('input').trigger('input');
+        vinput.find('input').setValue("3");
         await wrapper.vm.$nextTick();
 
         expect(vinput_vm.is_valid).toBe(true);
@@ -578,8 +573,8 @@ describe('Custom from_string_fn and to_string_fn allow null tests', () => {
     test('Empty string converted to null', () => {
         set_validated_input_text(wrapper, '');
         expect(wrapper.vm.is_valid).toEqual(true);
-        expect(wrapper.emitted('input').length).toEqual(1);
-        expect(wrapper.emitted('input')[0][0]).toBeNull();
+        expect(emitted(wrapper, 'input').length).toEqual(1);
+        expect(emitted(wrapper, 'input')[0][0]).toBeNull();
     });
 
     test('null converted to empty string', () => {

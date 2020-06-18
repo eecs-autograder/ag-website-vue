@@ -30,7 +30,7 @@
         <div class="danger-text">Reset Handgrading Result</div>
         <button type="button"
                 class="delete-button"
-                ref="show_reset_handgrading_modal_button"
+                data-testid="show_reset_handgrading_modal_button"
                 @click="d_show_reset_handgrading_modal = true">
           Reset
         </button>
@@ -51,7 +51,7 @@
         <div class="modal-button-footer">
           <button type="button"
                   class="red-button"
-                  ref="reset_handgrading_button"
+                  data-testid="reset_handgrading_button"
                   :disabled="d_resetting"
                   @click="reset_handgrading">
             Reset
@@ -248,19 +248,16 @@
           <i class="fas fa-chevron-left"></i>
           Prev
         </button>
-        <div
-          id="finished-grading-container"
-          class="checkbox-input-container footer-item"
-          @click="d_handgrading_result.finished_grading = !d_handgrading_result.finished_grading;
-                  save_finished_grading()"
-        >
+        <div id="finished-grading-container" class="checkbox-input-container footer-item">
+          <label>
           <input type="checkbox"
                  class="checkbox"
                  id="finished-grading"
                  :disabled="saving"
                  @change="save_finished_grading"
                  v-model="d_handgrading_result.finished_grading"/>
-          <label for="finished-grading">Done</label>
+            Done
+          </label>
         </div>
         <button type="button"
                 id="next-button"

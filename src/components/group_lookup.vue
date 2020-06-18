@@ -4,7 +4,7 @@
       <dropdown-typeahead ref="group_typeahead"
                           placeholder_text="Enter a username"
                           :choices="groups"
-                          @update_item_chosen="on_group_selected"
+                          @item_selected="on_group_selected"
                           :filter_fn="group_filter_fn">
         <template slot-scope="{item}">
           <span v-for="(member, index) of item.member_names">

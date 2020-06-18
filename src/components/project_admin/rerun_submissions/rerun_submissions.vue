@@ -3,15 +3,6 @@
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="rerun-submissions-component">
-    <div class="msg-spacing">
-      <i class="fas fa-exclamation-triangle"></i>
-      Do NOT delete any test cases (or suites or commands) while your rerun is in progress. <br>
-      Doing so may cause a retry loop. <br>
-      See <a href="https://github.com/eecs-autograder/autograder-server/issues/480"
-             target="_blank">this issue</a>
-      for progress updates.
-    </div>
-
     <div id="grades-can-change-header" class="step-header">0. Download Grades So Far</div>
     <div id="grades-can-change-msg">
       <div class="msg-spacing">
@@ -29,12 +20,14 @@
 
     <div class="step-header">1. Choose submissions</div>
     <div class="checkbox-input-container">
-      <input
-        id="rerun-all-submissions"
-        type="checkbox"
-        class="checkbox"
-        v-model="d_rerun_all_submissions"/>
-      <label for="rerun-all-submissions">Rerun All Submissions</label>
+      <label>
+        <input
+          id="rerun-all-submissions"
+          type="checkbox"
+          class="checkbox"
+          v-model="d_rerun_all_submissions"/>
+        Rerun All Submissions
+      </label>
     </div>
     <div v-show="!d_rerun_all_submissions" class="choose-submissions-wrapper">
       <div class="form-field-wrapper group-lookup-wrapper">
@@ -60,12 +53,14 @@
 
     <div class="step-header">2. Choose test cases</div>
     <div class="checkbox-input-container">
-      <input
-        id="rerun-all-ag-test-cases"
-        type="checkbox"
-        class="checkbox"
-        v-model="d_rerun_all_ag_test_cases"/>
-      <label for="rerun-all-ag-test-cases">Rerun All Tests</label>
+      <label>
+        <input
+          id="rerun-all-ag-test-cases"
+          type="checkbox"
+          class="checkbox"
+          v-model="d_rerun_all_ag_test_cases"/>
+        Rerun All Tests
+      </label>
     </div>
 
     <div v-show="!d_rerun_all_ag_test_cases" class="choose-ag-test-suites-wrapper">
@@ -78,30 +73,29 @@
       </div>
       <collapsible class="ag-test-suite-collapsible"
                    v-for="ag_test_suite of d_ag_test_suites">
-        <template v-slot:header>
+        <template v-slot:header_text>
           <div class="unpadded-checkbox-container ag-test-suite-header">
-            <input
-              type="checkbox"
-              class="checkbox"
-              ref="ag_test_suite_checkbox"
-              :checked="d_selected_test_cases_by_suite_pk.has(ag_test_suite.pk)"
-              @change="toggle_ag_test_suite_selected(ag_test_suite)"
-              :id="`ag-test-suite-${ag_test_suite.pk}`"/>
-            <label :for="`ag-test-suite-${ag_test_suite.pk}`">
+            <label>
+              <input
+                type="checkbox"
+                class="checkbox"
+                data-testid="ag_test_suite_checkbox"
+                :checked="d_selected_test_cases_by_suite_pk.has(ag_test_suite.pk)"
+                @change="toggle_ag_test_suite_selected(ag_test_suite)"
+                @click.stop/>
               {{ag_test_suite.name}}
             </label>
           </div>
         </template>
         <div class="unpadded-checkbox-container ag-test-case-checkbox-wrapper"
             v-for="ag_test_case of ag_test_suite.ag_test_cases">
-          <input
-            type="checkbox"
-            class="checkbox"
-            ref="ag_test_case_checkbox"
-            :checked="ag_test_case_is_checked(ag_test_case)"
-            @change="toggle_ag_test_case_selected(ag_test_case)"
-            :id="`ag-test-case-${ag_test_case.pk}`"/>
-          <label :for="`ag-test-case-${ag_test_case.pk}`">
+          <label>
+            <input
+              type="checkbox"
+              class="checkbox"
+              data-testid="ag_test_case_checkbox"
+              :checked="ag_test_case_is_checked(ag_test_case)"
+              @change="toggle_ag_test_case_selected(ag_test_case)"/>
             {{ag_test_case.name}}
           </label>
         </div>
@@ -111,12 +105,14 @@
     <template v-if="d_mutation_test_suites.length !== 0" ref="choose_mutation_test_suites">
       <div class="step-header">3. Choose mutation testing suites</div>
       <div class="checkbox-input-container">
-        <input
-          id="rerun-all-mutation-test-suites"
-          type="checkbox"
-          class="checkbox"
-          v-model="d_rerun_all_mutation_test_suites"/>
-        <label for="rerun-all-mutation-test-suites">Rerun All Suites</label>
+        <label>
+          <input
+            id="rerun-all-mutation-test-suites"
+            type="checkbox"
+            class="checkbox"
+            v-model="d_rerun_all_mutation_test_suites"/>
+          Rerun All Suites
+        </label>
       </div>
 
       <div v-show="!d_rerun_all_mutation_test_suites">
@@ -125,13 +121,12 @@
         </div>
         <div class="checkbox-input-container"
              v-for="mutation_test_suite of d_mutation_test_suites">
-          <input
-            type="checkbox"
-            class="checkbox"
-            ref="mutation_test_suite_checkbox"
-            @change="toggle_mutation_test_suite_selected(mutation_test_suite)"
-            :id="`mutation-test-suite-${mutation_test_suite.pk}`"/>
-          <label :for="`mutation-test-suite-${mutation_test_suite.pk}`">
+          <label>
+            <input
+              type="checkbox"
+              class="checkbox"
+              data-testid="mutation_test_suite_checkbox"
+              @change="toggle_mutation_test_suite_selected(mutation_test_suite)"/>
             {{mutation_test_suite.name}}
           </label>
         </div>
@@ -191,11 +186,11 @@ import APIErrors from "@/components/api_errors.vue";
 import Collapsible from '@/components/collapsible.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';
-import { handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, handle_api_errors_async, safe_assign, toggle } from '@/utils';
+import { deep_copy, format_datetime, safe_assign, toggle } from '@/utils';
 
 import {
   find_parent_suite,
@@ -296,8 +291,8 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
             rerun_all_ag_test_suites: this.d_rerun_all_ag_test_cases,
             ag_test_suite_data: this.get_ag_test_suite_data_for_request(),
 
-            rerun_all_student_test_suites: this.d_rerun_all_mutation_test_suites,
-            student_suite_pks: [...this.d_selected_mutation_test_suite_pks.values()]
+            rerun_all_mutation_test_suites: this.d_rerun_all_mutation_test_suites,
+            mutation_suite_pks: [...this.d_selected_mutation_test_suite_pks.values()]
         });
 
         this.d_rerun_tasks.unshift(rerun);
@@ -617,7 +612,7 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 }
 
 .choose-ag-test-suites-wrapper {
-  max-width: 300px;
+  max-width: 500px;
 }
 
 .ag-test-suite-collapsible {
@@ -628,12 +623,17 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
   width: 100%;
   margin-left: .25rem;
   @include section-header(
-    $with-left-divider: false, $line-spacing: .25rem, $line-color: $pebble-dark);
+    $with-left-divider: false, $line-spacing: .25rem, $line-color: $pebble-dark
+  );
+
+  white-space: nowrap;
 }
 
 .ag-test-case-checkbox-wrapper {
   margin: .25rem 0;
   margin-left: 2.5rem;
+
+  white-space: nowrap;
 }
 
 .button-footer {

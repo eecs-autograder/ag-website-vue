@@ -1,6 +1,6 @@
 import { Location } from 'vue-router';
 
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import { Course, Project, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -9,9 +9,6 @@ import CourseView from '@/components/course_view.vue';
 
 import * as data_ut from '@/tests/data_utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('CourseView tests', () => {
     let wrapper: Wrapper<CourseView>;

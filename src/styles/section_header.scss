@@ -8,6 +8,7 @@
     // When true, adds some horizontal padding to the .header-text class
     $pad-text: false,
 ) {
+    width: 100%;
     color: $text-color;
     display: flex;
     align-items: center;

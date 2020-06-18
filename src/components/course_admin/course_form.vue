@@ -31,7 +31,7 @@
     <div class="form-field-wrapper">
       <label class="label" for="semester"> Semester </label>
       <div>
-        <select ref="semester" v-model="d_form_data.semester" class="select">
+        <select data-testid="semester" v-model="d_form_data.semester" class="select">
           <option v-for="semester of semesters" :value="semester">{{semester}}</option>
         </select>
       </div>
@@ -99,7 +99,8 @@ import { GlobalData } from '@/app.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { deep_copy, format_datetime_short, handle_api_errors_async } from '@/utils';
+import { handle_api_errors_async } from '@/error_handling';
+import { deep_copy, format_datetime_short } from '@/utils';
 import {
   is_integer,
   is_non_negative,

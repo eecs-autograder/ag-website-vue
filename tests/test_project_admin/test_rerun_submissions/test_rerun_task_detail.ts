@@ -24,8 +24,8 @@ beforeEach(() => {
         submission_pks: [],
         rerun_all_ag_test_suites: true,
         ag_test_suite_data: {},
-        rerun_all_student_test_suites: true,
-        student_suite_pks: [],
+        rerun_all_mutation_test_suites: true,
+        mutation_suite_pks: [],
     });
 
     cancel_stub = sinon.stub(task, 'cancel');
@@ -42,16 +42,16 @@ test('Cancel rerun', async () => {
         }
     });
 
-    wrapper.find({ref: 'show_stop_task_modal'}).trigger('click');
+    wrapper.findComponent({ref: 'show_stop_task_modal'}).trigger('click');
     await wrapper.vm.$nextTick();
 
-    wrapper.find({ref: 'stop_task_button'}).trigger('click');
+    wrapper.find('[data-testid=stop_task_button]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(await wait_until(wrapper, w => !w.vm.d_cancelling)).toBe(true);
 
     expect(wrapper.find('.progress-cell').text()).toEqual('Cancelled');
     expect(cancel_stub.calledOnce).toBe(true);
-    expect(wrapper.find({ref: 'cancel_task_modal'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(false);
 });
 
 test('Cancel rerun API errors handled', async () => {
@@ -63,16 +63,16 @@ test('Cancel rerun API errors handled', async () => {
         }
     });
 
-    wrapper.find({ref: 'show_stop_task_modal'}).trigger('click');
+    wrapper.findComponent({ref: 'show_stop_task_modal'}).trigger('click');
     await wrapper.vm.$nextTick();
 
-    wrapper.find({ref: 'stop_task_button'}).trigger('click');
+    wrapper.find('[data-testid=stop_task_button]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(await wait_until(wrapper, w => !w.vm.d_cancelling)).toBe(true);
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.find({ref: 'cancel_task_modal'}).exists()).toBe(true);
-    let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+    expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(true);
+    let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
     expect(api_errors.d_api_errors.length).toBe(1);
 });
 
@@ -84,7 +84,7 @@ test('Cancel button hidden when task is done', () => {
             task: task
         }
     });
-    expect(wrapper.find({ref: 'show_stop_task_modal'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'show_stop_task_modal'}).exists()).toBe(false);
 });
 
 test('Cancel button hidden when task is cancelled', () => {
@@ -95,7 +95,7 @@ test('Cancel button hidden when task is cancelled', () => {
             task: task
         }
     });
-    expect(wrapper.find({ref: 'show_stop_task_modal'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'show_stop_task_modal'}).exists()).toBe(false);
 });
 
 test('Cancel button hidden when task has error', () => {
@@ -106,5 +106,5 @@ test('Cancel button hidden when task has error', () => {
             task: task
         }
     });
-    expect(wrapper.find({ref: 'show_stop_task_modal'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'show_stop_task_modal'}).exists()).toBe(false);
 });

@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
@@ -16,14 +16,13 @@ import ValidatedInput from '@/components/validated_input.vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    emitted,
     get_validated_input_text,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
+    wait_until
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('commands_are_visible getter', () => {
     let wrapper: Wrapper<AGCasePanel>;
@@ -158,7 +157,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
         expect(wrapper.vm.commands_are_visible).toBe(true);
     });
 
@@ -191,7 +190,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
 
         expect(wrapper.vm.commands_are_visible).toBe(true);
 
@@ -209,7 +208,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_case_green);
         expect(wrapper.vm.commands_are_visible).toBe(true);
     });
 
@@ -218,7 +217,7 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
 
         wrapper.setProps({active_ag_test_command: ag_command_green_1});
         await wrapper.vm.$nextTick();
@@ -250,7 +249,7 @@ describe('AGCasePanel tests', () => {
 
         expect(wrapper.vm.is_open).toBe(true);
         expect(wrapper.vm.commands_are_visible).toBe(true);
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
 
         wrapper.setProps({active_ag_test_command: ag_command_green_1});
         await wrapper.vm.$nextTick();
@@ -270,35 +269,35 @@ describe('AGCasePanel tests', () => {
         wrapper.findAll('.ag-test-case').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_case_green);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
         expect(wrapper.vm.commands_are_visible).toBe(true);
 
         wrapper.findAll('.ag-test-command').at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_command_green_2);
+        expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_command_green_2);
     });
 
     test('Add command - successful', async () => {
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
-        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
 
-        wrapper.findAll({ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
+        await wrapper.findAllComponents(
+            {ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
+        expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
 
         wrapper.vm.d_new_command_name = "New command name";
         wrapper.vm.d_new_command = "New command";
-
-        wrapper.find({ref: 'add_ag_test_command_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
+        await wrapper.findComponent({ref: 'add_ag_test_command_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_adding_command)).toBe(true);
+
         expect(create_command_stub.calledOnce).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
     });
 
@@ -314,43 +313,42 @@ describe('AGCasePanel tests', () => {
         wrapper.setProps({active_case: ag_case_green});
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
 
-        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
+        wrapper.findComponent({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
 
         wrapper.vm.d_new_command_name = "New command name";
         wrapper.vm.d_new_command = "New command";
+        await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'add_ag_test_command_form'}).trigger('submit');
+        wrapper.findComponent({ref: 'add_ag_test_command_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'new_command_api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'new_command_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
-        expect(wrapper.find({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
     });
 
     test('d_cloned_case_name binding', async () => {
-        wrapper.setProps({active_case: ag_case_green});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({active_case: ag_case_green});
+        await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
 
-        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        let ag_test_case_clone_name = wrapper.findComponent({ref: 'ag_test_case_clone_name'});
 
-        let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
-
-        set_validated_input_text(ag_test_case_clone_name, 'Water');
+        await set_validated_input_text(ag_test_case_clone_name, 'Water');
         expect(wrapper.vm.d_cloned_case_name).toEqual("Water");
         expect(validated_input_is_valid(ag_test_case_clone_name)).toEqual(true);
 
         wrapper.vm.d_cloned_case_name = "Air";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(ag_test_case_clone_name)).toEqual("Air");
     });
 
@@ -358,13 +356,13 @@ describe('AGCasePanel tests', () => {
         wrapper.setProps({active_case: ag_case_green});
         await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
+        wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
 
-        let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
-        let case_clone_name_validator = <ValidatedInput> wrapper.find(
+        let ag_test_case_clone_name = wrapper.findComponent({ref: 'ag_test_case_clone_name'});
+        let case_clone_name_validator = <ValidatedInput> wrapper.findComponent(
             {ref: 'ag_test_case_clone_name'}
         ).vm;
         expect(case_clone_name_validator.is_valid).toBe(false);
@@ -384,73 +382,63 @@ describe('AGCasePanel tests', () => {
                 new_case
             )
         );
-        wrapper.setProps({active_case: ag_case_green});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({active_case: ag_case_green});
 
-        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
 
-        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
-        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
 
-        let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
-        set_validated_input_text(ag_test_case_clone_name, 'Water');
+        let ag_test_case_clone_name = wrapper.findComponent({ref: 'ag_test_case_clone_name'});
+        await set_validated_input_text(ag_test_case_clone_name, 'Water');
 
-        expect(wrapper.find({ref: 'modal_clone_ag_test_case_button'}).is(
-            '[disabled]'
-        )).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'modal_clone_ag_test_case_button'}).element
+        ).not.toBeDisabled();
 
-        wrapper.find({ref: 'clone_ag_test_case_form'}).trigger('submit');
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'clone_ag_test_case_form'}).trigger('submit');
 
         expect(clone_case_stub.calledOnce).toBe(true);
         expect(clone_case_stub.firstCall.calledWith("Water")).toBe(true);
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
-        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
     });
 
     test('d_cloned_case_name begins as the empty string whenever the clone_ag_test_case ' +
          'modal is opened',
          async () => {
-        wrapper.setProps({active_case: ag_case_green});
-        await wrapper.vm.$nextTick();
-
-        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({active_case: ag_case_green});
+        await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
         expect(wrapper.vm.d_cloned_case_name).toEqual("");
 
-        set_validated_input_text(wrapper.find({ref: 'ag_test_case_clone_name'}), 'Fall');
-
+        await set_validated_input_text(
+            wrapper.findComponent({ref: 'ag_test_case_clone_name'}), 'Fall');
         expect(wrapper.vm.d_cloned_case_name).toEqual("Fall");
 
-        wrapper.find({ref: 'clone_ag_test_case_modal'}).vm.$emit('close');
+        wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).vm.$emit('close');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
 
-        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
-
+        await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
         expect(wrapper.vm.d_cloned_case_name).toEqual("");
 
-        set_validated_input_text(wrapper.find({ref: 'ag_test_case_clone_name'}), 'Winter');
-
+        await set_validated_input_text(
+            wrapper.findComponent({ref: 'ag_test_case_clone_name'}), 'Winter');
         expect(wrapper.vm.d_cloned_case_name).toEqual("Winter");
 
-        wrapper.find({ref: 'clone_ag_test_case_modal'}).vm.$emit('close');
+        wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).vm.$emit('close');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
 
-        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
-
+        await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
         expect(wrapper.vm.d_cloned_case_name).toEqual("");
     });
@@ -468,34 +456,29 @@ describe('AGCasePanel tests', () => {
             )
         );
 
-        wrapper.setProps({active_case: ag_case_green});
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
+        await wrapper.setProps({active_case: ag_case_green});
+        expect(wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(false);
 
-        wrapper.find({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
-
+        await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
-        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
 
-        let ag_test_case_clone_name = wrapper.find({ref: 'ag_test_case_clone_name'});
-        set_validated_input_text(ag_test_case_clone_name, 'Purple Case');
+        let ag_test_case_clone_name = wrapper.findComponent({ref: 'ag_test_case_clone_name'});
+        await set_validated_input_text(ag_test_case_clone_name, 'Purple Case');
 
-        expect(wrapper.find({ref: 'modal_clone_ag_test_case_button'}).is(
-            '[disabled]'
-        )).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'modal_clone_ag_test_case_button'}).element
+        ).not.toBeDisabled();
 
-        wrapper.find({ref: 'clone_ag_test_case_form'}).trigger('submit');
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'clone_ag_test_case_form'}).trigger('submit');
 
         expect(clone_case_stub.calledOnce).toBe(true);
         expect(clone_case_stub.firstCall.calledWith("Purple Case")).toBe(true);
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
-        expect(wrapper.find({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'clone_case_api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'clone_case_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
@@ -504,13 +487,13 @@ describe('AGCasePanel tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_ag_test_case_settings_modal).toBe(false);
-        expect(wrapper.find({ref: 'ag_test_case_settings_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'ag_test_case_settings_modal'}).exists()).toBe(false);
 
-        wrapper.find({ref: 'edit_ag_test_case_menu_item'}).trigger('click');
+        wrapper.findComponent({ref: 'edit_ag_test_case_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_ag_test_case_settings_modal).toBe(true);
-        expect(wrapper.find({ref: 'ag_test_case_settings_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'ag_test_case_settings_modal'}).exists()).toBe(true);
     });
 
     test('Delete case - successful', async () => {
@@ -519,34 +502,34 @@ describe('AGCasePanel tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(false);
-        expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
 
-        wrapper.find({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
+        wrapper.findComponent({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(true);
-        expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'delete_ag_test_case_modal'}).exists()).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(false);
-        expect(wrapper.find({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_ag_test_case_modal'}).exists()).toBe(false);
     });
 
     test('API errors handled on test case deletion', async () => {
         sinon.stub(wrapper.vm.ag_test_case, 'delete').rejects(new HttpError(403, 'err'));
         await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
+        wrapper.findComponent({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'delete_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(1);
     });
 
@@ -569,19 +552,18 @@ describe('AGCasePanel tests', () => {
     });
 
     test('d_new_command_name binding', async () => {
-        wrapper.setProps({active_ag_test_case: ag_case_green});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({active_ag_test_case: ag_case_green});
+        await wrapper.findComponent({ref: 'add_ag_test_command_menu_item'}).trigger('click');
 
-        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let new_ag_test_command_name_input = wrapper.find({ref: 'new_ag_test_command_name'});
-        set_validated_input_text(new_ag_test_command_name_input, 'Sunny');
+        let new_ag_test_command_name_input
+            = wrapper.findComponent({ref: 'new_ag_test_command_name'});
+        await set_validated_input_text(new_ag_test_command_name_input, 'Sunny');
 
         expect(wrapper.vm.d_new_command_name).toEqual("Sunny");
         expect(validated_input_is_valid(new_ag_test_command_name_input)).toEqual(true);
 
         wrapper.vm.d_new_command_name = "Cloudy";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(new_ag_test_command_name_input)).toEqual("Cloudy");
     });
 
@@ -589,11 +571,11 @@ describe('AGCasePanel tests', () => {
         wrapper.setProps({active_ag_test_case: ag_case_green});
         await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
+        wrapper.findComponent({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
-        let new_command_name_input = wrapper.find({ref: 'new_ag_test_command_name'});
-        let new_command_name_validator = <ValidatedInput> wrapper.find(
+        let new_command_name_input = wrapper.findComponent({ref: 'new_ag_test_command_name'});
+        let new_command_name_validator = <ValidatedInput> wrapper.findComponent(
             {ref: 'new_ag_test_command_name'}
         ).vm;
 
@@ -607,19 +589,17 @@ describe('AGCasePanel tests', () => {
     });
 
     test('d_new_command binding', async () => {
-        wrapper.setProps({active_ag_test_case: ag_case_green});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({active_ag_test_case: ag_case_green});
+        await wrapper.findComponent({ref: 'add_ag_test_command_menu_item'}).trigger('click');
 
-        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        let new_ag_test_command_input = wrapper.find({ref: 'new_ag_test_command'});
-        set_validated_input_text(new_ag_test_command_input, 'Moo');
+        let new_ag_test_command_input = wrapper.findComponent({ref: 'new_ag_test_command'});
+        await set_validated_input_text(new_ag_test_command_input, 'Moo');
 
         expect(wrapper.vm.d_new_command).toEqual("Moo");
         expect(validated_input_is_valid(new_ag_test_command_input)).toEqual(true);
 
         wrapper.vm.d_new_command = "Baa";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(new_ag_test_command_input)).toEqual("Baa");
     });
 
@@ -627,11 +607,12 @@ describe('AGCasePanel tests', () => {
         wrapper.setProps({active_ag_test_case: ag_case_green});
         await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'add_ag_test_command_menu_item'}).trigger('click');
+        wrapper.findComponent({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
-        let new_command_input = wrapper.find({ref: 'new_ag_test_command'});
-        let new_command_validator = <ValidatedInput> wrapper.find({ref: 'new_ag_test_command'}).vm;
+        let new_command_input = wrapper.findComponent({ref: 'new_ag_test_command'});
+        let new_command_validator
+            = <ValidatedInput> wrapper.findComponent({ref: 'new_ag_test_command'}).vm;
 
         expect(new_command_validator.is_valid).toBe(false);
 
@@ -684,7 +665,7 @@ test('Update test commands order', async () => {
     wrapper.find('.panel').trigger('click');
     await wrapper.vm.$nextTick();
 
-    wrapper.find({ref: 'ag_test_command_order'}).vm.$emit('change');
+    wrapper.findComponent({ref: 'ag_test_command_order'}).vm.$emit('change');
     await wrapper.vm.$nextTick();
     expect(
         order_stub.calledOnceWith(test_case.pk, cmds.map(cmd => cmd.pk))

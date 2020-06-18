@@ -1,10 +1,7 @@
-import { config, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 
 import Tooltip from '@/components/tooltip.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('Tooltip.vue', () => {
     test('Default placement and width', () => {

@@ -11,9 +11,6 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { find_by_name, wait_for_load } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('StudentRoster tests', () => {
     let wrapper: Wrapper<StudentRoster>;
@@ -108,7 +105,7 @@ describe('StudentRoster tests', () => {
 
         let remove_stduents_stub = sinon.stub(course, 'remove_students');
 
-        wrapper.find({ref: 'student_roster'}).vm.$emit('remove_user', [students[2]]);
+        wrapper.findComponent({ref: 'student_roster'}).vm.$emit('remove_user', [students[2]]);
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 

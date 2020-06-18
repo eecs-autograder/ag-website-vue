@@ -6,7 +6,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 import SelectObject from '@/components/select_object.vue';
 
 import { managed_mount } from '@/tests/setup';
-import { expect_html_element_has_value, find_by_name } from '@/tests/utils';
+import { emitted, expect_html_element_has_value, find_by_name, set_data } from '@/tests/utils';
 
 interface Thing {
     id: number;
@@ -39,10 +39,10 @@ describe('select-object tests', () => {
         expect_html_element_has_value(wrapper.find('select'), things[1].id.toString());
     });
 
-    test('Input value changed', () => {
+    test('Input value changed', async () => {
         expect(wrapper.vm.d_value).toEqual(things[1].id);
 
-        wrapper.setProps({value: things[0]});
+        await wrapper.setProps({value: things[0]});
         expect(wrapper.vm.d_value).toEqual(things[0].id);
         expect_html_element_has_value(wrapper.find('select'), things[0].id.toString());
     });
@@ -54,8 +54,7 @@ describe('select-object tests', () => {
             {id: 5, name: 'Thing 5'},
             {id: 6, name: 'Thing 6'},
         ];
-        wrapper.setProps({items: new_things, value: new_things[1]});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({items: new_things, value: new_things[1]});
 
         expect(wrapper.vm.d_items).toEqual(new_things);
         expect(wrapper.vm.d_value).toEqual(new_things[1].id);
@@ -63,10 +62,9 @@ describe('select-object tests', () => {
     });
 
     test('New option selected', async () => {
-        wrapper.findAll('option').at(3).setSelected();
-        await wrapper.vm.$nextTick();
+        await wrapper.findAll('option').at(3).setSelected();
         expect(wrapper.vm.d_value).toEqual(things[3].id);
-        expect(wrapper.emitted('change')[0][0]).toEqual(things[3]);
+        expect(emitted(wrapper, 'change')[0][0]).toEqual(things[3]);
     });
 });
 
@@ -82,9 +80,9 @@ test('Override body slot, no initial value', () => {
     });
 
     expect(wrapper.findAll('option').length).toBe(things.length + 1);
-    expect(wrapper.findAll('option').at(0).is('[selected]')).toBe(true);
-    expect(wrapper.findAll('option').at(1).is('[selected]')).toBe(false);
-    expect(wrapper.findAll('option').at(3).is('[selected]')).toBe(false);
+    expect(wrapper.findAll('option').at(0).element).toHaveAttribute('selected');
+    expect(wrapper.findAll('option').at(1).element).not.toHaveAttribute('selected');
+    expect(wrapper.findAll('option').at(3).element).not.toHaveAttribute('selected');
 });
 
 test('Null option', async () => {
@@ -102,14 +100,12 @@ test('Null option', async () => {
     expect(wrapper.vm.d_value).toBeNull();
     expect_html_element_has_value(wrapper.find('select'), '');
 
-    wrapper.setProps({value: things[1]});
-    await wrapper.vm.$nextTick();
+    await wrapper.setProps({value: things[1]});
     expect(wrapper.findAll('option').length).toBe(things.length + 1);
-    expect(wrapper.findAll('option').at(0).is('[selected]')).toBe(false);
+    expect(wrapper.findAll('option').at(0).element).not.toHaveAttribute('selected');
     expect_html_element_has_value(wrapper.find('select'), things[1].id.toString());
 
-    wrapper.setProps({value: null});
-    await wrapper.vm.$nextTick();
+    await wrapper.setProps({value: null});
     expect(wrapper.vm.d_value).toBeNull();
     expect_html_element_has_value(wrapper.find('select'), '');
 });
@@ -165,11 +161,10 @@ test('v-model usage', async () => {
     let select_object = find_by_name<SelectObject>(wrapper, 'SelectObject');
     expect(select_object.vm.value).toEqual(wrapper.vm.selected);
 
-    wrapper.vm.selected = things[2];
+    await set_data(wrapper, {selected: things[2]}, false);
     expect(select_object.vm.value).toEqual(things[2]);
 
-    select_object.findAll('option').at(0).setSelected();
-    await wrapper.vm.$nextTick();
+    await select_object.findAll('option').at(0).setSelected();
     expect(wrapper.vm.selected).toEqual(things[0]);
 });
 
@@ -186,5 +181,5 @@ test('Initially selected disabled option', async () => {
 
     expect(wrapper.vm.d_value).toBeNull();
     expect_html_element_has_value(wrapper.find('select'), '');
-    expect(wrapper.findAll('option').at(0).is('[selected]')).toBe(true);
+    expect(wrapper.findAll('option').at(0).element).toHaveAttribute('selected');
 });

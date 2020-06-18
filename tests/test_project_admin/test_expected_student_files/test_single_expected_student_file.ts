@@ -7,9 +7,6 @@ import APIErrors from '@/components/api_errors.vue';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import SingleExpectedStudentFile from '@/components/project_admin/expected_student_files/single_expected_student_file.vue';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('ExpectedStudentFiles tests', () => {
     let wrapper: Wrapper<SingleExpectedStudentFile>;
@@ -63,13 +60,12 @@ describe('ExpectedStudentFiles tests', () => {
         wrapper.find('.edit-file').trigger('click');
         await component.$nextTick();
 
-        let form_wrapper = wrapper.find({ref: "form"});
+        let form_wrapper = wrapper.findComponent({ref: "form"});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
 
-        wrapper.find('#expected-student-file-form').trigger('submit');
-        await component.$nextTick();
+        await wrapper.findComponent({ref: 'form'}).trigger('submit');
 
         expect(save_stub.calledOnce).toBe(true);
         expect(save_stub.thisValues[0].pattern).toEqual(file_without_wildcard.pattern);
@@ -94,15 +90,14 @@ describe('ExpectedStudentFiles tests', () => {
         wrapper.find('.edit-file').trigger('click');
         await component.$nextTick();
 
-        let form_wrapper = wrapper.find({ref: "form"});
+        let form_wrapper = wrapper.findComponent({ref: "form"});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
 
-        wrapper.find('#expected-student-file-form').trigger('submit');
-        await component.$nextTick();
+        await wrapper.findComponent({ref: 'form'}).trigger('submit');
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBeGreaterThan(0);
         expect(component.editing).toBe(true);
     });
@@ -113,7 +108,7 @@ describe('ExpectedStudentFiles tests', () => {
         wrapper.find('.edit-file').trigger('click');
         await component.$nextTick();
 
-        let form_wrapper = wrapper.find({ref: "form"});
+        let form_wrapper = wrapper.findComponent({ref: "form"});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = "filename.cpp";
         await component.$nextTick();
@@ -129,13 +124,17 @@ describe('ExpectedStudentFiles tests', () => {
         let delete_stub = sinon.stub(component.expected_student_file, 'delete');
 
         expect(wrapper.vm.d_show_delete_expected_student_file_modal).toBe(false);
-        expect(wrapper.find({ref: 'delete_expected_student_file_modal'}).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'delete_expected_student_file_modal'}).exists()
+        ).toBe(false);
 
         wrapper.find('.delete-file').trigger('click');
         await component.$nextTick();
 
         expect(wrapper.vm.d_show_delete_expected_student_file_modal).toBe(true);
-        expect(wrapper.find({ref: 'delete_expected_student_file_modal'}).exists()).toBe(true);
+        expect(
+            wrapper.findComponent({ref: 'delete_expected_student_file_modal'}).exists()
+        ).toBe(true);
 
         wrapper.find('.modal-delete-button').trigger('click');
         await component.$nextTick();
@@ -143,7 +142,9 @@ describe('ExpectedStudentFiles tests', () => {
         expect(delete_stub.callCount).toEqual(1);
         expect(component.d_delete_pending).toBe(false);
         expect(wrapper.vm.d_show_delete_expected_student_file_modal).toBe(false);
-        expect(wrapper.find({ref: 'delete_expected_student_file_modal'}).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'delete_expected_student_file_modal'}).exists()
+        ).toBe(false);
     });
 
     test('Cancel delete file', async () => {
@@ -162,12 +163,12 @@ describe('ExpectedStudentFiles tests', () => {
         wrapper.find('.edit-file').trigger('click');
         await component.$nextTick();
 
-        let form_wrapper = wrapper.find({ref: "form"});
+        let form_wrapper = wrapper.findComponent({ref: "form"});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
         form_component.d_expected_student_file.pattern = " ";
         await component.$nextTick();
 
-        expect(wrapper.find('.save-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.save-button').element).toBeDisabled();
         expect(component.pattern_is_valid).toBe(false);
     });
 

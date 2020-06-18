@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { AllCourses, Course, HttpError, Semester, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -6,13 +6,10 @@ import * as sinon from 'sinon';
 import APIErrors from '@/components/api_errors.vue';
 import CourseList from '@/components/course_list/course_list.vue';
 
+import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 
 import { wait_for_load, wait_until } from '../utils';
-
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 let can_create_courses_stub: sinon.SinonStub;
 
@@ -33,7 +30,7 @@ describe('Create course tests', () => {
     test('Create course button hidden', async () => {
         let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         expect(await wait_for_load(wrapper)).toBe(true);
-        expect(wrapper.find({ref: 'show_create_course_modal_button'}).exists()).toBe(false);
+        expect(wrapper.find('[data-testid=show_create_course_modal_button]').exists()).toBe(false);
     });
 
     test('Create course', async () => {
@@ -43,8 +40,7 @@ describe('Create course tests', () => {
         let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        wrapper.find({ref: 'show_create_course_modal_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_create_course_modal_button]').trigger('click');
 
         let new_course_data = {
             name: 'An very new name',
@@ -54,12 +50,12 @@ describe('Create course tests', () => {
             allowed_guest_domain: '@llama.net',
             subtitle: 'Great course',
         };
-        wrapper.find({ref: 'new_course_form'}).vm.$emit('submit', new_course_data);
+        wrapper.findComponent({ref: 'new_course_form'}).vm.$emit('submit', new_course_data);
         await wrapper.vm.$nextTick();
         expect(await wait_until(wrapper, w => !w.vm.d_creating_course)).toBe(true);
         expect(create_course_stub.calledOnceWith(new_course_data)).toBe(true);
 
-        expect(wrapper.find({ref: 'created_course_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'created_course_modal'}).exists()).toBe(false);
     });
 
     test('Create course API errors handled', async () => {
@@ -69,15 +65,14 @@ describe('Create course tests', () => {
         let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        wrapper.find({ref: 'show_create_course_modal_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_create_course_modal_button]').trigger('click');
 
-        wrapper.find({ref: 'new_course_form'}).vm.$emit('submit', {});
+        wrapper.findComponent({ref: 'new_course_form'}).vm.$emit('submit', {});
         await wrapper.vm.$nextTick();
         expect(await wait_until(wrapper, w => !w.vm.d_creating_course)).toBe(true);
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'create_course_api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'create_course_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(1);
     });
 });
@@ -98,9 +93,7 @@ describe('CourseList tests', () => {
     let copy_of_course: Course;
 
     beforeEach(() => {
-        user = new User(
-            {pk: 1, username: 'ashberg', first_name: 'Ashley', last_name: 'IceBerg',
-             email: 'iceberg@umich.edu', is_superuser: false});
+        user = data_ut.make_user();
 
         copy_of_course = new Course(
             {pk: 11, name: "Clone", semester: Semester.fall, year: 2048, subtitle: '',
@@ -156,14 +149,14 @@ describe('CourseList tests', () => {
         await component.$nextTick();
         await component.$nextTick();
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(2);
+        expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(2);
         expect(component.courses_by_term.length).toEqual(1);
 
         copy_of_course.name = "Clonedd course";
         copy_of_course.year = 2042;
         Course.notify_course_created(copy_of_course);
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(3);
+        expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(3);
         expect(component.courses_by_term.length).toEqual(2);
         expect(component.courses_by_term[0].course_list[0]).toEqual(copy_of_course);
         expect(component.courses_by_term[1].course_list[0]).toEqual(fall18_eecs280);
@@ -190,7 +183,7 @@ describe('CourseList tests', () => {
         copy_of_course.year = 2018;
         Course.notify_course_created(copy_of_course);
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(3);
+        expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(3);
         expect(component.courses_by_term.length).toEqual(1);
         expect(component.courses_by_term[0].course_list[0]).toEqual(fall18_eecs280);
         expect(component.courses_by_term[0].course_list[1]).toEqual(copy_of_course);
@@ -258,10 +251,10 @@ describe('CourseList tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(component.all_courses!.courses_is_admin_for.length).toEqual(1);
-        expect(component.all_courses!.courses_is_admin_for[0]).toEqual(fall18_eecs280);
+        expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(1);
+        expect(component.d_all_courses!.courses_is_admin_for[0]).toEqual(fall18_eecs280);
 
-        let all_displayed_courses = wrapper.findAll({name: 'SingleCourse'});
+        let all_displayed_courses = wrapper.findAllComponents({name: 'SingleCourse'});
         expect(all_displayed_courses.length).toEqual(3);
         expect(wrapper.findAll('.edit-course-settings').length).toEqual(1);
 
@@ -345,8 +338,8 @@ describe('CourseList tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        let fall_2018_term = wrapper.find('.single-semester-container');
-        let fall_2018_courses = fall_2018_term.findAll({name: 'SingleCourse'});
+        expect(wrapper.findAll('.single-semester-container').length).toEqual(1);
+        let fall_2018_courses = wrapper.findAllComponents({name: 'SingleCourse'});
 
         expect(fall_2018_courses.length).toEqual(3);
         expect(fall_2018_courses.at(0).html()).toContain("EECS 280");

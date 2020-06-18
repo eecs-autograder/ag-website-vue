@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     Course,
@@ -13,11 +13,8 @@ import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
-import { wait_for_load } from '@/tests/utils';
+import { set_data, wait_for_load } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('EditGroups tests', () => {
     let wrapper: Wrapper<EditGroups>;
@@ -144,7 +141,7 @@ describe('EditGroups tests', () => {
     test('Selected group set to group selected in GroupLookup', () => {
         expect(component.selected_group).toBeNull();
 
-        let group_lookup = wrapper.find({ref: 'group_lookup'});
+        let group_lookup = wrapper.findComponent({ref: 'group_lookup'});
         group_lookup.vm.$emit('update_group_selected', group_1);
 
         expect(component.selected_group).toEqual(group_1);
@@ -236,32 +233,32 @@ describe('EditGroups tests', () => {
         component.d_show_merge_groups_modal = true;
         await component.$nextTick();
 
-        let merge_groups = <Wrapper<MergeGroups>> wrapper.find({ref: 'merge_groups'});
+        let merge_groups = <Wrapper<MergeGroups>> wrapper.findComponent({ref: 'merge_groups'});
         expect(merge_groups.vm.groups).toEqual(component.groups_by_members.data);
     });
 
-    test('Toggling d_show_create_group_modal', () => {
-        expect(wrapper.find({ref: 'create_group_modal'}).exists()).toBe(false);
+    test('Toggling d_show_create_group_modal', async () => {
+        expect(wrapper.findComponent({ref: 'create_group_modal'}).exists()).toBe(false);
 
-        wrapper.setData({d_show_create_group_modal: true});
+        await set_data(wrapper, {d_show_create_group_modal: true});
         expect(wrapper.vm.d_show_create_group_modal).toBe(true);
-        expect(wrapper.find({ref: 'create_group_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'create_group_modal'}).exists()).toBe(true);
 
-        wrapper.setData({d_show_create_group_modal: false});
+        await set_data(wrapper, {d_show_create_group_modal: false});
         expect(wrapper.vm.d_show_create_group_modal).toBe(false);
-        expect(wrapper.find({ref: 'create_group_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'create_group_modal'}).exists()).toBe(false);
     });
 
-    test('Toggling d_show_merge_groups_modal', () => {
-        expect(wrapper.find({ref: 'create_group_modal'}).exists()).toBe(false);
+    test('Toggling d_show_merge_groups_modal', async () => {
+        expect(wrapper.findComponent({ref: 'create_group_modal'}).exists()).toBe(false);
 
-        wrapper.setData({d_show_merge_groups_modal: true});
+        await set_data(wrapper, {d_show_merge_groups_modal: true});
         expect(wrapper.vm.d_show_merge_groups_modal).toBe(true);
-        expect(wrapper.find({ref: 'merge_groups_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'merge_groups_modal'}).exists()).toBe(true);
 
-        wrapper.setData({d_show_merge_groups_modal: false});
+        await set_data(wrapper, {d_show_merge_groups_modal: false});
         expect(wrapper.vm.d_show_merge_groups_modal).toBe(false);
-        expect(wrapper.find({ref: 'merge_groups_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'merge_groups_modal'}).exists()).toBe(false);
     });
 
     test('merge groups - one group has an extension', async () => {

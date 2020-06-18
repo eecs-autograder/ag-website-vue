@@ -6,16 +6,17 @@
     <div class="sidebar-container">
       <div id="mutation-test-suite-sidebar" class="sidebar-menu">
         <div id="sidebar-header"
-              class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
-          <span class="collapse-sidebar-button" @click="d_collapsed = !d_collapsed">
+             class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
+          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars"></i>
           </span>
           <template v-if="!d_collapsed">
-            <div id="sidebar-title"> Suites </div>
+            <div class="sidebar-header-text"> Suites </div>
             <button type="button"
                     id="add-mutation-test-suite-button"
+                    class="sidebar-new-button"
                     @click="open_new_mutation_test_suite_modal">
-              <i class="fas fa-plus plus"></i> Add Suite
+              <i class="fas fa-plus sidebar-plus"></i> Add Suite
             </button>
           </template>
         </div>
@@ -250,11 +251,10 @@ import Draggable from 'vuedraggable';
 
 import {
     BugsExposedFeedbackLevel,
-    get_sandbox_docker_images,
     MutationTestSuite,
     MutationTestSuiteObserver,
     Project,
-    SandboxDockerImageData
+    SandboxDockerImage,
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -273,9 +273,9 @@ import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import Tooltip from "@/components/tooltip.vue";
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_global_errors_async, make_error_handler_func } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { deep_copy, format_datetime, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
@@ -306,7 +306,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
-  d_docker_images: SandboxDockerImageData[] = [];
+  d_docker_images: SandboxDockerImage[] = [];
 
   d_active_mutation_test_suite: MutationTestSuite | null = null;
   d_add_mutation_test_suite_form_is_valid = true;
@@ -326,7 +326,9 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   async created() {
     MutationTestSuite.subscribe(this);
     this.d_mutation_test_suites = await MutationTestSuite.get_all_from_project(this.project.pk);
-    this.d_docker_images = await get_sandbox_docker_images();
+    let global_images = await SandboxDockerImage.get_images(null);
+    let course_images = await SandboxDockerImage.get_images(this.project.course);
+    this.d_docker_images = global_images.concat(course_images);
     this.d_loading = false;
   }
 
@@ -583,58 +585,32 @@ $border-color: $gray-blue-1;
 
 @include collapsible-sidebar(
   $sidebar-width: 300px,
-  $sidebar-header-height: 3.125rem,
+  $sidebar-header-height: 2.625rem,
   $background-color: white,
   $border-color: $border-color,
   $stretch: true,
 );
 
 .sidebar-container {
-  .sidebar-menu {
-    border-left: none;
-    border-top: none;
-    border-bottom: none;
-  }
-
-  .sidebar-header {
-    padding: .25rem .5rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .sidebar-header-closed {
-    border-bottom: 1px solid $border-color;
-  }
-
   .body {
     padding: .625rem .875rem;
     overflow-x: hidden;
   }
 }
 
-.collapse-sidebar-button .fa-bars:hover {
-  color: $stormy-gray-dark;
-  cursor: pointer;
-}
-
-#sidebar-title {
-  font-size: 1.125rem;
-  margin: 0 8px;
-}
-
-#add-mutation-test-suite-button {
-  @extend .white-button;
-  box-shadow: none;
-  margin-left: auto;
-}
-
-.plus {
-  font-size: .75rem;
-  margin-right: .25rem;
-}
-
 @include list-panels();
+
+.panel .icons .icon {
+  padding: .375rem;
+
+  &:hover {
+    color: darken($stormy-gray-dark, 20%);
+  }
+}
+
+.handle {
+  cursor: grabbing;
+}
 
 .item-to-delete {
   color: $ocean-blue;

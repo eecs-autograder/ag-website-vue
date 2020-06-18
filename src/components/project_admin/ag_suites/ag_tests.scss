@@ -5,6 +5,14 @@ $panel-indentation: 1.25rem;
     @extend .red-button;
 }
 
+.panel .icons .icon {
+  padding: .375rem;
+
+  &:hover {
+    color: darken($stormy-gray-dark, 20%);
+  }
+}
+
 // Modal Related ***********************************************************
 
 .item-to-delete {

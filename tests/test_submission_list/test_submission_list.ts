@@ -54,7 +54,7 @@ describe('Submission list tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_loading).toBe(false);
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(0);
+        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(0);
         expect(wrapper.findAll('.active').length).toEqual(0);
         expect(wrapper.vm.d_selected_submission).toBeNull();
         expect(wrapper.vm.d_ultimate_submission).toBeNull();
@@ -74,7 +74,7 @@ describe('Submission list tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'submission_detail'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'submission_detail'}).exists()).toBe(false);
     });
 
     test('submission_detail is not visible when d_selected_submission !== null', async () => {
@@ -96,7 +96,7 @@ describe('Submission list tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_selected_submission).toEqual(submission1);
-        expect(wrapper.find({ref: 'submission_detail'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'submission_detail'}).exists()).toBe(true);
     });
 
     test('received submission selected on load', () => {
@@ -152,7 +152,7 @@ describe('Submission list tests', () => {
 
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(
+        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(
             has_ultimate_submission ? submissions.length + 1 : submissions.length);
         expect(wrapper.findAll('.active').length).toEqual(1);
         expect(wrapper.vm.d_selected_submission).toEqual(expected);
@@ -186,18 +186,20 @@ describe('Submission list tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
         expect(
-            wrapper.find('.sidebar-content').findAll({name: 'SubmissionPanel'}).length).toEqual(1);
+            wrapper.findAll('[data-testid=all_submissions_submission_panel]').length
+        ).toEqual(1);
         expect(wrapper.vm.d_submissions).toEqual([current_group_submission]);
 
         wrapper.setProps({group: other_group});
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
         expect(
-            wrapper.find('.sidebar-content').findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+            wrapper.findAll('[data-testid=all_submissions_submission_panel]').length
+        ).toEqual(2);
         expect(wrapper.vm.d_submissions).toEqual(
             [other_group_submission, other_group_submission2]);
 
@@ -220,7 +222,7 @@ describe('Submission list tests', () => {
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(1);
+        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(1);
         expect(wrapper.vm.d_submissions).toEqual([submission]);
 
         // This update can only happen when we create a new submission locally,
@@ -229,9 +231,10 @@ describe('Submission list tests', () => {
 
         let new_submission = new ag_cli.Submission(new_submission_with_results);
         ag_cli.Submission.notify_submission_created(new_submission);
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_submissions).toEqual([new_submission_with_results, submission]);
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
         expect(wrapper.vm.d_selected_submission).toEqual(new_submission_with_results);
     });
 
@@ -251,7 +254,7 @@ describe('Submission list tests', () => {
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
-        expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
 
         let removed_submission = new ag_cli.Submission(submissions[1]);
         removed_submission.status = ag_cli.GradingStatus.removed_from_queue;
@@ -339,16 +342,16 @@ describe('Ultimate submission tests', () => {
             expect(wrapper.vm.d_ultimate_submission).toEqual(ultimate_submission_with_results);
 
             // Ultimate submission shows up once on its own and once in "All Submissions"
-            expect(wrapper.findAll({name: 'SubmissionPanel'}).length).toEqual(3);
+            expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(3);
             expect(wrapper.findAll('.active').length).toEqual(2);
             expect(wrapper.vm.d_selected_submission).toEqual(ultimate_submission_with_results);
 
             expect(wrapper.vm.d_submissions).toEqual(
                 [submission, ultimate_submission_with_results]);
 
-            let ultimate_submission_regular_panel = (
-                <Wrapper<SubmissionPanel>> wrapper.findAll({name: 'SubmissionPanel'}).at(2)
-            );
+            let ultimate_submission_regular_panel
+                = <Wrapper<SubmissionPanel>> wrapper.findAllComponents(
+                    {name: 'SubmissionPanel'}).at(2);
             expect(ultimate_submission_regular_panel.vm.submission).toEqual(
                 ultimate_submission_with_results);
         }

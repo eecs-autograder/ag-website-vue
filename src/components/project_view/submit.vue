@@ -115,7 +115,7 @@
       </template>
       <div class="modal-button-footer">
         <button type="button"
-                ref="submit_button"
+                data-testid="submit_button"
                 :class="file_mismatches_present ? 'orange-button' : 'green-button'"
                 @click="submit"
                 :disabled="d_submitting">
@@ -123,7 +123,7 @@
         </button>
         <button type="button"
                 class="white-button"
-                ref="cancel_submit_button"
+                data-testid="cancel_submit_button"
                 @click="d_show_confirm_submit_modal = false"
                 :disabled="d_submitting">Cancel</button>
       </div>
@@ -149,8 +149,8 @@ import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { format_datetime, handle_api_errors_async, toggle } from '@/utils';
+import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { format_datetime, toggle } from '@/utils';
 
 interface ExpectedFilePatternMismatch {
   pattern: string;
@@ -325,6 +325,7 @@ export default class Submit extends Vue {
   @handle_api_errors_async(handle_submit_error)
   submit() {
     (<APIErrors> this.$refs.api_errors).clear();
+    this.d_submit_progress = 0;
 
     return toggle(this, 'd_submitting', async () => {
       await Submission.create(

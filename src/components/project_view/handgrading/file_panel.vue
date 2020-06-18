@@ -51,6 +51,7 @@ export default class FilePanel extends Vue {
   toggle_open() {
     let top = this.$el.getBoundingClientRect().top;
 
+    this.d_progress = null;
     this.d_is_open = !this.d_is_open;
     if (this.d_content === null) {
       this.d_content = HandgradingResult.get_file_from_handgrading_result(

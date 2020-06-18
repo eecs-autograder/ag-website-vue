@@ -63,7 +63,8 @@ import { Annotation } from "ag-client-typescript";
 import APIErrors from "@/components/api_errors.vue";
 import Modal from "@/components/modal.vue";
 import AnnotationForm, { AnnotationFormData } from "@/components/project_admin/handgrading_settings/annotation_form.vue";
-import { deep_copy, format_datetime, handle_api_errors_async, safe_assign } from "@/utils";
+import { handle_api_errors_async } from '@/error_handling';
+import { deep_copy, format_datetime, safe_assign } from "@/utils";
 
 @Component({
   components: {

@@ -46,12 +46,8 @@
 
       <div class="option-container">
         <div class="checkbox-input-container">
-          <input id="include-staff"
-                  type="checkbox"
-                  class="checkbox"
-                  v-model="d_include_staff"/>
-          <label class="checkbox-label"
-                  for="include-staff">
+          <label class="checkbox-label">
+          <input id="include-staff" type="checkbox" class="checkbox" v-model="d_include_staff"/>
             Include staff
           </label>
         </div>
@@ -243,6 +239,7 @@ export default class DownloadGrades extends Vue implements Created, BeforeDestro
 
   @handle_global_errors_async
   download_task_result(download_task: DownloadTask) {
+    this.d_downloading_result_progress = null;
     return toggle(this, 'd_downloading_result', async () => {
       let response = await HttpClient.get_instance().get_file(
         `/download_tasks/${download_task.pk}/result/`,

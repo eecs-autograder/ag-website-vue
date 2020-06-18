@@ -105,9 +105,6 @@ import HandgradingContainer from '@/components/project_view/handgrading/handgrad
 import StudentLookup from '@/components/project_view/student_lookup.vue';
 import Submit from '@/components/project_view/submit.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
 import { handle_global_errors_async } from '@/error_handling';
 import { assert_not_null, format_datetime, get_query_param } from '@/utils';
 
@@ -119,9 +116,6 @@ import { assert_not_null, format_datetime, get_query_param } from '@/utils';
     StudentLookup,
     SubmissionList,
     Submit,
-    Tab,
-    TabHeader,
-    Tabs
   }
 })
 export default class ProjectView extends Vue implements GroupObserver {

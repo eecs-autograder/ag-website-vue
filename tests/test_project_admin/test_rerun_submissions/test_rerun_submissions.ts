@@ -107,20 +107,20 @@ describe('Rerun list tests', () => {
 
     test('New rerun added to top of list', async () => {
         let wrapper = await make_wrapper();
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun)).toBe(true);
         expect(wrapper.vm.d_rerun_tasks).toEqual(new_tasks);
-        expect(wrapper.findAll({name: 'RerunTaskDetail'}).length).toBe(1);
+        expect(wrapper.findAllComponents({name: 'RerunTaskDetail'}).length).toBe(1);
 
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun)).toBe(true);
         expect(wrapper.vm.d_rerun_tasks).toEqual(new_tasks);
-        expect(wrapper.findAll({name: 'RerunTaskDetail'}).length).toBe(2);
+        expect(wrapper.findAllComponents({name: 'RerunTaskDetail'}).length).toBe(2);
     });
 
     test('Manual refresh', async () => {
         let wrapper = await make_wrapper();
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.progress-cell').text()).toEqual('0%');
         expect(wrapper.find('.refresh-icon').exists()).toBe(true);
@@ -138,7 +138,7 @@ describe('Rerun list tests', () => {
 
     test('Task has error', async () => {
         let wrapper = await make_wrapper();
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.vm.d_rerun_tasks[0].has_error = true;
@@ -153,16 +153,18 @@ describe('Rerun list tests', () => {
 
 test('Selecting and unselecting submissions', async () => {
     let wrapper = await make_wrapper();
-    wrapper.find({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[0]);
-    wrapper.find({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[1]);
+    wrapper.findComponent({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[0]);
+    wrapper.findComponent({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[1]);
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(0);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(0).text())
     ).toEqual('0 submission(s)');
 
-    wrapper.findAll({name: 'SubmissionSelector'}).at(0).vm.$emit(
+    wrapper.findAllComponents({name: 'SubmissionSelector'}).at(0).vm.$emit(
         'submissions_selected', group1_submissions);
+    await wrapper.vm.$nextTick();
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(2);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(0).text())
@@ -170,8 +172,9 @@ test('Selecting and unselecting submissions', async () => {
     expect(wrapper.vm.d_selected_submissions.has(group1_submissions[0])).toBe(true);
     expect(wrapper.vm.d_selected_submissions.has(group1_submissions[1])).toBe(true);
 
-    wrapper.findAll({name: 'SubmissionSelector'}).at(1).vm.$emit(
+    wrapper.findAllComponents({name: 'SubmissionSelector'}).at(1).vm.$emit(
         'submissions_selected', [group2_submissions[2]]);
+    await wrapper.vm.$nextTick();
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(3);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(0).text())
@@ -180,8 +183,9 @@ test('Selecting and unselecting submissions', async () => {
     expect(wrapper.vm.d_selected_submissions.has(group1_submissions[1])).toBe(true);
     expect(wrapper.vm.d_selected_submissions.has(group2_submissions[2])).toBe(true);
 
-    wrapper.findAll({name: 'SubmissionSelector'}).at(0).vm.$emit(
+    wrapper.findAllComponents({name: 'SubmissionSelector'}).at(0).vm.$emit(
         'submissions_unselected', group1_submissions);
+    await wrapper.vm.$nextTick();
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(1);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(0).text())
@@ -189,26 +193,28 @@ test('Selecting and unselecting submissions', async () => {
     expect(wrapper.vm.d_selected_submissions.has(group1_submissions[0])).toBe(false);
     expect(wrapper.vm.d_selected_submissions.has(group1_submissions[1])).toBe(false);
 
-    wrapper.findAll({name: 'SubmissionSelector'}).at(1).vm.$emit(
+    wrapper.findAllComponents({name: 'SubmissionSelector'}).at(1).vm.$emit(
         'submissions_unselected', [group2_submissions[2]]);
+    await wrapper.vm.$nextTick();
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(0);
 });
 
 test('Removing group unselects submissions', async () => {
     let wrapper = await make_wrapper();
-    wrapper.find({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[0]);
-    wrapper.find({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[1]);
+    wrapper.findComponent({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[0]);
+    wrapper.findComponent({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[1]);
+    await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(0);
-
-    wrapper.findAll({name: 'SubmissionSelector'}).at(0).vm.$emit(
+    wrapper.findAllComponents({name: 'SubmissionSelector'}).at(0).vm.$emit(
         'submissions_selected', group1_submissions);
 
-    wrapper.findAll({name: 'SubmissionSelector'}).at(1).vm.$emit(
+    wrapper.findAllComponents({name: 'SubmissionSelector'}).at(1).vm.$emit(
         'submissions_selected', [group2_submissions[0], group2_submissions[2]]);
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(4);
 
-    wrapper.findAll({name: 'SubmissionSelector'}).at(1).vm.$emit('remove_group', groups[1]);
+    wrapper.findAllComponents(
+        {name: 'SubmissionSelector'}).at(1).vm.$emit('remove_group', groups[1]);
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(2);
     expect(wrapper.vm.d_selected_submissions.has(group2_submissions[0])).toBe(false);
     expect(wrapper.vm.d_selected_submissions.has(group2_submissions[2])).toBe(false);
@@ -216,15 +222,14 @@ test('Removing group unselects submissions', async () => {
 
 test('Selecting and unselecting AG test suites', async () => {
     let wrapper = await make_wrapper();
-    wrapper.find('#rerun-all-ag-test-cases').setChecked(false);
-    await wrapper.vm.$nextTick();
+    await wrapper.find('#rerun-all-ag-test-cases').setChecked(false);
 
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(0);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(1).text())
     ).toEqual('0 test case(s) from 0 suite(s)');
-    let checkboxes = wrapper.findAll({ref: 'ag_test_suite_checkbox'});
-    checkboxes.at(1).setChecked(true);
+    let checkboxes = wrapper.findAll('[data-testid=ag_test_suite_checkbox]');
+    await checkboxes.at(1).setChecked(true);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(1).text())
@@ -233,7 +238,7 @@ test('Selecting and unselecting AG test suites', async () => {
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[1].pk).size
     ).toEqual(0);
 
-    checkboxes.at(0).setChecked(true);
+    await checkboxes.at(0).setChecked(true);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(2);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(1).text())
@@ -242,7 +247,7 @@ test('Selecting and unselecting AG test suites', async () => {
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(0);
 
-    checkboxes.at(0).setChecked(false);
+    await checkboxes.at(0).setChecked(false);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(
         wrapper.vm.d_selected_test_cases_by_suite_pk.has(ag_test_suites[0].pk)
@@ -251,11 +256,10 @@ test('Selecting and unselecting AG test suites', async () => {
 
 test('Selecting and unselecting test cases', async () => {
     let wrapper = await make_wrapper();
-    wrapper.find('#rerun-all-ag-test-cases').setChecked(false);
-    await wrapper.vm.$nextTick();
+    await wrapper.find('#rerun-all-ag-test-cases').setChecked(false);
 
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(0);
-    wrapper.findAll({ref: 'ag_test_suite_checkbox'}).at(0).setChecked(true);
+    await wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(0).setChecked(true);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(1).text())
@@ -264,7 +268,7 @@ test('Selecting and unselecting test cases', async () => {
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(0);
 
-    wrapper.findAll({ref: 'ag_test_case_checkbox'}).at(1).setChecked(true);
+    await wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(1).setChecked(true);
     expect(
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(1);
@@ -274,7 +278,7 @@ test('Selecting and unselecting test cases', async () => {
         ).has(ag_test_suites[0].ag_test_cases[1].pk)
     ).toBe(true);
 
-    wrapper.findAll({ref: 'ag_test_case_checkbox'}).at(0).setChecked(true);
+    await wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(0).setChecked(true);
     expect(
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(2);
@@ -289,7 +293,7 @@ test('Selecting and unselecting test cases', async () => {
         ).has(ag_test_suites[0].ag_test_cases[1].pk)
     ).toBe(true);
 
-    wrapper.findAll({ref: 'ag_test_case_checkbox'}).at(1).setChecked(false);
+    await wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(1).setChecked(false);
     expect(
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
     ).toEqual(1);
@@ -307,9 +311,11 @@ test('Selecting test case also selects suite, unselecting suite unselects tests'
 
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(0);
 
-    wrapper.findAll({ref: 'ag_test_case_checkbox'}).at(1).setChecked(true);
+    wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(1).setChecked(true);
     await wrapper.vm.$nextTick();
-    expect(checkbox_is_checked(wrapper.findAll({ref: 'ag_test_suite_checkbox'}).at(0))).toBe(true);
+    expect(
+        checkbox_is_checked(wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(0))
+    ).toBe(true);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(
         wrapper.vm.d_selected_test_cases_by_suite_pk.get(ag_test_suites[0].pk).size
@@ -319,31 +325,36 @@ test('Selecting test case also selects suite, unselecting suite unselects tests'
             ag_test_suites[0].pk
         ).has(ag_test_suites[0].ag_test_cases[1].pk)
     ).toBe(true);
-    expect(checkbox_is_checked(wrapper.findAll({ref: 'ag_test_suite_checkbox'}).at(0))).toBe(true);
+    expect(
+        checkbox_is_checked(wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(0))
+    ).toBe(true);
 
     // Add another suite so we make sure the right one is unchecked later
-    wrapper.findAll({ref: 'ag_test_suite_checkbox'}).at(1).setChecked(true);
+    wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(1).setChecked(true);
 
-    wrapper.findAll({ref: 'ag_test_suite_checkbox'}).at(0).setChecked(false);
+    wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(0).setChecked(false);
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.size).toEqual(1);
     expect(wrapper.vm.d_selected_test_cases_by_suite_pk.has(ag_test_suites[0].pk)).toBe(false);
-    expect(checkbox_is_checked(wrapper.findAll({ref: 'ag_test_case_checkbox'}).at(1))).toBe(false);
-    expect(checkbox_is_checked(wrapper.findAll({ref: 'ag_test_suite_checkbox'}).at(1))).toBe(true);
+    expect(
+        checkbox_is_checked(wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(1))
+    ).toBe(false);
+    expect(
+        checkbox_is_checked(wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(1))
+    ).toBe(true);
 });
 
 test('Selecting and unselecting mutation test suites', async () => {
     let wrapper = await make_wrapper();
-    expect(wrapper.find({ref: 'choose_mutation_test_suites'}).exists()).toBe(false);
-    wrapper.find('#rerun-all-mutation-test-suites').setChecked(false);
-    await wrapper.vm.$nextTick();
+    expect(wrapper.findComponent({ref: 'choose_mutation_test_suites'}).exists()).toBe(false);
+    await wrapper.find('#rerun-all-mutation-test-suites').setChecked(false);
 
     expect(wrapper.vm.d_selected_mutation_test_suite_pks.size).toEqual(0);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(2).text())
     ).toEqual('0 mutation test suite(s)');
-    let checkboxes = wrapper.findAll({ref: 'mutation_test_suite_checkbox'});
-    checkboxes.at(1).setChecked(true);
+    let checkboxes = wrapper.findAll('[data-testid=mutation_test_suite_checkbox]');
+    await checkboxes.at(1).setChecked(true);
     expect(wrapper.vm.d_selected_mutation_test_suite_pks.size).toEqual(1);
     expect(
         compress_whitespace(wrapper.findAll('.summary-line').at(2).text())
@@ -352,7 +363,7 @@ test('Selecting and unselecting mutation test suites', async () => {
         wrapper.vm.d_selected_mutation_test_suite_pks.has(mutation_test_suites[1].pk)
     ).toBe(true);
 
-    checkboxes.at(0).setChecked(true);
+    await checkboxes.at(0).setChecked(true);
     expect(wrapper.vm.d_selected_mutation_test_suite_pks.size).toEqual(2);
     expect(
         wrapper.vm.d_selected_mutation_test_suite_pks.has(mutation_test_suites[0].pk)
@@ -361,7 +372,7 @@ test('Selecting and unselecting mutation test suites', async () => {
         compress_whitespace(wrapper.findAll('.summary-line').at(2).text())
     ).toEqual('2 mutation test suite(s)');
 
-    checkboxes.at(1).setChecked(false);
+    await checkboxes.at(1).setChecked(false);
     expect(wrapper.vm.d_selected_mutation_test_suite_pks.size).toEqual(1);
     expect(
         wrapper.vm.d_selected_mutation_test_suite_pks.has(mutation_test_suites[1].pk)
@@ -371,8 +382,8 @@ test('Selecting and unselecting mutation test suites', async () => {
 test('Mutation testing suites section hidden when empty', async () => {
     get_mutation_test_suites_stub.withArgs(project.pk).resolves([]);
     let wrapper = await make_wrapper();
-    expect(wrapper.find({ref: 'choose_mutation_test_suites'}).exists()).toBe(false);
-    expect(wrapper.find({ref: 'mutation_test_suite_summary'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'choose_mutation_test_suites'}).exists()).toBe(false);
+    expect(wrapper.findComponent({ref: 'mutation_test_suite_summary'}).exists()).toBe(false);
 });
 
 describe('Start rerun tests', () => {
@@ -391,8 +402,8 @@ describe('Start rerun tests', () => {
                 submission_pks: [],
                 rerun_all_ag_test_suites: true,
                 ag_test_suite_data: {},
-                rerun_all_student_test_suites: true,
-                student_suite_pks: [],
+                rerun_all_mutation_test_suites: true,
+                mutation_suite_pks: [],
                 created_at: (new Date()).toISOString(),
             })
         );
@@ -402,7 +413,7 @@ describe('Start rerun tests', () => {
         let wrapper = await make_wrapper();
         wrapper.find('#rerun-all-submissions').setChecked(true);
 
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(create_task_stub.calledOnce).toBe(true);
         expect(create_task_stub.getCall(0).args[0]).toEqual(project.pk);
@@ -415,7 +426,7 @@ describe('Start rerun tests', () => {
         wrapper.vm.d_selected_submissions.insert(group1_submissions[0]);
         wrapper.vm.d_selected_submissions.insert(group2_submissions[1]);
 
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(create_task_stub.calledOnce).toBe(true);
         expect(create_task_stub.getCall(0).args[0]).toEqual(project.pk);
@@ -429,7 +440,7 @@ describe('Start rerun tests', () => {
         let wrapper = await make_wrapper();
         wrapper.find('#rerun-all-ag-test-cases').setChecked(true);
 
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(create_task_stub.calledOnce).toBe(true);
         expect(create_task_stub.getCall(0).args[0]).toEqual(project.pk);
@@ -440,10 +451,10 @@ describe('Start rerun tests', () => {
         let wrapper = await make_wrapper();
         wrapper.find('#rerun-all-ag-test-cases').setChecked(false);
 
-        wrapper.findAll({ref: 'ag_test_case_checkbox'}).at(0).setChecked(true);
-        wrapper.findAll({ref: 'ag_test_suite_checkbox'}).at(1).setChecked(true);
+        wrapper.findAll('[data-testid=ag_test_case_checkbox]').at(0).setChecked(true);
+        wrapper.findAll('[data-testid=ag_test_suite_checkbox]').at(1).setChecked(true);
 
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(create_task_stub.calledOnce).toBe(true);
         expect(create_task_stub.getCall(0).args[0]).toEqual(project.pk);
@@ -458,25 +469,25 @@ describe('Start rerun tests', () => {
         let wrapper = await make_wrapper();
         wrapper.find('#rerun-all-mutation-test-suites').setChecked(true);
 
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(create_task_stub.calledOnce).toBe(true);
         expect(create_task_stub.getCall(0).args[0]).toEqual(project.pk);
-        expect(create_task_stub.getCall(0).args[1].rerun_all_student_test_suites).toBe(true);
+        expect(create_task_stub.getCall(0).args[1].rerun_all_mutation_test_suites).toBe(true);
     });
 
     test('Rerun select mutation testing suites', async () => {
         let wrapper = await make_wrapper();
         wrapper.find('#rerun-all-mutation-test-suites').setChecked(false);
 
-        wrapper.findAll({ref: 'mutation_test_suite_checkbox'}).at(1).setChecked(true);
+        wrapper.findAll('[data-testid=mutation_test_suite_checkbox]').at(1).setChecked(true);
 
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         await wrapper.vm.$nextTick();
         expect(create_task_stub.calledOnce).toBe(true);
         expect(create_task_stub.getCall(0).args[0]).toEqual(project.pk);
-        expect(create_task_stub.getCall(0).args[1].rerun_all_student_test_suites).toBe(false);
-        expect(create_task_stub.getCall(0).args[1].student_suite_pks).toEqual([
+        expect(create_task_stub.getCall(0).args[1].rerun_all_mutation_test_suites).toBe(false);
+        expect(create_task_stub.getCall(0).args[1].mutation_suite_pks).toEqual([
             mutation_test_suites[1].pk
         ]);
     });
@@ -484,7 +495,7 @@ describe('Start rerun tests', () => {
     test('Start rerun, API errors handled', async () => {
         create_task_stub.rejects(new ag_cli.HttpError(403, 'U heked up'));
         let wrapper = await make_wrapper();
-        wrapper.find({ref: 'start_rerun_button'}).trigger('click');
+        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         expect(
             await wait_until(
                 wrapper, w => find_by_name<APIErrors>(

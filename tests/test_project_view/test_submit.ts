@@ -11,7 +11,7 @@ import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { compress_whitespace, find_by_name } from '@/tests/utils';
+import { compress_whitespace, emitted, find_by_name } from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -132,7 +132,7 @@ describe('Submit button text tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         await file_upload.vm.$nextTick();
         expect(
             file_upload.vm.$slots.upload_button_text![0].text!.trim()
@@ -154,7 +154,7 @@ describe('Submit button text tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         await file_upload.vm.$nextTick();
         expect(
             file_upload.vm.$slots.upload_button_text![0].text!.trim()
@@ -177,7 +177,7 @@ describe('Submit button text tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         await file_upload.vm.$nextTick();
         expect(
             file_upload.vm.$slots.upload_button_text![0].text!.trim()
@@ -199,7 +199,7 @@ describe('Submit button text tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         await file_upload.vm.$nextTick();
         expect(
             file_upload.vm.$slots.upload_button_text![0].text!.trim()
@@ -219,7 +219,7 @@ describe('Submit button text tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         await file_upload.vm.$nextTick();
         expect(
             file_upload.vm.$slots.upload_button_text![0].text!.trim()
@@ -237,7 +237,7 @@ describe('Submit button text tests', () => {
 
         await wrapper.vm.$nextTick();
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         await file_upload.vm.$nextTick();
         expect(
             file_upload.vm.$slots.upload_button_text![0].text!.trim()
@@ -478,7 +478,7 @@ describe('Submitted file validation tests', () => {
             }
         });
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         file_upload.vm.$emit('upload_files', files);
 
         await wrapper.vm.$nextTick();
@@ -492,9 +492,9 @@ describe('Submitted file validation tests', () => {
         expect(file_list.findAll('li').at(0).text()).toEqual('required');
         expect(file_list.findAll('li').at(1).text()).toEqual('too_few_1');
 
-        let submit_button = wrapper.find({ref: 'submit_button'});
+        let submit_button = wrapper.find('[data-testid=submit_button]');
         expect(submit_button.text().trim()).toEqual('Submit');
-        expect(submit_button.is('[disabled]')).toBe(false);
+        expect(submit_button.element).not.toBeDisabled();
     });
 
     test('Extra and missing files', async () => {
@@ -513,7 +513,7 @@ describe('Submitted file validation tests', () => {
             }
         });
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         file_upload.vm.$emit('upload_files', files);
 
         await wrapper.vm.$nextTick();
@@ -541,9 +541,9 @@ describe('Submitted file validation tests', () => {
             'Expected no more than 2 file(s) matching the pattern too_many_* but got 3'
         );
 
-        let submit_button = wrapper.find({ref: 'submit_button'});
+        let submit_button = wrapper.find('[data-testid=submit_button]');
         expect(submit_button.text().trim()).toEqual('Submit Anyway');
-        expect(submit_button.is('[disabled]')).toBe(false);
+        expect(submit_button.element).not.toBeDisabled();
     });
 });
 
@@ -572,7 +572,6 @@ describe('Submit tests', () => {
                     discarded_files: [],
                     missing_files: {},
                     status: GradingStatus.received,
-                    count_towards_daily_limit: true,
                     is_past_daily_limit: false,
                     is_bonus_submission: false,
                     count_towards_total_limit: true,
@@ -595,7 +594,7 @@ describe('Submit tests', () => {
         wrapper.vm.d_submit_progress = 20;
 
         let files_to_submit = [new File(['spam'], 'required')];
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         file_upload.vm.$emit('upload_files', files_to_submit);
 
         await wrapper.vm.$nextTick();
@@ -603,16 +602,16 @@ describe('Submit tests', () => {
         // Make sure that this variable is reset when we submit.
         expect(wrapper.vm.d_submit_progress).toEqual(0);
 
-        let submit_button = wrapper.find({ref: 'submit_button'});
+        let submit_button = wrapper.find('[data-testid=submit_button]');
         submit_button.trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(submit_stub.calledWith(group.pk, files_to_submit)).toBe(true);
         expect(wrapper.vm.d_submit_progress).toEqual(100);
 
-        expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'confirm_submit_modal'}).exists()).toBe(false);
 
-        expect(wrapper.emitted().submitted.length).toEqual(1);
+        expect(emitted(wrapper, 'submitted').length).toEqual(1);
     });
 
     test('Submit API error', async () => {
@@ -630,21 +629,21 @@ describe('Submit tests', () => {
             }
         });
 
-        let file_upload = wrapper.find({ref: 'submit_file_upload'});
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
         file_upload.vm.$emit('upload_files', []);
 
         await wrapper.vm.$nextTick();
 
-        let submit_button = wrapper.find({ref: 'submit_button'});
+        let submit_button = wrapper.find('[data-testid=submit_button]');
         submit_button.trigger('click');
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        let api_errors = <Wrapper<APIErrors>> wrapper.find({ref: 'api_errors'});
+        let api_errors = <Wrapper<APIErrors>> wrapper.findComponent({ref: 'api_errors'});
         expect(api_errors.vm.d_api_errors.length).toBe(1);
         expect(submit_stub.calledOnce).toBe(true);
 
-        expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'confirm_submit_modal'}).exists()).toBe(true);
     });
 
     test('Cancel submit', async () => {
@@ -656,14 +655,14 @@ describe('Submit tests', () => {
             }
         });
 
-        wrapper.find({ref: 'submit_file_upload'}).vm.$emit('upload_files', []);
+        wrapper.findComponent({ref: 'submit_file_upload'}).vm.$emit('upload_files', []);
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'confirm_submit_modal'}).exists()).toBe(true);
 
-        wrapper.find({ref: 'cancel_submit_button'}).trigger('click');
+        wrapper.find('[data-testid=cancel_submit_button]').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'confirm_submit_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'confirm_submit_modal'}).exists()).toBe(false);
         expect(submit_stub.calledOnce).toBe(false);
     });
 });

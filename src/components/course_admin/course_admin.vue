@@ -43,9 +43,15 @@
         Late Day Tokens
       </div>
 
+      <div class="nav-link"
+          ref="sandbox_images"
+          :class="{'active': current_tab === 'sandbox_images'}"
+          @click="set_current_tab('sandbox_images')">
+        Sandbox Images
+      </div>
     </div>
 
-    <div class="body">
+    <div class="body" :class="{'body-padding': current_tab !== 'sandbox_images'}">
       <course-settings v-show="current_tab === 'settings'"
                       v-if="loaded_tabs.has('settings')"
                       :course="d_course"></course-settings>
@@ -80,6 +86,12 @@
         v-if="current_tab === 'late_days'"
         :course="d_course">
       </edit-late-days>
+
+      <sandbox-images
+        v-show="current_tab === 'sandbox_images'"
+        v-if="loaded_tabs.has('sandbox_images')"
+        :course="d_course"
+      />
     </div>
   </div>
 </template>
@@ -98,9 +110,7 @@ import HandgraderRoster from '@/components/course_admin/roster/handgrader_roster
 import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
 import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
 import Dropdown from '@/components/dropdown.vue';
-import Tab from '@/components/tabs/tab.vue';
-import TabHeader from '@/components/tabs/tab_header.vue';
-import Tabs from '@/components/tabs/tabs.vue';
+import SandboxImages from '@/components/sandbox_images/sandbox_images.vue';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Mounted } from '@/lifecycle';
@@ -114,11 +124,9 @@ import { get_query_param, safe_assign } from "@/utils";
     StudentRoster,
     ManageProjects,
     EditLateDays,
+    SandboxImages,
     CourseSettings,
     Dropdown,
-    Tab,
-    TabHeader,
-    Tabs,
   }
 })
 export default class CourseAdmin extends CurrentTabMixin implements CourseObserver,
@@ -226,7 +234,7 @@ export enum RosterChoice {
   font-size: 1rem;
 }
 
-.body {
+.body-padding {
   padding: 1rem;
 }
 </style>

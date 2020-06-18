@@ -37,5 +37,8 @@ module.exports = {
     },
     cache: false,
 
-    setupTestFrameworkScriptFile: "./tests/setup.ts"
+    setupFilesAfterEnv: ["./tests/setup.ts"],
+
+    // https://kulshekhar.github.io/ts-jest/user/config/isolatedModules
+    globals: {'ts-jest': {isolatedModules: true}}
 };

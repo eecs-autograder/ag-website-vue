@@ -8,12 +8,12 @@
         ref="lookup"
         class="lookup"
         placeholder_text="Enter a username"
-        @update_item_chosen="search($event)"
+        @item_selected="search($event)"
         :filter_fn="(username, filter_text) => username.includes(filter_text)"
         :choices="d_students">
       </dropdown-typeahead>
       <button type="button"
-              ref="search_button"
+              data-testid="search_button"
               class="blue-button"
               @click="search($refs.lookup.filter_text)">
         Search (If not in list)
@@ -42,7 +42,7 @@
         <APIErrors ref="api_errors"></APIErrors>
 
         <div class="button-footer">
-          <button ref="save_button"
+          <button data-testid="save_button"
                   class="save-button"
                   type="submit"
                   :disabled="!d_late_day_form_is_valid || d_saving">

@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     AGTestCase,
@@ -16,23 +16,17 @@ import ValidatedInput from '@/components/validated_input.vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    emitted,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid
 } from '@/tests/utils';
 
-beforeAll(() => {
-    config.logModifiedComponents = false;
-});
 
 describe('AGSuitePanel tests', () => {
     let wrapper: Wrapper<AGSuitePanel>;
-    let component: AGSuitePanel;
     let project: Project;
     let ag_suite: AGTestSuite;
-    let ag_case_a: AGTestCase;
-    let ag_case_b: AGTestCase;
-    let ag_case_c: AGTestCase;
     let ag_command: AGTestCommand;
     let case_from_different_suite: AGTestCase;
 
@@ -40,13 +34,13 @@ describe('AGSuitePanel tests', () => {
         project = data_ut.make_project(data_ut.make_course().pk);
         ag_suite = data_ut.make_ag_test_suite(project.pk);
 
-        ag_case_a = data_ut.make_ag_test_case(ag_suite.pk);
-        ag_command = data_ut.make_ag_test_command(ag_case_a.pk);
+        ag_suite.ag_test_cases = [
+            data_ut.make_ag_test_case(ag_suite.pk),
+            data_ut.make_ag_test_case(ag_suite.pk),
+            data_ut.make_ag_test_case(ag_suite.pk),
+        ];
 
-        ag_case_b = data_ut.make_ag_test_case(ag_suite.pk);
-        ag_case_c = data_ut.make_ag_test_case(ag_suite.pk);
-
-        ag_suite.ag_test_cases = [ag_case_a, ag_case_b, ag_case_c];
+        ag_command = data_ut.make_ag_test_command(ag_suite.ag_test_cases[0].pk);
 
         case_from_different_suite = data_ut.make_ag_test_case(
             data_ut.make_ag_test_suite(project.pk).pk);
@@ -58,98 +52,96 @@ describe('AGSuitePanel tests', () => {
                 active_ag_test_command: null
             }
         });
-        component = wrapper.vm;
     });
 
     test('Click on suite that is closed, inactive, child command is not active', async () => {
         wrapper.findAll('.panel').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
-        expect(component.d_cases_are_visible).toBe(true);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
+        expect(wrapper.vm.d_cases_are_visible).toBe(true);
     });
 
     test('Click on suite that is open, inactive, child command is not active', async () => {
         let another_suite = data_ut.make_ag_test_suite(project.pk);
 
         wrapper.findAll('.panel').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
 
         wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.setProps({active_ag_test_suite: another_suite});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
         wrapper.findAll('.panel').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[1][0]).toEqual(ag_suite);
-        expect(component.d_cases_are_visible).toBe(true);
+        expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_suite);
+        expect(wrapper.vm.d_cases_are_visible).toBe(true);
     });
 
     test('Click on suite that is open, active, child command is not active', async () => {
         wrapper.findAll('.panel').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted('update_active_item').length).toEqual(1);
+        expect(emitted(wrapper, 'update_active_item').length).toEqual(1);
 
         wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_cases_are_visible).toBe(true);
+        expect(wrapper.vm.d_cases_are_visible).toBe(true);
 
         wrapper.findAll('.panel').at(0).trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_cases_are_visible).toBe(false);
+        expect(wrapper.vm.d_cases_are_visible).toBe(false);
     });
 
     test('Click on suite that is open, inactive, with active child command', async () => {
         wrapper.setProps({active_ag_test_command: ag_command});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_cases_are_visible).toBe(true);
+        expect(wrapper.vm.d_cases_are_visible).toBe(true);
 
         wrapper.find('.panel').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted().update_active_item[0][0]).toEqual(ag_suite);
+        expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
     });
 
     test('Command in suite becomes active', async () => {
         wrapper.setProps({active_ag_test_command: ag_command});
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(component.d_cases_are_visible).toBe(true);
-        expect(component.is_open).toBe(true);
+        expect(wrapper.vm.d_cases_are_visible).toBe(true);
+        expect(wrapper.vm.is_open).toBe(true);
     });
 
     test('Clicking on inactive suite panel emits event', async () => {
-        expect(component.active_ag_test_suite).toBeNull();
+        expect(wrapper.vm.active_ag_test_suite).toBeNull();
 
         wrapper.find('.panel').trigger('click');
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        expect(wrapper.emitted('update_active_item').length).toEqual(1);
+        expect(emitted(wrapper, 'update_active_item').length).toEqual(1);
     });
 
     test('d_new_case_name binding', async () => {
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        let d_new_case_name_input = wrapper.find({ref: 'new_case_name'});
+        let d_new_case_name_input = wrapper.findComponent({ref: 'new_case_name'});
 
-        set_validated_input_text(d_new_case_name_input, "Case 1");
+        await set_validated_input_text(d_new_case_name_input, "Case 1");
         expect(validated_input_is_valid(d_new_case_name_input)).toBe(true);
-        expect(component.d_new_case_name).toEqual("Case 1");
+        expect(wrapper.vm.d_new_case_name).toEqual("Case 1");
 
-        component.d_new_case_name = "Case 2";
+        wrapper.vm.d_new_case_name = "Case 2";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(d_new_case_name_input)).toEqual("Case 2");
     });
 
@@ -158,20 +150,18 @@ describe('AGSuitePanel tests', () => {
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        expect(component.d_new_case_name).toEqual("");
-        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(wrapper.vm.d_new_case_name).toEqual("");
+        expect(wrapper.vm.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.d_new_case_name = "Case 2";
-        component.d_new_commands[0].cmd = "Sit down";
+        wrapper.vm.d_new_case_name = "Case 2";
+        wrapper.vm.d_new_commands[0].cmd = "Sit down";
+        await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
-        await component.$nextTick();
+        await wrapper.findComponent({ref: 'create_ag_test_case_form'}).trigger('submit');
 
         expect(create_case_stub.calledOnce).toBe(true);
         expect(create_case_stub.firstCall.args[1].name).toEqual("Case 2");
@@ -185,26 +175,24 @@ describe('AGSuitePanel tests', () => {
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
-        wrapper.setProps({active_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_suite: ag_suite});
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        expect(component.d_new_case_name).toEqual("");
-        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(wrapper.vm.d_new_case_name).toEqual("");
+        expect(wrapper.vm.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.d_new_case_name = "Casey";
+        wrapper.vm.d_new_case_name = "Casey";
+        await wrapper.vm.$nextTick();
 
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.find('.add-ag-test-command-button').trigger('click');
 
-        component.d_new_commands[0].cmd = "apples";
-        component.d_new_commands[1].name = "BANANAS";
-        component.d_new_commands[1].cmd = "bananas";
+        wrapper.vm.d_new_commands[0].cmd = "apples";
+        wrapper.vm.d_new_commands[1].name = "BANANAS";
+        wrapper.vm.d_new_commands[1].cmd = "bananas";
+        await wrapper.vm.$nextTick();
 
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
-        await component.$nextTick();
+        await wrapper.findComponent({ref: 'create_ag_test_case_form'}).trigger('submit');
 
         expect(create_case_stub.calledOnce).toBe(true);
         expect(create_case_stub.firstCall.args[1].name).toEqual("Casey");
@@ -221,27 +209,24 @@ describe('AGSuitePanel tests', () => {
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
-        wrapper.setProps({active_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_suite: ag_suite});
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        expect(wrapper.vm.d_new_case_name).toEqual("");
+        expect(wrapper.vm.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        expect(component.d_new_case_name).toEqual("");
-        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
+        wrapper.vm.d_new_case_name = "Casey";
+        await wrapper.vm.$nextTick();
 
-        component.d_new_case_name = "Casey";
+        await wrapper.find('.add-ag-test-command-button').trigger('click');
 
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
+        wrapper.vm.d_new_commands[0].name = "APPLES";
+        wrapper.vm.d_new_commands[0].cmd = "apples";
+        wrapper.vm.d_new_commands[1].name = "BANANAS";
+        wrapper.vm.d_new_commands[1].cmd = "bananas";
+        await wrapper.vm.$nextTick();
 
-        component.d_new_commands[0].name = "APPLES";
-        component.d_new_commands[0].cmd = "apples";
-        component.d_new_commands[1].name = "BANANAS";
-        component.d_new_commands[1].cmd = "bananas";
-
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
-        await component.$nextTick();
+        await wrapper.findComponent({ref: 'create_ag_test_case_form'}).trigger('submit');
 
         expect(create_case_stub.calledOnce).toBe(true);
         expect(create_case_stub.firstCall.args[1].name).toEqual("Casey");
@@ -258,31 +243,27 @@ describe('AGSuitePanel tests', () => {
         let create_case_stub = sinon.stub(AGTestCase, 'create').returns(Promise.resolve(new_case));
         let create_command_stub = sinon.stub(AGTestCommand, 'create');
 
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        expect(wrapper.vm.d_new_case_name).toEqual("");
+        expect(wrapper.vm.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        expect(component.d_new_case_name).toEqual("");
-        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
+        wrapper.vm.d_new_case_name = "Casey";
+        await wrapper.vm.$nextTick();
 
-        component.d_new_case_name = "Casey";
+        await wrapper.find('.add-ag-test-command-button').trigger('click');
+        await wrapper.find('.add-ag-test-command-button').trigger('click');
 
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
+        wrapper.vm.d_new_commands[0].name = "APPLES";
+        wrapper.vm.d_new_commands[0].cmd = "apples";
+        wrapper.vm.d_new_commands[1].name = "BANANAS";
+        wrapper.vm.d_new_commands[1].cmd = "bananas";
+        wrapper.vm.d_new_commands[2].name = "APPLES";
+        wrapper.vm.d_new_commands[2].cmd = "cherries";
+        await wrapper.vm.$nextTick();
 
-        component.d_new_commands[0].name = "APPLES";
-        component.d_new_commands[0].cmd = "apples";
-        component.d_new_commands[1].name = "BANANAS";
-        component.d_new_commands[1].cmd = "bananas";
-        component.d_new_commands[2].name = "APPLES";
-        component.d_new_commands[2].cmd = "cherries";
-
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
-        await component.$nextTick();
+        await wrapper.findComponent({ref: 'create_ag_test_case_form'}).trigger('submit');
 
         expect(create_case_stub.callCount).toEqual(0);
         expect(create_command_stub.callCount).toEqual(0);
@@ -300,257 +281,221 @@ describe('AGSuitePanel tests', () => {
         );
         sinon.stub(AGTestCommand, 'create');
 
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        wrapper.vm.d_new_case_name = "Case A";
+        wrapper.vm.d_new_commands[0].cmd = "stand up";
+        await wrapper.vm.$nextTick();
 
-        component.d_new_case_name = "Case A";
-        component.d_new_commands[0].cmd = "stand up";
-
-        wrapper.find({ref: 'create_ag_test_case_form'}).trigger('submit');
-        await component.$nextTick();
-
+        await wrapper.findComponent({ref: 'create_ag_test_case_form'}).trigger('submit');
         expect(create_case_stub.callCount).toEqual(1);
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'new_ag_test_case_api_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'new_ag_test_case_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
     test('Remove command from create_case_modal', async () => {
-        wrapper.setProps({active_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_suite: ag_suite});
 
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
-        expect(component.d_new_case_name).toEqual("");
-        expect(component.d_new_commands[0]).toEqual({name: "", cmd: ""});
+        expect(wrapper.vm.d_new_case_name).toEqual("");
+        expect(wrapper.vm.d_new_commands[0]).toEqual({name: "", cmd: ""});
 
-        component.d_new_case_name = "Casey";
+        wrapper.vm.d_new_case_name = "Casey";
+        await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.remove-ag-test-command-button').length).toEqual(0);
 
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
+        await wrapper.find('.add-ag-test-command-button').trigger('click');
         expect(wrapper.findAll('.remove-ag-test-command-button').length).toEqual(2);
 
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
-
+        await wrapper.find('.add-ag-test-command-button').trigger('click');
         expect(wrapper.findAll('.remove-ag-test-command-button').length).toEqual(3);
 
-        wrapper.findAll('.remove-ag-test-command-button').at(0).trigger('click');
+        await wrapper.findAll('.remove-ag-test-command-button').at(0).trigger('click');
         expect(wrapper.findAll('.remove-ag-test-command-button').length).toEqual(2);
 
-        wrapper.findAll('.remove-ag-test-command-button').at(1).trigger('click');
+        await wrapper.findAll('.remove-ag-test-command-button').at(1).trigger('click');
         expect(wrapper.findAll('.remove-ag-test-command-button').length).toEqual(0);
     });
 
     test('Opening and closing new test case modal preserves number of commands', async () => {
-        wrapper.setProps({active_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_suite: ag_suite});
+        expect(wrapper.vm.ag_test_suite.ag_test_cases.length).toEqual(3);
 
-        expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
-
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
-
+        await wrapper.find('.icons .fa-plus').trigger('click');
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(true);
-        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'new_ag_test_case_modal'}).exists()).toBe(true);
 
-        wrapper.find({ref: 'new_ag_test_case_modal'}).vm.$emit('close');
-        await component.$nextTick();
+        wrapper.findComponent({ref: 'new_ag_test_case_modal'}).vm.$emit('close');
+        await wrapper.vm.$nextTick();
 
-        expect(component.ag_test_suite.ag_test_cases.length).toEqual(3);
+        expect(wrapper.vm.ag_test_suite.ag_test_cases.length).toEqual(3);
         expect(wrapper.vm.d_show_new_ag_test_case_modal).toBe(false);
-        expect(wrapper.find({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'new_ag_test_case_modal'}).exists()).toBe(false);
     });
 
     test('is_active_suite getter', async () => {
         let another_suite = data_ut.make_ag_test_suite(project.pk);
-        expect(component.suite_is_active).toBe(false);
+        expect(wrapper.vm.suite_is_active).toBe(false);
 
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
+        expect(wrapper.vm.suite_is_active).toBe(true);
 
-        expect(component.suite_is_active).toBe(true);
-
-        wrapper.setProps({active_ag_test_suite: another_suite});
-        await component.$nextTick();
-
-        expect(component.suite_is_active).toBe(false);
+        await wrapper.setProps({active_ag_test_suite: another_suite});
+        expect(wrapper.vm.suite_is_active).toBe(false);
     });
 
     test('error - new case name is blank', async () => {
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-
-        let new_case_name_input = wrapper.find({ref: 'new_case_name'});
-        let new_case_name_validator = <ValidatedInput> wrapper.find({ref: 'new_case_name'}).vm;
+        let new_case_name_input = wrapper.findComponent({ref: 'new_case_name'});
+        let new_case_name_validator
+            = <ValidatedInput> wrapper.findComponent({ref: 'new_case_name'}).vm;
 
         expect(new_case_name_validator.is_valid).toBe(false);
 
-        set_validated_input_text(new_case_name_input, "Paradise");
+        await set_validated_input_text(new_case_name_input, "Paradise");
         expect(new_case_name_validator.is_valid).toBe(true);
 
-        set_validated_input_text(new_case_name_input, " ");
+        await set_validated_input_text(new_case_name_input, " ");
         expect(new_case_name_validator.is_valid).toBe(false);
-        expect(wrapper.find('.modal-create-button').is('[disabled]')).toBe(true);
+        expect(wrapper.find('.modal-create-button').element).toBeDisabled();
     });
 
     test('new_command.name binding', async () => {
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
+        await wrapper.find('.icons .fa-plus').trigger('click');
+        await wrapper.find('.add-ag-test-command-button').trigger('click');
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        let first_new_command_name_input = wrapper.findAllComponents({ref: 'command_name'}).at(0);
 
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
-
-        let first_new_command_name_input = wrapper.findAll({ref: 'command_name'}).at(0);
-
-        set_validated_input_text(first_new_command_name_input, "Pasta");
+        await set_validated_input_text(first_new_command_name_input, "Pasta");
         expect(validated_input_is_valid(first_new_command_name_input)).toBe(true);
-        expect(component.d_new_commands[0].name).toEqual("Pasta");
+        expect(wrapper.vm.d_new_commands[0].name).toEqual("Pasta");
 
-        component.d_new_commands[0].name = "Pizza";
+        wrapper.vm.d_new_commands[0].name = "Pizza";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(first_new_command_name_input)).toEqual("Pizza");
     });
 
     test('error - new command name is blank', async () => {
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
+        await wrapper.find('.icons .fa-plus').trigger('click');
+        await wrapper.find('.add-ag-test-command-button').trigger('click');
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
-
-        wrapper.find('.add-ag-test-command-button').trigger('click');
-        await component.$nextTick();
-
-        let new_command_name_input = wrapper.findAll({ref: 'command_name'}).at(0);
-        let new_command_name_validator = <ValidatedInput> wrapper.findAll(
-            {ref: 'command_name'}
-        ).at(0).vm;
+        let new_command_name_input = wrapper.findAllComponents({ref: 'command_name'}).at(0);
+        let new_command_name_validator = <ValidatedInput> wrapper.findAllComponents({
+            ref: 'command_name'
+        }).at(0).vm;
 
         expect(new_command_name_validator.is_valid).toBe(false);
 
-        set_validated_input_text(new_command_name_input, "Great");
+        await set_validated_input_text(new_command_name_input, "Great");
         expect(new_command_name_validator.is_valid).toBe(true);
 
-        set_validated_input_text(new_command_name_input, " ");
+        await set_validated_input_text(new_command_name_input, " ");
         expect(new_command_name_validator.is_valid).toBe(false);
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.find('.modal-create-button').is(
-            '[disabled]'
-        )).toBe(true);
+        expect(wrapper.find('.modal-create-button').element).toBeDisabled();
     });
 
     test('new_command.cmd binding', async () => {
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-        await component.$nextTick();
+        let first_new_command_input = wrapper.findComponent({ref: 'command'});
 
-        let first_new_command_input = wrapper.find({ref: 'command'});
-
-        set_validated_input_text(first_new_command_input, "Lasagna");
+        await set_validated_input_text(first_new_command_input, "Lasagna");
         expect(validated_input_is_valid(first_new_command_input)).toBe(true);
-        expect(component.d_new_commands[0].cmd).toEqual("Lasagna");
+        expect(wrapper.vm.d_new_commands[0].cmd).toEqual("Lasagna");
 
-        component.d_new_commands[0].cmd = "Spaghetti";
+        wrapper.vm.d_new_commands[0].cmd = "Spaghetti";
+        await wrapper.vm.$nextTick();
         expect(get_validated_input_text(first_new_command_input)).toEqual("Spaghetti");
     });
 
     test('error - new command is blank', async () => {
-        wrapper.setProps({active_ag_test_suite: ag_suite});
-        await component.$nextTick();
+        await wrapper.setProps({active_ag_test_suite: ag_suite});
+        await wrapper.find('.icons .fa-plus').trigger('click');
 
-        wrapper.find('.icons .fa-plus').trigger('click');
-
-        let new_command_input = wrapper.find({ref: 'command'});
-        let new_command_validator = <ValidatedInput> wrapper.find({ref: 'command'}).vm;
+        let new_command_input = wrapper.findComponent({ref: 'command'});
+        let new_command_validator = <ValidatedInput> wrapper.findComponent({ref: 'command'}).vm;
 
         expect(new_command_validator.is_valid).toBe(false);
 
-        set_validated_input_text(new_command_input, "Splendid");
+        await set_validated_input_text(new_command_input, "Splendid");
         expect(new_command_validator.is_valid).toBe(true);
 
-        set_validated_input_text(new_command_input, " ");
+        await set_validated_input_text(new_command_input, " ");
         expect(new_command_validator.is_valid).toBe(false);
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.find('.modal-create-button').is(
-            '[disabled]'
-        )).toBe(true);
+        expect(wrapper.find('.modal-create-button').element).toBeDisabled();
     });
 
     test('Watcher for test_suite', async () => {
         let another_suite = data_ut.make_ag_test_suite(project.pk);
-        expect(component.ag_test_suite).toEqual(ag_suite);
+        expect(wrapper.vm.ag_test_suite).toEqual(ag_suite);
 
-        wrapper.setProps({ag_test_suite: another_suite});
-        await component.$nextTick();
-
-        expect(component.ag_test_suite).toEqual(another_suite);
+        await wrapper.setProps({ag_test_suite: another_suite});
+        expect(wrapper.vm.ag_test_suite).toEqual(another_suite);
     });
 
     test('duplicate_command_name getter', async () => {
-        component.d_new_commands = [
+        wrapper.vm.d_new_commands = [
             {name: "Anna", cmd: "Kendrick"}
         ];
-        expect(component.duplicate_command_name).toEqual("");
+        expect(wrapper.vm.duplicate_command_name).toEqual("");
 
-        component.d_new_commands = [
+        wrapper.vm.d_new_commands = [
             {name: "Anna", cmd: "Kendrick"},
             {name: "Rebel", cmd: "Wilson"}
         ]; // different names
-        expect(component.duplicate_command_name).toEqual("");
+        expect(wrapper.vm.duplicate_command_name).toEqual("");
 
-        component.d_new_commands = [
+        wrapper.vm.d_new_commands = [
             {name: "Anna", cmd: "Kendrick"},
             {name: "Anna", cmd: "Camp"}
         ]; // same name
-        expect(component.duplicate_command_name).toEqual("Anna");
+        expect(wrapper.vm.duplicate_command_name).toEqual("Anna");
 
-        component.d_new_commands = [
+        wrapper.vm.d_new_commands = [
             {name: "Adam", cmd: "DeVine"},
             {name: "Adam", cmd: "Levine"},
             {name: "Brittany", cmd: "Snow"}
         ];  // 1 and 2 same name
-        expect(component.duplicate_command_name).toEqual("Adam");
+        expect(wrapper.vm.duplicate_command_name).toEqual("Adam");
 
-        component.d_new_commands = [
+        wrapper.vm.d_new_commands = [
             {name: "Ester", cmd: "Dean"},
             {name: "Anna", cmd: "Camp"},
             {name: "Anna", cmd: "Kendrick"}
         ];  // 2 and 3 same name
-        expect(component.duplicate_command_name).toEqual("Anna");
+        expect(wrapper.vm.duplicate_command_name).toEqual("Anna");
 
-        component.d_new_commands = [
+        wrapper.vm.d_new_commands = [
             {name: "Adam", cmd: "DeVine"},
             {name: "Brittany", cmd: "Snow"},
             {name: "Adam", cmd: "Levine"}
         ];  // 1 and 3 same name
-        expect(component.duplicate_command_name).toEqual("Adam");
+        expect(wrapper.vm.duplicate_command_name).toEqual("Adam");
 
-        component.d_new_commands = [
+        wrapper.vm.d_new_commands = [
             {name: "Ester", cmd: "Dean"},
             {name: "Anna", cmd: "Camp"},
             {name: "Rebel", cmd: "Wilson"}
         ];  // all have different names
-        expect(component.duplicate_command_name).toEqual("");
+        expect(wrapper.vm.duplicate_command_name).toEqual("");
     });
 });
 
@@ -570,10 +515,9 @@ test('Update test cases order', async () => {
             active_ag_test_command: null
         }
     });
-    wrapper.find('.panel').trigger('click');
-    await wrapper.vm.$nextTick();
+    await wrapper.find('.panel').trigger('click');
 
-    wrapper.find({ref: 'ag_test_case_order'}).vm.$emit('change');
+    wrapper.findComponent({ref: 'ag_test_case_order'}).vm.$emit('change');
     await wrapper.vm.$nextTick();
     expect(
         order_stub.calledOnceWith(suite.pk, test_cases.map(test_case => test_case.pk))

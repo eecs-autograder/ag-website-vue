@@ -96,19 +96,19 @@ describe('Filter group summaries tests', () => {
     test('Include/exclude staff', async () => {
         expect(checkbox_is_checked(wrapper.find('#include-staff'))).toBe(false);
         expect(wrapper.vm.d_include_staff).toBe(false);
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(4);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(4);
         expect(summary_pks(wrapper).includes(staff_group.pk)).toBe(false);
 
         wrapper.find('#include-staff').setChecked();
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_include_staff).toBe(true);
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(5);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(5);
         expect(summary_pks(wrapper).includes(staff_group.pk)).toBe(true);
     });
 
     test('Filter by status', async () => {
         expect(checkbox_is_checked(wrapper.find('#all'))).toBe(true);
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(4);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(4);
         expect(summary_pks(wrapper)).toEqual([
             no_submissions_group.pk,
             ungraded_group.pk,
@@ -118,63 +118,63 @@ describe('Filter group summaries tests', () => {
 
         wrapper.find('#graded').setChecked();
         await wrapper.vm.$nextTick();
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(1);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([graded_group.pk]);
 
         wrapper.find('#in-progress').setChecked();
         await wrapper.vm.$nextTick();
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(1);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([in_progress_group.pk]);
 
         wrapper.find('#ungraded').setChecked();
         await wrapper.vm.$nextTick();
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(1);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([ungraded_group.pk]);
 
         wrapper.find('#no-submission').setChecked();
         await wrapper.vm.$nextTick();
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(1);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([no_submissions_group.pk]);
     });
 
     test('Filter by username', async () => {
         wrapper.find('.sidebar-footer input[type=text]').setValue('progress');
         await wrapper.vm.$nextTick();
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(1);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([in_progress_group.pk]);
 
         wrapper.vm.d_include_staff = true;
         wrapper.find('.sidebar-footer input[type=text]').setValue('taff2');
         await wrapper.vm.$nextTick();
-        expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(1);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([staff_group.pk]);
     });
 
     test('Grading progress', async () => {
         expect(wrapper.vm.d_include_staff).toBe(false);
         expect(
-            compress_whitespace(wrapper.find({ref: 'progress_text'}).text())
+            compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
         ).toEqual('1/3 (4 total)');
 
         wrapper.vm.d_include_staff = true;
         await wrapper.vm.$nextTick();
 
         expect(
-            compress_whitespace(wrapper.find({ref: 'progress_text'}).text())
+            compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
         ).toEqual('2/4 (5 total)');
 
         wrapper.vm.d_status_filter = HandgradingStatus.graded;
         await wrapper.vm.$nextTick();
 
         expect(
-            compress_whitespace(wrapper.find({ref: 'progress_text'}).text())
+            compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
         ).toEqual('2/4 (5 total)');
 
         wrapper.vm.d_search_text = 'staff';
         await wrapper.vm.$nextTick();
 
         expect(
-            compress_whitespace(wrapper.find({ref: 'progress_text'}).text())
+            compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
         ).toEqual('2/4 (5 total)');
     });
 });
@@ -203,7 +203,7 @@ test('Load and display paginated group summaries', async () => {
     wrapper.vm.d_include_staff = true;
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.findAll({name: 'GroupSummaryPanel'}).length).toBe(5);
+    expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(5);
     expect(summary_pks(wrapper)).toEqual([
         no_submissions_group.pk,
         ungraded_group.pk,
@@ -219,9 +219,21 @@ test('Load and display paginated group summaries', async () => {
 });
 
 function summary_pks(wrapper_: Wrapper<HandgradingContainer>): number[] {
-    return (<WrapperArray<GroupSummaryPanel>> wrapper_.findAll(
-        {name: 'GroupSummaryPanel'}
-    )).wrappers.map(w => w.vm.group_summary.pk);
+    return (<WrapperArray<GroupSummaryPanel>> wrapper_.findAllComponents({
+        name: 'GroupSummaryPanel'
+    })).wrappers.map(w => w.vm.group_summary.pk);
+}
+
+async function expect_result_is_selected(
+    wrapper: Wrapper<HandgradingContainer>, expected_result: ag_cli.HandgradingResult
+): Promise<void> {
+    expect(
+        await wait_until(wrapper, w => w.vm.d_currently_grading?.pk === expected_result.pk)
+    ).toBe(true);
+    expect(wrapper.vm.d_currently_grading).toEqual(expected_result);
+    expect(
+        find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
+    ).toEqual(expected_result);
 }
 
 describe('Select group tests', () => {
@@ -235,36 +247,28 @@ describe('Select group tests', () => {
     test('Select ungraded group for grading', async () => {
         let result = data_ut.make_handgrading_result(rubric, ungraded_group.pk, 42);
         get_or_create_stub.withArgs(ungraded_group.pk).resolves(result);
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
 
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(1).trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_currently_grading).toEqual(result);
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(result);
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(1).trigger('click');
+        await expect_result_is_selected(wrapper, result);
     });
 
     test('Select graded group for grading', async () => {
         let result = data_ut.make_handgrading_result(rubric, graded_group.pk, 42);
         get_or_create_stub.withArgs(graded_group.pk).resolves(result);
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
 
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(2).trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_currently_grading).toEqual(result);
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(result);
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(2).trigger('click');
+        await expect_result_is_selected(wrapper, result);
     });
 
     test('Group selected for grading has no submissions', async () => {
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(0).trigger('click');
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
+        wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_currently_grading).toBe(null);
-        expect(wrapper.find({name: 'Handgrading'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
     });
 });
 
@@ -284,65 +288,46 @@ describe('Select next/prev for grading', () => {
         set_summaries([ungraded_group, graded_group]);
         let wrapper = await make_wrapper();
 
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(ungraded_result);
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(0).trigger('click');
+        await expect_result_is_selected(wrapper, ungraded_result);
 
-        wrapper.find({name: 'Handgrading'}).vm.$emit('next_group');
+        wrapper.findComponent({name: 'Handgrading'}).vm.$emit('next_group');
         await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(graded_result);
+        await expect_result_is_selected(wrapper, graded_result);
 
-        wrapper.find({name: 'Handgrading'}).vm.$emit('prev_group');
+        wrapper.findComponent({name: 'Handgrading'}).vm.$emit('prev_group');
         await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(ungraded_result);
+        await expect_result_is_selected(wrapper, ungraded_result);
     });
 
     test('Select next and prev skips no_submission', async () => {
         set_summaries([ungraded_group, no_submissions_group, graded_group]);
         let wrapper = await make_wrapper();
 
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(ungraded_result);
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(0).trigger('click');
+        await expect_result_is_selected(wrapper, ungraded_result);
 
-        wrapper.find({name: 'Handgrading'}).vm.$emit('next_group');
+        wrapper.findComponent({name: 'Handgrading'}).vm.$emit('next_group');
         await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(graded_result);
+        await expect_result_is_selected(wrapper, graded_result);
 
-        wrapper.find({name: 'Handgrading'}).vm.$emit('prev_group');
+        wrapper.findComponent({name: 'Handgrading'}).vm.$emit('prev_group');
         await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(ungraded_result);
+        await expect_result_is_selected(wrapper, ungraded_result);
     });
 
     test('Current group is first or last', async () => {
         set_summaries([ungraded_group, graded_group]);
         let wrapper = await make_wrapper();
 
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(ungraded_result);
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(0).trigger('click');
+        await expect_result_is_selected(wrapper, ungraded_result);
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_first).toBe(true);
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_last).toBe(false);
 
-        wrapper.find({name: 'Handgrading'}).vm.$emit('next_group');
+        wrapper.findComponent({name: 'Handgrading'}).vm.$emit('next_group');
         await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(graded_result);
+        await expect_result_is_selected(wrapper, graded_result);
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_first).toBe(false);
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_last).toBe(true);
     });
@@ -351,11 +336,8 @@ describe('Select next/prev for grading', () => {
         set_summaries([no_submissions_group, ungraded_group, graded_group]);
 
         let wrapper = await make_wrapper();
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(1).trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(ungraded_result);
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(1).trigger('click');
+        await expect_result_is_selected(wrapper, ungraded_result);
 
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_first).toBe(true);
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_last).toBe(false);
@@ -365,11 +347,8 @@ describe('Select next/prev for grading', () => {
         set_summaries([ungraded_group, graded_group, no_submissions_group]);
 
         let wrapper = await make_wrapper();
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(1).trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(graded_result);
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(1).trigger('click');
+        await expect_result_is_selected(wrapper, graded_result);
 
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_first).toBe(false);
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_last).toBe(true);
@@ -379,11 +358,8 @@ describe('Select next/prev for grading', () => {
         set_summaries([ungraded_group]);
 
         let wrapper = await make_wrapper();
-        wrapper.findAll({name: 'GroupSummaryPanel'}).at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-        expect(
-            find_by_name<Handgrading>(wrapper, 'Handgrading').vm.handgrading_result
-        ).toEqual(ungraded_result);
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(0).trigger('click');
+        await expect_result_is_selected(wrapper, ungraded_result);
 
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_first).toBe(true);
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_last).toBe(true);
@@ -455,12 +431,12 @@ test('Header is "Students" or "Groups based on max group size"', async () => {
     project.max_group_size = 1;
     set_summaries([]);
     let wrapper = await make_wrapper();
-    expect(wrapper.find('.sidebar-header .header-text').text()).toEqual('Students');
+    expect(wrapper.find('.sidebar-header .sidebar-header-text').text()).toEqual('Students');
 
     project.max_group_size = 2;
     wrapper.vm.$forceUpdate();
     await wrapper.vm.$nextTick();
-    expect(wrapper.find('.sidebar-header .header-text').text()).toEqual('Groups');
+    expect(wrapper.find('.sidebar-header .sidebar-header-text').text()).toEqual('Groups');
 });
 
 function set_summaries(summaries: ag_cli.GroupWithHandgradingResultSummary[]) {

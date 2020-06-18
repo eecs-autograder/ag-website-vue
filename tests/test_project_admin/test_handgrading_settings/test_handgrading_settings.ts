@@ -26,7 +26,9 @@ import {
     get_validated_input_text,
     set_select_object_value,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
+    wait_for_load,
+    wait_until
 } from "@/tests/utils";
 
 let user: User;
@@ -44,10 +46,6 @@ beforeEach(() => {
 
 describe('Initialize handgrading tests', () => {
     let wrapper: Wrapper<HandgradingSettings>;
-
-    afterEach(() => {
-        sinon.restore();
-    });
 
     test('Create new handgrading rubric', async () => {
         sinon.stub(user, 'courses_is_admin_for').returns(Promise.resolve([course]));
@@ -78,12 +76,11 @@ describe('Initialize handgrading tests', () => {
             },
         });
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.vm.d_handgrading_rubric).toBeNull();
         expect(wrapper.find('#rubric-columns-container').exists()).toEqual(false);
 
-        wrapper.find('#new-rubric-button').trigger('click');
+        await wrapper.find('#new-rubric-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(new_rubric_stub.calledOnceWith(project.pk, {}));
@@ -122,27 +119,23 @@ describe('Initialize handgrading tests', () => {
                 project: current_project
             },
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_course_to_import_from).toEqual(course);
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
         // The current project doesn't have a rubric, so it's filtered out.
         expect(wrapper.vm.d_selected_course_projects).toEqual(
             [other_project, project_to_import_from]);
-        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
-            {ref: 'project_to_import_from'});
+        let select_project_to_import_from
+            = <Wrapper<SelectObject>> wrapper.findComponent({ref: 'project_to_import_from'});
         // "Select a project" is index 0, other_project is 1, project_to_import_from is 2
-        select_project_to_import_from.findAll('option').at(2).setSelected();
+        await select_project_to_import_from.findAll('option').at(2).setSelected();
 
-        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_project_to_import_from).toEqual(project_to_import_from);
 
-        wrapper.find('#import-button-container .green-button').trigger('click');
+        await wrapper.find('#import-button-container .green-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_import_request_pending)).toBe(true);
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_rubric).toEqual(rubric);
 
         expect(get_projects_stub.calledOnceWith(course.pk));
@@ -189,34 +182,27 @@ describe('Initialize handgrading tests', () => {
                 project: current_project
             },
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_course_to_import_from).toEqual(course);
         expect(wrapper.vm.d_selected_course_projects).toEqual([]);
-        set_select_object_value(
-            wrapper.find({ref: 'course_to_import_from'}), course_to_import_from.pk);
-
-        await wrapper.vm.$nextTick();
+        await set_select_object_value(
+            wrapper.findComponent({ref: 'course_to_import_from'}), course_to_import_from.pk);
 
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual(
             [other_project, project_to_import_from]);
-        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
-            {ref: 'project_to_import_from'});
+        let select_project_to_import_from
+            = <Wrapper<SelectObject>> wrapper.findComponent({ref: 'project_to_import_from'});
         // "Select a project" is index 0, other_project is 1, project_to_import_from is 2
-        select_project_to_import_from.findAll('option').at(2).setSelected();
+        await select_project_to_import_from.findAll('option').at(2).setSelected();
 
-        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_project_to_import_from).toEqual(project_to_import_from);
 
-        wrapper.find('#import-button-container .green-button').trigger('click');
+        await wrapper.find('#import-button-container .green-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_import_request_pending)).toBe(true);
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_rubric).toEqual(rubric);
-
         expect(import_rubric_stub.calledOnceWith(current_project.pk, project_to_import_from.pk));
     });
 
@@ -240,34 +226,31 @@ describe('Initialize handgrading tests', () => {
                 project: current_course_project
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual([project_with_rubric]);
 
-        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.find(
+        let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.findComponent(
             {ref: 'project_to_import_from'});
-        select_project_to_import_from.findAll('option').at(1).setSelected();
+        await select_project_to_import_from.findAll('option').at(1).setSelected();
 
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_project_to_import_from).toEqual(project_with_rubric);
 
         expect(
-            wrapper.find('#import-button-container .green-button').is('[disabled]')
-        ).toEqual(false);
+            wrapper.find('#import-button-container .green-button').element
+        ).not.toBeDisabled();
 
-        set_select_object_value(
-            wrapper.find({ref: 'course_to_import_from'}), no_projects_course.pk);
-        await wrapper.vm.$nextTick();
+        await set_select_object_value(
+            wrapper.findComponent({ref: 'course_to_import_from'}), no_projects_course.pk);
 
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual([]);
 
         expect(
-            wrapper.find('#import-button-container .green-button').is('[disabled]')
-        ).toEqual(true);
+            wrapper.find('#import-button-container .green-button').element
+        ).toBeDisabled();
     });
 });
 
@@ -341,7 +324,7 @@ describe('Handgrading settings tests', () => {
         expect(wrapper.vm.d_handgrading_rubric!.max_points).toEqual(42);
     });
 
-    test('Points style start at max, error max points empty, zero, or negative', () => {
+    test('Points style start at max, error max points empty, zero, or negative', async () => {
         // Switching points style should make the max points validators rerun
 
         expect(
@@ -350,21 +333,22 @@ describe('Handgrading settings tests', () => {
         expect(wrapper.vm.d_handgrading_rubric!.max_points).toBeNull();
 
         wrapper.vm.d_handgrading_rubric!.points_style = PointsStyle.start_at_max_and_subtract;
+        await wrapper.vm.$nextTick();
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
 
-        wrapper.find('#points-style').setValue(PointsStyle.start_at_zero_and_add);
+        await wrapper.find('#points-style').setValue(PointsStyle.start_at_zero_and_add);
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
 
-        wrapper.find('#points-style').setValue(PointsStyle.start_at_max_and_subtract);
+        await wrapper.find('#points-style').setValue(PointsStyle.start_at_max_and_subtract);
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
 
-        set_validated_input_text(wrapper.find('#max-points'), '1');
+        await set_validated_input_text(wrapper.find('#max-points'), '1');
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
 
-        set_validated_input_text(wrapper.find('#max-points'), '0');
+        await set_validated_input_text(wrapper.find('#max-points'), '0');
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
 
-        set_validated_input_text(wrapper.find('#max-points'), '-1');
+        await set_validated_input_text(wrapper.find('#max-points'), '-1');
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
     });
 
@@ -388,17 +372,16 @@ describe('Handgrading settings tests', () => {
         expect(wrapper.vm.d_handgrading_rubric!.handgraders_can_adjust_points).toEqual(true);
     });
 
-    test('Save button disabled when invalid', () => {
-        set_validated_input_text(wrapper.find('#max-points'), '-1');
+    test('Save button disabled when invalid', async () => {
+        await set_validated_input_text(wrapper.find('#max-points'), '-1');
         expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
-
-        expect(wrapper.find({ref: 'save_rubric_button'}).is('[disabled]')).toEqual(true);
+        expect(wrapper.find('[data-testid=save_rubric_button]').element).toBeDisabled();
     });
 
     test('Save settings', async () => {
         let save_stub = sinon.stub(rubric, 'save').returns(Promise.resolve());
-        expect(wrapper.find({ref: 'save_rubric_button'}).is('[disabled]')).toEqual(false);
-        wrapper.find({ref: 'handgrading_settings_form'}).trigger('submit');
+        expect(wrapper.find('[data-testid=save_rubric_button]').element).not.toBeDisabled();
+        wrapper.findComponent({ref: 'handgrading_settings_form'}).trigger('submit');
 
         await wrapper.vm.$nextTick();
         expect(save_stub.calledOnce).toEqual(true);
@@ -408,11 +391,10 @@ describe('Handgrading settings tests', () => {
         sinon.stub(rubric, 'save').returns(
             Promise.reject(new HttpError(403, 'Permission denied')));
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'settings_form_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'settings_form_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(0);
-        wrapper.find({ref: 'handgrading_settings_form'}).trigger('submit');
-
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'handgrading_settings_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving));
 
         expect(api_errors.d_api_errors.length).toEqual(1);
     });
@@ -453,8 +435,8 @@ describe('Criteria and annotation tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_rubric).toEqual(rubric);
 
-        expect(wrapper.findAll({name: 'SingleCriterion'}).length).toEqual(2);
-        expect(wrapper.findAll({name: 'SingleAnnotation'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SingleCriterion'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'SingleAnnotation'}).length).toEqual(2);
     });
 
     afterEach(() => {
@@ -470,22 +452,23 @@ describe('Criteria and annotation tests', () => {
         wrapper.vm.d_create_criterion_modal_is_open = true;
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'create_criterion_button'}).is('[disabled]')).toEqual(true);
+        expect(wrapper.find('[data-testid=create_criterion_button]').element).toBeDisabled();
 
-        let criterion_form = <Wrapper<CriterionForm>> wrapper.find({ref: 'create_criterion_form'});
+        let criterion_form
+            = <Wrapper<CriterionForm>> wrapper.findComponent({ref: 'create_criterion_form'});
         criterion_form.vm.d_form_data = {
             short_description: 'An criteria', long_description: '', points: 1
         };
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'create_criterion_button'}).is('[disabled]')).toEqual(false);
+        expect(wrapper.find('[data-testid=create_criterion_button]').element).not.toBeDisabled();
 
         criterion_form.vm.submit();
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'create_criterion_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'create_criterion_modal'}).exists()).toBe(false);
 
         expect(wrapper.vm.d_handgrading_rubric!.criteria.length).toEqual(3);
-        expect(wrapper.findAll({name: 'SingleCriterion'}).length).toEqual(3);
+        expect(wrapper.findAllComponents({name: 'SingleCriterion'}).length).toEqual(3);
 
         expect(wrapper.vm.d_handgrading_rubric!.criteria[2]).toEqual(new_criterion);
     });
@@ -497,15 +480,16 @@ describe('Criteria and annotation tests', () => {
         wrapper.vm.d_create_criterion_modal_is_open = true;
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'create_criterion_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'create_criterion_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(0);
 
-        let criterion_form = <Wrapper<CriterionForm>> wrapper.find({ref: 'create_criterion_form'});
+        let criterion_form
+            = <Wrapper<CriterionForm>> wrapper.findComponent({ref: 'create_criterion_form'});
         criterion_form.vm.submit();
 
         await wrapper.vm.$nextTick();
         expect(api_errors.d_api_errors.length).toEqual(1);
-        expect(wrapper.find({ref: 'create_criterion_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'create_criterion_modal'}).exists()).toBe(true);
     });
 
     test('Criterion changed', () => {
@@ -524,13 +508,13 @@ describe('Criteria and annotation tests', () => {
         Criterion.notify_criterion_deleted(rubric.criteria[0]);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'SingleCriterion'}).length).toEqual(1);
+        expect(wrapper.findAllComponents({name: 'SingleCriterion'}).length).toEqual(1);
         expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual(expected);
     });
 
     test('Change criteria order', async () => {
         let order_stub = sinon.stub(Criterion, 'update_order');
-        wrapper.find({ref: "criteria_order"}).vm.$emit('change');
+        wrapper.findComponent({ref: "criteria_order"}).vm.$emit('change');
         await wrapper.vm.$nextTick();
         expect(
             order_stub.calledOnceWith(rubric.pk, rubric.criteria.map(item => item.pk))
@@ -546,10 +530,10 @@ describe('Criteria and annotation tests', () => {
         wrapper.vm.d_create_annotation_modal_is_open = true;
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find({ref: 'create_annotation_button'}).is('[disabled]')).toEqual(true);
+        expect(wrapper.find('[data-testid=create_annotation_button]').element).toBeDisabled();
 
-        let annotation_form = <Wrapper<AnnotationForm>> wrapper.find(
-            {ref: 'create_annotation_form'});
+        let annotation_form
+            = <Wrapper<AnnotationForm>> wrapper.findComponent({ref: 'create_annotation_form'});
         annotation_form.vm.d_form_data = {
             short_description: 'An annotation',
             long_description: 'Some description',
@@ -558,14 +542,14 @@ describe('Criteria and annotation tests', () => {
         };
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'create_annotation_button'}).is('[disabled]')).toEqual(false);
+        expect(wrapper.find('[data-testid=create_annotation_button]').element).not.toBeDisabled();
 
         annotation_form.vm.submit();
         await wrapper.vm.$nextTick();
-        expect(wrapper.find({ref: 'create_annotation_modal'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'create_annotation_modal'}).exists()).toBe(false);
 
         expect(wrapper.vm.d_handgrading_rubric!.annotations.length).toEqual(3);
-        expect(wrapper.findAll({name: 'SingleAnnotation'}).length).toEqual(3);
+        expect(wrapper.findAllComponents({name: 'SingleAnnotation'}).length).toEqual(3);
 
         expect(wrapper.vm.d_handgrading_rubric!.annotations[2]).toEqual(new_annotation);
     });
@@ -577,16 +561,16 @@ describe('Criteria and annotation tests', () => {
         wrapper.vm.d_create_annotation_modal_is_open = true;
         await wrapper.vm.$nextTick();
 
-        let api_errors = <APIErrors> wrapper.find({ref: 'create_annotation_errors'}).vm;
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'create_annotation_errors'}).vm;
         expect(api_errors.d_api_errors.length).toEqual(0);
 
-        let annotation_form = <Wrapper<AnnotationForm>> wrapper.find(
-            {ref: 'create_annotation_form'});
+        let annotation_form
+            = <Wrapper<AnnotationForm>> wrapper.findComponent({ref: 'create_annotation_form'});
         annotation_form.vm.submit();
 
         await wrapper.vm.$nextTick();
         expect(api_errors.d_api_errors.length).toEqual(1);
-        expect(wrapper.find({ref: 'create_annotation_modal'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'create_annotation_modal'}).exists()).toBe(true);
     });
 
     test('Annotation changed', async () => {
@@ -606,13 +590,13 @@ describe('Criteria and annotation tests', () => {
         Annotation.notify_annotation_deleted(rubric.annotations[0]);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll({name: 'SingleAnnotation'}).length).toEqual(1);
+        expect(wrapper.findAllComponents({name: 'SingleAnnotation'}).length).toEqual(1);
         expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual(expected);
     });
 
     test('Change annotation order', async () => {
         let order_stub = sinon.stub(Annotation, 'update_order');
-        wrapper.find({ref: "annotation_order"}).vm.$emit('change');
+        wrapper.findComponent({ref: "annotation_order"}).vm.$emit('change');
         await wrapper.vm.$nextTick();
         expect(
             order_stub.calledOnceWith(rubric.pk, rubric.annotations.map(item => item.pk))
