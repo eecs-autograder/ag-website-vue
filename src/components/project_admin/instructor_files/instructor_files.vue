@@ -97,6 +97,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
 
   @handle_api_errors_async(handle_file_upload_errors)
   add_instructor_files(files: File[]) {
+    this.d_upload_progress = null;
     (<APIErrors> this.$refs.api_errors).clear();
     return toggle(this, 'd_uploading', async () => {
       for (let file of files) {

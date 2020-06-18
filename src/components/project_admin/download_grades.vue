@@ -239,6 +239,7 @@ export default class DownloadGrades extends Vue implements Created, BeforeDestro
 
   @handle_global_errors_async
   download_task_result(download_task: DownloadTask) {
+    this.d_downloading_result_progress = null;
     return toggle(this, 'd_downloading_result', async () => {
       let response = await HttpClient.get_instance().get_file(
         `/download_tasks/${download_task.pk}/result/`,

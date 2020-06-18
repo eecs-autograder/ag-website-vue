@@ -371,6 +371,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
 
   @handle_global_errors_async
   private download_file(filename: string) {
+    this.d_download_progress = null;
     return toggle(this, 'd_downloading_file', async () => {
       let content = this.submission.get_file_content(filename, (event) => {
         if (event.lengthComputable) {

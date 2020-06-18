@@ -63,7 +63,7 @@
       </ul>
     </div>
 
-    <progress-overlay v-if="d_downloading_files" :progress="d_download_progress"/>
+    <progress-overlay v-if="d_downloading_files" :progress="d_files_download_progress"/>
 
     <template v-if="build_task.status !== BuildImageStatus.queued">
       <div class="output-header">Build Output</div>
@@ -111,7 +111,7 @@ export default class BuildImageTaskDetail extends Vue {
   readonly SYSADMIN_CONTACT = SYSADMIN_CONTACT;
   readonly BuildImageStatus = BuildImageStatus;
 
-  private d_output_download_progress = 0;
+  private d_output_download_progress: number | null = null;
   private d_output: Promise<string> | null = null;
 
   private d_files_download_progress: number | null = null;
@@ -128,6 +128,7 @@ export default class BuildImageTaskDetail extends Vue {
 
   @handle_global_errors_async
   private download_files() {
+    this.d_files_download_progress = null;
     return toggle(this, 'd_downloading_files', async () => {
       let content = this.build_task.get_files(event => {
           if (event.lengthComputable) {
@@ -145,7 +146,7 @@ export default class BuildImageTaskDetail extends Vue {
       return;
     }
 
-    this.d_output_download_progress = 0;
+    this.d_output_download_progress = null;
     let output = this.build_task.get_output((event) => {
       if (event.lengthComputable) {
         this.d_output_download_progress = 100 * (1.0 * event.loaded / event.total);

@@ -245,6 +245,7 @@ export default class AGTestCommandResult extends Vue {
       return;
     }
 
+    this.d_stdout_load_progress = null;
     this.d_stdout_content = ResultOutput.get_ag_test_cmd_result_stdout(
       this.submission.pk,
       this.ag_test_command_result.pk,
@@ -262,6 +263,7 @@ export default class AGTestCommandResult extends Vue {
       return;
     }
 
+    this.d_stderr_load_progress = null;
     this.d_stderr_content = ResultOutput.get_ag_test_cmd_result_stderr(
       this.submission.pk,
       this.ag_test_command_result.pk,
@@ -280,6 +282,7 @@ export default class AGTestCommandResult extends Vue {
       return;
     }
 
+    this.d_stdout_diff_load_progress = null;
     this.d_stdout_diff = ResultOutput.get_ag_test_cmd_result_stdout_diff(
       this.submission.pk,
       this.ag_test_command_result.pk,
@@ -298,6 +301,7 @@ export default class AGTestCommandResult extends Vue {
       return;
     }
 
+    this.d_stderr_diff_load_progress = null;
     this.d_stderr_diff = ResultOutput.get_ag_test_cmd_result_stderr_diff(
       this.submission.pk,
       this.ag_test_command_result.pk,

@@ -184,7 +184,7 @@ export default class Submit extends Vue {
   readonly format_datetime = format_datetime;
 
   d_submitting = false;
-  d_submit_progress = 0;
+  d_submit_progress: number | null = null;
   private d_show_confirm_submit_modal = false;
 
   submitted_files: File[] = [];
@@ -325,6 +325,7 @@ export default class Submit extends Vue {
   @handle_api_errors_async(handle_submit_error)
   submit() {
     (<APIErrors> this.$refs.api_errors).clear();
+    this.d_submit_progress = null;
 
     return toggle(this, 'd_submitting', async () => {
       await Submission.create(

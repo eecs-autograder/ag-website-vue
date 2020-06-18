@@ -127,6 +127,7 @@ export default class SingleInstructorFile extends Vue {
 
   @handle_global_errors_async
   download_file() {
+    this.d_download_progress = null;
     return toggle(this, 'd_downloading', async () => {
       let file_content = this.file.get_content((event: ProgressEvent) => {
         if (event.lengthComputable) {

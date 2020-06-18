@@ -95,8 +95,8 @@ export default class AGSuiteSetupResult extends Vue {
 
   d_setup_stdout_content: Promise<string> | null = null;
   d_setup_stderr_content: Promise<string> | null = null;
-  d_setup_stdout_load_progress: number | null = 0;
-  d_setup_stderr_load_progress: number | null = 0;
+  d_setup_stdout_load_progress: number | null = null;
+  d_setup_stderr_load_progress: number | null = null;
   d_output_size: ResultOutput.AGTestSuiteResultOutputSize | null = null;
 
   @Watch('fdbk_category')
@@ -127,6 +127,7 @@ export default class AGSuiteSetupResult extends Vue {
       return;
     }
 
+    this.d_setup_stdout_load_progress = null;
     this.d_setup_stdout_content = ResultOutput.get_ag_test_suite_result_setup_stdout(
       this.submission.pk,
       this.ag_test_suite_result.pk,
@@ -145,6 +146,7 @@ export default class AGSuiteSetupResult extends Vue {
       return;
     }
 
+    this.d_setup_stderr_load_progress = null;
     this.d_setup_stderr_content = ResultOutput.get_ag_test_suite_result_setup_stderr(
       this.submission.pk,
       this.ag_test_suite_result.pk,
