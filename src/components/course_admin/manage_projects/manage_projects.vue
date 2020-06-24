@@ -108,9 +108,7 @@ export default class ManageProjects extends Vue implements ProjectObserver,
         this.course.pk, {name: this.new_project_name}
       );
       this.new_project_name = "";
-      this.$nextTick(() => {
-        (<ValidatedForm> this.$refs.new_project_form).reset_warning_state();
-      });
+      (<ValidatedForm> this.$refs.new_project_form).reset_warning_state();
     });
   }
 
