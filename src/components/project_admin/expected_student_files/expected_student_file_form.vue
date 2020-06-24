@@ -16,21 +16,31 @@
 
     <div class="exact-match-container">
       <div class="radio-input">
-        <input ref="exact_match_button"
-                type="radio"
-                data-testid="exact_match_button"
-                :disabled="wildcard_is_present"
-                :value="true"
-                v-model="d_exact_match">
-        <label class="exact-match-label"> Exact Match </label>
+        <label class="exact-match-label">
+          <input ref="exact_match_button"
+                  type="radio"
+                  data-testid="exact_match_button"
+                  :disabled="wildcard_is_present"
+                  :value="true"
+                  v-model="d_exact_match">
+          Exact Match
+        </label>
       </div>
       <div class="radio-input">
-        <input ref="not_exact_match_button"
-                type="radio"
-                data-testid="not_exact_match_button"
-                :value="false"
-                v-model="d_exact_match">
-        <label class="wildcard-label"> Shell Wildcard </label>
+        <label class="wildcard-label">
+          <input ref="not_exact_match_button"
+                  type="radio"
+                  data-testid="not_exact_match_button"
+                  :value="false"
+                  v-model="d_exact_match">
+          Shell Wildcard
+          <tooltip placement="top" width="large">
+            Shell-style wildcards can be used to allow students to submit
+            multiple files that match a pattern, e.g. test_*.cpp. <br><br>
+            The special characters supported are the same as those used by
+            Python's fnmatch function.
+          </tooltip>
+        </label>
       </div>
     </div>
 
