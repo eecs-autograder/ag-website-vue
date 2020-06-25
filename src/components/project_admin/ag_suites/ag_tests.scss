@@ -13,6 +13,21 @@ $panel-indentation: 1.25rem;
   }
 }
 
+.sticky-save-button {
+  @extend .green-button;
+  position: fixed;
+  bottom: $footer-height;
+  right: 0;
+
+  font-size: 1.25rem;
+  padding: .375rem .625rem;
+  margin: 0!important;
+
+  color: white;
+
+  border-radius: 1px;
+}
+
 // Modal Related ***********************************************************
 
 .item-to-delete {

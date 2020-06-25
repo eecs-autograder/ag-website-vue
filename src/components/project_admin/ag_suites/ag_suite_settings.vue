@@ -132,12 +132,19 @@
 
         </fieldset>
 
-        <APIErrors ref="api_errors"></APIErrors>
+        <APIErrors ref="api_errors" @num_errors_changed="d_num_api_errors = $event"></APIErrors>
 
         <div class="button-footer">
           <button type="submit"
                   class="save-button"
                   :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+
+          <button type="submit"
+                  class="sticky-save-button"
+                  :disabled="!d_settings_form_is_valid || d_saving">
+            <i v-if="d_num_api_errors === 0" class="far fa-save"></i>
+            <i v-else class="fas fa-exclamation-triangle"></i>
+          </button>
 
           <last-saved
             :last_modified="d_ag_test_suite.last_modified"
@@ -255,6 +262,7 @@ export default class AGSuiteSettings extends Vue {
   d_docker_images: SandboxDockerImage[] = [];
   d_loading = true;
   d_saving = false;
+  d_num_api_errors = 0;
   d_settings_form_is_valid = true;
   d_deleting = false;
   d_show_delete_ag_test_suite_modal = false;
@@ -324,7 +332,11 @@ export default class AGSuiteSettings extends Vue {
 }
 
 function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  let api_errors_elt = <APIErrors> component.$refs.api_errors;
+  api_errors_elt.show_errors_from_response(error);
+  if (component.d_num_api_errors !== 0) {
+    api_errors_elt.$el.scrollIntoView({behavior: 'smooth'});
+  }
 }
 </script>
 
@@ -335,4 +347,10 @@ function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: 
 @import '@/styles/modal.scss';
 
 @import './ag_tests.scss';
+
+.danger-zone-container {
+  // We want to have ample space between the delete button and the
+  // sticky save button
+  max-width: 75%;
+}
 </style>
