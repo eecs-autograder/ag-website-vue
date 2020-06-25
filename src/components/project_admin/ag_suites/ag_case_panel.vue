@@ -275,10 +275,10 @@ export default class AGCasePanel extends Vue {
   }
 
   open_clone_ag_test_case_modal() {
-    this.d_cloned_case_name = "";
+    this.d_cloned_case_name = this.ag_test_case.name;
     this.d_show_clone_ag_test_case_modal = true;
     Vue.nextTick(() => {
-        (<ValidatedInput> this.$refs.ag_test_case_clone_name).focus();
+        (<ValidatedInput> this.$refs.ag_test_case_clone_name).focus({select: true});
     });
   }
 

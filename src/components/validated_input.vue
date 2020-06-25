@@ -127,11 +127,23 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
     this.d_show_warnings = true;
   }
 
-  focus() {
+  // Calls .focus() on the underlying input/textarea element.
+  // Options object:
+  // - cursor_to_front: If true, will put the cursor at the beginning of the
+  //   input text.
+  // - select: If true, will highlight the input text.
+  focus({cursor_to_front = false, select = false} = {}) {
     let class_name = this.num_rows === 1 ? 'input' : 'textarea';
     let element = <HTMLInputElement> this.$el.getElementsByClassName(class_name)[0];
     element.focus();
-    element.setSelectionRange(0, 0);
+
+    if (cursor_to_front) {
+      element.setSelectionRange(0, 0);
+    }
+
+    if (select) {
+      element.select();
+    }
   }
 
   destroyed() {

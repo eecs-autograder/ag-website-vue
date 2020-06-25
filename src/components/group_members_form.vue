@@ -79,7 +79,7 @@ export default class GroupMembersForm extends Vue {
   }
 
   mounted() {
-    (<ValidatedInput> (<Vue[]> this.$refs.username_input)[0]).focus();
+    (<ValidatedInput> (<Vue[]> this.$refs.username_input)[0]).focus({cursor_to_front: true});
   }
 
   @Watch('value', {deep: true})
@@ -110,7 +110,9 @@ export default class GroupMembersForm extends Vue {
   private add_member() {
     this.d_usernames.push(this.course.allowed_guest_domain);
     Vue.nextTick(() => {
-      (<ValidatedInput> (<Vue[]> this.$refs.username_input)[this.d_usernames.length - 1]).focus();
+      (<ValidatedInput>
+        (<Vue[]> this.$refs.username_input)[this.d_usernames.length - 1]
+      ).focus({cursor_to_front: true});
     });
   }
 
