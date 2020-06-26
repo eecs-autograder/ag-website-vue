@@ -329,7 +329,7 @@ test('Refresh images and tasks event handled', async () => {
 
     wrapper.findComponent(BuildImageTaskDetail).vm.$emit('refresh_images_and_build_tasks');
     await wrapper.vm.$nextTick();
-    expect(await wait_until(wrapper, w => !w.vm.d_refreshing_images_and_tasks)).toBe(true);
+    expect(await wait_until(wrapper, w => !w.vm.d_loading_images_and_tasks)).toBe(true);
 
     expect(wrapper.vm.selected_build_task).toEqual(updated_task);
     expect(wrapper.vm.d_sandbox_images).toEqual([new_image]);
