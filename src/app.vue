@@ -51,20 +51,34 @@
             </span>
           </template>
         </div>
-        <div id="current-user">
-          <button @click="login"
-                  type="button"
-                  data-testid="login_button"
-                  class="blue-button"
-                  v-if="globals.current_user === null">
-            Sign In
-          </button>
+        <div id="right-side-icons">
+          <a id="github-icon" class="icon"
+              target="_blank"
+              href="https://eecs-autograder.github.io/autograder.io/">
+            <i class="fas fa-book"></i>
+          </a>
+
+          <a id="github-icon" class="icon"
+              target="_blank"
+              href="https://github.com/eecs-autograder/autograder.io">
+            <i class="fab fa-github"></i>
+          </a>
+
+          <div v-if="globals.current_user === null"
+               id="login-button-wrapper">
+            <button @click="login"
+                    type="button"
+                    data-testid="login_button"
+                    class="blue-button">
+              Sign In
+            </button>
+          </div>
           <div v-else class="current-user-dropdown">
             <div class="dropdown-header">
-              <span class="hello-message">Hi, {{globals.current_user.first_name}}!</span>
-              <i class="fas fa-chevron-down"></i>
+              <span class="hello-message"><i class="fas fa-user"></i></span>
             </div>
             <div class="menu">
+              <div class="greeting">Hi, {{globals.current_user.first_name}}!</div>
               <div class="signed-in-as">Signed in as:</div>
               <div class="username">{{globals.current_user.username}}</div>
               <div class="superuser-link" v-if="globals.current_user.is_superuser">
@@ -291,15 +305,34 @@ $breadcrumb-font-size: 1.5rem;
   }
 }
 
-#current-user {
+#right-side-icons {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   padding-right: .5rem;
   padding-left: .5rem;
 
   .button {
     white-space: nowrap;
   }
+
+  .icon {
+    font-size: 1.3rem;
+    padding: .5rem;
+
+    &:hover {
+      background-color: darken($banner-background-color, 5%);
+    }
+  }
+}
+
+#github-icon {
+  text-decoration: none;
+  color: black;
+}
+
+#login-button-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .current-user-dropdown {
@@ -333,6 +366,11 @@ $breadcrumb-font-size: 1.5rem;
   .menu {
     padding: .5rem;
     min-width: 250px;
+  }
+
+  .greeting {
+    font-size: 1.1rem;
+    margin-bottom: .5rem;
   }
 
   .signed-in-as {
