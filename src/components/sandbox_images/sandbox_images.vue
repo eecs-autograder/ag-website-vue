@@ -277,9 +277,9 @@ export default class SandboxImages extends Vue {
     await this.load_images_and_build_tasks();
     this.d_loading = false;
 
-    this.image_poller = new Poller(() => this.load_images_and_build_tasks(), 15);
+    this.image_poller = new Poller(() => this.load_images_and_build_tasks(), 30);
     // tslint:disable-next-line no-floating-promises
-    // this.image_poller.start_after_delay();
+    this.image_poller.start_after_delay();
   }
 
   beforeDestroy() {

@@ -1,5 +1,13 @@
 <template>
   <div class="build-sandbox-image">
+    <p>
+      Instructions and requirements for building custom sandbox images can be
+      found in our
+      <a href="https://eecs-autograder.github.io/autograder.io/topics/custom_sandbox_images.html">
+        UI documentation
+      </a>.
+    </p>
+
     <file-upload @upload_files="start_build_task"
                  ref="file_upload"
                  :disable_upload_button="d_starting_build">
