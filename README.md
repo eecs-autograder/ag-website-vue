@@ -1,5 +1,7 @@
 # AG Website
 The website frontend for autograder.io, implemented using Vue and Typescript.
+For information about contributing to Autograder.io, see our
+[contributing guide](https://github.com/eecs-autograder/autograder.io/blob/master/CONTRIBUTING.md).
 
 ## Setup
 Follow the [dev stack setup tutorial](https://github.com/eecs-autograder/autograder-full-stack/blob/master/docs/development_setup.md) for the [autograder-full-stack repo](https://github.com/eecs-autograder/autograder-full-stack).
