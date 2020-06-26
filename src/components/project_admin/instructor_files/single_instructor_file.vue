@@ -48,6 +48,10 @@
         <div class="modal-header">Confirm Delete</div>
         <div> Are you sure you want to delete
           <span class="file-to-delete">{{file.name}}</span>? <br><br>
+
+          If you want to <b>update the file's contents</b>, cancel this dialogue
+          and <b>re-upload the file instead.</b> <br><br>
+
           <b>This action cannot be undone</b>. <br>
           Any test cases that rely on this file may have
           to be updated before they'll run correctly again.

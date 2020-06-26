@@ -135,6 +135,7 @@ describe('AGSuiteSettings tests', () => {
     });
 
     test('Save suite settings - unsuccessful', async () => {
+        Element.prototype.scrollIntoView = () => {};
         let save_stub = sinon.stub(wrapper.vm.d_ag_test_suite!, 'save');
         save_stub.returns(
             Promise.reject(

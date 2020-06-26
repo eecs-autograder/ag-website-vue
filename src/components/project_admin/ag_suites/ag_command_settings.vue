@@ -888,21 +888,6 @@ function handle_save_ag_command_settings_error(component: AGTestCommandSettings,
   padding-top: .375rem;
 }
 
-.sticky-save-button {
-  @extend .green-button;
-  position: fixed;
-  bottom: $footer-height;
-  right: 0;
-
-  font-size: 1.25rem;
-  padding: .375rem .625rem;
-  margin: 0!important;
-
-  color: white;
-
-  border-radius: 1px;
-}
-
 .danger-zone-container {
   // We want to have ample space between the delete button and the
   // sticky save button

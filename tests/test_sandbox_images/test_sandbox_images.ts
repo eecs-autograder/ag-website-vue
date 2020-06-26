@@ -306,11 +306,13 @@ test('Image and task lists refreshed', async () => {
     expect(wrapper.vm.d_build_tasks).toEqual(updated_build_tasks);
 });
 
-test('Refresh selected build task event handled', async () => {
+test('Refresh images and tasks event handled', async () => {
     let build_task = data_ut.make_build_sanbdox_docker_image_task(null, null);
 
-    sinon.stub(ag_cli.SandboxDockerImage, 'get_images').resolves([]);
-    sinon.stub(ag_cli.BuildSandboxDockerImageTask, 'get_build_tasks').resolves([build_task]);
+    let get_images_stub = sinon.stub(ag_cli.SandboxDockerImage, 'get_images').resolves([]);
+    let get_tasks_stub = sinon.stub(
+        ag_cli.BuildSandboxDockerImageTask, 'get_build_tasks'
+    ).resolves([build_task]);
 
     let wrapper = managed_mount(SandboxImages);
     expect(await wait_for_load(wrapper)).toBe(true);
@@ -321,15 +323,16 @@ test('Refresh selected build task event handled', async () => {
     let updated_task = deep_copy(build_task, ag_cli.BuildSandboxDockerImageTask);
     updated_task.status = ag_cli.BuildImageStatus.image_invalid;
 
-    sinon.stub(
-        ag_cli.BuildSandboxDockerImageTask, 'get_by_pk'
-    ).withArgs(build_task.pk).resolves(updated_task);
+    let new_image = data_ut.make_sandbox_docker_image(null);
+    get_images_stub.onSecondCall().resolves([new_image]);
+    get_tasks_stub.onSecondCall().resolves([updated_task]);
 
-    wrapper.findComponent(BuildImageTaskDetail).vm.$emit('refresh_selected_build_task');
+    wrapper.findComponent(BuildImageTaskDetail).vm.$emit('refresh_images_and_build_tasks');
     await wrapper.vm.$nextTick();
-    expect(await wait_until(wrapper, w => !w.vm.d_refreshing_selected_build_task)).toBe(true);
+    expect(await wait_until(wrapper, w => !w.vm.d_loading_images_and_tasks)).toBe(true);
 
     expect(wrapper.vm.selected_build_task).toEqual(updated_task);
+    expect(wrapper.vm.d_sandbox_images).toEqual([new_image]);
 });
 
 describe('Edit and delete image tests', () => {
@@ -406,6 +409,9 @@ describe('Edit and delete image tests', () => {
         expect(wrapper.vm.d_sandbox_images).toEqual(images.slice(1));
         expect(wrapper.findAllComponents(Collapsible).length).toEqual(images.length - 1);
         expect(wrapper.vm.d_build_tasks.length).toEqual(0);
+
+        expect(wrapper.vm.d_show_delete_image_modal).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_image_modal'}).exists()).toBe(false);
     });
 
     test('Delete image API errors handled', async () => {

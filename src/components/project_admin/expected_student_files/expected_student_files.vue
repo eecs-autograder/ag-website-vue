@@ -2,7 +2,6 @@
   <div id="expected-student-files-component">
     <div class="new-pattern-side">
       <div class="new-pattern-container">
-        <div class="new-pattern-title"> New Expected Student File </div>
         <div id="new-expected-file-pattern">
           <create-expected-student-file ref="create_expected_student_file"
                                         :project="project">
@@ -12,7 +11,7 @@
     </div>
 
     <div class="existing-patterns">
-      <div class="existing-patterns-title"> Existing Expected Student Files </div>
+      <div class="existing-patterns-title"> Expected Student Files </div>
       <div class="list-of-patterns-container">
         <div v-for="file of expected_student_files" :key="file.pk">
           <single-expected-student-file :expected_student_file="file">
@@ -60,8 +59,7 @@ export default class ExpectedStudentFiles extends Vue {
 }
 
 #expected-student-files-component {
-  width: 95%;
-  margin: .5rem 2.5%;
+  margin: .5rem;
 }
 
 #new-expected-file-pattern {

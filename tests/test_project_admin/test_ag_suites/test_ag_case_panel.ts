@@ -365,10 +365,6 @@ describe('AGCasePanel tests', () => {
         let case_clone_name_validator = <ValidatedInput> wrapper.findComponent(
             {ref: 'ag_test_case_clone_name'}
         ).vm;
-        expect(case_clone_name_validator.is_valid).toBe(false);
-
-        set_validated_input_text(ag_test_case_clone_name, 'Stupendous');
-        expect(wrapper.vm.d_cloned_case_name).toEqual("Stupendous");
         expect(case_clone_name_validator.is_valid).toBe(true);
 
         set_validated_input_text(ag_test_case_clone_name, ' ');
@@ -407,14 +403,12 @@ describe('AGCasePanel tests', () => {
         expect(wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).exists()).toBe(false);
     });
 
-    test('d_cloned_case_name begins as the empty string whenever the clone_ag_test_case ' +
-         'modal is opened',
-         async () => {
+    test('d_cloned_case_name set to test name when clone modal opened', async () => {
         await wrapper.setProps({active_case: ag_case_green});
         await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
 
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
-        expect(wrapper.vm.d_cloned_case_name).toEqual("");
+        expect(wrapper.vm.d_cloned_case_name).toEqual(ag_case_green.name);
 
         await set_validated_input_text(
             wrapper.findComponent({ref: 'ag_test_case_clone_name'}), 'Fall');
@@ -427,7 +421,7 @@ describe('AGCasePanel tests', () => {
 
         await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
-        expect(wrapper.vm.d_cloned_case_name).toEqual("");
+        expect(wrapper.vm.d_cloned_case_name).toEqual(ag_case_green.name);
 
         await set_validated_input_text(
             wrapper.findComponent({ref: 'ag_test_case_clone_name'}), 'Winter');
@@ -440,7 +434,7 @@ describe('AGCasePanel tests', () => {
 
         await wrapper.findComponent({ref: 'clone_ag_test_case_menu_item'}).trigger('click');
         expect(wrapper.vm.d_show_clone_ag_test_case_modal).toBe(true);
-        expect(wrapper.vm.d_cloned_case_name).toEqual("");
+        expect(wrapper.vm.d_cloned_case_name).toEqual(ag_case_green.name);
     });
 
     test('Clone case - unsuccessful', async () => {

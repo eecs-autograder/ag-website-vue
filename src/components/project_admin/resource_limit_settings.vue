@@ -35,8 +35,7 @@
       <i class="fas fa-info-circle"></i>
       The options below can be used to apply stricter resource limits
       for pedagogical purposes.<br>
-      We apply separate (less restrictive) limits to preserve system
-      integrity.
+      We apply separate limits to preserve system integrity.
     </div>
 
     <div class="form-field-wrapper">
