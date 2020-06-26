@@ -42,7 +42,7 @@
           class="fas fa-sync-alt"
           v-if="build_task.status === BuildImageStatus.queued
                 || build_task.status === BuildImageStatus.in_progress"
-          @click="$emit('refresh_selected_build_task')"
+          @click="refresh_images_and_build_tasks"
         ></i>
       </span>
     </div>
@@ -107,6 +107,9 @@ export default class BuildImageTaskDetail extends Vue {
   @Prop({required: true, type: BuildSandboxDockerImageTask})
   build_task!: BuildSandboxDockerImageTask;
 
+  @Prop({required: true, type: Boolean})
+  refresh_in_progress!: boolean;
+
   readonly format_datetime = format_datetime;
   readonly SYSADMIN_CONTACT = SYSADMIN_CONTACT;
   readonly BuildImageStatus = BuildImageStatus;
@@ -124,6 +127,12 @@ export default class BuildImageTaskDetail extends Vue {
   @Watch('build_task', {deep: true})
   on_build_task_status_change() {
     return this.load_output();
+  }
+
+  refresh_images_and_build_tasks() {
+    if (!this.refresh_in_progress) {
+      this.$emit('refresh_images_and_build_tasks');
+    }
   }
 
   @handle_global_errors_async

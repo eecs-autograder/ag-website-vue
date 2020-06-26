@@ -146,8 +146,8 @@
         ref="build_image_task_detail"
         v-if="selected_build_task !== null"
         :build_task="selected_build_task"
-        @refresh_selected_build_task="refresh_selected_build_task"/>
-
+        :refresh_in_progress="d_loading_images_and_tasks"
+        @refresh_images_and_build_tasks="load_images_and_build_tasks"/>
 
     <div class="danger-zone-container" v-if="selected_image !== null">
       <div class="danger-text">
@@ -271,7 +271,7 @@ export default class SandboxImages extends Vue {
   d_show_delete_image_modal = false;
   d_deleting = false;
 
-  d_refreshing_selected_build_task = false;
+  d_loading_images_and_tasks = false;
 
   async created() {
     await this.load_images_and_build_tasks();
@@ -279,7 +279,7 @@ export default class SandboxImages extends Vue {
 
     this.image_poller = new Poller(() => this.load_images_and_build_tasks(), 15);
     // tslint:disable-next-line no-floating-promises
-    this.image_poller.start_after_delay();
+    // this.image_poller.start_after_delay();
   }
 
   beforeDestroy() {
@@ -290,10 +290,12 @@ export default class SandboxImages extends Vue {
 
   @handle_global_errors_async
   async load_images_and_build_tasks() {
-    [this.d_sandbox_images, this.d_build_tasks] = await Promise.all([
-      await SandboxDockerImage.get_images(this.course?.pk ?? null),
-      await BuildSandboxDockerImageTask.get_build_tasks(this.course?.pk ?? null)
-    ]);
+    return toggle(this, 'd_loading_images_and_tasks', async () => {
+      [this.d_sandbox_images, this.d_build_tasks] = await Promise.all([
+        await SandboxDockerImage.get_images(this.course?.pk ?? null),
+        await BuildSandboxDockerImageTask.get_build_tasks(this.course?.pk ?? null)
+      ]);
+    });
   }
 
   // Returns an array of pairs. The first item in each pair is a
@@ -396,16 +398,6 @@ export default class SandboxImages extends Vue {
 
       this.d_selected_image_pk = null;
       this.d_show_delete_image_modal = false;
-    });
-  }
-
-  @handle_global_errors_async
-  refresh_selected_build_task() {
-    return toggle(this, 'd_refreshing_selected_build_task', async () => {
-      assert_not_null(this.d_selected_build_task_pk);
-      let refreshed = await BuildSandboxDockerImageTask.get_by_pk(this.d_selected_build_task_pk);
-      let index = this.d_build_tasks.findIndex(task => task.pk === this.d_selected_build_task_pk);
-      Vue.set(this.d_build_tasks, index, refreshed);
     });
   }
 }

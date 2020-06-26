@@ -28,17 +28,24 @@ beforeEach(() => {
     });
 });
 
-test('Queued status', async () => {
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
+async function make_wrapper(build_task_ = build_task, refresh_in_progress = false) {
+    let wrapper = managed_mount(
+        BuildImageTaskDetail,
+        {propsData: {build_task: build_task_, refresh_in_progress: refresh_in_progress}}
+    );
     await wrapper.vm.$nextTick();
+    return wrapper;
+}
+
+test('Queued status', async () => {
+    let wrapper = await make_wrapper();
     expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(false);
     expect(compress_whitespace(wrapper.find('.status-info').text())).toEqual('Q In Queue');
 });
 
 test('In progress status', async () => {
     build_task.status = ag_cli.BuildImageStatus.in_progress;
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
-    await wrapper.vm.$nextTick();
+    let wrapper = await make_wrapper();
     expect(wrapper.find('.status-info').text().trim()).toEqual('In Progress');
 
     let view_file = <Wrapper<ViewFile>> wrapper.findComponent({ref: 'output'});
@@ -48,16 +55,14 @@ test('In progress status', async () => {
 
 test('Done status', async () => {
     build_task.status = ag_cli.BuildImageStatus.done;
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
-    await wrapper.vm.$nextTick();
+    let wrapper = await make_wrapper();
     expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(true);
     expect(wrapper.find('.status-info').text().trim()).toEqual('Success!');
 });
 
 test('Failed status', async () => {
     build_task.status = ag_cli.BuildImageStatus.failed;
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
-    await wrapper.vm.$nextTick();
+    let wrapper = await make_wrapper();
     expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(true);
     expect(wrapper.find('.status-info').text().trim()).toEqual('Build Failed');
 });
@@ -66,8 +71,7 @@ test('Invalid image status', async () => {
     let validation_msg = 'noefiavoniultonixevnoiersatn';
     build_task.status = ag_cli.BuildImageStatus.image_invalid;
     build_task.validation_error_msg = validation_msg;
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
-    await wrapper.vm.$nextTick();
+    let wrapper = await make_wrapper();
 
     expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(true);
     expect(wrapper.find('.status-info').text().trim()).toContain('Invalid Image');
@@ -76,8 +80,7 @@ test('Invalid image status', async () => {
 
 test('Internal error status non-superuser', async () => {
     build_task.status = ag_cli.BuildImageStatus.internal_error;
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
-    await wrapper.vm.$nextTick();
+    let wrapper = await make_wrapper();
     expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(true);
 
     let status_text = wrapper.find('.status-info').text().trim();
@@ -91,8 +94,7 @@ test('Internal error status superuser', async () => {
     let internal_error_msg = 'aw peas nrosteanorsetan';
     build_task.status = ag_cli.BuildImageStatus.internal_error;
     build_task.internal_error_msg = internal_error_msg;
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
-    await wrapper.vm.$nextTick();
+    let wrapper = await make_wrapper();
 
     let status_text = wrapper.find('.status-info').text().trim();
     expect(status_text).toContain('unexpected error');
@@ -102,8 +104,7 @@ test('Internal error status superuser', async () => {
 
 test('Status change output loaded', async () => {
     let queued_task = deep_copy(build_task, ag_cli.BuildSandboxDockerImageTask);
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: queued_task}});
-    await wrapper.vm.$nextTick();
+    let wrapper = await make_wrapper(queued_task);
     expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(false);
     expect(compress_whitespace(wrapper.find('.status-info').text())).toEqual('Q In Queue');
 
@@ -118,12 +119,18 @@ test('Status change output loaded', async () => {
     expect(await view_file.vm.file_contents).toEqual(output);
 });
 
-test('Refresh button', async () => {
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
-    await wrapper.vm.$nextTick();
+test('Refresh button emits event', async () => {
+    let wrapper = await make_wrapper();
 
     await wrapper.find('[data-testid=refresh_button]').trigger('click');
-    expect(wrapper.emitted('refresh_selected_build_task')?.length).toEqual(1);
+    expect(wrapper.emitted('refresh_images_and_build_tasks')?.length).toEqual(1);
+});
+
+test('Refresh button does nothing while refresh in progress', async () => {
+    let wrapper = await make_wrapper(build_task, true);
+
+    await wrapper.find('[data-testid=refresh_button]').trigger('click');
+    expect(wrapper.emitted('refresh_images_and_build_tasks')).toBeUndefined();
 });
 
 test('Download files', async () => {
@@ -136,8 +143,7 @@ test('Download files', async () => {
         callback(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
         return Promise.resolve(new Blob(['nst']));
     });
-    let wrapper = managed_mount(BuildImageTaskDetail, {propsData: {build_task: build_task}});
-
+    let wrapper = await make_wrapper();
     let filename_list_items = wrapper.findAll('.filename');
     expect(filename_list_items.length).toEqual(filenames.length);
     expect(filename_list_items.wrappers.map(w => w.text().trim())).toEqual(filenames);
