@@ -11,7 +11,7 @@ npm test
 ```
 
 ## Coding Standards
-In addition to the items listed here, all source code must follow
+In addition to the items listed here, all source code must follow our
 [Typescript/Vue coding standards](https://github.com/eecs-autograder/autograder.io/blob/master/coding_standards_typescript_vue.md).
 
 Run `npm run build` to check for some style issues using TSLint. All code must be free of TSLint errors. This command should also be treated as the single source of truth for type checking, as different editor plugins have various shortcomings.
