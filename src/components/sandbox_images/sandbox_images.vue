@@ -259,7 +259,6 @@ export default class SandboxImages extends Vue {
   d_sidebar_collapsed = false;
 
   d_starting_build = false;
-  d_file_upload_progress = 0;
 
   readonly format_datetime_short = format_datetime_short;
 
@@ -278,7 +277,7 @@ export default class SandboxImages extends Vue {
     await this.load_images_and_build_tasks();
     this.d_loading = false;
 
-    this.image_poller = new Poller(() => this.load_images_and_build_tasks(), 30);
+    this.image_poller = new Poller(() => this.load_images_and_build_tasks(), 15);
     // tslint:disable-next-line no-floating-promises
     this.image_poller.start_after_delay();
   }
@@ -396,6 +395,7 @@ export default class SandboxImages extends Vue {
       );
 
       this.d_selected_image_pk = null;
+      this.d_show_delete_image_modal = false;
     });
   }
 

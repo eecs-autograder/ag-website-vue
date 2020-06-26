@@ -406,6 +406,9 @@ describe('Edit and delete image tests', () => {
         expect(wrapper.vm.d_sandbox_images).toEqual(images.slice(1));
         expect(wrapper.findAllComponents(Collapsible).length).toEqual(images.length - 1);
         expect(wrapper.vm.d_build_tasks.length).toEqual(0);
+
+        expect(wrapper.vm.d_show_delete_image_modal).toBe(false);
+        expect(wrapper.findComponent({ref: 'delete_image_modal'}).exists()).toBe(false);
     });
 
     test('Delete image API errors handled', async () => {
