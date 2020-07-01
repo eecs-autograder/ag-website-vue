@@ -10,7 +10,7 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
+import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -23,8 +23,8 @@ import {
 } from '@/tests/utils';
 
 
-describe('AGSuitePanel tests', () => {
-    let wrapper: Wrapper<AGSuitePanel>;
+describe('AGTestSuitePanel tests', () => {
+    let wrapper: Wrapper<AGTestSuitePanel>;
     let project: Project;
     let ag_suite: AGTestSuite;
     let ag_command: AGTestCommand;
@@ -45,7 +45,7 @@ describe('AGSuitePanel tests', () => {
         case_from_different_suite = data_ut.make_ag_test_case(
             data_ut.make_ag_test_suite(project.pk).pk);
 
-        wrapper = managed_mount(AGSuitePanel, {
+        wrapper = managed_mount(AGTestSuitePanel, {
             propsData: {
                 ag_test_suite: ag_suite,
                 active_ag_test_suite: null,
@@ -508,7 +508,7 @@ test('Update test cases order', async () => {
         data_ut.make_ag_test_case(suite.pk),
     ];
     suite.ag_test_cases = test_cases;
-    let wrapper = managed_mount(AGSuitePanel, {
+    let wrapper = managed_mount(AGTestSuitePanel, {
         propsData: {
             ag_test_suite: suite,
             active_ag_test_suite: null,

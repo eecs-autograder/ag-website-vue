@@ -9,7 +9,7 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+import AGTestSuites from '@/components/project_admin/ag_tests/ag_test_suites.vue';
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
 import HandgradingSettings from '@/components/project_admin/handgrading_settings/handgrading_settings.vue';
@@ -68,7 +68,7 @@ describe('Changing tabs in project admin', () => {
         ).toBe(true);
         expect(wrapper.findComponent({name: 'InstructorFiles'}).exists()).toBe(false);
         expect(wrapper.findComponent({name: 'ExpectedStudentFiles'}).exists()).toBe(false);
-        expect(wrapper.findComponent({name: 'AGSuites'}).exists()).toBe(false);
+        expect(wrapper.findComponent({name: 'AGTestSuites'}).exists()).toBe(false);
         expect(wrapper.findComponent({name: 'MutationSuites'}).exists()).toBe(false);
         expect(wrapper.findComponent({name: 'EditGroups'}).exists()).toBe(false);
         expect(wrapper.findComponent({name: 'HandgradingSettings'}).exists()).toBe(false);
@@ -159,15 +159,15 @@ describe('Changing tabs in project admin', () => {
         let tabs = wrapper.findAll('.nav-link');
         tabs.at(3).trigger('click');
         expect(
-            await wait_until(wrapper, w => w.findComponent({name: 'AGSuites'}).exists())
+            await wait_until(wrapper, w => w.findComponent({name: 'AGTestSuites'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'AGSuites'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'AGTestSuites'}).element).toBeVisible();
 
         expect(wrapper.vm.current_tab).toEqual('test_cases');
         expect(router_replace.firstCall.calledWith(
             {query: {current_tab: 'test_cases'}})
         ).toBe(true);
-        expect(wrapper.findComponent(AGSuites).vm.$props.project).toEqual(project);
+        expect(wrapper.findComponent(AGTestSuites).vm.$props.project).toEqual(project);
     });
 
     test('Clicking on Mutation Testing tab', async () => {

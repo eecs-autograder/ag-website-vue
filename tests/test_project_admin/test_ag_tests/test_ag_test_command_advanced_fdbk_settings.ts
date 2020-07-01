@@ -2,7 +2,7 @@ import { Wrapper } from '@vue/test-utils';
 
 import { AGTestCase, AGTestCommandFeedbackConfig, AGTestSuite, ValueFeedbackLevel } from 'ag-client-typescript';
 
-import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
+import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_tests/ag_test_command_advanced_fdbk_settings.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';

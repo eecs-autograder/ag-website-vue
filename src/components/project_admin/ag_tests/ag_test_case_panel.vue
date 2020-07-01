@@ -187,7 +187,7 @@ import APIErrors from '@/components/api_errors.vue';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 import Modal from '@/components/modal.vue';
-import AGTestCaseSettings from '@/components/project_admin/ag_suites/ag_test_case_settings.vue';
+import AGTestCaseSettings from '@/components/project_admin/ag_tests/ag_test_case_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import {

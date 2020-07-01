@@ -9,8 +9,8 @@ import {
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
-import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
-import AGTestCaseSettings from '@/components/project_admin/ag_suites/ag_test_case_settings.vue';
+import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_tests/ag_test_case_fdbk_config_panel.vue';
+import AGTestCaseSettings from '@/components/project_admin/ag_tests/ag_test_case_settings.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import {

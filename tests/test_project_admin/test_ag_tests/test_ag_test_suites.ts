@@ -4,7 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+import AGTestSuites from '@/components/project_admin/ag_tests/ag_test_suites.vue';
 import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
@@ -23,7 +23,7 @@ let get_sandbox_docker_images: sinon.SinonStub;
 let get_all_suites_from_project: sinon.SinonStub;
 
 function make_wrapper() {
-    let wrapper = managed_mount(AGSuites, {
+    let wrapper = managed_mount(AGTestSuites, {
         propsData: {
             project: project
         }
@@ -41,7 +41,7 @@ beforeEach(() => {
 });
 
 describe('Creating ag_test_suite', () => {
-    let wrapper: Wrapper<AGSuites>;
+    let wrapper: Wrapper<AGTestSuites>;
 
     beforeEach(() => {
         get_all_suites_from_project.resolves([]);
@@ -166,7 +166,7 @@ describe('Changing ag_test_suite', () => {
 });
 
 describe('Deleting ag_test_suite', () => {
-    let wrapper: Wrapper<AGSuites>;
+    let wrapper: Wrapper<AGTestSuites>;
     let first_suite: ag_cli.AGTestSuite;
     let middle_suite: ag_cli.AGTestSuite;
     let last_suite: ag_cli.AGTestSuite;
@@ -395,7 +395,7 @@ describe('Changing ag_test_case', () => {
 });
 
 describe('Deleting ag_test_case', () => {
-    let wrapper: Wrapper<AGSuites>;
+    let wrapper: Wrapper<AGTestSuites>;
     let suite: ag_cli.AGTestSuite;
     let first_case: ag_cli.AGTestCase;
     let middle_case: ag_cli.AGTestCase;
@@ -633,7 +633,7 @@ describe('Changing ag_test_command', () => {
 });
 
 describe('Deleting ag_test_command', () => {
-    let wrapper: Wrapper<AGSuites>;
+    let wrapper: Wrapper<AGTestSuites>;
     let parent_suite: ag_cli.AGTestSuite;
     let parent_case: ag_cli.AGTestCase;
     let first_command: ag_cli.AGTestCommand;
@@ -767,7 +767,7 @@ describe('Deleting ag_test_command', () => {
 });
 
 describe('Next/prev test buttons', () => {
-    let wrapper: Wrapper<AGSuites>;
+    let wrapper: Wrapper<AGTestSuites>;
     let suite_1: ag_cli.AGTestSuite;
     let suite_1_case_1: ag_cli.AGTestCase;
     let suite_1_case_1_command_1: ag_cli.AGTestCommand;
@@ -1039,7 +1039,7 @@ describe('Next/prev test buttons', () => {
 });
 
 describe('Active_level', () => {
-    let wrapper: Wrapper<AGSuites>;
+    let wrapper: Wrapper<AGTestSuites>;
     let suite_1: ag_cli.AGTestSuite;
     let suite_1_case_1: ag_cli.AGTestCase;
     let suite_1_case_1_command_1: ag_cli.AGTestCommand;
@@ -1098,8 +1098,8 @@ describe('Active_level', () => {
     });
 });
 
-describe('AGSuites getter functions', () => {
-    let wrapper: Wrapper<AGSuites>;
+describe('AGTestSuites getter functions', () => {
+    let wrapper: Wrapper<AGTestSuites>;
 
     afterEach(() => {
         sinon.restore();
