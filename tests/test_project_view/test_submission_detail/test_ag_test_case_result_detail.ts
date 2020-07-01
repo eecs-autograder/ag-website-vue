@@ -2,7 +2,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
-import AGCaseResult from '@/components/project_view/submission_detail/ag_case_result.vue';
+import AGTestCaseResultDetail from '@/components/project_view/submission_detail/ag_test_case_result_detail.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 
 import * as data_ut from '@/tests/data_utils';
@@ -22,10 +22,10 @@ beforeEach(() => {
 });
 
 describe('command_result_correctness tests', () => {
-    let wrapper: Wrapper<AGCaseResult>;
+    let wrapper: Wrapper<AGTestCaseResultDetail>;
 
     beforeEach(() => {
-        wrapper = mount(AGCaseResult, {
+        wrapper = mount(AGTestCaseResultDetail, {
             propsData: {
                 ag_test_case_result: ag_test_case_result,
                 fdbk_category: ag_cli.FeedbackCategory.max,
@@ -619,10 +619,10 @@ describe('command_result_correctness tests', () => {
 });
 
 describe('command_result_return_code_correctness tests', () => {
-    let wrapper: Wrapper<AGCaseResult>;
+    let wrapper: Wrapper<AGTestCaseResultDetail>;
 
     beforeEach(() => {
-        wrapper = mount(AGCaseResult, {
+        wrapper = mount(AGTestCaseResultDetail, {
             propsData: {
                 ag_test_case_result: ag_test_case_result,
                 fdbk_category: ag_cli.FeedbackCategory.max,
@@ -688,10 +688,10 @@ describe('command_result_return_code_correctness tests', () => {
 });
 
 describe('command_result_output_correctness tests', () => {
-    let wrapper: Wrapper<AGCaseResult>;
+    let wrapper: Wrapper<AGTestCaseResultDetail>;
 
     beforeEach(() => {
-        wrapper = mount(AGCaseResult, {
+        wrapper = mount(AGTestCaseResultDetail, {
             propsData: {
                 ag_test_case_result: ag_test_case_result,
                 fdbk_category: ag_cli.FeedbackCategory.max,
@@ -748,10 +748,10 @@ describe('command_result_output_correctness tests', () => {
 });
 
 describe('AGTestCaseResult tests concerning props', () => {
-    let wrapper: Wrapper<AGCaseResult>;
+    let wrapper: Wrapper<AGTestCaseResultDetail>;
 
     beforeEach(() => {
-        wrapper = mount(AGCaseResult, {
+        wrapper = mount(AGTestCaseResultDetail, {
             propsData: {
                 ag_test_case_result: ag_test_case_result,
                 fdbk_category: ag_cli.FeedbackCategory.max,
@@ -771,7 +771,7 @@ describe('AGTestCaseResult tests concerning props', () => {
             }
         );
 
-        wrapper = mount(AGCaseResult, {
+        wrapper = mount(AGTestCaseResultDetail, {
             propsData: {
                 ag_test_case_result: ag_test_case_result,
                 fdbk_category: ag_cli.FeedbackCategory.max,

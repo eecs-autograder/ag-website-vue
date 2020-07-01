@@ -83,7 +83,7 @@ import { handle_global_errors_async } from '@/error_handling';
     ViewFile
   }
 })
-export default class AGSuiteSetupResult extends Vue {
+export default class AGTestSuiteSetupResultDetail extends Vue {
   @Prop({required: true, type: Submission})
   submission!: Submission;
 

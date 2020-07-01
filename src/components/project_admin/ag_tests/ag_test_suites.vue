@@ -24,22 +24,21 @@
                        @change="set_ag_test_suite_order"
                        @end="$event.item.style.transform = 'none'"
                        handle=".handle">
-              <AGSuitePanel v-for="ag_test_suite of d_ag_test_suites"
-                            :key="ag_test_suite.pk"
-                            :ag_test_suite="ag_test_suite"
-                            :active_ag_test_suite="d_active_ag_test_suite"
-                            :active_ag_test_command="d_active_ag_test_command"
-                            @update_active_item="update_active_item($event)">
-              </AGSuitePanel>
+              <AGTestSuitePanel
+                v-for="ag_test_suite of d_ag_test_suites"
+                :key="ag_test_suite.pk"
+                :ag_test_suite="ag_test_suite"
+                :active_ag_test_suite="d_active_ag_test_suite"
+                :active_ag_test_command="d_active_ag_test_command"
+                @update_active_item="update_active_item($event)">
+              </AGTestSuitePanel>
             </draggable>
           </div>
         </div>
 
         <div id="viewing-window" class="body" :class="{'body-closed': d_collapsed}">
           <template v-if="d_active_ag_test_suite !== null">
-            <AGSuiteSettings :ag_test_suite="d_active_ag_test_suite"
-                             :project="project">
-            </AGSuiteSettings>
+            <AGTestSuiteSettings :ag_test_suite="d_active_ag_test_suite" :project="project"/>
           </template>
           <template v-else-if="active_level_is_command">
             <AGTestCommandSettings :ag_test_command="d_active_ag_test_command"
@@ -119,10 +118,10 @@ import {
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
-import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
-import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
-import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
+import AGTestCaseSettings from '@/components/project_admin/ag_tests/ag_test_case_settings.vue';
+import AGTestCommandSettings from '@/components/project_admin/ag_tests/ag_test_command_settings.vue';
+import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_panel.vue';
+import AGTestSuiteSettings from '@/components/project_admin/ag_tests/ag_test_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
@@ -137,10 +136,10 @@ import {
 
 @Component({
   components: {
-    AGCaseSettings,
+    AGTestCaseSettings,
     AGTestCommandSettings,
-    AGSuitePanel,
-    AGSuiteSettings,
+    AGTestSuitePanel,
+    AGTestSuiteSettings,
     APIErrors,
     Draggable,
     Modal,
@@ -148,9 +147,9 @@ import {
     ValidatedInput
   }
 })
-export default class AGSuites extends Vue implements AGTestSuiteObserver,
-                                                     AGTestCaseObserver,
-                                                     AGTestCommandObserver {
+export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
+                                                         AGTestCaseObserver,
+                                                         AGTestCommandObserver {
   @Prop({required: true, type: Project})
   project!: Project;
 
@@ -534,7 +533,7 @@ export default class AGSuites extends Vue implements AGTestSuiteObserver,
                                         ag_test_command_order: number[]) { }
 }
 
-function handle_add_ag_test_suite_error(component: AGSuites, error: unknown) {
+function handle_add_ag_test_suite_error(component: AGTestSuites, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>

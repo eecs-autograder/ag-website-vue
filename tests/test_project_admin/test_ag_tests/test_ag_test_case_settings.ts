@@ -9,8 +9,8 @@ import {
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
-import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
-import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_suites/ag_test_case_fdbk_config_panel.vue';
+import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_tests/ag_test_case_fdbk_config_panel.vue';
+import AGTestCaseSettings from '@/components/project_admin/ag_tests/ag_test_case_settings.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import {
@@ -20,8 +20,8 @@ import {
 } from '@/tests/utils';
 
 describe('AG test case settings form tests', () => {
-    let wrapper: Wrapper<AGCaseSettings>;
-    let component: AGCaseSettings;
+    let wrapper: Wrapper<AGTestCaseSettings>;
+    let component: AGTestCaseSettings;
     let ag_test_suite: AGTestSuite;
     let ag_case: AGTestCase;
     let ag_case_with_multiple_commands: AGTestCase;
@@ -43,7 +43,7 @@ describe('AG test case settings form tests', () => {
             data_ut.make_ag_test_command(ag_case_with_multiple_commands.pk),
         ];
 
-        wrapper = mount(AGCaseSettings, {
+        wrapper = mount(AGTestCaseSettings, {
             propsData: {
                 ag_test_case: ag_case
             }
@@ -132,7 +132,7 @@ describe('AG test case settings form tests', () => {
     });
 
     test('update config settings in ag_case_config_panel - changes reflected in ' +
-         'ag_case_settings',
+         'ag_test_case_settings',
          async () => {
         wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
         await component.$nextTick();

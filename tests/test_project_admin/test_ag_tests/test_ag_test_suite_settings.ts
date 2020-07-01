@@ -4,8 +4,8 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
-import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
+import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_tests/ag_test_suite_advanced_fdbk_settings.vue';
+import AGTestSuiteSettings from '@/components/project_admin/ag_tests/ag_test_suite_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel/feedback_config_panel.vue';
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 
@@ -21,8 +21,8 @@ import {
 } from '@/tests/utils';
 
 
-describe('AGSuiteSettings tests', () => {
-    let wrapper: Wrapper<AGSuiteSettings>;
+describe('AGTestSuiteSettings tests', () => {
+    let wrapper: Wrapper<AGTestSuiteSettings>;
     let ag_test_suite: ag_cli.AGTestSuite;
     let project: ag_cli.Project;
     let expected_student_files: ag_cli.ExpectedStudentFile[];
@@ -64,7 +64,7 @@ describe('AGSuiteSettings tests', () => {
             global_sandbox_docker_images
         ).withArgs(course.pk).resolves(course_sandbox_docker_images);
 
-        wrapper = managed_mount(AGSuiteSettings, {
+        wrapper = managed_mount(AGTestSuiteSettings, {
             propsData: {
                 ag_test_suite: ag_test_suite,
                 project: project,
@@ -229,7 +229,7 @@ describe('AG test suite feedback tests', () => {
             show_setup_stdout: false,
         });
 
-        let wrapper = mount(AGSuiteSettings, {
+        let wrapper = mount(AGTestSuiteSettings, {
             propsData: {
                 ag_test_suite: ag_test_suite,
                 project: project
@@ -268,7 +268,7 @@ describe('AG test suite feedback tests', () => {
             show_setup_stdout: false,
         });
 
-        let wrapper = mount(AGSuiteSettings, {
+        let wrapper = mount(AGTestSuiteSettings, {
             propsData: {
                 ag_test_suite: ag_test_suite,
                 project: project
@@ -309,7 +309,7 @@ describe('AG test suite feedback tests', () => {
             show_setup_stdout: false,
         });
 
-        let wrapper = mount(AGSuiteSettings, {
+        let wrapper = mount(AGTestSuiteSettings, {
             propsData: {
                 ag_test_suite: ag_test_suite,
                 project: project
@@ -350,7 +350,7 @@ describe('AG test suite feedback tests', () => {
             show_setup_stdout: false,
         });
 
-        let wrapper = mount(AGSuiteSettings, {
+        let wrapper = mount(AGTestSuiteSettings, {
             propsData: {
                 ag_test_suite: ag_test_suite,
                 project: project

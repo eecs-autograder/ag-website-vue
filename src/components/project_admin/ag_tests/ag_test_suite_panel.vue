@@ -21,13 +21,13 @@
                  @change="set_ag_test_case_order"
                  @end="$event.item.style.transform = 'none'"
                  handle=".handle">
-        <AGCasePanel v-for="test_case of ag_test_suite.ag_test_cases"
+        <AGTestCasePanel v-for="test_case of ag_test_suite.ag_test_cases"
                    :key="test_case.pk"
                    :ag_test_case="test_case"
                    :ag_test_suite="ag_test_suite"
                    :active_ag_test_command="active_ag_test_command"
                    @update_active_item="$emit('update_active_item', $event)">
-        </AGCasePanel>
+        </AGTestCasePanel>
       </draggable>
     </div>
 
@@ -134,7 +134,7 @@ import {
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
+import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
@@ -153,7 +153,7 @@ export class NewCommandFields {
 
 @Component({
   components: {
-    AGCasePanel,
+    AGTestCasePanel,
     APIErrors,
     Draggable,
     Modal,
@@ -162,7 +162,7 @@ export class NewCommandFields {
     ValidatedInput
   }
 })
-export default class AGSuitePanel extends Vue {
+export default class AGTestSuitePanel extends Vue {
 
   @Prop({default: null, type: AGTestSuite})
   active_ag_test_suite!: AGTestSuite | null;
@@ -308,7 +308,7 @@ export default class AGSuitePanel extends Vue {
   }
 }
 
-function handle_create_ag_test_case_error(component: AGSuitePanel, error: unknown) {
+function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: unknown) {
   (<APIErrors> component.$refs.new_ag_test_case_api_errors).show_errors_from_response(error);
 }
 </script>

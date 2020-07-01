@@ -61,9 +61,9 @@
       <expected-student-files v-show="d_current_tab === 'expected_student_files'"
                               v-if="d_loaded_tabs.has('expected_student_files')"
                               :project="d_project"></expected-student-files>
-      <ag-suites v-show="d_current_tab === 'test_cases'"
-                 v-if="d_loaded_tabs.has('test_cases')"
-                 :project="d_project"></ag-suites>
+      <ag-test-suites v-show="d_current_tab === 'test_cases'"
+                      v-if="d_loaded_tabs.has('test_cases')"
+                      :project="d_project"></ag-test-suites>
       <mutation-suites v-show="d_current_tab === 'mutation_testing'"
                        v-if="d_loaded_tabs.has('mutation_testing')"
                        :project="d_project"></mutation-suites>
@@ -99,7 +99,7 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import { ArraySet } from '@/array_set';
-import AGSuites from '@/components/project_admin/ag_suites/ag_suites.vue';
+import AGTestSuites from '@/components/project_admin/ag_tests/ag_test_suites.vue';
 import DownloadGrades from "@/components/project_admin/download_grades.vue";
 import EditGroups from '@/components/project_admin/edit_groups/edit_groups.vue';
 import ExpectedStudentFiles from '@/components/project_admin/expected_student_files/expected_student_files.vue';
@@ -115,7 +115,7 @@ import { assert_not_null, deep_copy, get_query_param, safe_assign } from "@/util
 
 @Component({
   components: {
-    'ag-suites': AGSuites,
+    'ag-test-suites': AGTestSuites,
     DownloadGrades,
     EditGroups,
     ExpectedStudentFiles,

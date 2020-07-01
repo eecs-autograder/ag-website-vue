@@ -17,8 +17,8 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
-import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
+import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_tests/ag_test_command_advanced_fdbk_settings.vue';
+import AGTestCommandSettings from '@/components/project_admin/ag_tests/ag_test_command_settings.vue';
 import FeedbackConfigPanel from '@/components/project_admin/feedback_config_panel/feedback_config_panel.vue';
 import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 import { assert_not_null } from '@/utils';

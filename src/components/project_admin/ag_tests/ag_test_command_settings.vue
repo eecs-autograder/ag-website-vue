@@ -586,7 +586,7 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import Dropdown from '@/components/dropdown.vue';
 import Modal from '@/components/modal.vue';
-import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_command_advanced_fdbk_settings.vue';
+import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_tests/ag_test_command_advanced_fdbk_settings.vue';
 import {
   AGTestCommandFeedbackPreset,
   FeedbackConfigLabel,
@@ -699,7 +699,7 @@ export default class AGTestCommandSettings extends Vue {
     });
   }
 
-  @handle_api_errors_async(handle_save_ag_command_settings_error)
+  @handle_api_errors_async(handle_save_ag_test_cmd_settings_error)
   save_ag_test_command_settings() {
     return toggle(this, 'd_saving', () => {
       (<APIErrors> this.$refs.api_errors).clear();
@@ -813,7 +813,7 @@ function handle_save_ag_test_case_error(component: AGTestCommandSettings, error:
   api_errors_elt.show_errors_from_response(error);
 }
 
-function handle_save_ag_command_settings_error(component: AGTestCommandSettings, error: unknown) {
+function handle_save_ag_test_cmd_settings_error(component: AGTestCommandSettings, error: unknown) {
   let api_errors_elt = <APIErrors> component.$refs.api_errors;
   api_errors_elt.show_errors_from_response(error);
   if (component.d_num_api_errors !== 0) {

@@ -210,7 +210,7 @@ import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import LastSaved from "@/components/last_saved.vue";
 import Modal from '@/components/modal.vue';
-import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_suites/ag_test_suite_advanced_fdbk_settings.vue';
+import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_tests/ag_test_suite_advanced_fdbk_settings.vue';
 import { AGTestSuiteFeedbackPreset, FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import SelectObject from '@/components/select_object.vue';
@@ -245,7 +245,7 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
     ValidatedInput,
   }
 })
-export default class AGSuiteSettings extends Vue {
+export default class AGTestSuiteSettings extends Vue {
 
   @Prop({required: true, type: AGTestSuite})
   ag_test_suite!: AGTestSuite;
@@ -289,7 +289,7 @@ export default class AGSuiteSettings extends Vue {
     });
   }
 
-  @handle_api_errors_async(handle_save_ag_suite_settings_error)
+  @handle_api_errors_async(handle_save_ag_test_suite_settings_error)
   save_ag_test_suite_settings() {
     return toggle(this, 'd_saving', () => {
       (<APIErrors> this.$refs.api_errors).clear();
@@ -331,7 +331,7 @@ export default class AGSuiteSettings extends Vue {
   ]);
 }
 
-function handle_save_ag_suite_settings_error(component: AGSuiteSettings, error: unknown) {
+function handle_save_ag_test_suite_settings_error(component: AGTestSuiteSettings, error: unknown) {
   let api_errors_elt = <APIErrors> component.$refs.api_errors;
   api_errors_elt.show_errors_from_response(error);
   if (component.d_num_api_errors !== 0) {

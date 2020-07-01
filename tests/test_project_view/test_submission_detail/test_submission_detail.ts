@@ -561,7 +561,7 @@ describe('Suite results tests', () => {
 
     test('No AG test suite results', () => {
         let wrapper = make_wrapper();
-        expect(wrapper.findAllComponents({name: 'AGSuiteResult'}).length).toEqual(0);
+        expect(wrapper.findAllComponents({name: 'AGTestSuiteResultDetail'}).length).toEqual(0);
     });
 
     test('AG test suite results shown', () => {
@@ -572,7 +572,7 @@ describe('Suite results tests', () => {
         ];
 
         let wrapper = make_wrapper();
-        expect(wrapper.findAllComponents({name: 'AGSuiteResult'}).length).toEqual(2);
+        expect(wrapper.findAllComponents({name: 'AGTestSuiteResultDetail'}).length).toEqual(2);
     });
 });
 
