@@ -152,3 +152,40 @@ test('Download files', async () => {
     expect(await wait_until(wrapper, w => !w.vm.d_downloading_files)).toBe(true);
     expect(get_files_stub.calledOnce).toBe(true);
 });
+
+test('Cancel queued build', async () => {
+    let cancel_stub = sinon.stub(build_task, 'cancel');
+    let wrapper = await make_wrapper();
+    await wrapper.find('[data-testid=cancel_button]').trigger('click');
+    expect(await wait_until(wrapper, w => !w.vm.d_cancelling_build)).toBe(true);
+
+    expect(cancel_stub.calledOnce).toBe(true);
+});
+
+test('Cancel in_progress build', async () => {
+    let cancel_stub = sinon.stub(build_task, 'cancel');
+    build_task.status = ag_cli.BuildImageStatus.in_progress;
+    let wrapper = await make_wrapper();
+    await wrapper.find('[data-testid=cancel_button]').trigger('click');
+    expect(await wait_until(wrapper, w => !w.vm.d_cancelling_build)).toBe(true);
+
+    expect(cancel_stub.calledOnce).toBe(true);
+});
+
+test('Build finished, no cancel button', async () => {
+    build_task.status = ag_cli.BuildImageStatus.done;
+    let wrapper = await make_wrapper();
+    expect(wrapper.find('[data-testid=cancel_button]').exists()).toBe(false);
+});
+
+test('Build failed, no cancel button', async () => {
+    build_task.status = ag_cli.BuildImageStatus.failed;
+    let wrapper = await make_wrapper();
+    expect(wrapper.find('[data-testid=cancel_button]').exists()).toBe(false);
+});
+
+test('Build cancelled, no cancel button', async () => {
+    build_task.status = ag_cli.BuildImageStatus.cancelled;
+    let wrapper = await make_wrapper();
+    expect(wrapper.find('[data-testid=cancel_button]').exists()).toBe(false);
+});

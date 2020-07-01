@@ -63,6 +63,17 @@
       </ul>
     </div>
 
+    <div v-if="build_task.status === BuildImageStatus.queued
+               || build_task.status === BuildImageStatus.in_progress"
+         class="cancel-button-wrapper">
+      <button type="button" class="red-button"
+              @click="cancel_build"
+              :disabled="d_cancelling_build"
+              data-testid="cancel_button">
+        Cancel Build
+      </button>
+    </div>
+
     <progress-overlay v-if="d_downloading_files" :progress="d_files_download_progress"/>
 
     <template v-if="build_task.status !== BuildImageStatus.queued">
@@ -120,6 +131,8 @@ export default class BuildImageTaskDetail extends Vue {
   private d_files_download_progress: number | null = null;
   d_downloading_files = false;
 
+  d_cancelling_build = false;
+
   created() {
     return this.load_output();
   }
@@ -166,10 +179,18 @@ export default class BuildImageTaskDetail extends Vue {
     });
     this.d_output = blob_to_string(output);
   }
+
+  @handle_global_errors_async
+  cancel_build() {
+    return toggle(this, 'd_cancelling_build', () => {
+      return this.build_task.cancel();
+    });
+  }
 }
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 
 * {
@@ -234,7 +255,6 @@ export default class BuildImageTaskDetail extends Vue {
   }
 }
 
-
 .internal-error-msg {
   white-space: pre-wrap;
   word-break: break-all;
@@ -246,5 +266,9 @@ export default class BuildImageTaskDetail extends Vue {
 
   border: 1px solid $pebble-dark;
   padding: .25rem;
+}
+
+.cancel-button-wrapper {
+  margin: .75rem 0;
 }
 </style>
