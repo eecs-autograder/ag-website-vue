@@ -102,7 +102,7 @@ test('Internal error status superuser', async () => {
     expect(wrapper.find('.internal-error-msg').text().trim()).toEqual(internal_error_msg);
 });
 
-test('Status change output loaded', async () => {
+test('Output re-loaded when status changes', async () => {
     let queued_task = deep_copy(build_task, ag_cli.BuildSandboxDockerImageTask);
     let wrapper = await make_wrapper(queued_task);
     expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(false);

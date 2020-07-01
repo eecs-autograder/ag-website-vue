@@ -127,7 +127,7 @@ export default class BuildImageTaskDetail extends Vue {
   @Watch('build_task')
   on_build_task_change(
       new_task: BuildSandboxDockerImageTask, old_task: BuildSandboxDockerImageTask) {
-    if (new_task.status !== old_task.status) {
+    if (new_task.status !== old_task.status || new_task.status === BuildImageStatus.in_progress) {
       return this.load_output();
     }
   }
