@@ -2,7 +2,7 @@ import { Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
-import AGSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
+import AGTestSuiteResultDetail from '@/components/project_view/submission_detail/ag_test_suite_result_detail.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
 
@@ -66,7 +66,7 @@ function set_command_result_correctness(command: ag_cli.AGTestCommandResultFeedb
     command.stderr_correct = stderr_correctness;
 }
 
-function check_all_case_correctness_levels(wrapper: Wrapper<AGSuiteResult>,
+function check_all_case_correctness_levels(wrapper: Wrapper<AGTestSuiteResultDetail>,
                                            case_result: ag_cli.AGTestCaseResultFeedback,
                                            return_code_correctness: CorrectnessLevel,
                                            output_correctness: CorrectnessLevel,
@@ -79,7 +79,7 @@ function check_all_case_correctness_levels(wrapper: Wrapper<AGSuiteResult>,
 }
 
 function make_wrapper(is_first_suite: boolean) {
-    let wrapper = managed_shallow_mount(AGSuiteResult, {
+    let wrapper = managed_shallow_mount(AGTestSuiteResultDetail, {
         propsData: {
             submission: submission,
             ag_test_suite_result: ag_test_suite_result,
@@ -92,7 +92,7 @@ function make_wrapper(is_first_suite: boolean) {
 }
 
 describe('case_result_correctness tests', () => {
-    let wrapper: Wrapper<AGSuiteResult>;
+    let wrapper: Wrapper<AGTestSuiteResultDetail>;
 
     beforeEach(() => {
         wrapper = make_wrapper(false);
@@ -454,7 +454,7 @@ describe('case_result_correctness tests', () => {
 });
 
 describe('case_result_return_code_correctness tests', () => {
-    let wrapper: Wrapper<AGSuiteResult>;
+    let wrapper: Wrapper<AGTestSuiteResultDetail>;
 
     beforeEach(() => {
         expect(ag_test_case_result.ag_test_command_results[0].return_code_correct).toBeNull();
@@ -605,7 +605,7 @@ describe('case_result_return_code_correctness tests', () => {
 });
 
 describe('case_result_output_correctness tests', () => {
-    let wrapper: Wrapper<AGSuiteResult>;
+    let wrapper: Wrapper<AGTestSuiteResultDetail>;
 
     beforeEach(() => {
         wrapper = make_wrapper(false);
@@ -717,7 +717,7 @@ describe('case_result_output_correctness tests', () => {
     });
 });
 
-function get_setup_result_panel(wrapper: Wrapper<AGSuiteResult>) {
+function get_setup_result_panel(wrapper: Wrapper<AGTestSuiteResultDetail>) {
     return <ResultPanel> wrapper.findComponent({ref: 'setup_result_panel'}).vm;
 }
 
@@ -810,7 +810,7 @@ describe('Setup panel open initially tests', () => {
 });
 
 describe('First failed test case result panel open initially tests', () => {
-    function get_test_result_panel(wrapper: Wrapper<AGSuiteResult>, index: number) {
+    function get_test_result_panel(wrapper: Wrapper<AGTestSuiteResultDetail>, index: number) {
         return <ResultPanel> wrapper.findAllComponents({ref: 'test_result_panel'}).at(index).vm;
     }
 

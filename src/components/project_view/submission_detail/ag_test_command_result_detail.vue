@@ -179,7 +179,7 @@ import { handle_global_errors_async } from '@/error_handling';
     ViewFile
   }
 })
-export default class AGTestCommandResult extends Vue {
+export default class AGTestCommandResultDetail extends Vue {
   @Prop({required: true, type: Submission})
   submission!: Submission;
 

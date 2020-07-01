@@ -14,10 +14,10 @@
       :name="ag_test_suite_result.setup_name !== '' ? ag_test_suite_result.setup_name : 'Setup'"
       :correctness_level="setup_correctness_level"
       :open_initially="is_first_suite && setup_correctness_level === CorrectnessLevel.none_correct">
-      <AGSuiteSetupResult :submission="submission"
-                          :ag_test_suite_result="ag_test_suite_result"
-                          :fdbk_category="fdbk_category">
-      </AGSuiteSetupResult>
+      <AGTestSuiteSetupResultDetail
+        :submission="submission"
+        :ag_test_suite_result="ag_test_suite_result"
+        :fdbk_category="fdbk_category"/>
     </result-panel>
 
     <template v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results">
@@ -31,12 +31,12 @@
         :open_initially="first_incorrect_case !== null
                          && first_incorrect_case.pk === ag_test_case_result.pk"
         :is_multi_command_case="ag_test_case_result.ag_test_command_results.length > 1">
-        <AGCaseResult
+        <AGTestCaseResultDetail
           :submission="submission"
           :ag_test_case_result="ag_test_case_result"
           :fdbk_category="fdbk_category"
           :ag_test_case_row_correctness_level="case_result_correctness(ag_test_case_result)">
-        </AGCaseResult>
+        </AGTestCaseResultDetail>
       </result-panel>
     </template>
 
@@ -53,20 +53,20 @@ import {
     Submission
 } from "ag-client-typescript";
 
-import AGCaseResult from '@/components/project_view/submission_detail/ag_case_result.vue';
-import AGSuiteSetupResult from '@/components/project_view/submission_detail/ag_suite_setup_result.vue';
+import AGTestCaseResultDetail from '@/components/project_view/submission_detail/ag_test_case_result_detail.vue';
+import AGTestSuiteSetupResultDetail from '@/components/project_view/submission_detail/ag_test_suite_setup_result_detail.vue';
 import { CorrectnessLevel, setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
 import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
 
 @Component({
   components: {
-    AGCaseResult,
-    AGSuiteSetupResult,
+    AGTestCaseResultDetail,
+    AGTestSuiteSetupResultDetail,
     ResultPanel
   }
 })
-export default class AGSuiteResult extends Vue {
+export default class AGTestSuiteResultDetail extends Vue {
 
   @Prop({required: true, type: Submission})
   submission!: Submission;

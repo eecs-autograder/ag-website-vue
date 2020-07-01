@@ -4,7 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import Diff from '@/components/diff.vue';
-import AGTestCommandResult from '@/components/project_view/submission_detail/ag_test_command_result.vue';
+import AGTestCommandResultDetail from '@/components/project_view/submission_detail/ag_test_command_result_detail.vue';
 import ViewFile from '@/components/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -67,7 +67,7 @@ beforeEach(() => {
 });
 
 async function make_wrapper() {
-    let wrapper = managed_mount(AGTestCommandResult, {
+    let wrapper = managed_mount(AGTestCommandResultDetail, {
         propsData: {
             submission: submission,
             ag_test_command_result: ag_test_command_result,

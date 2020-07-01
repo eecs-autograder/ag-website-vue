@@ -3,7 +3,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import AGSuiteSetupResult from '@/components/project_view/submission_detail/ag_suite_setup_result.vue';
+import AGTestSuiteSetupResultDetail from '@/components/project_view/submission_detail/ag_test_suite_setup_result_detail.vue';
 import ViewFile from '@/components/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -57,7 +57,7 @@ function progress_stub_resolves<T>(
 }
 
 async function make_wrapper() {
-    let wrapper = managed_mount(AGSuiteSetupResult, {
+    let wrapper = managed_mount(AGTestSuiteSetupResultDetail, {
         propsData: {
             submission: submission,
             ag_test_suite_result: ag_test_suite_result,
@@ -172,15 +172,15 @@ describe('Setup output tests', () => {
     });
 });
 
-describe('AGSuiteSetupResult exit_status tests', () => {
-    let wrapper: Wrapper<AGSuiteSetupResult>;
+describe('AGTestSuiteSetupResultDetail exit_status tests', () => {
+    let wrapper: Wrapper<AGTestSuiteSetupResultDetail>;
 
     beforeEach(() => {
         output_size_resolves(submission.pk, ag_test_suite_result.pk);
     });
 
     test('setup_exit_status - setup_timed_out === null && setup_return_code === null', () => {
-        wrapper = mount(AGSuiteSetupResult, {
+        wrapper = mount(AGTestSuiteSetupResultDetail, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -196,7 +196,7 @@ describe('AGSuiteSetupResult exit_status tests', () => {
     test('setup_exit_status - setup_timed_out === null && setup_return_code !== null',  () => {
         ag_test_suite_result!.setup_return_code = 1;
 
-        wrapper = mount(AGSuiteSetupResult, {
+        wrapper = mount(AGTestSuiteSetupResultDetail, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -214,7 +214,7 @@ describe('AGSuiteSetupResult exit_status tests', () => {
     test('setup_exit_status - setup_timed_out === false && setup_return_code === null', () => {
         ag_test_suite_result!.setup_timed_out = false;
 
-        wrapper = mount(AGSuiteSetupResult, {
+        wrapper = mount(AGTestSuiteSetupResultDetail, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -230,7 +230,7 @@ describe('AGSuiteSetupResult exit_status tests', () => {
     test('setup_exit_status - setup_timed_out === true && setup_return_code === null',  () => {
         ag_test_suite_result!.setup_timed_out = true;
 
-        wrapper = mount(AGSuiteSetupResult, {
+        wrapper = mount(AGTestSuiteSetupResultDetail, {
             propsData: {
                 ag_test_suite_result: ag_test_suite_result,
                 submission: submission,
@@ -255,7 +255,7 @@ test('Output reloaded on fdbk_category change', async () => {
     setup_stdout_stub.onFirstCall().resolves(setup_stdout_content);
     setup_stderr_stub.onFirstCall().resolves(setup_stderr_content);
 
-    let wrapper = managed_mount(AGSuiteSetupResult, {
+    let wrapper = managed_mount(AGTestSuiteSetupResultDetail, {
         propsData: {
             ag_test_suite_result: ag_test_suite_result,
             submission: submission,

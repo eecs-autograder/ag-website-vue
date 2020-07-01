@@ -167,14 +167,14 @@
       :fdbk_category="feedback_category">
     </mutation-suite-results>
 
-    <AGSuiteResult
+    <AGTestSuiteResultDetail
       v-for="(ag_test_suite_result, index) of submission_result.ag_test_suite_results"
       :key="ag_test_suite_result.pk"
       :submission="submission"
       :ag_test_suite_result="ag_test_suite_result"
       :fdbk_category="feedback_category"
       :is_first_suite="index === 0"
-    ></AGSuiteResult>
+    ></AGTestSuiteResultDetail>
 
     <modal v-if="d_show_remove_submission_from_queue_modal"
            @close="d_show_remove_submission_from_queue_modal = false"
@@ -233,7 +233,7 @@ import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
 import Modal from '@/components/modal.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
-import AGSuiteResult from '@/components/project_view/submission_detail/ag_suite_result.vue';
+import AGTestSuiteResultDetail from '@/components/project_view/submission_detail/ag_test_suite_result_detail.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
@@ -246,7 +246,7 @@ import { format_datetime, toggle } from '@/utils';
 @Component({
   components: {
     APIErrors,
-    AGSuiteResult,
+    AGTestSuiteResultDetail,
     Modal,
     MutationSuiteResults,
     ProgressOverlay,

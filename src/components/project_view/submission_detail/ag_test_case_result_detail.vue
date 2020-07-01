@@ -9,19 +9,19 @@
           :name="ag_test_command_result.ag_test_command_name"
           :correctness_level="command_result_correctness(ag_test_command_result)"
           :is_command="true">
-          <AGTestCommandResult :submission="submission"
-                               :ag_test_command_result="ag_test_command_result"
-                               :fdbk_category="fdbk_category">
-          </AGTestCommandResult>
+          <AGTestCommandResultDetail
+            :submission="submission"
+            :ag_test_command_result="ag_test_command_result"
+            :fdbk_category="fdbk_category"/>
         </result-panel>
       </div>
     </template>
     <template v-else>
-      <AGTestCommandResult ref="ag_command_result"
-                           :submission="submission"
-                           :ag_test_command_result="ag_test_case_result.ag_test_command_results[0]"
-                           :fdbk_category="fdbk_category">
-      </AGTestCommandResult>
+      <AGTestCommandResultDetail
+        ref="ag_command_result"
+        :submission="submission"
+        :ag_test_command_result="ag_test_case_result.ag_test_command_results[0]"
+        :fdbk_category="fdbk_category"/>
     </template>
   </div>
 </template>
@@ -36,7 +36,7 @@ import {
     Submission
 } from "ag-client-typescript";
 
-import AGTestCommandResult from '@/components/project_view/submission_detail/ag_test_command_result.vue';
+import AGTestCommandResultDetail from '@/components/project_view/submission_detail/ag_test_command_result_detail.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from '@/components/project_view/submission_detail/correctness_icon.vue';
 import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
@@ -44,12 +44,12 @@ import ResultPanel from "@/components/project_view/submission_detail/result_pane
 
 @Component({
   components: {
-    AGTestCommandResult,
+    AGTestCommandResultDetail,
     ResultPanel,
     CorrectnessIcon
   }
 })
-export default class AGCaseResult extends Vue {
+export default class AGTestCaseResultDetail extends Vue {
   @Prop({required: true, type: Submission})
   submission!: Submission;
 
