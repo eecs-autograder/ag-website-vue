@@ -106,7 +106,7 @@ import { is_not_empty } from '@/validators';
     ValidatedInput
   }
 })
-export default class AGCaseSettings extends Vue {
+export default class AGTestCaseSettings extends Vue {
 
   @Prop({required: true, type: AGTestCase})
   ag_test_case!: AGTestCase;
@@ -141,7 +141,7 @@ export default class AGCaseSettings extends Vue {
   }
 }
 
-function handle_save_ag_test_case_settings_error(component: AGCaseSettings, error: unknown) {
+function handle_save_ag_test_case_settings_error(component: AGTestCaseSettings, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>

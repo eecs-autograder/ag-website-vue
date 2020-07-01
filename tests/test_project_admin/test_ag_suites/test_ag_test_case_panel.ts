@@ -10,7 +10,7 @@ import {
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
-import AGCasePanel from '@/components/project_admin/ag_suites/ag_case_panel.vue';
+import AGTestCasePanel from '@/components/project_admin/ag_suites/ag_test_case_panel.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -25,7 +25,7 @@ import {
 
 
 describe('commands_are_visible getter', () => {
-    let wrapper: Wrapper<AGCasePanel>;
+    let wrapper: Wrapper<AGTestCasePanel>;
     let project: Project;
     let ag_suite_colors: AGTestSuite;
     let ag_case_green: AGTestCase;
@@ -70,7 +70,7 @@ describe('commands_are_visible getter', () => {
     });
 
     test('Command in case is active', async () => {
-        wrapper = mount(AGCasePanel, {
+        wrapper = mount(AGTestCasePanel, {
             propsData: {
                 ag_test_case: ag_case_green,
                 ag_test_suite: ag_suite_colors,
@@ -83,7 +83,7 @@ describe('commands_are_visible getter', () => {
     });
 
     test('Command in case is not active', async () => {
-        wrapper = mount(AGCasePanel, {
+        wrapper = mount(AGTestCasePanel, {
             propsData: {
                 ag_test_case: ag_case_green,
                 ag_test_suite: ag_suite_colors,
@@ -96,8 +96,8 @@ describe('commands_are_visible getter', () => {
     });
 });
 
-describe('AGCasePanel tests', () => {
-    let wrapper: Wrapper<AGCasePanel>;
+describe('AGTestCasePanel tests', () => {
+    let wrapper: Wrapper<AGTestCasePanel>;
     let project: Project;
     let ag_suite_colors: AGTestSuite;
     let ag_case_green: AGTestCase;
@@ -134,7 +134,7 @@ describe('AGCasePanel tests', () => {
             ag_case_yellow
         ];
 
-        wrapper = mount(AGCasePanel, {
+        wrapper = mount(AGTestCasePanel, {
             propsData: {
                 ag_test_case: ag_case_green,
                 ag_test_suite: ag_suite_colors,
@@ -649,7 +649,7 @@ test('Update test commands order', async () => {
     ];
     test_case.ag_test_commands = cmds;
 
-    let wrapper = managed_mount(AGCasePanel, {
+    let wrapper = managed_mount(AGTestCasePanel, {
             propsData: {
                 ag_test_case: test_case,
                 ag_test_suite: suite,

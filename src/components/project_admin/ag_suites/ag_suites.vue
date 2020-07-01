@@ -119,10 +119,10 @@ import {
 
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
-import AGCaseSettings from '@/components/project_admin/ag_suites/ag_case_settings.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_suites/ag_command_settings.vue';
 import AGSuitePanel from '@/components/project_admin/ag_suites/ag_suite_panel.vue';
 import AGSuiteSettings from '@/components/project_admin/ag_suites/ag_suite_settings.vue';
+import AGTestCaseSettings from '@/components/project_admin/ag_suites/ag_test_case_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
@@ -137,7 +137,7 @@ import {
 
 @Component({
   components: {
-    AGCaseSettings,
+    AGTestCaseSettings,
     AGTestCommandSettings,
     AGSuitePanel,
     AGSuiteSettings,
