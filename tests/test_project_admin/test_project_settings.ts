@@ -8,32 +8,44 @@ import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import TimePicker from "@/components/datetime/time_picker.vue";
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { assert_not_null } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    api_error_count,
     checkbox_is_checked,
     expect_html_element_has_value,
     get_validated_input_text,
-    set_validated_input_text, validated_input_is_valid
+    set_validated_input_text,
+    validated_input_is_valid,
+    wait_until
 } from "@/tests/utils";
 
 
 let wrapper: Wrapper<ProjectSettings>;
 let project: Project;
+let router_push_stub: sinon.SinonStub;
 
 beforeEach(() => {
     project = data_ut.make_project(data_ut.make_course().pk);
+    router_push_stub = sinon.stub();
 
     wrapper = managed_mount(ProjectSettings, {
         propsData: {
             project: project
+        },
+        mocks: {
+            $router: {
+                push: router_push_stub
+            }
         }
     });
 });
 
 describe('ProjectSettings tests', () => {
     test('soft_closing_time clear button sets field to null', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.soft_closing_time = (new Date()).toISOString();
         await wrapper.vm.$nextTick();
 
@@ -43,7 +55,7 @@ describe('ProjectSettings tests', () => {
         button.trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_project.soft_closing_time).toBeNull();
+        expect(wrapper.vm.d_project?.soft_closing_time).toBeNull();
         expect(button.element).toBeDisabled();
     });
 
@@ -64,6 +76,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('closing_time clear button sets field to null', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.closing_time = (new Date()).toISOString();
         await wrapper.vm.$nextTick();
 
@@ -73,7 +86,7 @@ describe('ProjectSettings tests', () => {
         button.trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_project.closing_time).toBeNull();
+        expect(wrapper.vm.d_project?.closing_time).toBeNull();
         expect(button.element).toBeDisabled();
     });
 
@@ -96,14 +109,15 @@ describe('ProjectSettings tests', () => {
         let checkbox = wrapper.find('[data-testid=visible_to_students]');
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.visible_to_students).toEqual(true);
+        expect(wrapper.vm.d_project?.visible_to_students).toEqual(true);
 
         await checkbox.setChecked(false);
-        expect(wrapper.vm.d_project.visible_to_students).toEqual(false);
+        expect(wrapper.vm.d_project?.visible_to_students).toEqual(false);
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.visible_to_students).toEqual(true);
+        expect(wrapper.vm.d_project?.visible_to_students).toEqual(true);
 
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.visible_to_students = false;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(checkbox)).toEqual(false);
@@ -117,14 +131,15 @@ describe('ProjectSettings tests', () => {
         let checkbox = wrapper.find('[data-testid=guests_can_submit]');
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.guests_can_submit).toEqual(true);
+        expect(wrapper.vm.d_project?.guests_can_submit).toEqual(true);
 
         await checkbox.setChecked(false);
-        expect(wrapper.vm.d_project.guests_can_submit).toEqual(false);
+        expect(wrapper.vm.d_project?.guests_can_submit).toEqual(false);
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.guests_can_submit).toEqual(true);
+        expect(wrapper.vm.d_project?.guests_can_submit).toEqual(true);
 
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.guests_can_submit = false;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(checkbox)).toEqual(false);
@@ -138,14 +153,15 @@ describe('ProjectSettings tests', () => {
         let checkbox = wrapper.find('[data-testid=disallow_student_submissions]');
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.disallow_student_submissions).toEqual(true);
+        expect(wrapper.vm.d_project?.disallow_student_submissions).toEqual(true);
 
         await checkbox.setChecked(false);
-        expect(wrapper.vm.d_project.disallow_student_submissions).toEqual(false);
+        expect(wrapper.vm.d_project?.disallow_student_submissions).toEqual(false);
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.disallow_student_submissions).toEqual(true);
+        expect(wrapper.vm.d_project?.disallow_student_submissions).toEqual(true);
 
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.disallow_student_submissions = false;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(checkbox)).toEqual(false);
@@ -159,14 +175,15 @@ describe('ProjectSettings tests', () => {
         let checkbox = wrapper.find('[data-testid=disallow_group_registration]');
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.disallow_group_registration).toEqual(true);
+        expect(wrapper.vm.d_project?.disallow_group_registration).toEqual(true);
 
         await checkbox.setChecked(false);
-        expect(wrapper.vm.d_project.disallow_group_registration).toEqual(false);
+        expect(wrapper.vm.d_project?.disallow_group_registration).toEqual(false);
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.disallow_group_registration).toEqual(true);
+        expect(wrapper.vm.d_project?.disallow_group_registration).toEqual(true);
 
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.disallow_group_registration = false;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(checkbox)).toEqual(false);
@@ -177,6 +194,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('min and max group size binding', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.min_group_size = 4;
         wrapper.vm.d_project.max_group_size = 5;
         await wrapper.vm.$nextTick();
@@ -192,8 +210,8 @@ describe('ProjectSettings tests', () => {
         await set_validated_input_text(min_group_size_input, '1');
         await set_validated_input_text(max_group_size_input, '3');
 
-        expect(wrapper.vm.d_project.min_group_size).toEqual(1);
-        expect(wrapper.vm.d_project.max_group_size).toEqual(3);
+        expect(wrapper.vm.d_project?.min_group_size).toEqual(1);
+        expect(wrapper.vm.d_project?.max_group_size).toEqual(3);
 
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
     });
@@ -202,16 +220,17 @@ describe('ProjectSettings tests', () => {
         let publish_grades = wrapper.find('[data-testid=publish_final_grades]');
 
         await publish_grades.setChecked(true);
-        expect(wrapper.vm.d_project.hide_ultimate_submission_fdbk).toEqual(false);
+        expect(wrapper.vm.d_project?.hide_ultimate_submission_fdbk).toEqual(false);
 
         await publish_grades.setChecked(false);
-        expect(wrapper.vm.d_project.hide_ultimate_submission_fdbk).toEqual(true);
+        expect(wrapper.vm.d_project?.hide_ultimate_submission_fdbk).toEqual(true);
 
         await publish_grades.setChecked(true);
-        expect(wrapper.vm.d_project.hide_ultimate_submission_fdbk).toEqual(false);
+        expect(wrapper.vm.d_project?.hide_ultimate_submission_fdbk).toEqual(false);
 
         expect(checkbox_is_checked(publish_grades)).toEqual(true);
 
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.hide_ultimate_submission_fdbk = true;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(publish_grades)).toEqual(false);
@@ -225,15 +244,16 @@ describe('ProjectSettings tests', () => {
         let ultimate_submission_policy_input = wrapper.find('#ultimate-submission-policy');
 
         await ultimate_submission_policy_input.setValue(UltimateSubmissionPolicy.most_recent);
-        expect(wrapper.vm.d_project.ultimate_submission_policy).toEqual(
+        expect(wrapper.vm.d_project?.ultimate_submission_policy).toEqual(
             UltimateSubmissionPolicy.most_recent
         );
 
         await ultimate_submission_policy_input.setValue(UltimateSubmissionPolicy.best);
-        expect(wrapper.vm.d_project.ultimate_submission_policy).toEqual(
+        expect(wrapper.vm.d_project?.ultimate_submission_policy).toEqual(
             UltimateSubmissionPolicy.best
         );
 
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.most_recent;
         await wrapper.vm.$nextTick();
         expect_html_element_has_value(ultimate_submission_policy_input,
@@ -246,6 +266,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Best submission with normal feedback disabled, only visible if in use', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.ultimate_submission_policy
             = UltimateSubmissionPolicy.best_with_normal_fdbk;
         await wrapper.vm.$nextTick();
@@ -256,6 +277,7 @@ describe('ProjectSettings tests', () => {
         expect_html_element_has_value(ultimate_submission_policy_input,
                                       UltimateSubmissionPolicy.best_with_normal_fdbk);
 
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.ultimate_submission_policy = UltimateSubmissionPolicy.best;
         await wrapper.vm.$nextTick();
 
@@ -266,8 +288,8 @@ describe('ProjectSettings tests', () => {
         expect_html_element_has_value(option_tags.at(1), UltimateSubmissionPolicy.best);
     });
 
-    test('d_project.submission_limit_per_day nullable form input',
-         async () => {
+    test('d_project.submission_limit_per_day nullable form input', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.submission_limit_per_day = 42;
         await wrapper.vm.$nextTick();
         let daily_submission_limit_input = wrapper.find('#submission-limit-per-day');
@@ -283,13 +305,13 @@ describe('ProjectSettings tests', () => {
 
         set_validated_input_text(daily_submission_limit_input, '7');
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_project.submission_limit_per_day).toEqual(7);
+        expect(wrapper.vm.d_project?.submission_limit_per_day).toEqual(7);
 
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
 
         set_validated_input_text(daily_submission_limit_input, '');
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_project.submission_limit_per_day).toEqual(null);
+        expect(wrapper.vm.d_project?.submission_limit_per_day).toEqual(null);
 
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
     });
@@ -297,14 +319,14 @@ describe('ProjectSettings tests', () => {
     test('allow_submissions_past_limit checkbox disabled when submission_limit_per_day is null',
          async () => {
         let allow_past_limit_checkbox = wrapper.find('[data-testid=allow_submissions_past_limit]');
-        expect(wrapper.vm.d_project.submission_limit_per_day).toBeNull();
+        expect(wrapper.vm.d_project?.submission_limit_per_day).toBeNull();
         expect(allow_past_limit_checkbox.element).toBeDisabled();
 
         set_validated_input_text(wrapper.find('#submission-limit-per-day'), '7');
 
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_project.submission_limit_per_day).not.toBeNull();
+        expect(wrapper.vm.d_project?.submission_limit_per_day).not.toBeNull();
         expect(allow_past_limit_checkbox.element).not.toBeDisabled();
     });
 
@@ -332,6 +354,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Submission limit reset time binding', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_show_reset_time_picker = true;
         await wrapper.vm.$nextTick();
 
@@ -344,18 +367,19 @@ describe('ProjectSettings tests', () => {
 
         time.vm.go_to_next_minute();
         await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_project.submission_limit_reset_time).toEqual('08:01');
+        expect(wrapper.vm.d_project?.submission_limit_reset_time).toEqual('08:01');
     });
 
     test('Submission limit reset timezone binding', async () => {
+        assert_not_null(wrapper.vm.d_project);
         let submission_limit_reset_timezone_input = wrapper.find(
             '#submission-limit-reset-timezone');
 
         await submission_limit_reset_timezone_input.setValue('US/Mountain');
-        expect(wrapper.vm.d_project.submission_limit_reset_timezone).toEqual('US/Mountain');
+        expect(wrapper.vm.d_project?.submission_limit_reset_timezone).toEqual('US/Mountain');
 
         await submission_limit_reset_timezone_input.setValue('US/Eastern');
-        expect(wrapper.vm.d_project.submission_limit_reset_timezone).toEqual('US/Eastern');
+        expect(wrapper.vm.d_project?.submission_limit_reset_timezone).toEqual('US/Eastern');
 
         wrapper.vm.d_project.submission_limit_reset_timezone = 'UTC';
         await wrapper.vm.$nextTick();
@@ -367,6 +391,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Groups get more submissions binding', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.max_group_size = 2;
         await wrapper.vm.$nextTick();
 
@@ -374,13 +399,13 @@ describe('ProjectSettings tests', () => {
         expect(checkbox.element).not.toBeDisabled();
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.groups_combine_daily_submissions).toEqual(true);
+        expect(wrapper.vm.d_project?.groups_combine_daily_submissions).toEqual(true);
 
         await checkbox.setChecked(false);
-        expect(wrapper.vm.d_project.groups_combine_daily_submissions).toEqual(false);
+        expect(wrapper.vm.d_project?.groups_combine_daily_submissions).toEqual(false);
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.groups_combine_daily_submissions).toEqual(true);
+        expect(wrapper.vm.d_project?.groups_combine_daily_submissions).toEqual(true);
 
         wrapper.vm.d_project.groups_combine_daily_submissions = false;
         await wrapper.vm.$nextTick();
@@ -392,6 +417,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Groups get more submissions disabled when max group size is 1', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.max_group_size = 1;
         await wrapper.vm.$nextTick();
 
@@ -403,14 +429,15 @@ describe('ProjectSettings tests', () => {
         let checkbox = wrapper.find('[data-testid=allow_late_days]');
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.allow_late_days).toEqual(true);
+        expect(wrapper.vm.d_project?.allow_late_days).toEqual(true);
 
         await checkbox.setChecked(false);
-        expect(wrapper.vm.d_project.allow_late_days).toEqual(false);
+        expect(wrapper.vm.d_project?.allow_late_days).toEqual(false);
 
         await checkbox.setChecked(true);
-        expect(wrapper.vm.d_project.allow_late_days).toEqual(true);
+        expect(wrapper.vm.d_project?.allow_late_days).toEqual(true);
 
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.allow_late_days = false;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(checkbox)).toEqual(false);
@@ -421,6 +448,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('d_project.total_submission_limit nullable form input', async () => {
+        assert_not_null(wrapper.vm.d_project);
         wrapper.vm.d_project.total_submission_limit = 42;
         await wrapper.vm.$nextTick();
         let daily_submission_limit_input = wrapper.find('#total-submission-limit');
@@ -435,17 +463,18 @@ describe('ProjectSettings tests', () => {
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
 
         await set_validated_input_text(daily_submission_limit_input, '7');
-        expect(wrapper.vm.d_project.total_submission_limit).toEqual(7);
+        expect(wrapper.vm.d_project?.total_submission_limit).toEqual(7);
 
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
 
         await set_validated_input_text(daily_submission_limit_input, '');
-        expect(wrapper.vm.d_project.total_submission_limit).toEqual(null);
+        expect(wrapper.vm.d_project?.total_submission_limit).toEqual(null);
 
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
     });
 
     test('Successful attempt to save project settings', async () => {
+        assert_not_null(wrapper.vm.d_project);
         let save_settings_stub = sinon.stub(wrapper.vm.d_project, 'save');
 
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
@@ -457,6 +486,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Unsuccessful attempt to save project settings', async () => {
+        assert_not_null(wrapper.vm.d_project);
         let save_settings_stub = sinon.stub(wrapper.vm.d_project, 'save');
         save_settings_stub.returns(Promise.reject(
             new HttpError(400, {__all__: "Project with this name already exists in course"})
@@ -478,6 +508,30 @@ describe('ProjectSettings tests', () => {
     });
 });
 
+describe('Delete project tests', () => {
+    test('Delete project', async () => {
+        let delete_stub = sinon.stub(project, 'delete');
+        await wrapper.find('[data-testid=show_delete_project_modal_button]').trigger('click');
+        await wrapper.find('[data-testid=delete_project_button]').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
+
+        expect(delete_stub.calledOnce).toBe(true);
+        expect(router_push_stub.calledOnce).toBe(true);
+        let args = router_push_stub.firstCall.args[0];
+        expect(args.name).toEqual('course_admin');
+        expect(args.params).toEqual({course_id: project.course.toString()});
+    });
+
+    test('Delete project API errors handled', async () => {
+        sinon.stub(project, 'delete').rejects(new HttpError(400, 'Noope'));
+        await wrapper.find('[data-testid=show_delete_project_modal_button]').trigger('click');
+        await wrapper.find('[data-testid=delete_project_button]').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
+
+        expect(router_push_stub.callCount).toEqual(0);
+        expect(api_error_count(wrapper, {ref: 'delete_errors'})).toEqual(1);
+    });
+});
 
 describe('Invalid input tests', () => {
     test('Error project name is blank', async () => {

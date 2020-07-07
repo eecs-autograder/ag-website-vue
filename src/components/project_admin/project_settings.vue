@@ -332,6 +332,50 @@
         </div>
       </div>
     </validated-form>
+
+    <div class="danger-zone-container">
+      <div class="delete-instructions">
+        To delete this project, please delete all of its test cases first
+        (regular test suites and mutation test suites).
+      </div>
+      <div class="danger-text">
+        Delete Project: {{project.name}}
+      </div>
+      <button data-testid="show_delete_project_modal_button" class="delete-button"
+              type="button"
+              @click="d_show_delete_project_modal = true">
+        Delete
+      </button>
+
+      <modal v-if="d_show_delete_project_modal"
+             @close="d_show_delete_project_modal = false"
+             ref="delete_project_modal"
+             size="large"
+             :click_outside_to_close="!d_deleting"
+             :show_closing_x="!d_deleting">
+        <div class="modal-header">
+          Confirm Delete
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete the project
+          <span class="item-to-delete">{{project.name}}</span>? <br><br>
+          This will delete all associated submissions and handgrading results.<br>
+          <b>THIS ACTION CANNOT BE UNDONE.</b>
+          <APIErrors ref="delete_errors"></APIErrors>
+          <div class="modal-button-footer">
+            <button data-testid="delete_project_button"
+                    class="red-button"
+                    :disabled="d_deleting"
+                    @click="delete_project"> Delete </button>
+
+            <button class="modal-cancel-button white-button"
+                    @click="d_show_delete_project_modal = false">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </modal>
+    </div>
   </div>
 </template>
 
@@ -343,12 +387,13 @@ import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import TimePicker from "@/components/datetime/time_picker.vue";
+import Modal from "@/components/modal.vue";
 import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/error_handling';
-import { deep_copy, format_datetime, format_datetime_short, format_time } from "@/utils";
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
+import { assert_not_null, deep_copy, format_datetime, format_datetime_short, format_time, toggle } from "@/utils";
 import {
   is_integer,
   is_non_negative,
@@ -367,6 +412,7 @@ interface UltimateSubmissionPolicyOption {
   components: {
     APIErrors,
     DatetimePicker,
+    Modal,
     TimePicker,
     Toggle,
     Tooltip,
@@ -375,7 +421,6 @@ interface UltimateSubmissionPolicyOption {
   }
 })
 export default class ProjectSettings extends Vue {
-
   @Prop({required: true, type: Project})
   project!: Project;
 
@@ -387,11 +432,14 @@ export default class ProjectSettings extends Vue {
     'UTC'
   ];
 
-  d_project: Project = make_empty_project();
+  d_project: Project | null = null;
   d_saving = false;
   settings_form_is_valid = true;
 
   d_show_reset_time_picker = false;
+
+  d_show_delete_project_modal = false;
+  d_deleting = false;
 
   readonly is_non_negative = is_non_negative;
   readonly is_not_empty = is_not_empty;
@@ -414,14 +462,27 @@ export default class ProjectSettings extends Vue {
   @handle_api_errors_async(handle_save_project_settings_error)
   async save_project_settings() {
     try {
+      assert_not_null(this.d_project);
       this.d_saving = true;
       (<APIErrors> this.$refs.api_errors).clear();
 
-      await this.d_project!.save();
+      await this.d_project.save();
     }
     finally {
       this.d_saving = false;
     }
+  }
+
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
+  async delete_project() {
+    return toggle(this, 'd_deleting', async () => {
+      await this.project.delete();
+      this.$router.push({
+        name: 'course_admin',
+        params: {course_id: this.project.course.toString()},
+        query: {current_tab: 'projects'}
+      });
+    });
   }
 }
 
@@ -438,36 +499,6 @@ function is_positive_int_or_empty_str(value: string): ValidatorResponse {
   return make_min_value_validator(1)(value);
 }
 
-function make_empty_project(): Project {
-  return new Project({
-    pk: 0,
-    name: '',
-    last_modified: '',
-    course: 0,
-    visible_to_students: false,
-    closing_time: null,
-    soft_closing_time: null,
-    disallow_student_submissions: false,
-    disallow_group_registration: false,
-    guests_can_submit: false,
-    min_group_size: 0,
-    max_group_size: 0,
-    submission_limit_per_day: null,
-    allow_submissions_past_limit: false,
-    groups_combine_daily_submissions: false,
-    submission_limit_reset_time: '12:00',
-    submission_limit_reset_timezone: 'UTC',
-    num_bonus_submissions: 0,
-    total_submission_limit: null,
-    allow_late_days: false,
-    ultimate_submission_policy: UltimateSubmissionPolicy.most_recent,
-    hide_ultimate_submission_fdbk: false,
-    instructor_files: [],
-    expected_student_files: [],
-    has_handgrading_rubric: false,
-  });
-}
-
 </script>
 
 <style scoped lang="scss">
@@ -476,6 +507,7 @@ function make_empty_project(): Project {
 @import '@/styles/components/datetime.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
@@ -507,6 +539,11 @@ function make_empty_project(): Project {
     display: flex;
     align-items: center;
   }
+}
+
+.delete-instructions {
+  width: 100%;
+  margin-bottom: 1rem;
 }
 
 </style>

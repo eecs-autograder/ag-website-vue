@@ -1,8 +1,8 @@
 import { Vue } from "vue-property-decorator";
 
-import { RefSelector, VueClass, Wrapper } from "@vue/test-utils";
+import { RefSelector, Wrapper } from "@vue/test-utils";
 
-import SelectObject from '@/components/select_object.vue';
+import APIErrors from "@/components/api_errors.vue";
 import ValidatedInput from "@/components/validated_input.vue";
 import { assert_not_null } from '@/utils';
 
@@ -197,3 +197,7 @@ type SetDataInputPartial<T> = {
     // tslint:disable-next-line
     [Key in keyof T]?: T[Key] extends Array<infer U> ? Array<U> : SetDataInputPartial<T[Key]>
 };
+
+export function api_error_count(wrapper: Wrapper<Vue>, selector: RefSelector) {
+    return (<APIErrors> wrapper.findComponent(selector).vm).d_api_errors.length;
+}

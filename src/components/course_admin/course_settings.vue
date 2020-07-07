@@ -22,7 +22,47 @@
         </div>
       </div>
     </course-form>
-  </div>
+
+<div class="danger-zone-container">
+      <div class="danger-text">
+        Delete Course: {{course.name}} {{course.semester}} {{course.year}}
+      </div>
+      <button data-testid="show_delete_course_modal_button" class="delete-button"
+              type="button"
+              @click="d_show_delete_course_modal = true">
+        Delete
+      </button>
+
+      <modal v-if="d_show_delete_course_modal"
+             @close="d_show_delete_course_modal = false"
+             ref="delete_course_modal"
+             size="large"
+             :click_outside_to_close="!d_deleting"
+             :show_closing_x="!d_deleting">
+        <div class="modal-header">
+          Confirm Delete
+        </div>
+        <div class="modal-body">
+          Are you sure you want to pseudo-delete the course
+          <span class="item-to-delete">{{course.name}} {{course.semester}} {{course.year}}</span>?
+          <br><br>
+          All associated projects will become inaccessible.<br>
+          This action can be undone occasionally if you ask your system administrator nicely. :)
+          <APIErrors ref="delete_errors"></APIErrors>
+          <div class="modal-button-footer">
+            <button data-testid="delete_course_button"
+                    class="red-button"
+                    :disabled="d_deleting"
+                    @click="delete_course"> Delete </button>
+
+            <button class="modal-cancel-button white-button"
+                    @click="d_show_delete_course_modal = false">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </modal>
+    </div>  </div>
 </template>
 
 <script lang="ts">
@@ -31,6 +71,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Course, Semester } from 'ag-client-typescript';
 
 import APIErrors from "@/components/api_errors.vue";
+import Modal from '@/components/modal.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -56,6 +97,7 @@ import CourseForm, { CourseFormData } from './course_form.vue';
   components: {
     APIErrors,
     CourseForm,
+    Modal,
     Tooltip,
     ValidatedForm,
     ValidatedInput
@@ -80,6 +122,9 @@ export default class CourseSettings extends Vue {
   readonly semesters = [Semester.fall, Semester.winter, Semester.spring, Semester.summer];
   d_settings_form_is_valid = true;
 
+  d_show_delete_course_modal = false;
+  d_deleting = false;
+
   readonly Semester = Semester;
 
   readonly is_non_negative = is_non_negative;
@@ -102,6 +147,14 @@ export default class CourseSettings extends Vue {
       return this.d_course.save();
     });
   }
+
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
+  delete_course() {
+    return toggle(this, 'd_deleting', async () => {
+      await this.course.delete();
+      this.$router.push({name: 'course_list'});
+    });
+  }
 }
 </script>
 
@@ -109,6 +162,7 @@ export default class CourseSettings extends Vue {
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 
 .suffix-element {
   padding-left: .625rem;
