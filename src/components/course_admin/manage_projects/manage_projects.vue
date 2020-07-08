@@ -29,8 +29,8 @@
       </validated-form>
     </div>
 
-    <div v-if="d_loading" class="loading-wrapper loading-medium">
-      <i class="loading-centered fa fa-spinner fa-pulse"></i>
+    <div v-if="d_loading" class="loading-centered loading-medium">
+      <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <div v-else-if="!d_loading && projects.length === 0"
           class="no-projects-message">
@@ -140,10 +140,6 @@ export function handle_add_project_error(component: ManageProjects, error: unkno
   margin: 0;
 }
 
-.loading-wrapper {
-  margin-top: 2rem;
-}
-
 .no-projects-message {
   padding: .5rem 0;
   color: darken($stormy-gray-dark, 10%);
@@ -151,6 +147,7 @@ export function handle_add_project_error(component: ManageProjects, error: unkno
 
 #manage-projects-component {
   max-width: 350px;
+  padding: 1rem;
 }
 
 #new-project-label {

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="d_loading" class="loading-centered loading-large">
+  <div v-if="d_loading" class="loading loading-medium">
     <i class="fa fa-spinner fa-pulse"></i>
   </div>
   <div v-else id="edit-late-days-component">

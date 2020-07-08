@@ -1,6 +1,8 @@
 <template>
-  <div v-if="d_loading" class="loading-centered loading-large">
-    <div> <i class="fa fa-spinner fa-pulse"></i> </div>
+  <div v-if="d_loading" class="loading-centered">
+    <div class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
   </div>
   <div v-else id="project-list-component">
     <div v-if="d_projects.length === 0" id="no-projects-message">

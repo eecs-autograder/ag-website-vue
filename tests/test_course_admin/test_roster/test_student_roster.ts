@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -9,7 +9,7 @@ import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { find_by_name, wait_for_load } from '@/tests/utils';
+import { find_by_name, wait_until } from '@/tests/utils';
 
 
 describe('StudentRoster tests', () => {
@@ -35,7 +35,7 @@ describe('StudentRoster tests', () => {
                 course: course
             }
         });
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await wait_until(wrapper, w => w.vm.d_students !== null)).toBe(true);
     });
 
     test('Students passed to roster component', async () => {
@@ -57,7 +57,7 @@ describe('StudentRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(add_students_stub.calledOnceWith(new_usernames)).toBe(true);
-        expect(wrapper.vm.students).toEqual(updated_students);
+        expect(wrapper.vm.d_students).toEqual(updated_students);
 
         expect(roster.vm.d_form_text).toEqual('');
     });
@@ -85,7 +85,7 @@ describe('StudentRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(set_students_stub.calledOnceWith(new_usernames)).toBe(true);
-        expect(wrapper.vm.students).toEqual(new_users);
+        expect(wrapper.vm.d_students).toEqual(new_users);
 
         expect(roster.vm.d_form_text).toEqual('');
     });
@@ -110,6 +110,6 @@ describe('StudentRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(remove_stduents_stub.calledOnceWith([students[2]])).toBe(true);
-        expect(wrapper.vm.students).toEqual([students[0], students[1]]);
+        expect(wrapper.vm.d_students).toEqual([students[0], students[1]]);
     });
 });

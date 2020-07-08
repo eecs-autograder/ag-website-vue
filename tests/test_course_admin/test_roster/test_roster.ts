@@ -5,6 +5,7 @@ import { User } from 'ag-client-typescript';
 import Roster from '@/components/course_admin/roster/roster.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { assert_not_null } from '@/utils';
 
 import { emitted, get_validated_input_text, set_validated_input_text } from '@/tests/utils';
 
@@ -75,7 +76,7 @@ describe('Roster tests', () => {
         });
 
         roster = wrapper.vm;
-        expect(roster.d_roster.length).toEqual(4);
+        expect(roster.d_roster?.length).toEqual(4);
 
         validated_input = <Wrapper<ValidatedInput>> wrapper.find('#add-users-input');
         validated_input_component = <ValidatedInput> wrapper.find('#add-users-input').vm;
@@ -90,6 +91,7 @@ describe('Roster tests', () => {
     });
 
     test('Usernames are displayed in alphabetical order', () => {
+        assert_not_null(roster.d_roster);
         expect(roster.role).toEqual("admin");
         expect(roster.d_roster[0]).toEqual(user_2); // amandaplease
         expect(roster.d_roster[1]).toEqual(user_1); // coolmom
@@ -109,7 +111,7 @@ describe('Roster tests', () => {
         remove_user_buttons.at(1).trigger('click');
         await roster.$nextTick();
 
-        expect(roster.d_roster.length).toEqual(4);
+        expect(roster.d_roster?.length).toEqual(4);
 
         expect(emitted(wrapper, 'remove_user').length).toBe(1);
         expect(emitted(wrapper, 'remove_user')[0][0]).toEqual([user_1]);
@@ -122,11 +124,11 @@ describe('Roster tests', () => {
         expect(all_users.at(1).text()).toEqual(user_1.username);
         expect(all_users.at(2).text()).toEqual(user_4.username);
         expect(all_users.at(3).text()).toEqual(user_3.username);
-        expect(roster.d_roster.length).toEqual(4);
+        expect(roster.d_roster?.length).toEqual(4);
 
         wrapper.setProps({roster: [user_1, user_3, user_4, new_user_1, new_user_2, user_2]});
         await roster.$nextTick();
-        expect(roster.d_roster.length).toEqual(6);
+        expect(roster.d_roster?.length).toEqual(6);
 
         all_users = wrapper.findAll('.email');
         expect(all_users.at(0).text()).toEqual(user_2.username);

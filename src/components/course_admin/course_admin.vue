@@ -1,6 +1,8 @@
 <template>
-  <div v-if="d_loading" class="loading-centered loading-large">
-    <i class="fa fa-spinner fa-pulse"></i>
+  <div v-if="d_loading" class="loading-centered">
+    <div class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
   </div>
   <div v-else class="course-admin-component" ref="course_admin_component">
     <div class="navbar default-navbar">
@@ -51,47 +53,47 @@
       </div>
     </div>
 
-    <div class="body" :class="{'body-padding': current_tab !== 'sandbox_images'}">
+    <div class="body">
       <course-settings v-show="current_tab === 'settings'"
-                      v-if="loaded_tabs.has('settings')"
-                      :course="d_course"></course-settings>
+                       v-if="loaded_tabs.has('settings')"
+                       :course="d_course"
+                       class="body-padding"/>
 
       <admin-roster v-show="current_tab === RosterChoice.admin + '_roster'"
                     v-if="loaded_tabs.has(RosterChoice.admin + '_roster')"
-                    :course="d_course">
-      </admin-roster>
+                    :course="d_course"
+                    class="body-padding"/>
 
       <staff-roster v-show="current_tab === RosterChoice.staff + '_roster'"
                     v-if="loaded_tabs.has(RosterChoice.staff + '_roster')"
-                    :course="d_course">
-      </staff-roster>
+                    :course="d_course"
+                    class="body-padding"/>
 
       <student-roster v-show="current_tab === RosterChoice.student + '_roster'"
                       v-if="loaded_tabs.has(RosterChoice.student + '_roster')"
-                      :course="d_course">
-      </student-roster>
+                      :course="d_course"
+                      class="body-padding"/>
 
       <handgrader-roster v-show="current_tab === RosterChoice.handgrader + '_roster'"
-                        v-if="loaded_tabs.has(RosterChoice.handgrader + '_roster')"
-                        :course="d_course">
-      </handgrader-roster>
+                         v-if="loaded_tabs.has(RosterChoice.handgrader + '_roster')"
+                         :course="d_course"
+                         class="body-padding"/>
 
       <manage-projects v-show="current_tab === 'projects'"
-                      v-if="loaded_tabs.has('projects')"
-                      :course="d_course">
-      </manage-projects>
+                       v-if="loaded_tabs.has('projects')"
+                       :course="d_course"
+                       class="body-padding"/>
 
       <!-- Intentionally using v-if here because we don't have pub/sub for roster updates. -->
       <edit-late-days
         v-if="current_tab === 'late_days'"
-        :course="d_course">
-      </edit-late-days>
+        :course="d_course"
+        class="body-padding"/>
 
       <sandbox-images
         v-show="current_tab === 'sandbox_images'"
         v-if="loaded_tabs.has('sandbox_images')"
-        :course="d_course"
-      />
+        :course="d_course"/>
     </div>
   </div>
 </template>
@@ -207,6 +209,10 @@ export enum RosterChoice {
 @import '@/styles/navbar.scss';
 @import '@/styles/static_dropdown.scss';
 
+.course-admin-component {
+  height: 100%;
+}
+
 @include navbar(
   $background-color: $navbar-background-color,
   $hover-color: $navbar-hover-color,
@@ -232,6 +238,10 @@ export enum RosterChoice {
 
 .roster-dropdown-row {
   font-size: 1rem;
+}
+
+.body {
+  height: 100%;
 }
 
 .body-padding {
