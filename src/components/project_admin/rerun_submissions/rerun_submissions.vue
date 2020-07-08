@@ -1,6 +1,8 @@
 <template>
-  <div v-if="d_loading" class="loading-wrapper loading-centered loading-large">
-    <i class="fa fa-spinner fa-pulse"></i>
+  <div v-if="d_loading" class="loading-centered">
+    <div class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
   </div>
   <div v-else id="rerun-submissions-component">
     <div id="grades-can-change-header" class="step-header">0. Download Grades So Far</div>

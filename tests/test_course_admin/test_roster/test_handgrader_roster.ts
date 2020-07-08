@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -9,7 +9,7 @@ import Roster from '@/components/course_admin/roster/roster.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { find_by_name, wait_for_load } from '@/tests/utils';
+import { find_by_name, wait_until } from '@/tests/utils';
 
 
 describe('HandgraderRoster tests', () => {
@@ -35,7 +35,7 @@ describe('HandgraderRoster tests', () => {
                 course: course
             }
         });
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await wait_until(wrapper, w => w.vm.d_handgraders !== null)).toBe(true);
     });
 
     test('Handgraders passed to roster component', async () => {
@@ -57,7 +57,7 @@ describe('HandgraderRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(add_handgraders_stub.calledOnceWith(new_usernames)).toBe(true);
-        expect(wrapper.vm.handgraders).toEqual(updated_handgraders);
+        expect(wrapper.vm.d_handgraders).toEqual(updated_handgraders);
     });
 
     test('Add handgraders API error handled', async () => {
@@ -80,6 +80,6 @@ describe('HandgraderRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(remove_handgraders_stub.calledOnceWith([handgraders[2]])).toBe(true);
-        expect(wrapper.vm.handgraders).toEqual([handgraders[0], handgraders[1]]);
+        expect(wrapper.vm.d_handgraders).toEqual([handgraders[0], handgraders[1]]);
     });
 });

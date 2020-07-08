@@ -1,6 +1,8 @@
 <template>
-  <div v-if="d_loading" class="loading-centered loading-large">
-    <i class="fa fa-spinner fa-pulse"></i>
+  <div v-if="d_loading" class="loading-centered">
+    <div class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
   </div>
   <div v-else id="project-admin">
     <div class="navbar default-navbar">
@@ -51,7 +53,7 @@
       </div>
     </div>
 
-    <div>
+    <div class="body">
       <project-settings v-show="d_current_tab === 'settings'"
                         v-if="d_loaded_tabs.has('settings')"
                         :project="d_project"> </project-settings>
@@ -275,5 +277,9 @@ export default class ProjectAdmin extends CurrentTabMixin implements ProjectObse
   $active-color: $navbar-active-color,
   $border-color: $navbar-hover-color
 );
+
+.body {
+  height: 100%;
+}
 
 </style>

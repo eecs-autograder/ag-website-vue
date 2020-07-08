@@ -57,7 +57,7 @@ describe('StudentRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(add_students_stub.calledOnceWith(new_usernames)).toBe(true);
-        expect(wrapper.vm.students).toEqual(updated_students);
+        expect(wrapper.vm.d_students).toEqual(updated_students);
 
         expect(roster.vm.d_form_text).toEqual('');
     });
@@ -85,7 +85,7 @@ describe('StudentRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(set_students_stub.calledOnceWith(new_usernames)).toBe(true);
-        expect(wrapper.vm.students).toEqual(new_users);
+        expect(wrapper.vm.d_students).toEqual(new_users);
 
         expect(roster.vm.d_form_text).toEqual('');
     });
@@ -110,6 +110,6 @@ describe('StudentRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(remove_stduents_stub.calledOnceWith([students[2]])).toBe(true);
-        expect(wrapper.vm.students).toEqual([students[0], students[1]]);
+        expect(wrapper.vm.d_students).toEqual([students[0], students[1]]);
     });
 });
