@@ -85,7 +85,7 @@ export default class Roster extends Vue {
   @Prop({required: true, type: String})
   role!: string;
 
-  @Prop({required: true, validator: prop => prop instanceof Array || prop == null})
+  @Prop({required: true, validator: prop => prop instanceof Array || prop === null})
   roster!: User[];
 
   @Prop({default: false, type: Boolean})
