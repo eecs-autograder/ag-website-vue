@@ -1,104 +1,104 @@
 <template>
-  <div id="ag-test-suites-component">
-    <template v-if="!d_loading">
-      <div class="sidebar-container">
-        <div class="sidebar-menu">
-          <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
-            <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
-              <i class="fas fa-bars"></i>
-            </span>
-            <template v-if="!d_collapsed">
-              <span class="sidebar-header-text"> Suites </span>
-              <button type="button"
-                      id="add-ag-test-suite-button"
-                      class="sidebar-new-button"
-                      @click="open_new_ag_test_suite_modal()">
-                <i class="fas fa-plus sidebar-plus"></i> Add Suite
-              </button>
-            </template>
-          </div>
-
-          <div class="sidebar-content" v-if="!d_collapsed">
-            <draggable ref="ag_test_suite_order"
-                       v-model="d_ag_test_suites"
-                       @change="set_ag_test_suite_order"
-                       @end="$event.item.style.transform = 'none'"
-                       handle=".handle">
-              <AGTestSuitePanel
-                v-for="ag_test_suite of d_ag_test_suites"
-                :key="ag_test_suite.pk"
-                :ag_test_suite="ag_test_suite"
-                :active_ag_test_suite="d_active_ag_test_suite"
-                :active_ag_test_command="d_active_ag_test_command"
-                @update_active_item="update_active_item($event)">
-              </AGTestSuitePanel>
-            </draggable>
-          </div>
-        </div>
-
-        <div id="viewing-window" class="body" :class="{'body-closed': d_collapsed}">
-          <template v-if="d_active_ag_test_suite !== null">
-            <AGTestSuiteSettings :ag_test_suite="d_active_ag_test_suite" :project="project"/>
-          </template>
-          <template v-else-if="active_level_is_command">
-            <AGTestCommandSettings :ag_test_command="d_active_ag_test_command"
-                                   :ag_test_case="parent_ag_test_case"
-                                   :project="project">
-            </AGTestCommandSettings>
-          </template>
-        </div>
-      </div>
-
-      <div id="fixed-button-footer">
-        <span v-if="active_level_is_command">
-          <button type="button"
-                  @click="go_to_prev_ag_test_case"
-                  id="prev-ag-test-case-button"
-                  :disabled="!prev_ag_test_case_is_available">
-            <i class="fas fa-angle-double-left" id="prev"> </i> Prev Test
-          </button>
-
-          <button type="button"
-                  @click="go_to_next_ag_test_case"
-                  id="next-ag-test-case-button"
-                  :disabled="!next_ag_test_case_is_available">
-            Next Test <i class="fas fa-angle-double-right" id="next"></i>
-          </button>
-        </span>
-      </div>
-
-      <modal v-if="d_show_new_ag_test_suite_modal"
-             @close="d_show_new_ag_test_suite_modal = false"
-             ref="new_ag_test_suite_modal"
-             click_outside_to_close
-             size="medium">
-        <div class="modal-header"> New Suite </div>
-        <validated-form id="add-ag-test-suite-form"
-                        autocomplete="off"
-                        spellcheck="false"
-                        @submit="add_ag_test_suite"
-                        @form_validity_changed="d_add_ag_test_suite_form_is_valid = $event">
-          <div class="ag-test-suite-name-container">
-            <label class="label"> Suite name </label>
-            <validated-input ref="new_ag_test_suite_name"
-                              v-model="d_new_ag_test_suite_name"
-                              :validators="[is_not_empty]">
-            </validated-input>
-          </div>
-
-          <APIErrors ref="api_errors"></APIErrors>
-
-          <div class="modal-button-footer">
-            <button class="modal-create-button"
-                    :disabled="!d_add_ag_test_suite_form_is_valid || d_adding_suite"> Add Suite
+  <div v-if="d_loading" class="loading-centered">
+    <div class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
+  </div>
+  <div v-else id="ag-test-suites-component">
+    <div class="sidebar-container">
+      <div class="sidebar-menu">
+        <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
+          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+            <i class="fas fa-bars"></i>
+          </span>
+          <template v-if="!d_collapsed">
+            <span class="sidebar-header-text"> Suites </span>
+            <button type="button"
+                    id="add-ag-test-suite-button"
+                    class="sidebar-new-button"
+                    @click="open_new_ag_test_suite_modal()">
+              <i class="fas fa-plus sidebar-plus"></i> Add Suite
             </button>
-          </div>
-        </validated-form>
-      </modal>
-    </template>
-    <template v-else>
-      <div class="loading-centered loading-large"><i class="fa fa-spinner fa-pulse"></i></div>
-    </template>
+          </template>
+        </div>
+
+        <div class="sidebar-content" v-if="!d_collapsed">
+          <draggable ref="ag_test_suite_order"
+                      v-model="d_ag_test_suites"
+                      @change="set_ag_test_suite_order"
+                      @end="$event.item.style.transform = 'none'"
+                      handle=".handle">
+            <AGTestSuitePanel
+              v-for="ag_test_suite of d_ag_test_suites"
+              :key="ag_test_suite.pk"
+              :ag_test_suite="ag_test_suite"
+              :active_ag_test_suite="d_active_ag_test_suite"
+              :active_ag_test_command="d_active_ag_test_command"
+              @update_active_item="update_active_item($event)">
+            </AGTestSuitePanel>
+          </draggable>
+        </div>
+      </div>
+
+      <div id="viewing-window" class="body" :class="{'body-closed': d_collapsed}">
+        <template v-if="d_active_ag_test_suite !== null">
+          <AGTestSuiteSettings :ag_test_suite="d_active_ag_test_suite" :project="project"/>
+        </template>
+        <template v-else-if="active_level_is_command">
+          <AGTestCommandSettings :ag_test_command="d_active_ag_test_command"
+                                  :ag_test_case="parent_ag_test_case"
+                                  :project="project">
+          </AGTestCommandSettings>
+        </template>
+      </div>
+    </div>
+
+    <div id="fixed-button-footer">
+      <span v-if="active_level_is_command">
+        <button type="button"
+                @click="go_to_prev_ag_test_case"
+                id="prev-ag-test-case-button"
+                :disabled="!prev_ag_test_case_is_available">
+          <i class="fas fa-angle-double-left" id="prev"> </i> Prev Test
+        </button>
+
+        <button type="button"
+                @click="go_to_next_ag_test_case"
+                id="next-ag-test-case-button"
+                :disabled="!next_ag_test_case_is_available">
+          Next Test <i class="fas fa-angle-double-right" id="next"></i>
+        </button>
+      </span>
+    </div>
+
+    <modal v-if="d_show_new_ag_test_suite_modal"
+            @close="d_show_new_ag_test_suite_modal = false"
+            ref="new_ag_test_suite_modal"
+            click_outside_to_close
+            size="medium">
+      <div class="modal-header"> New Suite </div>
+      <validated-form id="add-ag-test-suite-form"
+                      autocomplete="off"
+                      spellcheck="false"
+                      @submit="add_ag_test_suite"
+                      @form_validity_changed="d_add_ag_test_suite_form_is_valid = $event">
+        <div class="ag-test-suite-name-container">
+          <label class="label"> Suite name </label>
+          <validated-input ref="new_ag_test_suite_name"
+                            v-model="d_new_ag_test_suite_name"
+                            :validators="[is_not_empty]">
+          </validated-input>
+        </div>
+
+        <APIErrors ref="api_errors"></APIErrors>
+
+        <div class="modal-button-footer">
+          <button class="modal-create-button"
+                  :disabled="!d_add_ag_test_suite_form_is_valid || d_adding_suite"> Add Suite
+          </button>
+        </div>
+      </validated-form>
+    </modal>
   </div>
 </template>
 

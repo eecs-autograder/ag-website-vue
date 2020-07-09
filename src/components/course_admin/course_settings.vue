@@ -23,7 +23,7 @@
       </div>
     </course-form>
 
-<div class="danger-zone-container">
+    <div class="danger-zone-container">
       <div class="danger-text">
         Delete Course: {{course.name}} {{course.semester}} {{course.year}}
       </div>
@@ -62,7 +62,8 @@
           </div>
         </div>
       </modal>
-    </div>  </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
