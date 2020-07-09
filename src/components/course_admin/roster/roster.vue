@@ -1,67 +1,65 @@
 <template>
   <div class="roster-container">
-    <div class="adding-container">
-      <validated-form id="add-users-form"
-                      autocomplete="off"
-                      @submit="add_users"
-                      @form_validity_changed="d_form_is_valid = $event">
-        <label class="enrollment-add-label"> Add {{role}}
-          <tooltip width="medium" placement="bottom">
-            Enter a comma-separated list of email addresses.
-          </tooltip>
-        </label>
-        <ValidatedInput ref="add_users_textarea"
-                        id="add-users-input"
-                        v-model="d_form_text"
-                        :validators="[email_list_validator]"
-                        :num_rows="7">
-        </ValidatedInput>
-        <slot name="before_save_button"></slot>
-        <div class="button-footer">
-          <button type="submit"
-                  data-testid="add_users_button"
-                  class="save-button"
-                  :disabled="!d_form_is_valid">
-            Add to Roster
-          </button>
+    <validated-form id="add-users-form"
+                    autocomplete="off"
+                    @submit="add_users"
+                    @form_validity_changed="d_form_is_valid = $event">
+      <label class="enrollment-add-label"> Add {{role}}
+        <tooltip width="medium" placement="bottom">
+          Enter a comma-separated list of email addresses.
+        </tooltip>
+      </label>
+      <ValidatedInput ref="add_users_textarea"
+                      id="add-users-input"
+                      v-model="d_form_text"
+                      :validators="[email_list_validator]"
+                      :num_rows="7">
+      </ValidatedInput>
+      <slot name="before_save_button"></slot>
+      <div class="button-footer">
+        <button type="submit"
+                data-testid="add_users_button"
+                class="save-button"
+                :disabled="!d_form_is_valid">
+          Add to Roster
+        </button>
 
-          <button v-if="include_replace_button"
-                  type="button"
-                  data-testid="replace_users_button"
-                  @click="replace_users"
-                  class="orange-button"
-                  :disabled="!d_form_is_valid">
-            Replace Roster
-          </button>
-        </div>
-      </validated-form>
+        <button v-if="include_replace_button"
+                type="button"
+                data-testid="replace_users_button"
+                @click="replace_users"
+                class="orange-button"
+                :disabled="!d_form_is_valid">
+          Replace Roster
+        </button>
+      </div>
+    </validated-form>
+
+    <div v-if="d_roster === null" class="loading loading-medium">
+      <i class="fa fa-spinner fa-pulse"></i>
     </div>
-
-    <div class="enrolled-container">
-      <div v-if="d_roster.length !== 0"
-            class="user-table-wrapper">
-        <table class="user-table">
-          <tr>
-            <th class="email-column"> Username </th>
-            <th class="name-column"> Name </th>
-            <th class="remove-user-column"> Remove </th>
-          </tr>
-          <tr v-for="(person, index) in d_roster"
-              :class="index % 2 ? 'odd-row' : 'even-row'">
-            <td class="email-column email">{{person.username}}</td>
-            <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
-            <td class="remove-user-column">
-              <i class="fas fa-user-times remove-user"
-                  :title="'Delete ' + person.username"
-                  @click="remove_person_from_roster([person], index)">
-              </i>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div v-else class="empty-roster-message">
-        The {{role}} roster is currently empty
-      </div>
+    <div v-else-if="d_roster.length !== 0" class="user-table-wrapper">
+      <table class="user-table">
+        <tr>
+          <th class="email-column"> Username </th>
+          <th class="name-column"> Name </th>
+          <th class="remove-user-column"> Remove </th>
+        </tr>
+        <tr v-for="(person, index) in d_roster"
+            :class="index % 2 ? 'odd-row' : 'even-row'">
+          <td class="email-column email">{{person.username}}</td>
+          <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
+          <td class="remove-user-column">
+            <i class="fas fa-user-times remove-user"
+                :title="'Delete ' + person.username"
+                @click="remove_person_from_roster([person], index)">
+            </i>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div v-else class="empty-roster-message">
+      The {{role}} roster is currently empty
     </div>
   </div>
 </template>
@@ -87,7 +85,7 @@ export default class Roster extends Vue {
   @Prop({required: true, type: String})
   role!: string;
 
-  @Prop({required: true, type: Array})
+  @Prop({required: true, validator: prop => prop instanceof Array || prop === null})
   roster!: User[];
 
   @Prop({default: false, type: Boolean})
@@ -96,21 +94,24 @@ export default class Roster extends Vue {
   d_form_is_valid = false;
 
   d_form_text = '';
-  d_roster: User[] = [];
-
-  @Watch('roster')
-  on_roster_change(new_users_array: User[], old_users_array: User[]) {
-    this.d_roster = new_users_array.slice(0);
-    this.sort_users(this.d_roster);
-  }
+  d_roster: User[] | null = null;
 
   async created() {
-    this.d_roster = this.roster.slice(0);
-    this.sort_users(this.d_roster);
+    this.initialize_roster(this.roster);
   }
 
-  sort_users(users: User[]) {
-    users.sort((user_a: User, user_b: User) => {
+  @Watch('roster')
+  on_roster_change(new_users: User[] | null, old_users: User[] | null) {
+    this.initialize_roster(new_users);
+  }
+
+  initialize_roster(users: User[] | null) {
+    if (users === null) {
+      return;
+    }
+
+    this.d_roster = users.slice(0);
+    this.d_roster.sort((user_a: User, user_b: User) => {
       if (user_a.username <= user_b.username) {
         return -1;
       }
@@ -177,6 +178,8 @@ function parse_emails(to_parse: string): {valid_emails: string[], invalid_emails
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/loading.scss';
+
 
 * {
   box-sizing: border-box;

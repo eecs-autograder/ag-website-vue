@@ -1,11 +1,8 @@
 <template>
-  <div v-if="d_loading" class="loading-wrapper loading-large">
-    <i class="loading-centered fa fa-spinner fa-pulse"></i>
-  </div>
-  <div v-else class="handgrader-roster-container">
+  <div class="handgrader-roster-container">
     <roster ref="handgrader_roster"
             role="handgraders"
-            :roster="handgraders"
+            :roster="d_handgraders"
             @add_users="add_handgraders_to_roster($event)"
             @remove_user="remove_handgrader_from_roster($event)">
       <template v-slot:before_save_button>
@@ -33,27 +30,24 @@ export default class HandgraderRoster extends Vue {
   @Prop({required: true, type: Course})
   course!: Course;
 
-  handgraders: User[] = [];
-
-  d_loading = true;
+  d_handgraders: User[] | null = null;
 
   @handle_global_errors_async
   async created() {
-    this.handgraders = await this.course.get_handgraders();
-    this.d_loading = false;
+    this.d_handgraders = await this.course.get_handgraders();
 }
 
   @handle_api_errors_async(make_error_handler_func())
   async add_handgraders_to_roster(new_handgraders: string[]) {
     await this.course.add_handgraders(new_handgraders);
-    this.handgraders = await this.course.get_handgraders();
+    this.d_handgraders = await this.course.get_handgraders();
     (<Roster> this.$refs.handgrader_roster).reset_form();
   }
 
   @handle_global_errors_async
   async remove_handgrader_from_roster(handgraders_to_delete: User[]) {
     await this.course.remove_handgraders(handgraders_to_delete);
-    this.handgraders = await this.course.get_handgraders();
+    this.d_handgraders = await this.course.get_handgraders();
   }
 }
 </script>

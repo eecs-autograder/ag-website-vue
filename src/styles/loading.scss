@@ -3,29 +3,35 @@
     color: $stormy-gray-light;
 }
 
-.loading-wrapper {
-    position: relative;
+.loading-fullscreen {
+    @extend .loading;
+
     overflow: hidden;
-}
-
-.loading-centered {
-    @extend .loading;
-}
-
-.loading-large {
-    @extend .loading;
-}
-
-.loading-centered {
     position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
 
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
+}
+
+.loading-centered {
+    @extend .loading;
+
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-large {
+    @extend .loading;
 }
 
 .loading-horiz-centered {

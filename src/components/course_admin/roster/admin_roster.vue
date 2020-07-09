@@ -1,11 +1,8 @@
 <template>
-  <div v-if="d_loading" class="loading-wrapper loading-large">
-    <i class="loading-centered fa fa-spinner fa-pulse"></i>
-  </div>
-  <div v-else class="admin-roster-container">
+  <div class="admin-roster-container">
     <roster ref="admin_roster"
             role="admins"
-            :roster="admins"
+            :roster="d_admins"
             @add_users="add_admins_to_roster($event)"
             @remove_user="remove_admin_from_roster($event)">
       <template v-slot:before_save_button>
@@ -33,27 +30,24 @@ export default class AdminRoster extends Vue {
   @Prop({required: true, type: Course})
   course!: Course;
 
-  admins: User[] = [];
-
-  d_loading = true;
+  d_admins: User[] | null = null;
 
   @handle_global_errors_async
   async created() {
-    this.admins = await this.course.get_admins();
-    this.d_loading = false;
+    this.d_admins = await this.course.get_admins();
 }
 
   @handle_api_errors_async(make_error_handler_func())
   async add_admins_to_roster(new_admins: string[]) {
     await this.course.add_admins(new_admins);
-    this.admins = await this.course.get_admins();
+    this.d_admins = await this.course.get_admins();
     (<Roster> this.$refs.admin_roster).reset_form();
   }
 
   @handle_global_errors_async
   async remove_admin_from_roster(admins_to_delete: User[]) {
     await this.course.remove_admins(admins_to_delete);
-    this.admins = await this.course.get_admins();
+    this.d_admins = await this.course.get_admins();
   }
 }
 </script>

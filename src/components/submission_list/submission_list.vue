@@ -22,7 +22,7 @@
       </div>
 
       <div class="sidebar-content" v-if="!d_collapsed">
-        <div class="list-loading-container loading-wrapper" v-if="d_loading">
+        <div class="list-loading-container" v-if="d_loading">
           <i class="loading-horiz-centered loading-medium fa fa-spinner fa-pulse"></i>
         </div>
         <template v-else>

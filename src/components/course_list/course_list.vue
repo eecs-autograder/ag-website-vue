@@ -1,6 +1,8 @@
 <template>
-  <div v-if="d_loading" class="loading-centered loading-large">
-    <div> <i class="fa fa-spinner fa-pulse"></i> </div>
+  <div v-if="d_loading" class="loading-centered">
+    <div class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
   </div>
   <div v-else id="course-list">
     <div v-if="d_can_create_courses" class="create-course-wrapper">

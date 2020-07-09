@@ -469,7 +469,7 @@ table {
   white-space: normal;
 }
 
-// Do NOT use loading-wrapper here
+// Do NOT use loading-centered here
 .loading-container {
   overflow: hidden;
 }

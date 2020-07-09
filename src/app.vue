@@ -7,7 +7,7 @@
         @num_errors_changed="d_global_error_count = $event">
       </APIErrors>
     </div>
-    <div v-if="d_loading" class="loading-centered loading-large">
+    <div v-if="d_loading" class="loading-fullscreen loading-large">
       <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <template v-else>

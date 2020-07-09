@@ -1,4 +1,4 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -9,7 +9,7 @@ import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { find_by_name, wait_for_load } from '@/tests/utils';
+import { find_by_name, wait_until } from '@/tests/utils';
 
 
 describe('StaffRoster tests', () => {
@@ -35,7 +35,7 @@ describe('StaffRoster tests', () => {
                 course: course
             }
         });
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await wait_until(wrapper, w => w.vm.d_staff !== null)).toBe(true);
     });
 
     test('Staff passed to roster component', async () => {
@@ -57,7 +57,7 @@ describe('StaffRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(add_staff_stub.calledOnceWith(new_usernames)).toBe(true);
-        expect(wrapper.vm.staff).toEqual(updated_staff);
+        expect(wrapper.vm.d_staff).toEqual(updated_staff);
     });
 
     test('Add staff API error handled', async () => {
@@ -80,6 +80,6 @@ describe('StaffRoster tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(remove_staff_stub.calledOnceWith([staff[2]])).toBe(true);
-        expect(wrapper.vm.staff).toEqual([staff[0], staff[1]]);
+        expect(wrapper.vm.d_staff).toEqual([staff[0], staff[1]]);
     });
 });
