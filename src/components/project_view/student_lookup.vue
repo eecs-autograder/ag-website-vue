@@ -1,6 +1,8 @@
 <template>
-  <div v-if="d_loading" class="loading-centered loading-large">
-    <i class="fa fa-spinner fa-pulse"></i>
+  <div v-if="d_loading" class="loading-centered">
+    <div class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
   </div>
   <div v-else id="student-lookup-component">
     <group-lookup class="lookup-container"
@@ -105,6 +107,7 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/loading.scss';
 
 .lookup-container {
   margin: .5rem;

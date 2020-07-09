@@ -104,7 +104,7 @@
         </div>
       </div>
 
-      <!-- Note: Do NOT put loading-wrapper (or any other position: relative) on this tag -->
+      <!-- Note: Do NOT put position: relative on this tag -->
       <div class="body" :class="{'body-closed': d_group_sidebar_collapsed}">
         <handgrading v-if="d_currently_grading !== null && !d_loading_result"
                      :readonly_handgrading_results="false"

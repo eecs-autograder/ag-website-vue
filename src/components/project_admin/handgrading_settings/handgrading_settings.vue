@@ -1,7 +1,8 @@
 <template>
-  <div v-if="d_loading"
-       class="loading-centered loading-large">
-    <i class="fa fa-spinner fa-pulse"></i>
+  <div v-if="d_loading" class="loading-centered">
+    <div class="loading-large">
+      <i class="fa fa-spinner fa-pulse"></i>
+    </div>
   </div>
   <div v-else
        id="handgrading-settings-component">
