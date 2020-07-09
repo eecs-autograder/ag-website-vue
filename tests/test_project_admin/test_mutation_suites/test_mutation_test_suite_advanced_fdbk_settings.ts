@@ -67,6 +67,11 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
         expect(wrapper.vm.d_feedback_config!.bugs_exposed_fdbk_level).toEqual(
             BugsExposedFeedbackLevel.exposed_bug_names
         );
+
+        await bugs_exposed_fdbk_level_input.setValue(BugsExposedFeedbackLevel.all_bug_names);
+        expect(wrapper.vm.d_feedback_config!.bugs_exposed_fdbk_level).toEqual(
+            BugsExposedFeedbackLevel.all_bug_names
+        );
     });
 
     test('Toggle show_invalid_test_names', async () => {

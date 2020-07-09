@@ -35,6 +35,9 @@
               <option :value="BugsExposedFeedbackLevel.exposed_bug_names">
                 Exposed bug names
               </option>
+              <option :value="BugsExposedFeedbackLevel.all_bug_names">
+                Exposed + unexposed bug names
+              </option>
             </select>
           </label>
         </div>
