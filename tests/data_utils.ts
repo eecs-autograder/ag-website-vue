@@ -631,6 +631,7 @@ export function make_mutation_test_suite_result_feedback(
         timed_out_tests: null,
         num_bugs_exposed: null,
         bugs_exposed: null,
+        all_bug_names: null,
         total_points: 0,
         total_points_possible: 0
     };

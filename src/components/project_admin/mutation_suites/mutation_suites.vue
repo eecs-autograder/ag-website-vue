@@ -433,6 +433,24 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
         show_grade_buggy_impls_stderr: true,
         show_invalid_test_names: true,
         show_points: true,
+        bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.all_bug_names
+      }
+    ],
+    [
+      'Bugs Exposed + All Output',
+      {
+        show_setup_return_code: true,
+        show_setup_stdout: true,
+        show_setup_stderr: true,
+        show_get_test_names_return_code: true,
+        show_get_test_names_stdout: true,
+        show_get_test_names_stderr: true,
+        show_validity_check_stdout: true,
+        show_validity_check_stderr: true,
+        show_grade_buggy_impls_stdout: true,
+        show_grade_buggy_impls_stderr: true,
+        show_invalid_test_names: true,
+        show_points: true,
         bugs_exposed_fdbk_level: BugsExposedFeedbackLevel.exposed_bug_names
       }
     ],

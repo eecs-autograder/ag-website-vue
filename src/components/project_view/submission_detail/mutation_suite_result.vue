@@ -1,17 +1,16 @@
 <template>
-  <div id="mutation-suite-result">
-
-    <fieldset v-if="show_setup_fieldset"
-              class="fieldset">
-      <legend class="legend"
-              id="setup-command-name">{{mutation_test_suite_result.setup_command_name !== null
-        ? mutation_test_suite_result.setup_command_name : 'Setup'}}</legend>
-      <div id="setup-section">
+  <div class="mutation-suite-result">
+    <fieldset v-if="show_setup_fieldset" class="fieldset">
+      <legend class="legend" data-testid="setup_command_name">
+        {{mutation_test_suite_result.setup_command_name !== null
+          ? mutation_test_suite_result.setup_command_name : 'Setup'}}
+      </legend>
+      <div data-testid="setup_section">
 
         <div v-if="mutation_test_suite_result.setup_return_code !== null
                    || (mutation_test_suite_result.setup_timed_out !== null
                    && mutation_test_suite_result.setup_timed_out)"
-             id="setup-return-code"
+             data-testid="setup_return_code"
              class="feedback-row">
           <div class="feedback-label"> Exit status: </div>
           <div class="feedback">
@@ -36,7 +35,7 @@
         </div>
 
         <div v-if="mutation_test_suite_result.fdbk_settings.show_setup_stdout"
-             id="setup-stdout-section"
+             data-testid="setup_stdout_section"
              class="feedback-row">
           <div class="feedback-label"> Output: </div>
           <div class="feedback">
@@ -57,7 +56,7 @@
         </div>
 
         <div v-if="mutation_test_suite_result.fdbk_settings.show_setup_stderr"
-             id="setup-stderr-section"
+             data-testid="setup_stderr_section"
              class="feedback-row">
           <div class="feedback-label"> Error output: </div>
           <div class="feedback">
@@ -82,32 +81,31 @@
 
     <fieldset class="fieldset">
       <legend class="legend"> Student Tests </legend>
-      <div id="student-tests-section">
+      <div data-testid="student_tests_section">
 
         <div v-if="mutation_test_suite_result.student_tests.length === 0"
-             class="feedback-row"
-             id="no-tests-submitted-message">
+             class="feedback-row no-tests-submitted-message">
           <div> No test cases were submitted. </div>
         </div>
 
         <div v-if="mutation_test_suite_result.discarded_tests.length"
-             id="discarded-tests-section"
+             data-testid="discarded_tests_section"
              class="feedback-row">
           <div class="feedback-explanation">
             This suite accepts up to
-            <span id="num-tests-accepted">
+            <span class="num-tests-accepted">
               {{mutation_test_suite_result.student_tests.length}}</span>
             tests, but you submitted
-            <span id="total-tests-submitted">
+            <span class="total-tests-submitted">
               {{mutation_test_suite_result.student_tests.length
                 + mutation_test_suite_result.discarded_tests.length}}</span>.
           </div>
 
           <div class="feedback-label test-names-feedback-label"> Discarded test cases: </div>
           <div class="feedback test-names-feedback">
-            <div id="list-of-discarded-tests">
+            <div class="list" data-testid="discarded_tests">
               <div v-for="discarded_test_name of mutation_test_suite_result.discarded_tests"
-                   class="single-discarded-test">
+                   class="list-item">
                 <span class="list-icon"><i class="far fa-trash-alt discarded-test-icon"></i></span>
                 <span class="test-name">{{discarded_test_name}}</span>
               </div>
@@ -117,7 +115,7 @@
 
         <div v-if="mutation_test_suite_result.invalid_tests !== null &&
                    mutation_test_suite_result.invalid_tests.length"
-             id="false-positive-tests-section"
+             data-testid="false_positive_tests_section"
              class="feedback-row">
 
           <div class="feedback-explanation">
@@ -126,9 +124,9 @@
           </div>
           <div class="feedback-label test-names-feedback-label">Tests with false positives:</div>
           <div class="feedback test-names-feedback">
-            <div id="list-of-false-positive-tests">
+            <div class="list" data-testid="false_positives">
               <div v-for="false_positive_test of mutation_test_suite_result.invalid_tests"
-                   class="single-false-positive-test">
+                   class="list-item">
                 <span v-if="test_timed_out(false_positive_test)"
                       class="list-icon">
                   <i class="far fa-clock timed-out-icon"></i>
@@ -148,14 +146,13 @@
           </div>
         </div>
 
-        <div v-if="get_valid_tests().length"
+        <div v-if="valid_tests.length"
              class="feedback-row"
-             id="valid-tests-section">
+             data-testid="valid_tests_section">
           <div class="feedback-label test-names-feedback-label"> Valid test cases: </div>
           <div class="feedback test-names-feedback">
-            <div id="list-of-valid-tests">
-              <div v-for="valid_test of get_valid_tests()"
-                   class="single-valid-test">
+            <div class="list" data-testid="valid_tests">
+              <div v-for="valid_test of valid_tests" class="list-item">
                 <span class="list-icon"><i class="far fa-check-circle valid-test-icon"></i></span>
                 <span class="test-name">{{valid_test}}</span>
               </div>
@@ -171,7 +168,7 @@
           <div class="feedback-label show-output-button-label">Test names output:</div>
           <div class="feedback">
             <button class="show-output-button"
-                    id="show-test-names-output-button"
+                    data-testid="show_test_names_output_button"
                     @click="toggle_d_show_student_test_names_output">
               {{d_show_student_test_names_output ? 'Hide' : 'Show'}} Output
             </button>
@@ -181,7 +178,7 @@
         <div v-if="mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout
                    && d_show_student_test_names_output"
              class="feedback-row"
-             id="test-names-stdout-section">
+             data-testid="test_names_stdout_section">
           <div class="feedback-label test-names-feedback-label"> Output: </div>
           <div class="feedback test-names-feedback">
             <template v-if="!d_student_test_names_stdout_loaded">
@@ -203,7 +200,7 @@
         <div v-if="mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr
                    && d_show_student_test_names_output"
              class="feedback-row"
-             id="test-names-stderr-section">
+             data-testid="test_names_stderr_section">
           <div class="feedback-label test-names-feedback-label"> Error output: </div>
           <div class="feedback test-names-feedback">
             <template v-if="!d_student_test_names_stderr_loaded">
@@ -230,7 +227,7 @@
           <div class="feedback-label show-output-button-label">Validity output:</div>
           <div class="feedback">
             <button class="show-output-button"
-                    id="show-validity-check-output-button"
+                    data-testid="show_validity_check_output_button"
                     @click="toggle_d_show_validity_check_output">
               {{d_show_validity_check_output ? 'Hide' : 'Show'}} Output
             </button>
@@ -240,7 +237,7 @@
         <div v-if="mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
                    && d_show_validity_check_output"
              class="feedback-row"
-             id="validity-check-stdout-section">
+             data-testid="validity_check_stdout_section">
           <div class="feedback-label"> Output: </div>
           <div class="feedback">
             <template v-if="!d_validity_check_stdout_loaded">
@@ -262,7 +259,7 @@
         <div v-if="mutation_test_suite_result.fdbk_settings.show_validity_check_stderr
                    && d_show_validity_check_output"
              class="feedback-row"
-             id="validity-check-stderr-section">
+             data-testid="validity_check_stderr_section">
           <div class="feedback-label"> Error output: </div>
           <div class="feedback">
             <template v-if="!d_validity_check_stderr_loaded">
@@ -286,10 +283,10 @@
     <fieldset v-if="show_buggy_implementations_fieldset"
               class="fieldset">
       <legend class="legend"> Buggy Implementations </legend>
-      <div id="buggy-implementations-section">
+      <div data-testid="buggy_implementations_section">
 
         <div v-if="mutation_test_suite_result.num_bugs_exposed !== null"
-             id="num-bugs-exposed-section"
+             data-testid="num_bugs_exposed_section"
              class="feedback-row">
           <div class="feedback-label buggy-impl-feedback-label"> # of exposed bugs: </div>
           <div class="feedback buggy-impl-feedback">
@@ -297,17 +294,15 @@
           </div>
         </div>
 
-        <div v-if="mutation_test_suite_result.fdbk_settings.bugs_exposed_fdbk_level
-                     === BugsExposedFeedbackLevel.exposed_bug_names
-                     && mutation_test_suite_result.num_bugs_exposed > 1"
-             class="feedback-row">
+        <div v-if="show_exposed_bug_names" class="feedback-row">
           <div class="feedback-label buggy-impl-feedback-label"> Bugs exposed: </div>
           <div class="feedback buggy-impl-feedback">
-            <div id="list-of-bugs">
-              <div v-for="bug_name of mutation_test_suite_result.bugs_exposed"
-                   class="single-bug">
-                  <span class="list-icon"><i class="fas fa-bug bug-icon"></i></span>
-                  <span>{{bug_name}}</span>
+            <div class="list" data-testid="bugs_exposed">
+              <div v-for="bug_name of bug_names_to_show"
+                   class="list-item"
+                   :class="{'unexposed-bug': !exposed_bug_set.has(bug_name)}">
+                <span class="list-icon"><i class="fas fa-bug bug-icon"></i></span>
+                <span class="bug-name">{{bug_name}}</span>
               </div>
             </div>
           </div>
@@ -319,7 +314,7 @@
           <div class="feedback-label show-output-button-label">Bug output:</div>
           <div class="feedback">
             <button class="show-output-button"
-                    id="show-buggy-output-button"
+                    data-testid="show_buggy_output_button"
                     @click="toggle_d_show_buggy_implementations_output">
               {{d_show_buggy_implementations_output ? 'Hide' : 'Show'}} Output
             </button>
@@ -327,7 +322,7 @@
         </div>
         <div v-if="mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
                      && d_show_buggy_implementations_output"
-               id="buggy-stdout-section"
+               data-testid="buggy_stdout_section"
                class="feedback-row">
           <div class="feedback-label buggy-impl-feedback-label"> Output: </div>
           <div class="feedback buggy-impl-feedback">
@@ -350,7 +345,7 @@
         <div v-if="mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr
                    && d_show_buggy_implementations_output"
              class="feedback-row"
-             id="buggy-stderr-section">
+             data-testid="buggy_stderr_section">
           <div class="feedback-label buggy-impl-feedback-label"> Error output: </div>
           <div class="feedback buggy-impl-feedback">
             <template v-if="!d_grade_buggy_stderr_loaded">
@@ -447,17 +442,36 @@ export default class MutationSuiteResult extends Vue {
   }
 
   get show_setup_fieldset(): boolean {
-    return this.mutation_test_suite_result!.fdbk_settings.show_setup_stdout
-           || this.mutation_test_suite_result!.fdbk_settings.show_setup_stderr
-           || this.mutation_test_suite_result!.setup_return_code !== null
-           || (this.mutation_test_suite_result!.setup_timed_out !== null
-               && this.mutation_test_suite_result!.setup_timed_out!);
+    return this.mutation_test_suite_result.fdbk_settings.show_setup_stdout
+           || this.mutation_test_suite_result.fdbk_settings.show_setup_stderr
+           || this.mutation_test_suite_result.setup_return_code !== null
+           || (this.mutation_test_suite_result.setup_timed_out !== null
+               && this.mutation_test_suite_result.setup_timed_out!);
   }
 
   get show_buggy_implementations_fieldset(): boolean {
-    return this.mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stdout
-           || this.mutation_test_suite_result!.fdbk_settings.show_grade_buggy_impls_stderr
-           || this.mutation_test_suite_result!.num_bugs_exposed !== null;
+    return this.mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
+           || this.mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr
+           || this.mutation_test_suite_result.num_bugs_exposed !== null;
+  }
+
+  get show_exposed_bug_names() {
+    return (this.mutation_test_suite_result.bugs_exposed !== null
+            && this.mutation_test_suite_result.bugs_exposed.length !== 0)
+           || this.mutation_test_suite_result.all_bug_names !== null;
+  }
+
+  // Selects between this.mutation_test_suite_result.bugs_exposed and
+  // this.mutation_test_suite_result.all_bug_names.
+  get bug_names_to_show() {
+    return this.mutation_test_suite_result.all_bug_names
+           ?? this.mutation_test_suite_result.bugs_exposed;
+  }
+
+  // Returns a Set with the contents of this.mutation_test_suite_result.bugs_exposed.
+  // If this.mutation_test_suite_result.bugs_exposed is null, returns an empty set.
+  get exposed_bug_set() {
+    return new Set(this.mutation_test_suite_result.bugs_exposed);
   }
 
   toggle_d_show_buggy_implementations_output() {
@@ -497,7 +511,7 @@ export default class MutationSuiteResult extends Vue {
   async get_output() {
     this.d_output_size = await ResultOutput.get_mutation_test_suite_result_output_size(
       this.submission!.pk,
-      this.mutation_test_suite_result!.pk,
+      this.mutation_test_suite_result.pk,
       this.fdbk_category
     );
 
@@ -534,7 +548,7 @@ export default class MutationSuiteResult extends Vue {
     else {
       this.d_setup_stdout_content = ResultOutput.get_mutation_test_suite_result_setup_stdout(
         this.submission.pk,
-        this.mutation_test_suite_result!.pk,
+        this.mutation_test_suite_result.pk,
         this.fdbk_category
       );
     }
@@ -549,7 +563,7 @@ export default class MutationSuiteResult extends Vue {
     else {
       this.d_setup_stderr_content = ResultOutput.get_mutation_test_suite_result_setup_stderr(
         this.submission.pk,
-        this.mutation_test_suite_result!.pk,
+        this.mutation_test_suite_result.pk,
         this.fdbk_category
       );
     }
@@ -565,7 +579,7 @@ export default class MutationSuiteResult extends Vue {
       this.d_student_test_names_stdout_content
           = ResultOutput.get_mutation_test_suite_result_get_student_test_names_stdout(
         this.submission.pk,
-        this.mutation_test_suite_result!.pk,
+        this.mutation_test_suite_result.pk,
         this.fdbk_category
       );
     }
@@ -597,7 +611,7 @@ export default class MutationSuiteResult extends Vue {
       this.d_validity_check_stdout_content
           = ResultOutput.get_mutation_test_suite_result_validity_check_stdout(
         this.submission.pk,
-        this.mutation_test_suite_result!.pk,
+        this.mutation_test_suite_result.pk,
         this.fdbk_category
       );
     }
@@ -613,7 +627,7 @@ export default class MutationSuiteResult extends Vue {
       this.d_validity_check_stderr_content
           = ResultOutput.get_mutation_test_suite_result_validity_check_stderr(
         this.submission.pk,
-        this.mutation_test_suite_result!.pk,
+        this.mutation_test_suite_result.pk,
         this.fdbk_category
       );
     }
@@ -629,7 +643,7 @@ export default class MutationSuiteResult extends Vue {
       this.d_grade_buggy_stdout_content
           = ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stdout(
         this.submission.pk,
-        this.mutation_test_suite_result!.pk,
+        this.mutation_test_suite_result.pk,
         this.fdbk_category
       );
     }
@@ -645,7 +659,7 @@ export default class MutationSuiteResult extends Vue {
       this.d_grade_buggy_stderr_content
           = ResultOutput.get_mutation_test_suite_result_grade_buggy_impls_stderr(
         this.submission.pk,
-        this.mutation_test_suite_result!.pk,
+        this.mutation_test_suite_result.pk,
         this.fdbk_category
       );
     }
@@ -653,22 +667,23 @@ export default class MutationSuiteResult extends Vue {
   }
 
   test_timed_out(test: string): boolean {
-    if (this.mutation_test_suite_result!.timed_out_tests === null) {
+    if (this.mutation_test_suite_result.timed_out_tests === null) {
         return false;
     }
-    return this.mutation_test_suite_result!.timed_out_tests!.findIndex(
+    return this.mutation_test_suite_result.timed_out_tests!.findIndex(
         (item) => item === test
     ) !== -1;
   }
 
-  get_valid_tests(): string[] {
-    if (this.mutation_test_suite_result!.invalid_tests === null) {
-        return this.mutation_test_suite_result!.student_tests;
+  get valid_tests(): string[] {
+    if (this.mutation_test_suite_result.invalid_tests === null) {
+        return this.mutation_test_suite_result.student_tests;
     }
-    let valid_tests = this.mutation_test_suite_result!.student_tests.filter(
-      (student_test) => this.mutation_test_suite_result!.invalid_tests!.findIndex(
-          (invalid_test) => invalid_test === student_test)
-      === -1);
+
+    let invalid_tests = new Set(this.mutation_test_suite_result.invalid_tests);
+    let valid_tests = this.mutation_test_suite_result.student_tests.filter(
+      (student_test) => !invalid_tests.has(student_test)
+    );
     return valid_tests;
   }
 }
@@ -689,19 +704,28 @@ $bug-color: $navy-blue;
   padding-right: 3px;
 }
 
-#no-tests-submitted-message {
-  padding: 5px 2px;
+.list {
+  padding: .25rem;
+
+  .list-item {
+    padding: 0 0 .25rem 0;
+    word-break: break-word;
+
+    .list-icon {
+      padding-right: .625rem;
+    }
+  }
 }
 
-.list-icon {
-  padding-right: 10px;
+.no-tests-submitted-message {
+  padding: .25rem .125rem;
 }
 
 .discarded-test-icon {
   color: $discarded-test-color;
 }
 
-#num-tests-accepted, #total-tests-submitted {
+.num-tests-accepted, .total-tests-submitted {
   text-decoration: underline;
   color: $discarded-test-color;
 }
@@ -724,32 +748,19 @@ $bug-color: $navy-blue;
   color: $valid-test-color;
 }
 
+.unexposed-bug {
+  .list-icon {
+    visibility: hidden;
+  }
+
+  .bug-name {
+    color: $stormy-gray-light;
+  }
+}
+
 .bug-icon {
   color: $bug-color;
   font-size: 14px;
-}
-
-.single-bug,
-.single-valid-test,
-.single-false-positive-test,
-.single-discarded-test {
-  padding: 0 0 5px 0;
-  word-break: break-word;
-}
-
-.single-discarded-test,
-.single-false-positive-test,
-.single-valid-test,
-.single-bug {
-  display: flex;
-  flex-direction: row;
-}
-
-#list-of-bugs,
-#list-of-valid-tests,
-#list-of-false-positive-tests,
-#list-of-discarded-tests {
-  padding: 5px;
 }
 
 .feedback-explanation {
