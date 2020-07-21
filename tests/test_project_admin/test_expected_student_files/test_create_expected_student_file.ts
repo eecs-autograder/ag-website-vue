@@ -1,50 +1,26 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
-import { ExpectedStudentFile, HttpError, Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import { ExpectedStudentFile, HttpError, Project } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
 import CreateExpectedStudentFile from '@/components/project_admin/expected_student_files/create_expected_student_file.vue';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 
+import { make_course, make_project } from '@/tests/data_utils';
+
 
 describe('CreateExpectedStudentFile tests', () => {
     let wrapper: Wrapper<CreateExpectedStudentFile>;
     let component: CreateExpectedStudentFile;
-    let project_1: Project;
+    let project: Project;
 
     beforeEach(() => {
-        project_1 = new Project({
-            pk: 10,
-            name: "Detroit Zoo",
-            last_modified: "today",
-            course: 2,
-            visible_to_students: true,
-            closing_time: null,
-            soft_closing_time: null,
-            disallow_student_submissions: true,
-            disallow_group_registration: true,
-            guests_can_submit: true,
-            min_group_size: 1,
-            max_group_size: 1,
-            submission_limit_per_day: null,
-            allow_submissions_past_limit: true,
-            groups_combine_daily_submissions: false,
-            submission_limit_reset_time: "",
-            submission_limit_reset_timezone: "",
-            num_bonus_submissions: 1,
-            total_submission_limit: null,
-            allow_late_days: true,
-            ultimate_submission_policy: UltimateSubmissionPolicy.best,
-            hide_ultimate_submission_fdbk: false,
-            instructor_files: [],
-            expected_student_files: [],
-            has_handgrading_rubric: false,
-        });
+        project = make_project(make_course().pk);
 
         wrapper = mount(CreateExpectedStudentFile, {
             propsData: {
-                project: project_1
+                project: project
             }
         });
         component = wrapper.vm;
@@ -68,7 +44,7 @@ describe('CreateExpectedStudentFile tests', () => {
         wrapper.findComponent({ref: 'form'}).trigger('submit');
         await component.$nextTick();
 
-        expect(create_stub.getCall(0).args[0]).toEqual(project_1.pk);
+        expect(create_stub.getCall(0).args[0]).toEqual(project.pk);
         expect(create_stub.getCall(0).args[1]
         ).toEqual({
             pattern: "Giraffe.cpp",
@@ -94,7 +70,7 @@ describe('CreateExpectedStudentFile tests', () => {
     });
 
     test("The 'create' button is disabled when an input value is invalid", async () => {
-        expect(component.project).toEqual(project_1);
+        expect(component.project).toEqual(project);
 
         let form_wrapper = wrapper.findComponent({ref: 'form'});
         let form_component = <ExpectedStudentFileForm> form_wrapper.vm;
