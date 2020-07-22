@@ -321,6 +321,38 @@
 
       <div class="section-container">
         <fieldset class="fieldset">
+          <legend class="legend">Email Receipts</legend>
+          <div class="checkbox-input-container">
+            <label class="checkbox-label">
+              <input data-testid="send_email_on_submission_received"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.send_email_on_submission_received"/>
+              Send submission received email
+            </label>
+            <tooltip width="medium" placement="top">
+              Students will receive a confirmation email when their submission
+              is recorded in the database.
+            </tooltip>
+          </div>
+          <div class="checkbox-input-container">
+            <label class="checkbox-label">
+              <input data-testid="send_email_on_non_deferred_tests_finished"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.send_email_on_non_deferred_tests_finished"/>
+              Send score summary email
+            </label>
+            <tooltip width="medium" placement="top">
+              Students will receive a score-summary email when all non-deferred
+              test cases are finished grading.
+            </tooltip>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="section-container">
+        <fieldset class="fieldset">
           <legend class="legend">Honor Pledge</legend>
           <div class="checkbox-input-container">
             <label class="checkbox-label">

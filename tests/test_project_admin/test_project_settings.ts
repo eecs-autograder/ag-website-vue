@@ -508,7 +508,7 @@ describe('ProjectSettings tests', () => {
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
-    test('use_honor_pledge_binding', async () => {
+    test('use_honor_pledge binding', async () => {
         let checkbox = wrapper.find('[data-testid=use_honor_pledge]');
 
         await checkbox.setChecked(true);
@@ -530,7 +530,7 @@ describe('ProjectSettings tests', () => {
         expect(checkbox_is_checked(checkbox)).toEqual(true);
     });
 
-    test('honor_pledge_text', async () => {
+    test('honor_pledge_text binding', async () => {
         expect(wrapper.find('[data-testid=honor_pledge_text]').exists()).toBe(false);
 
         let checkbox = wrapper.find('[data-testid=use_honor_pledge]');
@@ -545,6 +545,50 @@ describe('ProjectSettings tests', () => {
         assert_not_null(wrapper.vm.d_project);
         await set_data(wrapper, {d_project: {honor_pledge_text: 'very new text'}});
         expect(get_validated_input_text(pledge_text)).toEqual('very new text');
+    });
+
+    test('send_email_on_submission_received binding', async () => {
+        let checkbox = wrapper.find('[data-testid=send_email_on_submission_received]');
+
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_project?.send_email_on_submission_received).toEqual(true);
+
+        await checkbox.setChecked(false);
+        expect(wrapper.vm.d_project?.send_email_on_submission_received).toEqual(false);
+
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_project?.send_email_on_submission_received).toEqual(true);
+
+        assert_not_null(wrapper.vm.d_project);
+        wrapper.vm.d_project.send_email_on_submission_received = false;
+        await wrapper.vm.$nextTick();
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        wrapper.vm.d_project.send_email_on_submission_received = true;
+        await wrapper.vm.$nextTick();
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
+    });
+
+    test('send_email_on_non_deferred_tests_finished binding', async () => {
+        let checkbox = wrapper.find('[data-testid=send_email_on_non_deferred_tests_finished]');
+
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_project?.send_email_on_non_deferred_tests_finished).toEqual(true);
+
+        await checkbox.setChecked(false);
+        expect(wrapper.vm.d_project?.send_email_on_non_deferred_tests_finished).toEqual(false);
+
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_project?.send_email_on_non_deferred_tests_finished).toEqual(true);
+
+        assert_not_null(wrapper.vm.d_project);
+        wrapper.vm.d_project.send_email_on_non_deferred_tests_finished = false;
+        await wrapper.vm.$nextTick();
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        wrapper.vm.d_project.send_email_on_non_deferred_tests_finished = true;
+        await wrapper.vm.$nextTick();
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
     });
 });
 
