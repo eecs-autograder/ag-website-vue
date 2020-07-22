@@ -721,7 +721,8 @@ describe('Honor pledge tests', () => {
         project.honor_pledge_text = 'norfutofnrt';
         let wrapper = make_wrapper();
 
-        await set_data(wrapper, {d_honor_pledge_signature: username_part});
+        await set_data(
+            wrapper, {d_honor_pledge_signature: '  ' + username_part.toUpperCase() + '   '});
 
         let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
         expect(file_upload.vm.disable_upload_button).toBe(false);
