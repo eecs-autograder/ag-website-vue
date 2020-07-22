@@ -58,7 +58,23 @@
       </div>
     </div>
 
-    <file-upload ref="submit_file_upload" @upload_files="process_files">
+    <file-upload ref="submit_file_upload" @upload_files="process_files"
+                 :disable_upload_button="!honor_pledged_signed">
+      <template v-slot:before_upload_button v-if="project.use_honor_pledge">
+        <div class="honor-pledge-text">
+          <div class="honor-pledge-header">
+            You must agree to the honor pledge before submitting:
+          </div>
+          {{project.honor_pledge_text}}
+        </div>
+
+        <div class="confirm-pledge">
+          <label class="label">
+            Sign your username "{{expected_honor_pledge_signature}}" to confirm: <br>
+            <input type="text" class="input" v-model="d_honor_pledge_signature">
+          </label>
+        </div>
+      </template>
       <template v-slot:upload_button_text>
         Submit <template v-if="submission_might_use_late_day">(Use late day)</template>
       </template>
@@ -150,7 +166,7 @@ import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
-import { format_datetime, toggle } from '@/utils';
+import { assert_not_null, format_datetime, toggle } from '@/utils';
 
 interface ExpectedFilePatternMismatch {
   pattern: string;
@@ -182,6 +198,8 @@ export default class Submit extends Vue {
   group!: Group;
 
   readonly format_datetime = format_datetime;
+
+  d_honor_pledge_signature = '';
 
   d_submitting = false;
   d_submit_progress = 0;
@@ -339,8 +357,32 @@ export default class Submit extends Vue {
 
       (<FileUpload> this.$refs.submit_file_upload).clear_files();
       this.d_show_confirm_submit_modal = false;
+      this.d_honor_pledge_signature = '';
       this.$emit('submitted');
     });
+  }
+
+  get honor_pledged_signed() {
+    if (!this.project.use_honor_pledge || this.d_globals.user_roles.is_staff) {
+      return true;
+    }
+
+    assert_not_null(this.d_globals.current_user);
+    let signature = this.d_honor_pledge_signature.trim().toLowerCase();
+
+    // Accept any substring of the current user's username that starts
+    // with at least the part of the username before the "@" sign.
+    // For example:
+    // - YES: jameslp, jameslp@umich.edu, jameslp@umi
+    // - NO: ameslp, jameslp@umich.eduuuuuu
+    return signature === this.expected_honor_pledge_signature
+      || (signature.startsWith(this.expected_honor_pledge_signature)
+          && this.d_globals.current_user.username.startsWith(signature));
+  }
+
+  get expected_honor_pledge_signature() {
+    assert_not_null(this.d_globals.current_user);
+    return this.d_globals.current_user.username.split('@')[0];
   }
 }
 
@@ -446,6 +488,19 @@ function num_glob_matches(names: string[], pattern: string): number {
     color: $cherry;
     font-weight: bold;
   }
+}
+
+.honor-pledge-text {
+  margin: 1rem 0;
+}
+
+.honor-pledge-header {
+  margin-bottom: .5rem;
+  font-weight: bold;
+}
+
+.confirm-pledge {
+  margin: 1rem 0;
 }
 
 .modal-header {

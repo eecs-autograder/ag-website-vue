@@ -17,6 +17,7 @@ import {
     checkbox_is_checked,
     expect_html_element_has_value,
     get_validated_input_text,
+    set_data,
     set_validated_input_text,
     validated_input_is_valid,
     wait_until
@@ -505,6 +506,45 @@ describe('ProjectSettings tests', () => {
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
+    });
+
+    test('use_honor_pledge_binding', async () => {
+        let checkbox = wrapper.find('[data-testid=use_honor_pledge]');
+
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_project?.use_honor_pledge).toEqual(true);
+
+        await checkbox.setChecked(false);
+        expect(wrapper.vm.d_project?.use_honor_pledge).toEqual(false);
+
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_project?.use_honor_pledge).toEqual(true);
+
+        assert_not_null(wrapper.vm.d_project);
+        wrapper.vm.d_project.use_honor_pledge = false;
+        await wrapper.vm.$nextTick();
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+
+        wrapper.vm.d_project.use_honor_pledge = true;
+        await wrapper.vm.$nextTick();
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
+    });
+
+    test('honor_pledge_text', async () => {
+        expect(wrapper.find('[data-testid=honor_pledge_text]').exists()).toBe(false);
+
+        let checkbox = wrapper.find('[data-testid=use_honor_pledge]');
+        await checkbox.setChecked(true);
+        let pledge_text = wrapper.find('[data-testid=honor_pledge_text]');
+        expect(pledge_text.exists()).toBe(true);
+
+        let text = 'noerastoineratonieratsienrastoinearsoitrs';
+        await set_validated_input_text(pledge_text, text);
+        expect(wrapper.vm.d_project?.honor_pledge_text).toEqual(text);
+
+        assert_not_null(wrapper.vm.d_project);
+        await set_data(wrapper, {d_project: {honor_pledge_text: 'very new text'}});
+        expect(get_validated_input_text(pledge_text)).toEqual('very new text');
     });
 });
 

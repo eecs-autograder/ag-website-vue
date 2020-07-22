@@ -6,12 +6,13 @@ import moment from "moment";
 import * as sinon from 'sinon';
 
 import APIErrors from "@/components/api_errors.vue";
+import FileUpload from "@/components/file_upload.vue";
 import GroupMembers from '@/components/project_view/group_members.vue';
 import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { compress_whitespace, emitted, find_by_name } from '@/tests/utils';
+import { compress_whitespace, emitted, find_by_name, set_data } from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -664,5 +665,100 @@ describe('Submit tests', () => {
 
         expect(wrapper.findComponent({ref: 'confirm_submit_modal'}).exists()).toBe(false);
         expect(submit_stub.calledOnce).toBe(false);
+    });
+});
+
+describe('Honor pledge tests', () => {
+    function make_wrapper() {
+        return mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+    }
+
+    const username_part = 'batman';
+
+    beforeEach(() => {
+        current_user.username = username_part + '@umich.edu';
+    });
+
+    test('Pledge text displayed', async () => {
+        let text = 'noesatoniersatonierasot';
+        project.use_honor_pledge = true;
+        project.honor_pledge_text = text;
+        let wrapper = make_wrapper();
+
+        expect(wrapper.find('.honor-pledge-text').text().includes(text)).toBe(true);
+        expect(wrapper.find('.confirm-pledge').text().includes(`"${username_part}"`));
+
+        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.vm.disable_upload_button).toBe(true);
+    });
+
+    test('Pledge text non-empty but Project.use_honor_pledge is false', async () => {
+        project.use_honor_pledge = false;
+        project.honor_pledge_text = 'nrosteanoieafoinwf';
+        let wrapper = make_wrapper();
+        expect(wrapper.find('.honor-pledge-text').exists()).toBe(false);
+        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.vm.disable_upload_button).toBe(false);
+    });
+
+    test('Staff not required to sign pledge', async () => {
+        data_ut.set_global_user_roles(data_ut.make_user_roles({is_staff: true}));
+        project.use_honor_pledge = true;
+        project.honor_pledge_text = 'norfutofnrt';
+        let wrapper = make_wrapper();
+        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.vm.disable_upload_button).toBe(false);
+    });
+
+    test('Pledge signed with username part only', async () => {
+        project.use_honor_pledge = true;
+        project.honor_pledge_text = 'norfutofnrt';
+        let wrapper = make_wrapper();
+
+        await set_data(
+            wrapper, {d_honor_pledge_signature: '  ' + username_part.toUpperCase() + '   '});
+
+        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.vm.disable_upload_button).toBe(false);
+    });
+
+    test('Pledge signed with full email', async () => {
+        project.use_honor_pledge = true;
+        project.honor_pledge_text = 'norfutofnrt';
+        let wrapper = make_wrapper();
+
+        await set_data(wrapper, {d_honor_pledge_signature: current_user.username});
+
+        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.vm.disable_upload_button).toBe(false);
+    });
+
+    test('Pledge signed with almost full email', async () => {
+        project.use_honor_pledge = true;
+        project.honor_pledge_text = 'norfutofnrt';
+        let wrapper = make_wrapper();
+
+        let slice = current_user.username.slice(0, current_user.username.length - 2);
+        await set_data(wrapper, {d_honor_pledge_signature: slice});
+
+        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.vm.disable_upload_button).toBe(false);
+    });
+
+    test('Pledge signed incorrectly', async () => {
+        project.use_honor_pledge = true;
+        project.honor_pledge_text = 'norfutofnrt';
+        let wrapper = make_wrapper();
+
+        await set_data(wrapper, {d_honor_pledge_signature: current_user.username.slice(1)});
+
+        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.vm.disable_upload_button).toBe(true);
     });
 });

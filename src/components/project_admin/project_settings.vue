@@ -319,6 +319,34 @@
         </fieldset>
       </div>
 
+      <div class="section-container">
+        <fieldset class="fieldset">
+          <legend class="legend">Honor Pledge</legend>
+          <div class="checkbox-input-container">
+            <label class="checkbox-label">
+              <input data-testid="use_honor_pledge"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_project.use_honor_pledge"/>
+              Require honor pledge
+            </label>
+            <tooltip width="medium" placement="top">
+              Students will be prompted to sign an honor pledge each time they submit.
+            </tooltip>
+          </div>
+          <div class="form-field-wrapper" v-if="d_project.use_honor_pledge">
+            <label class="label">Honor pledge text</label>
+            <validated-input
+              data-testid="honor_pledge_text"
+              v-model="d_project.honor_pledge_text"
+              :validators="[]"
+              :num_rows="4"
+              input_style="max-width: 500px; width: 100%"
+            />
+          </div>
+        </fieldset>
+      </div>
+
       <APIErrors ref="api_errors"></APIErrors>
 
       <div class="button-footer">

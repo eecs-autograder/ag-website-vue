@@ -159,6 +159,10 @@ export function make_project(course_pk: number, args: Partial<Project> = {}): Pr
         instructor_files: [],
         expected_student_files: [],
         has_handgrading_rubric: false,
+        use_honor_pledge: false,
+        honor_pledge_text: '',
+        send_email_on_submission_received: false,
+        send_email_on_non_deferred_tests_finished: false,
     };
     safe_assign(defaults, args);
     defaults.course = course_pk;

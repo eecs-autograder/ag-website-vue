@@ -46,6 +46,9 @@
         </tr>
       </tbody>
     </table>
+    <div>
+      <slot name="before_upload_button"></slot>
+    </div>
     <button class="upload-files-button green-button"
             @click="attempt_to_upload()"
             :disabled="disable_upload_button">
