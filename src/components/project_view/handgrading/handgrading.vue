@@ -738,6 +738,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   }
 
   .long-description {
+    white-space: pre-wrap;
     font-size: .75rem;
     color: darken($stormy-gray-dark, 15%);
   }
@@ -787,6 +788,10 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     padding-left: .25rem;
     color: darken($ocean-blue, 0%);
     font-weight: bold;
+  }
+
+  .short-description {
+    white-space: pre-wrap;
   }
 
   .long-description {
