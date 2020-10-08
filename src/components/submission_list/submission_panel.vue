@@ -27,6 +27,9 @@
       <template v-else-if="submission.status === GradingStatus.removed_from_queue">
         <i class="fas fa-eject"></i>
       </template>
+      <template v-else-if="submission.status === GradingStatus.rejected">
+        <i class="fas fa-ban"></i>
+      </template>
       <template v-else-if="submission.status === GradingStatus.error">
         <i class="fas fa-skull"></i>
         <!-- <i class="fas fa-skull-crossbones"></i> -->
@@ -90,7 +93,7 @@ export default class SubmissionPanel extends Vue {
       color: $orange;
     }
 
-    .fa-skull {
+    .fa-skull, .fa-ban {
       color: crimson;
     }
   }

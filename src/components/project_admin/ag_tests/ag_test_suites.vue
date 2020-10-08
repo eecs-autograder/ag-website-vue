@@ -25,6 +25,7 @@
         <div class="sidebar-content" v-if="!d_collapsed">
           <draggable ref="ag_test_suite_order"
                       v-model="d_ag_test_suites"
+                      @start="record_current_ag_test_suite_order"
                       @change="set_ag_test_suite_order"
                       @end="$event.item.style.transform = 'none'"
                       handle=".handle">
@@ -113,6 +114,7 @@ import {
   AGTestCommandObserver,
   AGTestSuite,
   AGTestSuiteObserver,
+  HttpError,
   Project
 } from 'ag-client-typescript';
 
@@ -165,6 +167,8 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
 
   d_loading = true;
   d_ag_test_suites: AGTestSuite[] = [];
+  // For rolling back re-ordering if an error occurs.
+  private d_current_ag_test_suite_order: AGTestSuite[] = [];
 
   d_collapsed = false;
 
@@ -230,9 +234,22 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     });
   }
 
+  record_current_ag_test_suite_order() {
+    this.d_current_ag_test_suite_order = this.d_ag_test_suites.slice();
+  }
+
   @handle_global_errors_async
-  set_ag_test_suite_order() {
-    return AGTestSuite.update_order(this.project.pk, this.d_ag_test_suites.map(suite => suite.pk));
+  async set_ag_test_suite_order() {
+    try {
+      await AGTestSuite.update_order(
+        this.project.pk, this.d_ag_test_suites.map(suite => suite.pk)
+      );
+    }
+    catch (e) {
+      this.d_ag_test_suites = this.d_current_ag_test_suite_order;
+      this.d_current_ag_test_suite_order = [];
+      throw e;
+    }
   }
 
   get prev_ag_test_case_is_available() {

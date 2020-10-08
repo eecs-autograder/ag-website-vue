@@ -311,6 +311,30 @@ test('Update suites order', async () => {
     ).toBe(true);
 });
 
+test('Original order restored after bad update suites order request', async () => {
+    sinon.stub(ag_cli.AGTestSuite, 'update_order').rejects(
+        new ag_cli.HttpError(400, 'NOOOOOPE')
+    );
+    let suites = [
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+    ];
+    get_all_suites_from_project.resolves(suites.slice());
+    let wrapper = make_wrapper();
+    await wrapper.vm.$nextTick();
+
+    wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('start');
+    await wrapper.vm.$nextTick();
+
+    wrapper.vm.d_ag_test_suites = wrapper.vm.d_ag_test_suites.reverse();
+    await wrapper.vm.$nextTick();
+
+    wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('change');
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.d_ag_test_suites).toEqual(suites);
+});
+
 describe('Creating ag_test_case', () => {
     // Note that this also covers the case where a test was cloned
     test('Case created', async () => {

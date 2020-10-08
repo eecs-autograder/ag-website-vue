@@ -44,6 +44,23 @@
             </validated-input>
           </div>
 
+          <div class="checkbox-input-container">
+            <label class="checkbox-label">
+              <input data-testid="reject_submission_if_setup_fails"
+                     type="checkbox"
+                     class="checkbox"
+                     v-model="d_ag_test_suite.reject_submission_if_setup_fails"/>
+              Reject submission if setup fails
+            </label>
+            <tooltip width="large" placement="top">
+              If this suite's setup command fails, stop grading the current submission. <br>
+              - The submission will not be counted toward the
+              {{project.min_group_size === 1 ? 'student' : 'group'}}'s daily limit. <br>
+              - If a bonus submission token was used, it will be refunded. <br>
+              - Late day tokens used will NOT be refunded.
+            </tooltip>
+          </div>
+
         </fieldset>
 
         <!------------------------ Feedback Settings ------------------------------------->
