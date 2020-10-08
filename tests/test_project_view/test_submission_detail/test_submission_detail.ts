@@ -98,6 +98,7 @@ describe('SubmissionDetail tests', () => {
         do_auto_update_message_test(ag_cli.GradingStatus.finished_grading, false);
         do_auto_update_message_test(ag_cli.GradingStatus.received, true);
         do_auto_update_message_test(ag_cli.GradingStatus.removed_from_queue, false);
+        do_auto_update_message_test(ag_cli.GradingStatus.rejected, false);
         do_auto_update_message_test(ag_cli.GradingStatus.queued, true);
         do_auto_update_message_test(ag_cli.GradingStatus.waiting_for_deferred, false);
 

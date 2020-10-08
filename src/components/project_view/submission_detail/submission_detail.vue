@@ -42,6 +42,12 @@
         You removed this submission from the queue. That means it won't be graded,
         and it won't count towards your daily submission limit.
       </div>
+      <div v-else-if="submission.status === GradingStatus.rejected">
+        <i class="fas fa-ban rejected-symbol"></i>
+        Your submission has been rejected because it did not pass certain
+        required checks (see first test suite results). It won't be graded,
+        and it won't count towards your daily submission limit.
+      </div>
       <div v-else-if="submission.status === GradingStatus.error">
         <i class="fas fa-skull error-symbol"></i>
         An unexpected error occurred while grading your submission.
@@ -449,7 +455,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
     color: $orange;
   }
 
-  .error-symbol {
+  .error-symbol, .rejected-symbol {
     color: crimson;
   }
 }

@@ -161,6 +161,19 @@ describe('Submission status icons', () => {
         expect(wrapper.find('.submission-status').element.children.length).toEqual(1);
     });
 
+    test('rejected icon', () => {
+        let rejected = data_ut.make_submission_with_results(
+            group, {status: ag_cli.GradingStatus.rejected});
+        let wrapper = mount(SubmissionPanel, {
+            propsData: {
+                submission: rejected
+            }
+        });
+
+        expect(wrapper.find('.submission-status .fa-ban').exists()).toBe(true);
+        expect(wrapper.find('.submission-status').element.children.length).toEqual(1);
+    });
+
     test('error icon', () => {
         let error = data_ut.make_submission_with_results(
             group, {status: ag_cli.GradingStatus.error});
