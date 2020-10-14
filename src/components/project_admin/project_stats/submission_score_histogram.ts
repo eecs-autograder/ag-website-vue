@@ -28,7 +28,6 @@ export default class SubmissionScoreHistogram extends Vue<Bar> {
         // Overwriting base render method with actual data.
         this.renderChart(
             {
-                // labels: [],
                 labels: labels,
                 datasets: [
                     {

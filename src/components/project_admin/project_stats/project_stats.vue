@@ -81,6 +81,10 @@
         v-if="d_loading_all_submissions && d_all_submissions_progress !== 0"
         :progress="d_all_submissions_progress"
       />
+      <submissions-over-time-graph
+        v-if="d_all_submissions.length !== 0"
+        :submissions="d_all_submissions"
+      />
     </div>
 
     <div class="stats-section">
@@ -123,6 +127,7 @@ import { toggle } from '@/utils';
 
 import PassFailCounts from './pass_fail_counts.vue';
 import SubmissionScoreHistogram from './submission_score_histogram';
+import SubmissionsOverTimeGraph from './submissions_over_time_graph';
 
 interface SubmissionResultsPage {
   count: number;
@@ -136,6 +141,7 @@ interface SubmissionResultsPage {
     PassFailCounts,
     ProgressBar,
     SubmissionScoreHistogram,
+    SubmissionsOverTimeGraph,
   }
 })
 export default class ProjectStats extends Vue {
@@ -196,12 +202,14 @@ export default class ProjectStats extends Vue {
       let groups = await ag_cli.Group.get_all_from_project(this.project.pk);
 
       let num_loaded_groups = 0;
+      let all_submissions = [];
       for (let group of groups) {
         let submissions = await ag_cli.Submission.get_all_from_group(group.pk);
-        this.d_all_submissions.push(...submissions);
+        all_submissions.push(...submissions);
         num_loaded_groups += 1;
         this.d_all_submissions_progress = (num_loaded_groups / groups.length) * 100;
       }
+      this.d_all_submissions = all_submissions;
     });
   }
 }
