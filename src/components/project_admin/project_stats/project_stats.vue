@@ -34,30 +34,9 @@
         v-if="d_loading_submission_results && d_submission_results_progress !== 0"
         :progress="d_submission_results_progress"
       />
-
-      <div v-if="d_all_submissions_progress === 100">
-        Count: {{d_submission_results.length}}
-      </div>
-      <table v-if="d_submission_result_stats !== null">
-        <tr><td>Count:</td> <td class="descriptive-stat">{{d_submission_results.length}}</td></tr>
-        <tr><td>Min:</td> <td class="descriptive-stat">{{d_submission_result_stats.min}}</td></tr>
-        <tr><td>Q1:</td> <td class="descriptive-stat">{{d_submission_result_stats.q1}}</td></tr>
-        <tr>
-          <td>Q2 (Median):</td>
-          <td class="descriptive-stat">{{d_submission_result_stats.median}}</td>
-        </tr>
-        <tr><td>Q3:</td> <td class="descriptive-stat">{{d_submission_result_stats.q3}}</td></tr>
-        <tr><td>Max:</td> <td class="descriptive-stat">{{d_submission_result_stats.max}}</td></tr>
-        <tr>
-          <td>Mean:</td> <td class="descriptive-stat">{{d_submission_result_stats.mean}}</td>
-        </tr>
-        <tr>
-          <td>Stdev:</td> <td class="descriptive-stat">{{d_submission_result_stats.stdev}}</td>
-        </tr>
-      </table>
       <submission-score-histogram
         v-if="d_submission_results.length !== 0"
-        :submission_results="d_submission_results"
+        :ultimate_submission_entries="d_submission_results"
         @stats_updated="d_submission_result_stats = $event"
       />
     </div>
@@ -110,7 +89,7 @@
         ref="pass_fail_counts"
         v-if="d_submission_results.length !== 0"
         :project="project"
-        :submission_results="d_submission_results"
+        :ultimate_submission_entries="d_submission_results"
       />
     </div>
   </div>
@@ -126,14 +105,20 @@ import { handle_api_errors_async, handle_global_errors_async } from '@/error_han
 import { toggle } from '@/utils';
 
 import PassFailCounts from './pass_fail_counts.vue';
-import SubmissionScoreHistogram from './submission_score_histogram';
+import SubmissionScoreHistogram from './submission_score_histogram/submission_score_histogram.vue';
 import SubmissionsOverTimeGraph from './submissions_over_time_graph';
 
-interface SubmissionResultsPage {
+interface UltimateSubmissionEntryPage {
   count: number;
   next: string | null;
   previous: string | null;
-  results: {ultimate_submission: {results: ag_cli.SubmissionResultFeedback}}[];
+  results: UltimateSubmissionEntry[];
+}
+
+export interface UltimateSubmissionEntry {
+  username: string;
+  group: ag_cli.Group;
+  ultimate_submission: ag_cli.Submission & {results: ag_cli.SubmissionResultFeedback};
 }
 
 @Component({
@@ -152,7 +137,7 @@ export default class ProjectStats extends Vue {
 
   d_loading_submission_results = false;
   d_submission_results_progress = 0;
-  d_submission_results: ag_cli.SubmissionResultFeedback[] = [];
+  d_submission_results: UltimateSubmissionEntry[] = [];
   d_submission_result_stats: {[key: string]: number} | null = null;
 
   d_loading_all_submissions = false;
@@ -168,20 +153,18 @@ export default class ProjectStats extends Vue {
       let page_size = 200;
 
       let results = [];
-      let page: SubmissionResultsPage;
+      let page: UltimateSubmissionEntryPage;
       do {
-        let response = await ag_cli.HttpClient.get_instance().get<SubmissionResultsPage>(
+        let response = await ag_cli.HttpClient.get_instance().get<UltimateSubmissionEntryPage>(
           `projects/${this.project.pk}/all_ultimate_submission_results/`
           + `?page=${page_num}&groups_per_page=${page_size}`
           + `&full_results=true&include_staff=${this.d_include_staff ? 'true' : 'false'}`
         );
         page = response.data;
-        results.push(
-          ...page.results.map(result => result.ultimate_submission.results)
-        );
+        results.push(...page.results);
 
+        this.d_submission_results_progress = (page_num * page_size / page.count) * 100;
         page_num += 1;
-        this.d_submission_results_progress = (results.length / page.count) * 100;
       } while (page.next !== null);
 
       this.d_submission_results = results;
@@ -238,9 +221,5 @@ export default class ProjectStats extends Vue {
 
   margin: 1rem 0 .55rem;
   font-size: 1.25rem;
-}
-
-.descriptive-stat {
-  text-align: right;
 }
 </style>

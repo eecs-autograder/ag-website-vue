@@ -44,7 +44,7 @@ export default class PassFailCounts extends Vue {
   project!: ag_cli.Project;
 
   @Prop({required: true})
-  submission_results!: ag_cli.SubmissionResultFeedback[];
+  ultimate_submission_entries!: ag_cli.SubmissionResultFeedback[];
 
   d_ag_test_suites: ag_cli.AGTestSuite[] = [];
   d_mutation_suites: ag_cli.MutationTestSuite[] = [];
@@ -55,6 +55,10 @@ export default class PassFailCounts extends Vue {
   d_pass_counts = new SafeMap<number, number>();
   // <test case pk>: <num fail>
   d_fail_counts = new SafeMap<number, number>();
+
+  get submission_results() {
+    return this.ultimate_submission_entries.map(entry => entry.ultimate_submission.results);
+  }
 
   @handle_global_errors_async
   async created() {
