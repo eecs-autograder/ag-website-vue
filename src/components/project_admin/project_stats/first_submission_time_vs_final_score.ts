@@ -1,24 +1,27 @@
 // CommitChart.ts
-import { Line } from 'vue-chartjs';
+import { Scatter } from 'vue-chartjs';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import { Submission } from 'ag-client-typescript';
-// @ts-ignore
-import moment from "moment";
+import { SafeMap } from '@/safe_map';
+
+import { FirstSubmissionData, UltimateSubmissionEntry } from './project_stats.vue';
 
 @Component({
-    extends: Line,
+    extends: Scatter,
 })
-export default class SubmissionsOverTimeGraph extends Vue<Line> {
+export default class FirstSubmissionTimeVsFinalScore extends Vue<Scatter> {
     @Prop({required: true})
-    submissions!: Submission[];
+    ultimate_submission_entries!: UltimateSubmissionEntry[];
+
+    @Prop({required: true})
+    first_submissions_by_group!: SafeMap<number, FirstSubmissionData>;
 
     mounted() {
         this.update_chart();
     }
 
-    @Watch('submission_results')
-    on_submission_results_change() {
+    @Watch('ultimate_submission_entries')
+    on_ultimate_submission_entries_change() {
         this.update_chart();
     }
 
@@ -29,7 +32,7 @@ export default class SubmissionsOverTimeGraph extends Vue<Line> {
                 // labels: labels,
                 datasets: [
                     {
-                        label: 'Submissions Per Hour',
+                        label: 'Final Score vs. First Submission Time',
                         backgroundColor: '#f87979',
                         data: this.compute_data_points(),
                     }
@@ -56,7 +59,7 @@ export default class SubmissionsOverTimeGraph extends Vue<Line> {
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: 'Time'
+                            labelString: 'Time of First Submission'
                         },
                     }],
                     yAxes: [{
@@ -67,7 +70,7 @@ export default class SubmissionsOverTimeGraph extends Vue<Line> {
                         },
                         scaleLabel: {
                             display: true,
-                            labelString: '# of Submissions'
+                            labelString: '% Score'
                         }
                     }]
                 }
@@ -76,29 +79,27 @@ export default class SubmissionsOverTimeGraph extends Vue<Line> {
     }
 
     compute_data_points() {
-        if (this.submissions.length === 0) {
+        if (this.ultimate_submission_entries.length === 0) {
             return [];
         }
 
-        let timestamps = this.submissions.map(submission => moment(submission.timestamp));
-        timestamps.sort((first, second) => first.diff(second));
-
-        let start = timestamps[0];
-        let end = timestamps[timestamps.length - 1];
-
-        let num_hours = Math.ceil(moment.duration(end.diff(start)).asHours());
-        let buckets = Array(num_hours).fill(0);
-
-        for (let timestamp of timestamps) {
-            let offset = moment.duration(timestamp.diff(start));
-            buckets[Math.floor(offset.asHours())] += 1;
-        }
-
         let result = [];
-        for (let i = 0; i < num_hours; ++i) {
+        for (let entry of this.ultimate_submission_entries) {
+            if (!this.first_submissions_by_group.has(entry.group.pk)) {
+                continue;
+            }
+
+            if (Number(entry.ultimate_submission.results.total_points_possible) === 0) {
+                continue;
+            }
+            let percent = Math.floor(
+                Number(entry.ultimate_submission.results.total_points)
+                / Number(entry.ultimate_submission.results.total_points_possible)
+                * 100
+            );
             result.push({
-                x: moment(start).add(i, 'hour').set('second', 0).set('millisecond', 0),
-                y: buckets[i],
+                x: this.first_submissions_by_group.get(entry.group.pk).first_submission.timestamp,
+                y: percent,
             });
         }
         return result;

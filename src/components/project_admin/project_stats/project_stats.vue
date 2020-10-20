@@ -16,81 +16,146 @@
     </div>
 
     <div class="stats-section">
-      <div class="stats-header">
-        Summary
-      </div>
-      <div class="load-data-button-wrapper">
-        <button
-          type="button"
-          class="blue-button"
-          @click="load_submission_results"
-          :disabled="d_loading_submission_results"
-        >
-          Load Data
-        </button>
-      </div>
+      <collapsible
+        class="stats-collapsible-header"
+        :include_caret="false"
+        :indentation_level="null"
+        @click="initial_load_submission_results"
+      >
+        <template v-slot:header_text>
+          <div class="stats-header-text">
+            Summary
+          </div>
+        </template>
+        <div class="load-data-button-wrapper">
+          <button
+            type="button"
+            class="blue-button"
+            @click="reload_submission_results"
+            :disabled="d_loading_submission_results"
+          >
+            Reload Data
+          </button>
+        </div>
 
-      <progress-bar
-        v-if="d_loading_submission_results && d_submission_results_progress !== 0"
-        :progress="d_submission_results_progress"
-      />
-      <submission-score-histogram
-        v-if="d_submission_results.length !== 0"
-        :ultimate_submission_entries="d_submission_results"
-        @stats_updated="d_submission_result_stats = $event"
-      />
+        <progress-bar
+          v-if="d_loading_submission_results"
+          :progress="d_submission_results_progress"
+        />
+        <submission-score-histogram
+          v-if="d_submission_results !== null"
+          :ultimate_submission_entries="d_submission_results"
+          @stats_updated="d_submission_result_stats = $event"
+        />
+      </collapsible>
     </div>
 
     <div class="stats-section">
-      <div class="stats-header">
-        Submissions over time
-      </div>
+      <collapsible
+        class="stats-collapsible-header"
+        :include_caret="false"
+        :indentation_level="null"
+        @click="initial_load_all_submissions"
+      >
+        <template v-slot:header_text>
+          <div class="stats-header-text">
+            Submissions over time
+          </div>
+        </template>
 
-      <div class="load-data-button-wrapper">
-        <button
-          type="button"
-          class="blue-button"
-          @click="load_all_submissions"
-          :disabled="d_loading_all_submissions"
-        >
-          Load Data
-        </button>
-      </div>
-      <progress-bar
-        v-if="d_loading_all_submissions && d_all_submissions_progress !== 0"
-        :progress="d_all_submissions_progress"
-      />
-      <submissions-over-time-graph
-        v-if="d_all_submissions.length !== 0"
-        :submissions="d_all_submissions"
-      />
+        <div class="load-data-button-wrapper">
+          <button
+            type="button"
+            class="blue-button"
+            @click="reload_all_submissions"
+            :disabled="d_loading_all_submissions"
+          >
+            Reload Data
+          </button>
+        </div>
+        <progress-bar
+          v-if="d_loading_all_submissions"
+          :progress="d_all_submissions_progress"
+        />
+        <submissions-over-time-graph
+          v-if="d_all_submissions !== null"
+          :submissions="d_all_submissions"
+        />
+      </collapsible>
     </div>
 
     <div class="stats-section">
-      <div class="stats-header">
-        Pass/Fail Counts Per Test Case
-      </div>
+      <collapsible
+        class="stats-collapsible-header"
+        :include_caret="false"
+        :indentation_level="null"
+        @click="initial_load_submission_results"
+      >
+        <template v-slot:header_text>
+          <div class="stats-header-text">
+            Pass/Fail Counts Per Test Case
+          </div>
+        </template>
 
-      <div class="load-data-button-wrapper">
-        <button
-          type="button"
-          class="blue-button"
-          @click="load_pass_fail_counts"
-          :disabled="d_loading_submission_results"
-        >
-          Load Data
-        </button>
-      </div>
-      <progress-bar
-        v-if="d_loading_submission_results && d_submission_results_progress !== 0"
-        :progress="d_submission_results_progress"
-      />
-      <pass-fail-counts
-        ref="pass_fail_counts"
-        v-if="d_submission_results.length !== 0"
-        :project="project"
-        :ultimate_submission_entries="d_submission_results"
-      />
+        <div class="load-data-button-wrapper">
+          <button
+            type="button"
+            class="blue-button"
+            @click="reload_submission_results"
+            :disabled="d_loading_submission_results"
+          >
+            Reload Data
+          </button>
+        </div>
+        <progress-bar
+          v-if="d_loading_submission_results"
+          :progress="d_submission_results_progress"
+        />
+        <pass-fail-counts
+          ref="pass_fail_counts"
+          v-if="d_submission_results !== null"
+          :project="project"
+          :ultimate_submission_entries="d_submission_results"
+        />
+      </collapsible>
+    </div>
+
+    <div class="stats-section">
+      <collapsible
+        class="stats-collapsible-header"
+        :include_caret="false"
+        :indentation_level="null"
+        @click="initial_load_final_score_vs_first_submission"
+      >
+        <template v-slot:header_text>
+          <div class="stats-header-text">
+            Final Score vs. First Submission time
+          </div>
+        </template>
+
+        <div class="load-data-button-wrapper">
+          <button
+            type="button"
+            class="blue-button"
+            @click="reload_final_score_vs_first_submission"
+            :disabled="d_loading_submission_results || d_loading_all_submissions"
+          >
+            Reload Data
+          </button>
+        </div>
+        <progress-bar
+          v-if="d_loading_first_submissions_by_group"
+          :progress="(d_submission_results_progress + d_all_submissions_progress) / 2"
+        />
+
+        <first-submission-time-vs-final-score
+          ref="final_score_vs_first_submission"
+          v-if="d_submission_results !== null && d_all_submissions !== null"
+          :project="project"
+          :ultimate_submission_entries="d_submission_results"
+          :first_submissions_by_group="d_first_submissions_by_group"
+        />
+      </collapsible>
     </div>
   </div>
 </template>
@@ -100,13 +165,16 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
+import Collapsible from '@/components/collapsible.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { toggle } from '@/utils';
 
+import FirstSubmissionTimeVsFinalScore from './first_submission_time_vs_final_score';
 import PassFailCounts from './pass_fail_counts.vue';
 import SubmissionScoreHistogram from './submission_score_histogram/submission_score_histogram.vue';
 import SubmissionsOverTimeGraph from './submissions_over_time_graph';
+import { SafeMap } from '@/safe_map';
 
 interface UltimateSubmissionEntryPage {
   count: number;
@@ -121,12 +189,19 @@ export interface UltimateSubmissionEntry {
   ultimate_submission: ag_cli.Submission & {results: ag_cli.SubmissionResultFeedback};
 }
 
+export interface FirstSubmissionData {
+  group: ag_cli.Group;
+  first_submission: ag_cli.Submission;
+}
+
 @Component({
   components: {
+    Collapsible,
     PassFailCounts,
     ProgressBar,
     SubmissionScoreHistogram,
     SubmissionsOverTimeGraph,
+    FirstSubmissionTimeVsFinalScore
   }
 })
 export default class ProjectStats extends Vue {
@@ -137,17 +212,27 @@ export default class ProjectStats extends Vue {
 
   d_loading_submission_results = false;
   d_submission_results_progress = 0;
-  d_submission_results: UltimateSubmissionEntry[] = [];
+  d_submission_results: UltimateSubmissionEntry[] | null = null;
+
   d_submission_result_stats: {[key: string]: number} | null = null;
 
   d_loading_all_submissions = false;
   d_all_submissions_progress = 0;
-  d_all_submissions: ag_cli.Submission[] = [];
+  d_all_submissions: ag_cli.Submission[] | null = null;
+
+  d_loading_first_submissions_by_group = false;
+  d_first_submissions_by_group = new SafeMap<number, FirstSubmissionData>();
+
+  async initial_load_submission_results() {
+    if (this.d_submission_results === null && !this.d_loading_submission_results) {
+      await this.reload_submission_results();
+    }
+  }
 
   @handle_global_errors_async
-  load_submission_results() {
+  reload_submission_results() {
     return toggle(this, 'd_loading_submission_results', async () => {
-      this.d_submission_results = [];
+      this.d_submission_results = null;
       this.d_submission_results_progress = 0;
       let page_num = 1;
       let page_size = 200;
@@ -171,17 +256,19 @@ export default class ProjectStats extends Vue {
     });
   }
 
-  async load_pass_fail_counts() {
-    await this.load_submission_results();
-    await this.$nextTick();
-    (<Vue> this.$refs['pass_fail_counts']).$el.scrollIntoView();
+  async initial_load_all_submissions() {
+    if (this.d_all_submissions === null && !this.d_loading_all_submissions) {
+      await this.reload_all_submissions();
+    }
   }
 
   @handle_global_errors_async
-  load_all_submissions() {
+  reload_all_submissions() {
     return toggle(this, 'd_loading_all_submissions', async () => {
-      this.d_all_submissions = [];
+      this.d_all_submissions = null;
       this.d_all_submissions_progress = 0;
+      this.d_first_submissions_by_group = new SafeMap();
+
       let groups = await ag_cli.Group.get_all_from_project(this.project.pk);
 
       let num_loaded_groups = 0;
@@ -189,10 +276,29 @@ export default class ProjectStats extends Vue {
       for (let group of groups) {
         let submissions = await ag_cli.Submission.get_all_from_group(group.pk);
         all_submissions.push(...submissions);
+        if (submissions.length !== 0) {
+          this.d_first_submissions_by_group.set(
+            group.pk, {group: group, first_submission: submissions[0]}
+          );
+        }
         num_loaded_groups += 1;
         this.d_all_submissions_progress = (num_loaded_groups / groups.length) * 100;
       }
       this.d_all_submissions = all_submissions;
+    });
+  }
+
+  initial_load_final_score_vs_first_submission() {
+    return toggle(this, 'd_loading_first_submissions_by_group', async () => {
+      await this.initial_load_submission_results();
+      await this.initial_load_all_submissions();
+    });
+  }
+
+  reload_final_score_vs_first_submission() {
+    return toggle(this, 'd_loading_first_submissions_by_group', async () => {
+      await this.reload_submission_results();
+      await this.reload_all_submissions();
     });
   }
 }
@@ -216,10 +322,12 @@ export default class ProjectStats extends Vue {
   margin-bottom: .75rem;
 }
 
-.stats-header {
-  @include section-header();
-
+.stats-collapsible-header {
   margin: 1rem 0 .55rem;
+}
+
+.stats-header-text {
+  @include section-header();
   font-size: 1.25rem;
 }
 </style>
