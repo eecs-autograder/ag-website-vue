@@ -18,44 +18,50 @@
     <div class="stats-section">
       <collapsible
         class="stats-collapsible-header"
-        :include_caret="false"
+        :include_caret="true"
         :indentation_level="null"
         @click="initial_load_submission_results"
+        :use_v_if="true"
       >
         <template v-slot:header_text>
           <div class="stats-header-text">
             Summary
           </div>
         </template>
-        <div class="load-data-button-wrapper">
-          <button
-            type="button"
-            class="blue-button"
-            @click="reload_submission_results"
-            :disabled="d_loading_submission_results"
-          >
-            Reload Data
-          </button>
-        </div>
+        <!-- Lazy slot evaluation.
+             See https://github.com/vuejs/vue/issues/8578#issuecomment-488183335 -->
+        <template #default>
+          <div class="load-data-button-wrapper">
+            <button
+              type="button"
+              class="blue-button"
+              @click="reload_submission_results"
+              :disabled="d_loading_submission_results"
+            >
+              Reload Data
+            </button>
+          </div>
 
-        <progress-bar
-          v-if="d_loading_submission_results"
-          :progress="d_submission_results_progress"
-        />
-        <submission-score-histogram
-          v-if="d_submission_results !== null"
-          :ultimate_submission_entries="d_submission_results"
-          @stats_updated="d_submission_result_stats = $event"
-        />
+          <progress-bar
+            v-if="d_loading_submission_results"
+            :progress="d_submission_results_progress"
+          />
+          <submission-score-histogram
+            v-if="d_submission_results !== null"
+            :ultimate_submission_entries="d_submission_results"
+            @stats_updated="d_submission_result_stats = $event"
+          />
+        </template>
       </collapsible>
     </div>
 
     <div class="stats-section">
       <collapsible
         class="stats-collapsible-header"
-        :include_caret="false"
+        :include_caret="true"
         :indentation_level="null"
         @click="initial_load_all_submissions"
+        :use_v_if="true"
       >
         <template v-slot:header_text>
           <div class="stats-header-text">
@@ -63,33 +69,36 @@
           </div>
         </template>
 
-        <div class="load-data-button-wrapper">
-          <button
-            type="button"
-            class="blue-button"
-            @click="reload_all_submissions"
-            :disabled="d_loading_all_submissions"
-          >
-            Reload Data
-          </button>
-        </div>
-        <progress-bar
-          v-if="d_loading_all_submissions"
-          :progress="d_all_submissions_progress"
-        />
-        <submissions-over-time-graph
-          v-if="d_all_submissions !== null"
-          :submissions="d_all_submissions"
-        />
+        <template #default>
+          <div class="load-data-button-wrapper">
+            <button
+              type="button"
+              class="blue-button"
+              @click="reload_all_submissions"
+              :disabled="d_loading_all_submissions"
+            >
+              Reload Data
+            </button>
+          </div>
+          <progress-bar
+            v-if="d_loading_all_submissions"
+            :progress="d_all_submissions_progress"
+          />
+          <submissions-over-time-graph
+            v-if="d_all_submissions !== null"
+            :submissions="d_all_submissions"
+          />
+        </template>
       </collapsible>
     </div>
 
     <div class="stats-section">
       <collapsible
         class="stats-collapsible-header"
-        :include_caret="false"
+        :include_caret="true"
         :indentation_level="null"
         @click="initial_load_submission_results"
+        :use_v_if="true"
       >
         <template v-slot:header_text>
           <div class="stats-header-text">
@@ -97,35 +106,38 @@
           </div>
         </template>
 
-        <div class="load-data-button-wrapper">
-          <button
-            type="button"
-            class="blue-button"
-            @click="reload_submission_results"
-            :disabled="d_loading_submission_results"
-          >
-            Reload Data
-          </button>
-        </div>
-        <progress-bar
-          v-if="d_loading_submission_results"
-          :progress="d_submission_results_progress"
-        />
-        <pass-fail-counts
-          ref="pass_fail_counts"
-          v-if="d_submission_results !== null"
-          :project="project"
-          :ultimate_submission_entries="d_submission_results"
-        />
+        <template #default>
+          <div class="load-data-button-wrapper">
+            <button
+              type="button"
+              class="blue-button"
+              @click="reload_submission_results"
+              :disabled="d_loading_submission_results"
+            >
+              Reload Data
+            </button>
+          </div>
+          <progress-bar
+            v-if="d_loading_submission_results"
+            :progress="d_submission_results_progress"
+          />
+          <pass-fail-counts
+            ref="pass_fail_counts"
+            v-if="d_submission_results !== null"
+            :project="project"
+            :ultimate_submission_entries="d_submission_results"
+          />
+        </template>
       </collapsible>
     </div>
 
     <div class="stats-section">
       <collapsible
         class="stats-collapsible-header"
-        :include_caret="false"
+        :include_caret="true"
         :indentation_level="null"
         @click="initial_load_final_score_vs_first_submission"
+        :use_v_if="true"
       >
         <template v-slot:header_text>
           <div class="stats-header-text">
@@ -133,28 +145,30 @@
           </div>
         </template>
 
-        <div class="load-data-button-wrapper">
-          <button
-            type="button"
-            class="blue-button"
-            @click="reload_final_score_vs_first_submission"
-            :disabled="d_loading_submission_results || d_loading_all_submissions"
-          >
-            Reload Data
-          </button>
-        </div>
-        <progress-bar
-          v-if="d_loading_first_submissions_by_group"
-          :progress="(d_submission_results_progress + d_all_submissions_progress) / 2"
-        />
+        <template #default>
+          <div class="load-data-button-wrapper">
+            <button
+              type="button"
+              class="blue-button"
+              @click="reload_final_score_vs_first_submission"
+              :disabled="d_loading_submission_results || d_loading_all_submissions"
+            >
+              Reload Data
+            </button>
+          </div>
+          <progress-bar
+            v-if="d_loading_first_submissions_by_group"
+            :progress="(d_submission_results_progress + d_all_submissions_progress) / 2"
+          />
 
-        <first-submission-time-vs-final-score
-          ref="final_score_vs_first_submission"
-          v-if="d_submission_results !== null && d_all_submissions !== null"
-          :project="project"
-          :ultimate_submission_entries="d_submission_results"
-          :first_submissions_by_group="d_first_submissions_by_group"
-        />
+          <first-submission-time-vs-final-score
+            ref="final_score_vs_first_submission"
+            v-if="d_submission_results !== null && d_all_submissions !== null"
+            :project="project"
+            :ultimate_submission_entries="d_submission_results"
+            :first_submissions_by_group="d_first_submissions_by_group"
+          />
+        </template>
       </collapsible>
     </div>
   </div>
@@ -327,7 +341,7 @@ export default class ProjectStats extends Vue {
 }
 
 .stats-header-text {
-  @include section-header();
+  @include section-header($with-left-divider: false);
   font-size: 1.25rem;
 }
 </style>

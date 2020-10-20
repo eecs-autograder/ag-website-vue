@@ -3,15 +3,15 @@
     <div class="descriptive-stats-wrapper">
       <div class="stats">
         <div class="stats-title">All Students</div>
-        <descriptive-stats-table :percentages="d_percentages"/>
+        <descriptive-stats-table :values="d_percentages"/>
       </div>
       <div class="stats">
         <div class="stats-title">Individuals Only</div>
-        <descriptive-stats-table :percentages="d_individual_percentages"/>
+        <descriptive-stats-table :values="d_individual_percentages"/>
       </div>
       <div class="stats">
         <div class="stats-title">Groups Only</div>
-        <descriptive-stats-table :percentages="d_group_percentages"/>
+        <descriptive-stats-table :values="d_group_percentages"/>
       </div>
     </div>
 

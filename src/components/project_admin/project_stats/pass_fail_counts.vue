@@ -1,5 +1,5 @@
 <template>
-  <div class="pass-fail-counts">
+  <div class="pass-fail-counts" v-if="!d_loading">
     <table class="pass-fail-table">
       <thead>
         <tr>
@@ -23,11 +23,22 @@
         </template>
       </tbody>
     </table>
+
+    <template v-for="mutation_suite of d_mutation_suites">
+      <h3>{{mutation_suite.name}}: # Bugs Exposed</h3>
+      <descriptive-stats-table
+        :values="bugs_exposed_per_student_per_mutation_suite.get(mutation_suite.name)"
+      />
+      <bugs-exposed-histogram
+        :mutation_test_suite="mutation_suite"
+        :ultimate_submission_entries="ultimate_submission_entries"
+      />
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
@@ -38,13 +49,22 @@ import {
 import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 
-@Component({})
+import BugsExposedHistogram from './bugs_exposed_histogram';
+import { UltimateSubmissionEntry } from './project_stats.vue';
+import DescriptiveStatsTable from './submission_score_histogram/descriptive_stats_table.vue';
+
+@Component({
+  components: {
+    BugsExposedHistogram,
+    DescriptiveStatsTable
+  }
+})
 export default class PassFailCounts extends Vue {
   @Prop({required: true, type: ag_cli.Project})
   project!: ag_cli.Project;
 
   @Prop({required: true})
-  ultimate_submission_entries!: ag_cli.SubmissionResultFeedback[];
+  ultimate_submission_entries!: UltimateSubmissionEntry[];
 
   d_ag_test_suites: ag_cli.AGTestSuite[] = [];
   d_mutation_suites: ag_cli.MutationTestSuite[] = [];
@@ -62,10 +82,23 @@ export default class PassFailCounts extends Vue {
 
   @handle_global_errors_async
   async created() {
+    await this.load_data();
+    this.d_loading = false;
+  }
+
+  @Watch('ultimate_submission_entries')
+  on_ultimate_submission_entries_change() {
+    this.load_data();
+  }
+
+  async load_data() {
     [this.d_ag_test_suites, this.d_mutation_suites] = await Promise.all([
       ag_cli.AGTestSuite.get_all_from_project(this.project.pk),
       ag_cli.MutationTestSuite.get_all_from_project(this.project.pk)
     ]);
+
+    let pass_counts = new SafeMap<number, number>();
+    let fail_counts = new SafeMap<number, number>();
 
     for (let result of this.submission_results) {
       for (let suite_result of result.ag_test_suite_results) {
@@ -75,8 +108,7 @@ export default class PassFailCounts extends Vue {
             continue;
           }
 
-          let counts = correctness === CorrectnessLevel.all_correct
-            ? this.d_pass_counts : this.d_fail_counts;
+          let counts = correctness === CorrectnessLevel.all_correct ? pass_counts : fail_counts;
           counts.set(
             test_case_result.ag_test_case_pk,
             counts.get(test_case_result.ag_test_case_pk, 0) + 1
@@ -84,7 +116,27 @@ export default class PassFailCounts extends Vue {
         }
       }
     }
-    this.d_loading = false;
+
+    this.d_pass_counts = pass_counts;
+    this.d_fail_counts = fail_counts;
+  }
+
+  get bugs_exposed_per_student_per_mutation_suite() {
+    let result_lists = new SafeMap<string, number[]>();
+
+    for (let suite of this.d_mutation_suites) {
+      result_lists.set(suite.name, []);
+    }
+
+    for (let result of this.submission_results) {
+      for (let suite_result of result.mutation_test_suite_results) {
+        result_lists.get(
+          suite_result.mutation_test_suite_name
+        ).push(suite_result.num_bugs_exposed ?? 0);
+      }
+    }
+
+    return result_lists;
   }
 }
 </script>

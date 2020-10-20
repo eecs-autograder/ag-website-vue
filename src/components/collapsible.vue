@@ -16,9 +16,16 @@
         <slot name="header_icons"></slot>
       </div>
     </div>
-    <div v-show="d_is_open" data-testid="collapsible_body">
-      <slot></slot>
-    </div>
+    <template v-if="use_v_if">
+      <div v-if="d_is_open" data-testid="collapsible_body">
+        <slot></slot>
+      </div>
+    </template>
+    <template v-else>
+      <div v-show="d_is_open" data-testid="collapsible_body">
+        <slot></slot>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -57,6 +64,11 @@ export default class Collapsible extends Vue {
   // hovers over the header panel or when this.is_active is true.
   @Prop({default: false, type: Boolean})
   always_show_icons!: boolean;
+
+  // When true, the body of the collapsible will be wrapped
+  // in a v-if instead of v-show.
+  @Prop({default: false, type: Boolean})
+  use_v_if!: boolean;
 
   private d_is_open = this.start_open;
 

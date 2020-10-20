@@ -1,41 +1,43 @@
 <template>
   <table class="stats-table">
-    <tr><td class="stat-name">Count:</td> <td class="stat-value">{{percentages.length}}</td></tr>
-    <tr><td class="stat-name">Min:</td> <td class="stat-value">{{min}}</td></tr>
-    <tr><td class="stat-name">Q1:</td> <td class="stat-value">{{q1}}</td></tr>
-    <tr>
-      <td class="stat-name">Median:</td>
-      <td class="stat-value">{{median}}</td>
-    </tr>
-    <tr><td class="stat-name">Q3:</td> <td class="stat-value">{{q3}}</td></tr>
-    <tr><td class="stat-name">Max:</td> <td class="stat-value">{{max}}</td></tr>
-    <tr>
-      <td class="stat-name">Mean:</td> <td class="stat-value">{{mean}}</td>
-    </tr>
-    <tr>
-      <td class="stat-name">Stdev:</td> <td class="stat-value">{{stdev}}</td>
-    </tr>
+    <tr><td class="stat-name">Count:</td> <td class="stat-value">{{values.length}}</td></tr>
+    <template v-if="values.length !== 0">
+      <tr><td class="stat-name">Min:</td> <td class="stat-value">{{to_precision(min)}}</td></tr>
+      <tr><td class="stat-name">Q1:</td> <td class="stat-value">{{to_precision(q1)}}</td></tr>
+      <tr>
+        <td class="stat-name">Median:</td>
+        <td class="stat-value">{{median}}</td>
+      </tr>
+      <tr><td class="stat-name">Q3:</td> <td class="stat-value">{{to_precision(q3)}}</td></tr>
+      <tr><td class="stat-name">Max:</td> <td class="stat-value">{{to_precision(max)}}</td></tr>
+      <tr>
+        <td class="stat-name">Mean:</td> <td class="stat-value">{{to_precision(mean)}}</td>
+      </tr>
+      <tr>
+        <td class="stat-name">Stdev:</td> <td class="stat-value">{{to_precision(stdev)}}</td>
+      </tr>
+    </template>
   </table>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
-@Component({})
+@Component
 export default class DescriptiveStatsTable extends Vue {
     @Prop({required: true})
-    percentages!: number[];
+    values!: number[];
+
+    @Prop({default: 2})
+    precision!: number;
 
     get mean() {
-      let sum = this.percentages.reduce((total, current_val) => total + current_val, 0);
-      return Math.floor(sum / this.percentages.length);
+      let sum = this.values.reduce((total, current_val) => total + current_val, 0);
+      return sum / this.values.length;
     }
 
     get median() {
-      let sorted = this.sorted_percentages;
-      if (sorted.length === 0) {
-        return null;
-      }
+      let sorted = this.sorted_values;
 
       if (sorted.length % 2 !== 0) {
         return sorted[Math.floor(sorted.length / 2)];
@@ -47,51 +49,55 @@ export default class DescriptiveStatsTable extends Vue {
     }
 
     get stdev() {
-      if (this.percentages.length === 0) {
-        return null;
-      }
-
-      let sum_of_squares = this.percentages.reduce(
+      let sum_of_squares = this.values.reduce(
         (sum, current_value) => sum + Math.pow((current_value - this.mean), 2),
         0
       );
-      return Math.sqrt(sum_of_squares / this.percentages.length).toFixed(2);
+      return Math.sqrt(sum_of_squares / this.values.length);
     }
 
     get min() {
-      return Math.min(...this.percentages).toFixed(2);
+      return Math.min(...this.values);
     }
 
     get max() {
-      return Math.max(...this.percentages).toFixed(2);
+      return Math.max(...this.values);
     }
 
     get q1() {
-        return this.percentile(this.sorted_percentages, 25);
+        return this.percentile(this.sorted_values, 25);
     }
 
     get q3() {
-      return this.percentile(this.sorted_percentages, 75);
+      return this.percentile(this.sorted_values, 75);
     }
 
-    percentile(sorted_percentages: number[], p: number) {
-      let rank = (p / 100) * (sorted_percentages.length - 1) + 1;
+    percentile(sorted_values: number[], p: number) {
+      let rank = (p / 100) * (sorted_values.length - 1) + 1;
       let int_part = Math.floor(rank);
       let float_part = rank % 1;
 
       if (rank === 0) {
         return 0;
       }
-      if (rank === sorted_percentages.length) {
-        return sorted_percentages[sorted_percentages.length - 1];
+      if (rank === sorted_values.length) {
+        return sorted_values[sorted_values.length - 1];
       }
-      return sorted_percentages[int_part - 1]
+      return sorted_values[int_part - 1]
         + float_part
-        * (sorted_percentages[int_part] - sorted_percentages[int_part - 1]);
+        * (sorted_values[int_part] - sorted_values[int_part - 1]);
     }
 
-    get sorted_percentages() {
-      return this.percentages.slice().sort((first, second) => first - second);
+    get sorted_values() {
+      return this.values.slice().sort((first, second) => first - second);
+    }
+
+    to_precision(value: number) {
+      if (Math.floor(value) === value) {
+        return value;
+      }
+
+      return value.toFixed(this.precision);
     }
 }
 </script>
