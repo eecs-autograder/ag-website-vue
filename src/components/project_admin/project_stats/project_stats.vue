@@ -182,13 +182,13 @@ import * as ag_cli from 'ag-client-typescript';
 import Collapsible from '@/components/collapsible.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { SafeMap } from '@/safe_map';
 import { toggle } from '@/utils';
 
 import FirstSubmissionTimeVsFinalScore from './first_submission_time_vs_final_score';
 import PassFailCounts from './pass_fail_counts.vue';
 import SubmissionScoreHistogram from './submission_score_histogram/submission_score_histogram.vue';
 import SubmissionsOverTimeGraph from './submissions_over_time_graph';
-import { SafeMap } from '@/safe_map';
 
 interface UltimateSubmissionEntryPage {
   count: number;

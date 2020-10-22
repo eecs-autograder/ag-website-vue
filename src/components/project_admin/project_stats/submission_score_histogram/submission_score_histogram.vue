@@ -29,8 +29,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { UltimateSubmissionEntry } from '../project_stats.vue';
 
-import SubmissionScoreHistogramChart from './submission_score_histogram_chart';
 import DescriptiveStatsTable from './descriptive_stats_table.vue';
+import SubmissionScoreHistogramChart from './submission_score_histogram_chart';
 
 @Component({
       components: {

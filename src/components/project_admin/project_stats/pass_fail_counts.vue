@@ -88,7 +88,7 @@ export default class PassFailCounts extends Vue {
 
   @Watch('ultimate_submission_entries')
   on_ultimate_submission_entries_change() {
-    this.load_data();
+    return this.load_data();
   }
 
   async load_data() {

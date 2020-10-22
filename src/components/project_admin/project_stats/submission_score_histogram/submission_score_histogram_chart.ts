@@ -84,7 +84,10 @@ export default class SubmissionScoreHistogramChart extends Vue<Bar> {
         let buckets = Array(this.num_buckets).fill(0);
         for (let score of percentages) {
             // Prevent off-by-one when percent is 100
-            let bucket_index = Math.min(this.num_buckets - 1, Math.floor(score / this.label_increment));
+            let bucket_index = Math.min(
+                this.num_buckets - 1,
+                Math.floor(score / this.label_increment)
+            );
             buckets[bucket_index] += 1;
         }
 
