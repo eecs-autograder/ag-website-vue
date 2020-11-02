@@ -1,6 +1,6 @@
 // CommitChart.ts
 import { Line } from 'vue-chartjs';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { Submission } from 'ag-client-typescript';
 // @ts-ignore
@@ -9,7 +9,7 @@ import moment from "moment";
 @Component({
     extends: Line,
 })
-export default class SubmissionsOverTimeGraph extends Vue<Line> {
+export default class SubmissionsOverTimeGraph extends Mixins(Line) {
     @Prop({required: true})
     submissions!: Submission[];
 

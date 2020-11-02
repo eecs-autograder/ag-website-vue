@@ -1,6 +1,6 @@
 // CommitChart.ts
 import { Scatter } from 'vue-chartjs';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { SafeMap } from '@/safe_map';
 
@@ -9,7 +9,7 @@ import { FirstSubmissionData, UltimateSubmissionEntry } from './project_stats.vu
 @Component({
     extends: Scatter,
 })
-export default class FirstSubmissionTimeVsFinalScore extends Vue<Scatter> {
+export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
     @Prop({required: true})
     ultimate_submission_entries!: UltimateSubmissionEntry[];
 

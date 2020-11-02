@@ -1,11 +1,11 @@
 // CommitChart.ts
 import { Bar } from 'vue-chartjs';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
 
 @Component({
     extends: Bar,
 })
-export default class SubmissionScoreHistogramChart extends Vue<Bar> {
+export default class SubmissionScoreHistogramChart extends Mixins(Bar) {
     @Prop({required: true, type: Array})
     all_percentages!: number[];
 

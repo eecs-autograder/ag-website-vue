@@ -1,6 +1,6 @@
 // CommitChart.ts
 import { Bar } from 'vue-chartjs';
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
@@ -11,7 +11,7 @@ import { UltimateSubmissionEntry } from './project_stats.vue';
 @Component({
     extends: Bar,
 })
-export default class BugsExposedHistogram extends Vue<Bar> {
+export default class BugsExposedHistogram extends Mixins(Bar) {
     @Prop({required: true, type: ag_cli.MutationTestSuite})
     mutation_test_suite!: ag_cli.MutationTestSuite;
 
