@@ -103,7 +103,7 @@ describe('Datetime format tests', () => {
     });
 
     test('format_datetime non-null', () => {
-        let datetime = new Date(2020, 3, 28, 17, 42).toISOString();
+        let datetime = '2020-04-28T21:42:00.000Z';
         expect(format_datetime(datetime)).toEqual(`April 28, 2020, 02:42 PM ${mock_timezone_abbr}`);
     });
 
