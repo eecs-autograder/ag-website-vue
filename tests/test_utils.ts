@@ -9,6 +9,7 @@ import {
     chain,
     format_course_name,
     format_datetime,
+    format_datetime_short,
     format_mem_size,
     format_time,
     safe_assign,
@@ -105,6 +106,13 @@ describe('Datetime format tests', () => {
     test('format_datetime non-null', () => {
         let datetime = '2020-04-28T21:42:00.000Z';
         expect(format_datetime(datetime)).toEqual(`April 28, 2020, 02:42 PM ${mock_timezone_abbr}`);
+    });
+
+    test('format_datetime_short', () => {
+        let datetime = '2020-04-28T21:42:00.000Z';
+        expect(
+            format_datetime_short(datetime)
+        ).toEqual(`Apr 28, '20, 02:42 PM ${mock_timezone_abbr}`);
     });
 
     test('format_time null', () => {
