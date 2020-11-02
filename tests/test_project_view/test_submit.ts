@@ -3,6 +3,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 import { Course, GradingStatus, Group, HttpError, Project, Submission, User } from "ag-client-typescript";
 // @ts-ignore
 import moment from "moment";
+import { fn as moment_prototype } from 'moment';
 import * as sinon from 'sinon';
 
 import APIErrors from "@/components/api_errors.vue";
@@ -36,10 +37,6 @@ beforeEach(() => {
     ).withArgs(course.pk, current_user.pk).callsFake(() => {
         return Promise.resolve({late_days_remaining: late_days_remaining});
     });
-});
-
-afterEach(() => {
-    sinon.restore();
 });
 
 describe('Deadline info tests', () => {
@@ -451,6 +448,51 @@ describe('Submission limit, bonus submission, late day tests', () => {
         expect(wrapper.find('#late-days-remaining').exists()).toBe(false);
 
         expect(late_days_stub.notCalled).toBe(true);
+    });
+});
+
+describe('Submission limit reset time display tests', () => {
+    test('Reset timezone earlier than local timezone', async () => {
+        sinon.stub(moment.tz, 'guess').returns('Europe/Berlin');
+
+        project.submission_limit_per_day = 2;
+        project.submission_limit_reset_timezone = 'America/Los Angeles';
+        project.submission_limit_reset_time = '22:00:00';
+
+        sinon.stub(moment_prototype, 'tz').withArgs(
+            project.submission_limit_reset_timezone
+        ).returns(
+            moment.tz([2020, 11, 2, 1, 14, 0, 0], project.submission_limit_reset_timezone)
+        );
+
+        const wrapper = mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('.limit-reset-time-container').text()).toContain(
+            '7:00 AM CEST/10:00 PM PST'
+        );
+    });
+
+    test('Reset timezone later than local timezone', async () => {
+        fail();
+    });
+
+    test('Local and reset timezones identical', async () => {
+        fail();
+    });
+
+    test('Local and reset timezone times span DST', async () => {
+        fail();
+    });
+
+    test('No submission limit, reset time not shown', () => {
+        fail();
     });
 });
 

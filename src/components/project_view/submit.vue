@@ -24,13 +24,18 @@
     <group-members :group="group"></group-members>
 
     <div id="all-limits-container">
-      <div id="submissions-used"
-           class="limit-container" v-if="project.submission_limit_per_day !== null">
-        <span class="allotment">
-          {{group.num_submits_towards_limit}}/{{num_submissions_per_day}}
-        </span>
-        submissions used today.
-      </div>
+      <template v-if="project.submission_limit_per_day !== null">
+        <div id="submissions-used" class="limit-container">
+          <span class="allotment">
+            {{group.num_submits_towards_limit}}/{{num_submissions_per_day}}
+          </span>
+          submissions used today.
+        </div>
+        <div class="limit-reset-time-container">
+          <i class="fas fa-info-circle"></i>
+          This number will reset at <span class="limit-reset-time">{{formatted_reset_time}}</span>
+        </div>
+      </template>
       <div id="submissions-used-towards-limit"
            class="limit-container"
            v-if="project.total_submission_limit !== null">
@@ -157,7 +162,7 @@ import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 import { Course, ExpectedStudentFile, Group, Project, Submission, User } from 'ag-client-typescript';
 import * as minimatch from 'minimatch';
 // @ts-ignore
-import moment from "moment";
+import moment from "moment-timezone";
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
@@ -228,6 +233,31 @@ export default class Submit extends Vue {
       return this.project.submission_limit_per_day * this.group.member_names.length;
     }
     return this.project.submission_limit_per_day;
+  }
+
+  get formatted_reset_time() {
+    let reset_time = moment(this.project.submission_limit_reset_time, ['HH:mm', 'HH:mm:ss']);
+
+    // - Get the current time in the same timezone as the submission limit reset timezone.
+    // - "Fast-forward" that time until it has the same hour as the submission limit reset time.
+    //   - Note that just setting the hour of that time does NOT work because the next
+    //     reset time could be tomorrow.
+    let now_in_reset_timezone = moment().tz(this.project.submission_limit_reset_timezone);
+    console.log('now_in_reset_timezone: ', now_in_reset_timezone);
+    let next_reset_datetime = now_in_reset_timezone.clone()
+      .minute(reset_time.minute()).second(0).millisecond(0);
+    console.log('next_reset_datetime pre-loop: ', next_reset_datetime);
+    while (next_reset_datetime.hour() !== reset_time.hour()) {
+      next_reset_datetime.add(1, 'hour');
+    }
+
+    console.log('next_reset_datetime: ', next_reset_datetime);
+
+    console.log('cloney:' + next_reset_datetime.clone().format());
+    let next_local_reset_datetime = next_reset_datetime.clone().tz(moment.tz.guess());
+    console.log('next_local_reset_datetime' + next_local_reset_datetime);
+    let format = 'hh:mm A z';
+    return `${next_local_reset_datetime.format(format)}/${next_reset_datetime.format(format)}`;
   }
 
   get show_late_day_count(): boolean {
@@ -461,6 +491,20 @@ function num_glob_matches(names: string[], pattern: string): number {
 .allotment {
   color: darken($green, 5%);
   font-weight: bold;
+}
+
+.limit-reset-time-container {
+  font-size: .75em;
+  padding-left: .5rem;
+  margin-bottom: .5rem;
+
+  .limit-reset-time {
+    font-weight: bold;
+  }
+
+  .fa-info-circle {
+    color: $ocean-blue;
+  }
 }
 
 .file-list-header {
