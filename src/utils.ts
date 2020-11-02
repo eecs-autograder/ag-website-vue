@@ -2,7 +2,7 @@ import { Dictionary } from 'vue-router/types/router';
 
 import { Course } from 'ag-client-typescript';
 // @ts-ignore
-import moment from "moment";
+import moment from "moment-timezone";
 
 export function sleep(seconds: number) {
     return new Promise(resolve => setTimeout(resolve, seconds * 1000));
@@ -111,13 +111,13 @@ export function get_query_param(query_params: Dictionary<string | string[]>, key
 
 export function format_datetime(datetime: string | null): string {
     if (datetime === null) {
-        return '--- --, ----, --:-- --';
+        return '--- --, ----, --:-- -- ---';
     }
-    return moment(datetime).format('MMMM DD, YYYY, hh:mm A');
+    return moment(datetime).tz(moment.tz.guess()).format('MMMM DD, YYYY, hh:mm A z');
 }
 
 export function format_datetime_short(datetime: string): string {
-    return moment(datetime).format("MMM DD, 'YY, hh:mm A");
+    return moment(datetime).tz(moment.tz.guess()).format("MMM DD, 'YY, hh:mm A z");
 }
 
 export function format_time(time: string | null): string {

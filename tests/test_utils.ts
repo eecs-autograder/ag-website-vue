@@ -1,15 +1,27 @@
 import { Course, Semester } from 'ag-client-typescript';
+// @ts-ignore
+import moment from 'moment';
+import * as sinon from 'sinon';
 
 import {
     chain,
     format_course_name,
     format_datetime,
+    format_datetime_short,
     format_mem_size,
     format_time,
     safe_assign,
     zip,
 } from '@/utils';
 
+// Arizona doesn't have DST, so we'll use their timezone to prevent our
+// date formatting tests from failing for half the year.
+let mock_timezone = 'America/Phoenix';
+let mock_timezone_abbr = moment().tz(mock_timezone).format('z');
+
+beforeEach(() => {
+    sinon.stub(moment.tz, 'guess').returns(mock_timezone);
+});
 
 test('Safe assign', () => {
     let assign_to = {spam: '', egg: 42};
@@ -81,12 +93,19 @@ describe('chain() tests', () => {
 
 describe('Datetime format tests', () => {
     test('format_datetime null', () => {
-        expect(format_datetime(null)).toEqual('--- --, ----, --:-- --');
+        expect(format_datetime(null)).toEqual('--- --, ----, --:-- -- ---');
     });
 
     test('format_datetime non-null', () => {
-        let datetime = new Date(2020, 3, 28, 17, 42).toISOString();
-        expect(format_datetime(datetime)).toEqual('April 28, 2020, 05:42 PM');
+        let datetime = '2020-04-28T21:42:00.000Z';
+        expect(format_datetime(datetime)).toEqual(`April 28, 2020, 02:42 PM ${mock_timezone_abbr}`);
+    });
+
+    test('format_datetime_short', () => {
+        let datetime = '2020-04-28T21:42:00.000Z';
+        expect(
+            format_datetime_short(datetime)
+        ).toEqual(`Apr 28, '20, 02:42 PM ${mock_timezone_abbr}`);
     });
 
     test('format_time null', () => {
