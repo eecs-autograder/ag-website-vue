@@ -2,8 +2,6 @@ import { Course, Semester } from 'ag-client-typescript';
 // @ts-ignore
 import moment from 'moment';
 import * as sinon from 'sinon';
-// @ts-ignore
-import * as timezone_mock from 'timezone-mock';
 
 import {
     chain,
@@ -23,12 +21,7 @@ let mock_timezone_abbr = moment().tz(mock_timezone).format('z');
 
 beforeEach(() => {
     sinon.stub(moment.tz, 'guess').returns(mock_timezone);
-    // timezone_mock.register(mock_timezone);
 });
-
-// afterEach(() => {
-//     timezone_mock.unregister();
-// });
 
 test('Safe assign', () => {
     let assign_to = {spam: '', egg: 42};
