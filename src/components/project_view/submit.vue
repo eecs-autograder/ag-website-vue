@@ -238,26 +238,33 @@ export default class Submit extends Vue {
   get formatted_reset_time() {
     let reset_time = moment(this.project.submission_limit_reset_time, ['HH:mm', 'HH:mm:ss']);
 
-    // - Get the current time in the same timezone as the submission limit reset timezone.
-    // - "Fast-forward" that time until it has the same hour as the submission limit reset time.
-    //   - Note that just setting the hour of that time does NOT work because the next
-    //     reset time could be tomorrow.
     let now_in_reset_timezone = moment().tz(this.project.submission_limit_reset_timezone);
-    console.log('now_in_reset_timezone: ', now_in_reset_timezone);
-    let next_reset_datetime = now_in_reset_timezone.clone()
-      .minute(reset_time.minute()).second(0).millisecond(0);
-    console.log('next_reset_datetime pre-loop: ', next_reset_datetime);
-    while (next_reset_datetime.hour() !== reset_time.hour()) {
-      next_reset_datetime.add(1, 'hour');
+
+    // The next reset time is either today or tomorrow. If the current time
+    // is before the "today" reset time, then that's the next reset time.
+    // Otherwise, we've already passed the "today" reset time, meaning the
+    // next one is tomorrow.
+    let today_reset_datetime = now_in_reset_timezone.clone()
+      .hour(reset_time.hour()).minute(reset_time.minute()).second(0).millisecond(0);
+    let tomorrow_reset_datetime = today_reset_datetime.clone().add(1, 'day');
+
+    let next_reset_datetime;
+    if (now_in_reset_timezone.isBefore(today_reset_datetime)) {
+      next_reset_datetime = today_reset_datetime;
+    }
+    else {
+      next_reset_datetime = tomorrow_reset_datetime;
     }
 
-    console.log('next_reset_datetime: ', next_reset_datetime);
-
-    console.log('cloney:' + next_reset_datetime.clone().format());
     let next_local_reset_datetime = next_reset_datetime.clone().tz(moment.tz.guess());
-    console.log('next_local_reset_datetime' + next_local_reset_datetime);
     let format = 'hh:mm A z';
-    return `${next_local_reset_datetime.format(format)}/${next_reset_datetime.format(format)}`;
+
+    let formatted_local_reset = next_local_reset_datetime.format(format);
+    let formatted_next_reset = next_reset_datetime.format(format);
+    if (formatted_local_reset === formatted_next_reset) {
+      return formatted_local_reset;
+    }
+    return `${formatted_local_reset}/${formatted_next_reset}`;
   }
 
   get show_late_day_count(): boolean {

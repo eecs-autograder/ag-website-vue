@@ -3,7 +3,6 @@ import { mount, Wrapper } from '@vue/test-utils';
 import { Course, GradingStatus, Group, HttpError, Project, Submission, User } from "ag-client-typescript";
 // @ts-ignore
 import moment from "moment";
-import { fn as moment_prototype } from 'moment';
 import * as sinon from 'sinon';
 
 import APIErrors from "@/components/api_errors.vue";
@@ -452,18 +451,23 @@ describe('Submission limit, bonus submission, late day tests', () => {
 });
 
 describe('Submission limit reset time display tests', () => {
-    test('Reset timezone earlier than local timezone', async () => {
-        sinon.stub(moment.tz, 'guess').returns('Europe/Berlin');
-
+    beforeEach(() => {
         project.submission_limit_per_day = 2;
-        project.submission_limit_reset_timezone = 'America/Los Angeles';
-        project.submission_limit_reset_time = '22:00:00';
+    });
 
-        sinon.stub(moment_prototype, 'tz').withArgs(
-            project.submission_limit_reset_timezone
-        ).returns(
-            moment.tz([2020, 11, 2, 1, 14, 0, 0], project.submission_limit_reset_timezone)
-        );
+    async function do_submission_limit_reset_time_display_test(args: {
+        reset_timezone: string,
+        reset_time: string,
+        current_datetime: moment.Moment,
+        local_timezone: string,
+        expected_timezone_display: string,
+    }) {
+        project.submission_limit_reset_timezone = args.reset_timezone;
+        project.submission_limit_reset_time = args.reset_time;
+
+        sinon.stub(moment, 'now').returns(args.current_datetime.valueOf());
+
+        sinon.stub(moment.tz, 'guess').returns(args.local_timezone);
 
         const wrapper = mount(Submit, {
             propsData: {
@@ -475,24 +479,88 @@ describe('Submission limit reset time display tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find('.limit-reset-time-container').text()).toContain(
-            '7:00 AM CEST/10:00 PM PST'
+            args.expected_timezone_display
         );
+        wrapper.destroy();
+    }
+
+    // We want to make sure that our implementation works whether the
+    // next reset point is on the same day or the next day.
+    // If the next day is after a DST shift, we want to make sure we don't
+    // use the prior reset point, which would have been before the DST shift.
+
+    test('Next reset point within same day as current time in reset timezone', () => {
+        return do_submission_limit_reset_time_display_test({
+            reset_timezone: 'America/Los_Angeles',
+            reset_time: '22:35:00',
+            current_datetime: moment.tz('2020-11-02 17:14', 'America/New_York'),
+            local_timezone: 'Europe/Berlin',
+            expected_timezone_display: '7:35 AM CET/10:35 PM PST'
+        });
     });
 
-    test('Reset timezone later than local timezone', async () => {
-        fail();
+    test('Next reset point is in next day in reset timezone', () => {
+        return do_submission_limit_reset_time_display_test({
+            reset_timezone: 'America/Los_Angeles',
+            reset_time: '22:35:00',
+            current_datetime: moment.tz('2020-11-02 23:30', 'America/Los_Angeles'),
+            local_timezone: 'Europe/Berlin',
+            expected_timezone_display: '7:35 AM CET/10:35 PM PST'
+        });
     });
 
-    test('Local and reset timezones identical', async () => {
-        fail();
+    test('Next reset point spans DST', () => {
+        return do_submission_limit_reset_time_display_test({
+            reset_timezone: 'America/New_York',
+            reset_time: '22:35:00',
+            current_datetime: moment.tz('2020-11-01 23:45', 'America/New_York'),
+            local_timezone: 'America/Chicago',
+            expected_timezone_display: '9:35 PM CST/10:35 PM EST'
+        });
     });
 
-    test('Local and reset timezone times span DST', async () => {
-        fail();
+    test('Current time is minutes after but in same hour as reset time, spans DST', () => {
+        return do_submission_limit_reset_time_display_test({
+            reset_timezone: 'America/New_York',
+            reset_time: '22:35:00',
+            current_datetime: moment.tz('2020-11-01 22:45', 'America/New_York'),
+            local_timezone: 'America/Chicago',
+            expected_timezone_display: '9:35 PM CST/10:35 PM EST'
+        });
     });
 
-    test('No submission limit, reset time not shown', () => {
-        fail();
+    test('Current time is minutes before, same hour as reset time, before DST', () => {
+        return do_submission_limit_reset_time_display_test({
+            reset_timezone: 'America/New_York',
+            reset_time: '01:35:00',
+            current_datetime: moment.tz('2020-11-01 01:13', 'America/New_York'),
+            local_timezone: 'America/Chicago',
+            expected_timezone_display: '12:35 AM CDT/01:35 AM EDT'
+        });
+    });
+
+    test('Local and reset timezones identical', () => {
+        return do_submission_limit_reset_time_display_test({
+            reset_timezone: 'America/Chicago',
+            reset_time: '00:00:00',
+            current_datetime: moment.tz('2020-11-03 01:13', 'America/Chicago'),
+            local_timezone: 'America/Chicago',
+            expected_timezone_display: '12:00 AM CST'
+        });
+    });
+
+    test('No submission limit, reset time not shown', async () => {
+        project.submission_limit_per_day = null;
+        const wrapper = mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('.limit-reset-time-container').exists()).toBe(false);
     });
 });
 
