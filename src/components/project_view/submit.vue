@@ -24,13 +24,18 @@
     <group-members :group="group"></group-members>
 
     <div id="all-limits-container">
-      <div id="submissions-used"
-           class="limit-container" v-if="project.submission_limit_per_day !== null">
-        <span class="allotment">
-          {{group.num_submits_towards_limit}}/{{num_submissions_per_day}}
-        </span>
-        submissions used today.
-      </div>
+      <template v-if="project.submission_limit_per_day !== null">
+        <div id="submissions-used" class="limit-container">
+          <span class="allotment">
+            {{group.num_submits_towards_limit}}/{{num_submissions_per_day}}
+          </span>
+          submissions used today.
+        </div>
+        <div class="limit-reset-time-container">
+          <i class="fas fa-info-circle"></i>
+          This number will reset at <span class="limit-reset-time">{{formatted_reset_time}}</span>
+        </div>
+      </template>
       <div id="submissions-used-towards-limit"
            class="limit-container"
            v-if="project.total_submission_limit !== null">
@@ -157,7 +162,7 @@ import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 import { Course, ExpectedStudentFile, Group, Project, Submission, User } from 'ag-client-typescript';
 import * as minimatch from 'minimatch';
 // @ts-ignore
-import moment from "moment";
+import moment from "moment-timezone";
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
@@ -228,6 +233,38 @@ export default class Submit extends Vue {
       return this.project.submission_limit_per_day * this.group.member_names.length;
     }
     return this.project.submission_limit_per_day;
+  }
+
+  get formatted_reset_time() {
+    let reset_time = moment(this.project.submission_limit_reset_time, ['HH:mm', 'HH:mm:ss']);
+
+    let now_in_reset_timezone = moment().tz(this.project.submission_limit_reset_timezone);
+
+    // The next reset time is either today or tomorrow. If the current time
+    // is before the "today" reset time, then that's the next reset time.
+    // Otherwise, we've already passed the "today" reset time, meaning the
+    // next one is tomorrow.
+    let today_reset_datetime = now_in_reset_timezone.clone()
+      .hour(reset_time.hour()).minute(reset_time.minute()).second(0).millisecond(0);
+    let tomorrow_reset_datetime = today_reset_datetime.clone().add(1, 'day');
+
+    let next_reset_datetime;
+    if (now_in_reset_timezone.isBefore(today_reset_datetime)) {
+      next_reset_datetime = today_reset_datetime;
+    }
+    else {
+      next_reset_datetime = tomorrow_reset_datetime;
+    }
+
+    let next_local_reset_datetime = next_reset_datetime.clone().tz(moment.tz.guess());
+    let format = 'hh:mm A z';
+
+    let formatted_local_reset = next_local_reset_datetime.format(format);
+    let formatted_next_reset = next_reset_datetime.format(format);
+    if (formatted_local_reset === formatted_next_reset) {
+      return formatted_local_reset;
+    }
+    return `${formatted_local_reset}/${formatted_next_reset}`;
   }
 
   get show_late_day_count(): boolean {
@@ -461,6 +498,20 @@ function num_glob_matches(names: string[], pattern: string): number {
 .allotment {
   color: darken($green, 5%);
   font-weight: bold;
+}
+
+.limit-reset-time-container {
+  font-size: .75em;
+  padding-left: .5rem;
+  margin-bottom: .5rem;
+
+  .limit-reset-time {
+    font-weight: bold;
+  }
+
+  .fa-info-circle {
+    color: $ocean-blue;
+  }
 }
 
 .file-list-header {
