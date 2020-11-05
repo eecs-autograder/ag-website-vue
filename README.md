@@ -7,6 +7,13 @@ For information about contributing to Autograder.io, see our
 Follow the [dev stack setup tutorial](https://github.com/eecs-autograder/autograder-full-stack/blob/master/docs/development_setup.md) for the [autograder-full-stack repo](https://github.com/eecs-autograder/autograder-full-stack).
 
 ## Dev commands
+The unit tests currently require Node.js version 8. You can install this
+version with [NVM](https://github.com/nvm-sh/nvm/blob/master/README.md)
+by running:
+```
+nvm install 8
+```
+
 To run the unit tests (with coverage):
 ```
 npm test
