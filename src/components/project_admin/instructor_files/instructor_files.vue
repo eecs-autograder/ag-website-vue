@@ -18,7 +18,9 @@
             <i class="fas fa-bars"></i>
           </span>
           <span class="sidebar-header-text"
-                v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
+                v-if="!d_collapsed || current_filename === null">
+                  Uploaded Files
+          </span>
         </div>
 
         <div class="sidebar-content" v-if="!d_collapsed">
@@ -26,6 +28,7 @@
                                   :key="instructor_file.pk"
                                   :file="instructor_file"
                                   @click="view_file(instructor_file)"
+                                  @selected="toggleFileForBatchOperation(instructor_file.pk)"
                                   class="sidebar-item"
                                   :class="{'active': current_filename === instructor_file.name}">
           </single-instructor-file>
@@ -75,6 +78,19 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   d_collapsed = false;
   d_uploading = false;
   d_upload_progress: number | null = null;
+
+  d_files_list = new Set();
+
+  toggleFileForBatchOperation(key: string) {
+    if( this.d_files_list.has(key) ){
+      this.d_files_list.delete(key)
+      console.log(`deleted ${key}`)
+    }
+    else{
+      this.d_files_list.add(key)
+      console.log(`added ${key}`)
+    }
+  }
 
   // Do NOT modify the contents of this array!!
   get instructor_files(): ReadonlyArray<Readonly<InstructorFile>> {
