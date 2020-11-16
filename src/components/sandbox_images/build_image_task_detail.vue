@@ -13,6 +13,11 @@
       </template>
       <template v-else-if="build_task.status === BuildImageStatus.failed">
         Build Failed
+        <div v-if="build_task.timed_out" class="explanation">
+          The build exceeded the time limit of 10 minutes. Please optimize
+          your build or use the strategy detailed
+          <a :href="tips_and_tricks_url">here.</a>
+        </div>
       </template>
       <template v-else-if="build_task.status === BuildImageStatus.image_invalid">
         Invalid Image
@@ -132,6 +137,9 @@ export default class BuildImageTaskDetail extends Vue {
   d_downloading_files = false;
 
   d_cancelling_build = false;
+
+  tips_and_tricks_url = 'https://eecs-autograder.github.io/autograder.io'
+                        + '/topics/custom_sandbox_images.html#tips-and-tricks';
 
   created() {
     return this.load_output();

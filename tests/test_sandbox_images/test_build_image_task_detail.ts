@@ -60,11 +60,22 @@ test('Done status', async () => {
     expect(wrapper.find('.status-info').text().trim()).toEqual('Success!');
 });
 
-test('Failed status', async () => {
+test('Failed status, no timeout', async () => {
     build_task.status = ag_cli.BuildImageStatus.failed;
     let wrapper = await make_wrapper();
     expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(true);
     expect(wrapper.find('.status-info').text().trim()).toEqual('Build Failed');
+});
+
+test('Failed status and timed out', async () => {
+    build_task.status = ag_cli.BuildImageStatus.failed;
+    build_task.timed_out = true;
+    let wrapper = await make_wrapper();
+    expect(wrapper.findComponent({ref: 'output'}).exists()).toBe(true);
+    expect(wrapper.find('.status-info').text().trim()).toContain('Build Failed');
+    expect(wrapper.find('.status-info .explanation').text().trim()).toContain(
+        'The build exceeded the time limit'
+    );
 });
 
 test('Invalid image status', async () => {

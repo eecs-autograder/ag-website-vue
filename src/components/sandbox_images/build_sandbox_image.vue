@@ -16,7 +16,7 @@
 
     <progress-bar
       class="progress-bar"
-      v-if="d_file_upload_progress !== null"
+      v-if="d_starting_build && d_file_upload_progress !== null"
       :progress="d_file_upload_progress"
     />
     <APIErrors ref="api_errors"></APIErrors>
