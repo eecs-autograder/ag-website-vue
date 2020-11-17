@@ -1,20 +1,20 @@
 <template>
   <table class="stats-table">
-    <tr><td class="stat-name">Count:</td> <td class="stat-value">{{values.length}}</td></tr>
+    <tr><td class="stat-name">Count</td> <td class="stat-value">{{values.length}}</td></tr>
     <template v-if="values.length !== 0">
-      <tr><td class="stat-name">Min:</td> <td class="stat-value">{{to_precision(min)}}</td></tr>
-      <tr><td class="stat-name">Q1:</td> <td class="stat-value">{{to_precision(q1)}}</td></tr>
+      <tr><td class="stat-name">Min</td> <td class="stat-value">{{to_precision(min)}}</td></tr>
+      <tr><td class="stat-name">Q1</td> <td class="stat-value">{{to_precision(q1)}}</td></tr>
       <tr>
-        <td class="stat-name">Median:</td>
+        <td class="stat-name">Median</td>
         <td class="stat-value">{{median}}</td>
       </tr>
-      <tr><td class="stat-name">Q3:</td> <td class="stat-value">{{to_precision(q3)}}</td></tr>
-      <tr><td class="stat-name">Max:</td> <td class="stat-value">{{to_precision(max)}}</td></tr>
+      <tr><td class="stat-name">Q3</td> <td class="stat-value">{{to_precision(q3)}}</td></tr>
+      <tr><td class="stat-name">Max</td> <td class="stat-value">{{to_precision(max)}}</td></tr>
       <tr>
-        <td class="stat-name">Mean:</td> <td class="stat-value">{{to_precision(mean)}}</td>
+        <td class="stat-name">Mean</td> <td class="stat-value">{{to_precision(mean)}}</td>
       </tr>
       <tr>
-        <td class="stat-name">Stdev:</td> <td class="stat-value">{{to_precision(stdev)}}</td>
+        <td class="stat-name">Stdev</td> <td class="stat-value">{{to_precision(stdev)}}</td>
       </tr>
     </template>
   </table>
@@ -65,27 +65,28 @@ export default class DescriptiveStatsTable extends Vue {
     }
 
     get q1() {
-        return this.percentile(this.sorted_values, 25);
+        return this.percentile(25);
     }
 
     get q3() {
-      return this.percentile(this.sorted_values, 75);
+      return this.percentile(75);
     }
 
-    percentile(sorted_values: number[], p: number) {
-      let rank = (p / 100) * (sorted_values.length - 1) + 1;
+    private percentile(p: number) {
+      let rank = (p / 100) * (this.sorted_values.length - 1) + 1;
       let int_part = Math.floor(rank);
       let float_part = rank % 1;
 
       if (rank === 0) {
+        // istanbul ignore next
         return 0;
       }
-      if (rank === sorted_values.length) {
-        return sorted_values[sorted_values.length - 1];
+      if (rank === this.sorted_values.length) {
+        return this.sorted_values[this.sorted_values.length - 1];
       }
-      return sorted_values[int_part - 1]
+      return this.sorted_values[int_part - 1]
         + float_part
-        * (sorted_values[int_part] - sorted_values[int_part - 1]);
+        * (this.sorted_values[int_part] - this.sorted_values[int_part - 1]);
     }
 
     get sorted_values() {
