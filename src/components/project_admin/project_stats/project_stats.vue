@@ -200,7 +200,7 @@ interface UltimateSubmissionEntryPage {
 export interface UltimateSubmissionEntry {
   username: string;
   group: ag_cli.Group;
-  ultimate_submission: ag_cli.Submission & {results: ag_cli.SubmissionResultFeedback};
+  ultimate_submission: ag_cli.SubmissionWithResults;
 }
 
 export interface FirstSubmissionData {

@@ -33,10 +33,10 @@ import DescriptiveStatsTable from './descriptive_stats_table.vue';
 import SubmissionScoreHistogramChart from './submission_score_histogram_chart';
 
 @Component({
-      components: {
-        SubmissionScoreHistogramChart,
-        DescriptiveStatsTable,
-    }
+  components: {
+    SubmissionScoreHistogramChart,
+    DescriptiveStatsTable,
+  }
 })
 export default class SubmissionScoreHistogram extends Vue {
   @Prop({required: true})
