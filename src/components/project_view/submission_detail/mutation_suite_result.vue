@@ -119,8 +119,9 @@
              class="feedback-row">
 
           <div class="feedback-explanation">
-            Tests with false positives incorrectly reported a bug when run against a correct
-            implementation.
+            False positives detected in
+            {{mutation_test_suite_result.invalid_tests.length}} of your tests.
+            Those tests reported an error when run against a correct implementation.
           </div>
           <div class="feedback-label test-names-feedback-label">Tests with false positives:</div>
           <div class="feedback test-names-feedback">
