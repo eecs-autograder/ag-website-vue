@@ -17,8 +17,8 @@ export default class SubmissionsOverTimeGraph extends Mixins(Line) {
         this.update_chart();
     }
 
-    @Watch('submission_results')
-    on_submission_results_change() {
+    @Watch('submissions')
+    on_submissions_change() {
         this.update_chart();
     }
 

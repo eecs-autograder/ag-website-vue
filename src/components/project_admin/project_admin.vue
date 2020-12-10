@@ -91,6 +91,7 @@
       <project-stats
         v-show="d_current_tab === 'stats'"
         v-if="d_loaded_tabs.has('stats')"
+        :course="d_globals.current_course"
         :project="d_project"
       />
     </div>

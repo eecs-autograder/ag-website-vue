@@ -47,8 +47,8 @@
             :progress="d_submission_results_progress"
           />
           <submission-score-histogram
-            v-if="d_submission_results !== null"
-            :ultimate_submission_entries="d_submission_results"
+            v-if="submission_results !== null"
+            :ultimate_submission_entries="submission_results"
             @stats_updated="d_submission_result_stats = $event"
           />
         </template>
@@ -85,8 +85,8 @@
             :progress="d_all_submissions_progress"
           />
           <submissions-over-time-graph
-            v-if="d_all_submissions !== null"
-            :submissions="d_all_submissions"
+            v-if="all_submissions !== null"
+            :submissions="all_submissions"
           />
         </template>
       </collapsible>
@@ -123,9 +123,9 @@
           />
           <pass-fail-counts
             ref="pass_fail_counts"
-            v-if="d_submission_results !== null"
+            v-if="submission_results !== null"
             :project="project"
-            :ultimate_submission_entries="d_submission_results"
+            :ultimate_submission_entries="submission_results"
           />
         </template>
       </collapsible>
@@ -163,9 +163,9 @@
 
           <first-submission-time-vs-final-score
             ref="final_score_vs_first_submission"
-            v-if="d_submission_results !== null && d_all_submissions !== null"
+            v-if="submission_results !== null && d_all_submissions !== null"
             :project="project"
-            :ultimate_submission_entries="d_submission_results"
+            :ultimate_submission_entries="submission_results"
             :first_submissions_by_group="d_first_submissions_by_group"
           />
         </template>
@@ -219,10 +219,14 @@ export interface FirstSubmissionData {
   }
 })
 export default class ProjectStats extends Vue {
+  @Prop({type: ag_cli.Course, required: true})
+  course!: ag_cli.Course;
+
   @Prop({type: ag_cli.Project, required: true})
   project!: ag_cli.Project;
 
   d_include_staff = true;
+  d_staff_usernames = new Set<string>();
 
   d_loading_submission_results = false;
   d_submission_results_progress = 0;
@@ -236,6 +240,22 @@ export default class ProjectStats extends Vue {
 
   d_loading_first_submissions_by_group = false;
   d_first_submissions_by_group = new SafeMap<number, FirstSubmissionData>();
+
+  @handle_global_errors_async
+  async created() {
+    let [staff, admins] = await Promise.all([this.course.get_staff(), this.course.get_admins()]);
+    this.d_staff_usernames = new Set([...staff, ...admins].map(user => user.username));
+  }
+
+  get submission_results() {
+    if (this.d_submission_results === null || this.d_include_staff) {
+      return this.d_submission_results;
+    }
+
+    return this.d_submission_results.filter(
+      result => !this.d_staff_usernames.has(result.username)
+    );
+  }
 
   async initial_load_submission_results() {
     if (this.d_submission_results === null && !this.d_loading_submission_results) {
@@ -257,7 +277,8 @@ export default class ProjectStats extends Vue {
         let response = await ag_cli.HttpClient.get_instance().get<UltimateSubmissionEntryPage>(
           `projects/${this.project.pk}/all_ultimate_submission_results/`
           + `?page=${page_num}&groups_per_page=${page_size}`
-          + `&full_results=true&include_staff=${this.d_include_staff ? 'true' : 'false'}`
+          // Staff will be filtered out after we load the data
+          + `&full_results=true&include_staff=true`
         );
         page = response.data;
         results.push(...page.results);
@@ -268,6 +289,17 @@ export default class ProjectStats extends Vue {
 
       this.d_submission_results = results;
     });
+  }
+
+  get all_submissions(): ag_cli.Submission[] | null {
+    if (this.d_all_submissions === null || this.d_include_staff) {
+      return this.d_all_submissions;
+    }
+
+    let result = this.d_all_submissions.filter(
+      submission => !this.d_staff_usernames.has(submission.submitter)
+    );
+    return result;
   }
 
   async initial_load_all_submissions() {

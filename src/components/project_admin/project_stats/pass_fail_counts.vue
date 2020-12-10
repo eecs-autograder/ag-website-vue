@@ -51,8 +51,8 @@ import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 
 import BugsExposedHistogram from './bugs_exposed_histogram';
+import DescriptiveStatsTable from './descriptive_stats_table.vue';
 import { UltimateSubmissionEntry } from './project_stats.vue';
-import DescriptiveStatsTable from './submission_score_histogram/descriptive_stats_table.vue';
 
 @Component({
   components: {

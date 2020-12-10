@@ -3,22 +3,22 @@
     <div class="descriptive-stats-wrapper">
       <div class="stats">
         <div class="stats-title">All Students</div>
-        <descriptive-stats-table :values="d_percentages"/>
+        <descriptive-stats-table :values="percentages"/>
       </div>
       <div class="stats">
         <div class="stats-title">Individuals Only</div>
-        <descriptive-stats-table :values="d_individual_percentages"/>
+        <descriptive-stats-table :values="individual_percentages"/>
       </div>
       <div class="stats">
         <div class="stats-title">Groups Only</div>
-        <descriptive-stats-table :values="d_group_percentages"/>
+        <descriptive-stats-table :values="group_percentages"/>
       </div>
     </div>
 
     <submission-score-histogram-chart
-      :all_percentages="d_percentages"
-      :individual_percentages="d_individual_percentages"
-      :group_percentages="d_group_percentages"
+      :all_percentages="percentages"
+      :individual_percentages="individual_percentages"
+      :group_percentages="group_percentages"
       :num_buckets="num_buckets"
     />
   </div>
@@ -27,9 +27,9 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import DescriptiveStatsTable from '../descriptive_stats_table.vue';
 import { UltimateSubmissionEntry } from '../project_stats.vue';
 
-import DescriptiveStatsTable from './descriptive_stats_table.vue';
 import SubmissionScoreHistogramChart from './submission_score_histogram_chart';
 
 @Component({
@@ -42,27 +42,38 @@ export default class SubmissionScoreHistogram extends Vue {
   @Prop({required: true})
   ultimate_submission_entries!: UltimateSubmissionEntry[];
 
-  // All scores
-  d_percentages: number[] = [];
-  // Scores for students working alone
-  d_individual_percentages: number[] = [];
-  // Scores for students working in a group
-  d_group_percentages: number[] = [];
-
   readonly num_buckets = 20;
 
-  mounted() {
-    this.compute_percentages();
+  // All scores
+  get percentages(): number[] {
+    return this.percentages_by_entry.map(tuple => tuple[1]);
   }
 
-  @Watch('ultimate_submission_entries')
-  on_ultimate_submission_entries_changed() {
-    this.compute_percentages();
+  // Scores for students working alone
+  get individual_percentages(): number[] {
+    return this.percentages_by_entry.filter(tuple => {
+      let [entry, percent] = tuple;
+      return entry.group.members.length === 1;
+    }).map(tuple => tuple[1]);
   }
 
-  compute_percentages() {
+  // Scores for students working in a group
+  get group_percentages(): number[] {
     let groups_seen = new Set<number>();
-    for (let entry of this.ultimate_submission_entries) {
+    let result: number[] = [];
+
+    for (let [entry, percent] of this.percentages_by_entry) {
+      if (entry.group.members.length !== 1 && !groups_seen.has(entry.group.pk)) {
+        result.push(percent);
+        groups_seen.add(entry.group.pk);
+      }
+    }
+
+    return result;
+  }
+
+  get percentages_by_entry(): [UltimateSubmissionEntry, number][] {
+    return this.ultimate_submission_entries.map(entry => {
       let submission_result = entry.ultimate_submission.results;
       let percent = 0;
       let points_possible = Number(submission_result.total_points_possible);
@@ -70,16 +81,8 @@ export default class SubmissionScoreHistogram extends Vue {
         percent = Math.floor((Number(submission_result.total_points) / points_possible) * 100);
       }
 
-      this.d_percentages.push(percent);
-
-      if (entry.group.members.length === 1) {
-        this.d_individual_percentages.push(percent);
-      }
-      else if (!groups_seen.has(entry.group.pk)) {
-        this.d_group_percentages.push(percent);
-        groups_seen.add(entry.group.pk);
-      }
-    }
+      return [entry, percent];
+    });
   }
 }
 </script>

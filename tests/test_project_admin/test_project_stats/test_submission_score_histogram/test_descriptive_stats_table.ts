@@ -1,4 +1,4 @@
-import DescriptiveStatsTable from '@/components/project_admin/project_stats/submission_score_histogram/descriptive_stats_table.vue';
+import DescriptiveStatsTable from '@/components/project_admin/project_stats/descriptive_stats_table.vue';
 
 import { managed_mount } from '@/tests/setup';
 

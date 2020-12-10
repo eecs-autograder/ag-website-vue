@@ -1,7 +1,7 @@
 import { WrapperArray } from '@vue/test-utils';
 
+import DescriptiveStatsTable from '@/components/project_admin/project_stats/descriptive_stats_table.vue';
 import { UltimateSubmissionEntry } from '@/components/project_admin/project_stats/project_stats.vue';
-import DescriptiveStatsTable from '@/components/project_admin/project_stats/submission_score_histogram/descriptive_stats_table.vue';
 import SubmissionScoreHistogram from '@/components/project_admin/project_stats/submission_score_histogram/submission_score_histogram.vue';
 import SubmissionScoreHistogramChart from '@/components/project_admin/project_stats/submission_score_histogram/submission_score_histogram_chart';
 
