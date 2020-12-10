@@ -1,4 +1,3 @@
-// CommitChart.ts
 import { Bar } from 'vue-chartjs';
 import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
 
@@ -72,7 +71,7 @@ export default class BugsExposedHistogram extends Mixins(Bar) {
         );
     }
 
-    // Returns a map of how many times each bug was exposed.
+    // Returns a map of (bug name) -> (how many times that bug was exposed).
     buggy_impl_exposed_count() {
         let counts = new SafeMap<string, number>();
         for (let bug_name of this.mutation_test_suite.buggy_impl_names) {

@@ -15,7 +15,8 @@
             <td></td><td></td>
           </tr>
 
-          <tr v-for="test_case of suite.ag_test_cases" :key="`test-${test_case.pk}`">
+          <tr v-for="test_case of suite.ag_test_cases" :key="`test-${test_case.pk}`"
+              data-testid="test_row">
             <td class="test-name">{{test_case.name}}</td>
             <td class="num-pass">{{d_pass_counts.get(test_case.pk, null)}}</td>
             <td class="num-fail">{{d_fail_counts.get(test_case.pk, null)}}</td>
@@ -104,6 +105,7 @@ export default class PassFailCounts extends Vue {
       for (let suite_result of result.ag_test_suite_results) {
         for (let test_case_result of suite_result.ag_test_case_results) {
           let correctness = ag_test_case_result_correctness(test_case_result);
+          // Correctness level should never be "not_available"
           if (correctness === CorrectnessLevel.info_only) {
             continue;
           }
@@ -122,6 +124,7 @@ export default class PassFailCounts extends Vue {
   }
 
   get bugs_exposed_per_student_per_mutation_suite() {
+    // Map of (suite name) -> (list of number of bugs exposed, one item per student)
     let result_lists = new SafeMap<string, number[]>();
 
     for (let suite of this.d_mutation_suites) {

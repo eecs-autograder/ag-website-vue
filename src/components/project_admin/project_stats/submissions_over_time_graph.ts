@@ -1,6 +1,6 @@
 // CommitChart.ts
 import { Line } from 'vue-chartjs';
-import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
 import { Submission } from 'ag-client-typescript';
 // @ts-ignore
