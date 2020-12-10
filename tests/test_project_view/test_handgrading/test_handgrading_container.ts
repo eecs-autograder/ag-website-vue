@@ -21,7 +21,9 @@ let ungraded_group: ag_cli.GroupWithHandgradingResultSummary;
 let in_progress_group: ag_cli.GroupWithHandgradingResultSummary;
 let graded_group: ag_cli.GroupWithHandgradingResultSummary;
 let staff_group: ag_cli.GroupWithHandgradingResultSummary;
+let admin_group: ag_cli.GroupWithHandgradingResultSummary;
 
+let get_admins_stub: sinon.SinonStub;
 let get_staff_stub: sinon.SinonStub;
 let get_all_summaries_stub: sinon.SinonStub;
 let get_or_create_stub: sinon.SinonStub;
@@ -31,6 +33,7 @@ beforeEach(() => {
     project = data_ut.make_project(course.pk);
     rubric = data_ut.make_handgrading_rubric(project.pk);
 
+    get_admins_stub = sinon.stub(course, 'get_admins').resolves([]);
     get_staff_stub = sinon.stub(course, 'get_staff').resolves([]);
     get_all_summaries_stub = sinon.stub(
         ag_cli.HandgradingResult, 'get_all_summaries_from_project'
@@ -75,6 +78,18 @@ beforeEach(() => {
     );
     get_staff_stub.resolves(staff);
 
+    let admin = data_ut.make_user({username: 'admin@spam.com'});
+    admin_group = data_ut.make_group_summary(
+        project.pk, 1,
+        {member_names: [admin.username], num_submissions: 1},
+        {
+            finished_grading: true,
+            total_points: 5,
+            total_points_possible: 6
+        }
+    );
+    get_admins_stub.resolves([admin]);
+
     sinon.stub(ag_cli.HandgradingResult.prototype, 'has_correct_submission').resolves(true);
 });
 
@@ -88,6 +103,7 @@ describe('Filter group summaries tests', () => {
             in_progress_group,
             graded_group,
             staff_group,
+            admin_group,
         ]);
 
         wrapper = await make_wrapper();
@@ -102,7 +118,7 @@ describe('Filter group summaries tests', () => {
         wrapper.find('#include-staff').setChecked();
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_include_staff).toBe(true);
-        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(5);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(6);
         expect(summary_pks(wrapper).includes(staff_group.pk)).toBe(true);
     });
 
@@ -161,21 +177,22 @@ describe('Filter group summaries tests', () => {
 
         expect(
             compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
-        ).toEqual('2/4 (5 total)');
+        ).toEqual('3/5 (6 total)');
 
+        // Filtering by status does NOT change the "total graded" display
         wrapper.vm.d_status_filter = HandgradingStatus.graded;
         await wrapper.vm.$nextTick();
-
         expect(
             compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
-        ).toEqual('2/4 (5 total)');
+        ).toEqual('3/5 (6 total)');
 
+
+        // Entering search text does NOT change the "total graded" display
         wrapper.vm.d_search_text = 'staff';
         await wrapper.vm.$nextTick();
-
         expect(
             compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
-        ).toEqual('2/4 (5 total)');
+        ).toEqual('3/5 (6 total)');
     });
 });
 

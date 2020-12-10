@@ -173,7 +173,8 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 
   @handle_global_errors_async
   async created() {
-    this.d_staff =  new Set((await this.course.get_staff()).map(user => user.username));
+    let [staff, admins] = await Promise.all([this.course.get_staff(), this.course.get_admins()]);
+    this.d_staff =  new Set([...staff, ...admins].map(user => user.username));
     await this.load_result_summaries();
     ag_cli.HandgradingResult.subscribe(this);
   }
