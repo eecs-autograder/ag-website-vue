@@ -14,13 +14,21 @@
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
-          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
-            <i class="fas fa-bars"></i>
-          </span>
-          <span class="sidebar-header-text"
-                v-if="!d_collapsed || current_filename === null">
-                  Uploaded Files
-          </span>
+          <div>
+            <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+              <i class="fas fa-bars"></i>
+            </span>
+            <span class="sidebar-header-text"
+                  v-if="!d_collapsed || current_filename === null">
+                    Uploaded Files
+            </span>
+          </div>
+          <div>
+            <button v-if="d_batch_mode" class="batch-delete-files-button red-button">
+              Delete
+            </button>
+            <input class="batch-select-all-checkbox" type="checkbox" @click="batch_toggle_all()" />
+          </div>
         </div>
 
         <div class="sidebar-content" v-if="!d_collapsed">
@@ -79,9 +87,10 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   d_uploading = false;
   d_upload_progress: number | null = null;
 
-  d_files_list = new Set();
+  d_files_list = new Set<Number>();
+  d_batch_mode = false;
 
-  toggleFileForBatchOperation(key: string) {
+  toggleFileForBatchOperation(key: Number) {
     if( this.d_files_list.has(key) ){
       this.d_files_list.delete(key)
       console.log(`deleted ${key}`)
@@ -90,7 +99,10 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
       this.d_files_list.add(key)
       console.log(`added ${key}`)
     }
+
+    this.d_batch_mode = this.d_files_list.size > 0;
   }
+
 
   // Do NOT modify the contents of this array!!
   get instructor_files(): ReadonlyArray<Readonly<InstructorFile>> {
@@ -202,10 +214,16 @@ $border-color: hsl(220, 40%, 94%);
 }
 
 .sidebar-header {
+  display: flex;
+  justify-content: space-between;
   padding-top: .5rem;
   padding-bottom: .5rem;
   font-weight: bold;
   font-size: 1.125rem;
+}
+
+.sidebar-header-text {
+  white-space: nowrap;
 }
 
 .sidebar-collapse-button {
@@ -215,6 +233,15 @@ $border-color: hsl(220, 40%, 94%);
   &:hover {
     color: darken($ocean-blue, 10);
   }
+}
+
+.batch-delete-files-button {
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+.batch-select-all-checkbox {
+  margin: 0 0.5em;
 }
 
 .sidebar-item {
