@@ -79,6 +79,10 @@
 
     <fieldset class="fieldset">
       <legend class="legend"> Instructor Files </legend>
+      <button class="instructor-file-batch-select-button"
+              @click="start_batch_selection_mode(0)">
+        Batch Select
+      </button>
       <div class="typeahead-search-bar">
         <dropdown-typeahead ref="instructor_files_typeahead"
                             placeholder_text="Enter a filename"
@@ -135,6 +139,27 @@
         </div>
       </div>
     </fieldset>
+
+    <div @click.stop>
+      <modal v-if="d_show_batch_select_modal"
+             @close="d_show_batch_select_modal = false"
+             size="large"
+             click_outside_to_close>
+        <div class="modal-header">Select Files</div>
+        <div>
+          <ul>
+            <li :class="d_batch_needed_files.some((el) => el.pk == file.pk) ? 'selected' : ''" v-for="file of d_batch_available_files" :key="file.pk" @click="batch_toggle_select(file)">{{ file.name }}</li>
+          </ul>
+        </div>
+
+        <div class="button-footer-right modal-button-footer">
+          <button class="modal-confirm-button"
+                  @click="end_batch_selection_mode"> Confirm </button>
+          <button class="modal-cancel-button"
+                  @click="d_show_batch_select_modal = false"> Cancel </button>
+        </div>
+      </modal>
+    </div>
   </div>
 </template>
 
@@ -150,6 +175,7 @@ import {
   SandboxDockerImageData,
 } from 'ag-client-typescript';
 
+import Modal from '@/components/modal.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import SelectObject from '@/components/select_object.vue';
 import Toggle from '@/components/toggle.vue';
@@ -177,8 +203,15 @@ class Suite {
   }
 }
 
+type UnionFile = ExpectedStudentFile | InstructorFile;
+enum BatchModeEnum {
+  INSTRUCTOR_FILES,
+  STUDENT_FILES
+}
+
 @Component({
   components: {
+    Modal,
     DropdownTypeahead,
     SelectObject,
     Toggle,
@@ -199,6 +232,37 @@ export default class SuiteSettings extends Vue {
   d_suite: Suite | null = null;
 
   readonly is_not_empty = is_not_empty;
+
+  d_show_batch_select_modal = false;
+  d_batch_available_files: UnionFile[]  = new Array<UnionFile>();
+  d_batch_needed_files: UnionFile[] = new Array<UnionFile>();
+  d_batch_mode : BatchModeEnum;
+
+  start_batch_selection_mode(mode: BatchModeEnum) {
+    this.d_batch_available_files = (mode == BatchModeEnum.INSTRUCTOR_FILES ? this.project.instructor_files!: this.project.expected_student_files!);
+    this.d_batch_needed_files = (mode == BatchModeEnum.INSTRUCTOR_FILES ? this.d_suite!.instructor_files_needed: this.d_suite!.student_files_needed!);
+
+    this.d_show_batch_select_modal = true;
+  }
+
+  batch_toggle_select(file: UnionFile) {
+    if(this.d_batch_needed_files.some((el) => el.pk == file.pk)) {
+      this.d_batch_needed_files = this.d_batch_needed_files.filter(el => el.pk !== file.pk);
+    } else {
+      this.d_batch_needed_files.push(file);
+    }
+  }
+
+  end_batch_selection_mode() {
+    if(this.d_batch_mode === BatchModeEnum.INSTRUCTOR_FILES) {
+      this.d_suite!.instructor_files_needed = this.d_batch_needed_files
+    } else {
+      this.d_suite!.student_files_needed = this.d_batch_needed_files
+    }
+    this.$emit('field_change', this.d_suite);
+
+    this.d_show_batch_select_modal = false;
+  }
 
   created() {
     this.d_suite = new Suite(this.suite);
@@ -227,6 +291,10 @@ export default class SuiteSettings extends Vue {
     return file.pattern.indexOf(filter_text) >= 0;
   }
 
+  is_in_batch(file) {
+    return this.d_batch_needed_files.has(file);
+  }
+
   get instructor_files_available() {
     return this.project.instructor_files!.filter((instructor_file: InstructorFile) => {
       return this.d_suite!.instructor_files_needed.findIndex(
@@ -246,7 +314,11 @@ export default class SuiteSettings extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
+
 
 * {
   box-sizing: border-box;
@@ -296,5 +368,26 @@ export default class SuiteSettings extends Vue {
 
 .odd-index {
   background-color: hsl(210, 20%, 96%);
+}
+
+/* TODO: get rid of dev stuff */
+.selected {
+  color: red;
+}
+
+
+/* ---------------- MODAL ---------------- */
+
+.file-to-delete {
+  color: darken($ocean-blue, 5%);
+  font-weight: bold;
+}
+
+.modal-confirm-button {
+  @extend .green-button;
+}
+
+.modal-cancel-button {
+  @extend .red-button;
 }
 </style>
