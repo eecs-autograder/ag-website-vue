@@ -79,10 +79,6 @@
 
     <fieldset class="fieldset">
       <legend class="legend"> Instructor Files </legend>
-      <button class="instructor-file-batch-select-button"
-              @click="start_batch_selection_mode(0)">
-        Batch Select
-      </button>
       <div class="typeahead-search-bar">
         <dropdown-typeahead ref="instructor_files_typeahead"
                             placeholder_text="Enter a filename"
@@ -95,6 +91,10 @@
             </span>
           </template>
         </dropdown-typeahead>
+        <button class="button white-button batch-select-button"
+                @click="start_batch_selection_mode(BatchModeEnum.INSTRUCTOR_FILES)">
+          Batch Select
+        </button>
       </div>
 
       <div class="instructor-files">
@@ -113,10 +113,6 @@
 
     <fieldset class="fieldset">
       <legend class="legend"> Student Files </legend>
-      <button class="instructor-file-batch-select-button"
-              @click="start_batch_selection_mode(1)">
-        Batch Select
-      </button>
       <div class="typeahead-search-bar">
         <dropdown-typeahead ref="student_files_typeahead"
                             placeholder_text="Enter a filename"
@@ -129,6 +125,10 @@
             </span>
           </template>
         </dropdown-typeahead>
+        <button class="button white-button batch-select-button"
+                @click="start_batch_selection_mode(BatchModeEnum.STUDENT_FILES)">
+          Batch Select
+        </button>
       </div>
 
       <div class="student-files">
@@ -151,10 +151,12 @@
              click_outside_to_close>
         <div class="modal-header">Select Files</div>
         <div>
-          <ul>
-            <li :class="d_batch_needed_files.some((el) => el.pk == file.pk) ?
+          <ul class="batch-select-card-grid">
+            <li class="batch-select-card" :class="d_batch_needed_files.some((el) => el.pk == file.pk) ?
 'selected' : ''" v-for="file of d_batch_available_files" :key="file.pk"
-@click="batch_toggle_select(file)">{{ file.name || file.pattern }}</li>
+@click="batch_toggle_select(file)">
+          {{ file.name || file.pattern }}
+              </li>
           </ul>
         </div>
 
@@ -209,7 +211,6 @@ class Suite {
   }
 }
 
-type UnionFile = ExpectedStudentFile | InstructorFile;
 enum BatchModeEnum {
   INSTRUCTOR_FILES,
   STUDENT_FILES
@@ -235,13 +236,15 @@ export default class SuiteSettings extends Vue {
   @Prop({required: true})
   docker_images!: SandboxDockerImageData[];
 
+  BatchModeEnum = BatchModeEnum;
+
   d_suite: Suite | null = null;
 
   readonly is_not_empty = is_not_empty;
 
   d_show_batch_select_modal = false;
-  d_batch_available_files: UnionFile[]  = new Array<UnionFile>();
-  d_batch_needed_files: UnionFile[] = new Array<UnionFile>();
+  d_batch_available_files: File[]  = new Array<File>();
+  d_batch_needed_files: File[] = new Array<File>();
   d_batch_mode : BatchModeEnum;
 
   start_batch_selection_mode(mode: BatchModeEnum) {
@@ -253,7 +256,7 @@ export default class SuiteSettings extends Vue {
     this.d_show_batch_select_modal = true;
   }
 
-  batch_toggle_select(file: UnionFile) {
+  batch_toggle_select(file: File) {
     if(this.d_batch_needed_files.some((el) => el.pk == file.pk)) {
       this.d_batch_needed_files = this.d_batch_needed_files.filter(el => el.pk !== file.pk);
     } else {
@@ -327,7 +330,6 @@ export default class SuiteSettings extends Vue {
 @import '@/styles/forms.scss';
 @import '@/styles/modal.scss';
 
-
 * {
   box-sizing: border-box;
   padding: 0;
@@ -378,9 +380,38 @@ export default class SuiteSettings extends Vue {
   background-color: hsl(210, 20%, 96%);
 }
 
-/* TODO: get rid of dev stuff */
-.selected {
-  color: red;
+
+.typeahead-search-bar {
+  display: flex;
+
+  .dropdown-typeahead-container {
+    flex: 1;
+  }
+
+  .batch-select-button {
+    margin-left: 1em;
+  }
+}
+
+
+.batch-select-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 0.5em;
+  align-items: stretch;
+  list-style-type: none;
+
+  .batch-select-card {
+    display: block;
+    padding: 1em;
+    border-radius: 3px;
+    background-color: $gray-blue-1;
+    cursor: grabbing;
+
+    &.selected {
+      background-color: $ocean-blue;
+    }
+  }
 }
 
 
