@@ -243,22 +243,30 @@ export default class SuiteSettings extends Vue {
   readonly is_not_empty = is_not_empty;
 
   d_show_batch_select_modal = false;
-  d_batch_available_files: File[]  = new Array<File>();
-  d_batch_needed_files: File[] = new Array<File>();
-  d_batch_mode : BatchModeEnum;
+  d_batch_available_files: Array<InstructorFile | ExpectedStudentFile> = [];
+  d_batch_needed_files: Array<InstructorFile | ExpectedStudentFile> = [];
+  d_batch_search_query: string = "";
+  d_batch_mode: BatchModeEnum;
 
   start_batch_selection_mode(mode: BatchModeEnum) {
     this.d_batch_mode = mode;
 
-    this.d_batch_available_files = (mode == BatchModeEnum.INSTRUCTOR_FILES ? this.project.instructor_files!: this.project.expected_student_files!);
-    this.d_batch_needed_files = (mode == BatchModeEnum.INSTRUCTOR_FILES ? this.d_suite!.instructor_files_needed: this.d_suite!.student_files_needed!);
+    if(mode == BatchModeEnum.INSTRUCTOR_FILES) {
+      this.d_batch_available_files = this.project.instructor_files!;
+      this.d_batch_needed_files = this.d_suite!.instructor_files_needed;
+    } else {
+      this.d_batch_available_files =  this.project.expected_student_files!;
+      this.d_batch_needed_files = this.d_suite!.student_files_needed!;
+    }
 
     this.d_show_batch_select_modal = true;
   }
 
-  batch_toggle_select(file: File) {
-    if(this.d_batch_needed_files.some((el) => el.pk == file.pk)) {
-      this.d_batch_needed_files = this.d_batch_needed_files.filter(el => el.pk !== file.pk);
+  batch_toggle_select(file: InstructorFile | ExpectedStudentFile) {
+    if (this.d_batch_needed_files.some((el) => el.pk == file.pk)) {
+      this.d_batch_needed_files = this.d_batch_needed_files.filter(
+        (el) => el.pk !== file.pk
+      );
     } else {
       this.d_batch_needed_files.push(file);
     }
@@ -300,6 +308,18 @@ export default class SuiteSettings extends Vue {
 
   expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
     return file.pattern.indexOf(filter_text) >= 0;
+  }
+
+  get batch_filtered_files() {
+    if(this.d_batch_search_query) {
+      if(this.d_batch_mode == BatchModeEnum.INSTRUCTOR_FILES) {
+        return this.d_batch_available_files.filter((file: InstructorFile) => this.instructor_file_filter_fn(file, this.d_batch_search_query));
+      } else {
+        return this.d_batch_available_files.filter((file) => this.expected_student_file_filter_fn(file, this.d_batch_search_query));
+      }
+    } else {
+      return this.d_batch_available_files;
+    }
   }
 
   get instructor_files_available() {
@@ -425,4 +445,5 @@ export default class SuiteSettings extends Vue {
 .modal-cancel-button {
   @extend .red-button;
 }
+
 </style>
