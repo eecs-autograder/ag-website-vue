@@ -24,7 +24,7 @@
             </span>
           </div>
           <div>
-            <button v-if="d_batch_mode" class="batch-delete-files-button red-button">
+            <button v-if="d_batch_mode" class="batch-delete-files-button red-button" @click.stop="request_batch_delete()">
               Delete
             </button>
             <input class="batch-select-all-checkbox" type="checkbox" @click="batch_toggle_all()" />
@@ -37,6 +37,7 @@
                                   :file="instructor_file"
                                   @click="view_file(instructor_file)"
                                   @selected="toggleFileForBatchOperation(instructor_file.pk)"
+                                  @delete_requested="request_single_delete(instructor_file)"
                                   class="sidebar-item"
                                   :class="{'active': current_filename === instructor_file.name}">
           </single-instructor-file>
@@ -48,6 +49,36 @@
                    :progress="load_contents_progress"></view-file>
       </div>
     </div>
+    <div @click.stop>
+      <modal v-if="d_show_delete_modal"
+             @close="d_show_delete_modal = false"
+             size="large"
+             click_outside_to_close>
+        <div class="modal-header">Confirm Delete</div>
+        <div> Are you sure you want to delete the following file(s):
+          <ul class="files-to-delete">
+            <li v-for="file of d_to_be_deleted" :key="file.pk" class="filename">{{file.name}}</li> 
+          </ul>
+          <br>
+
+          If you want to <b>update the file's contents</b>, cancel this dialogue
+          and <b>re-upload the file instead.</b> <br><br>
+
+          <b>This action cannot be undone</b>. <br>
+          Any test cases that rely on this file may have
+          to be updated before they'll run correctly again.
+        </div>
+
+        <APIErrors ref="delete_errors"></APIErrors>
+        <div class="button-footer-right modal-button-footer">
+          <button class="modal-delete-button"
+                  :disabled="d_delete_pending"
+                  @click="delete_files_permanently"> Delete </button>
+          <button class="modal-cancel-button"
+                  @click="d_show_delete_modal = false"> Cancel </button>
+        </div>
+      </modal>
+    </div>
   </div>
 </template>
 
@@ -57,10 +88,15 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
 import APIErrors from "@/components/api_errors.vue";
+import Modal from '@/components/modal.vue';
 import FileUpload from '@/components/file_upload.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import ViewFile from '@/components/view_file.vue';
-import { handle_api_errors_async } from '@/error_handling';
+import {
+  handle_api_errors_async,
+  handle_global_errors_async,
+  make_error_handler_func
+} from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { SafeMap } from '@/safe_map';
@@ -71,6 +107,7 @@ import SingleInstructorFile from './single_instructor_file.vue';
 @Component({
   components: {
     APIErrors,
+    Modal,
     FileUpload,
     ProgressBar,
     SingleInstructorFile,
@@ -87,22 +124,66 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   d_uploading = false;
   d_upload_progress: number | null = null;
 
-  d_files_list = new Set<Number>();
+  // Array of files that will be deleted after the user confirms any kind of
+  // deletion (single or batch); allows us to reuse 1 modal for both kinds of
+  // deletion
+  d_to_be_deleted = new Array<InstructorFile>();
+  d_delete_pending = false;
+  d_show_delete_modal = false;
+
   d_batch_mode = false;
+  // Set of file pks selected for deletion in batch mode
+  d_batch_to_be_deleted = new Set<Number>();
 
   toggleFileForBatchOperation(key: Number) {
-    if( this.d_files_list.has(key) ){
-      this.d_files_list.delete(key)
-      console.log(`deleted ${key}`)
+    if( this.d_batch_to_be_deleted.has(key) ){
+      this.d_batch_to_be_deleted.delete(key)
     }
     else{
-      this.d_files_list.add(key)
-      console.log(`added ${key}`)
+      this.d_batch_to_be_deleted.add(key)
     }
 
-    this.d_batch_mode = this.d_files_list.size > 0;
+    this.d_batch_mode = this.d_batch_to_be_deleted.size > 0;
   }
 
+  // Called when a user presses the delete button inside of child SingleInstructorFile component
+  request_single_delete(file: InstructorFile) {
+    this.d_to_be_deleted = []
+    this.d_to_be_deleted.push(file)
+    this.d_show_delete_modal = true;
+  }
+
+  // Called when a user presses the batch delete button from this component
+  request_batch_delete() {
+    this.d_to_be_deleted  = this.instructor_files.filter((file: InstructorFile) => this.d_batch_to_be_deleted.has(file.pk));
+    this.d_show_delete_modal = true;
+  }
+
+  @handle_api_errors_async(make_error_handler_func('delete_errors'))
+  async delete_files_permanently() {
+    try {
+      this.d_delete_pending = true;
+
+      // Delete all files in parallel
+      await Promise.all(this.d_to_be_deleted.map(async (file) => {
+        await file.delete();
+        this.d_batch_to_be_deleted.delete(file.pk);
+      }));
+
+      this.d_show_delete_modal = false;
+
+    }
+    finally {
+      this.d_delete_pending = false;
+
+      // Allow for batch mode to operate consistently
+      if(this.d_batch_to_be_deleted.size == 0) {
+        this.d_batch_mode = false;
+      }
+
+      this.d_to_be_deleted = []
+    }
+  }
 
   // Do NOT modify the contents of this array!!
   get instructor_files(): ReadonlyArray<Readonly<InstructorFile>> {
@@ -183,6 +264,8 @@ function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
 @import "@/styles/colors.scss";
 @import '@/styles/button_styles.scss';
 @import '@/styles/collapsible_sidebar.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
@@ -254,4 +337,22 @@ $border-color: hsl(220, 40%, 94%);
   }
 }
 
+/* ---------------- MODAL ---------------- */
+
+.files-to-delete {
+  margin-left: 0; padding-left: 40px;
+
+  .filename {
+    color: darken($ocean-blue, 5%);
+    font-weight: bold;
+  }
+}
+
+.modal-cancel-button {
+  @extend .white-button;
+}
+
+.modal-delete-button {
+  @extend .red-button;
+}
 </style>

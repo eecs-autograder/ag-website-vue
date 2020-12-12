@@ -34,41 +34,12 @@
       <i class="fas fa-file-download download-file"
          @click.stop="download_file"></i>
       <i class="far fa-trash-alt delete-file"
-         @click.stop="d_show_delete_instructor_file_modal = true"></i>
+         @click.stop="$emit('delete_requested')"></i>
       <input @click="$emit('selected')" type="checkbox" />
     </div>
     <div class="display-timestamp">
       {{format_datetime(file.last_modified)}}
     </div>
-    <div @click.stop>
-      <modal v-if="d_show_delete_instructor_file_modal"
-             @close="d_show_delete_instructor_file_modal = false"
-             ref="delete_instructor_file_modal"
-             size="large"
-             click_outside_to_close>
-        <div class="modal-header">Confirm Delete</div>
-        <div> Are you sure you want to delete
-          <span class="file-to-delete">{{file.name}}</span>? <br><br>
-
-          If you want to <b>update the file's contents</b>, cancel this dialogue
-          and <b>re-upload the file instead.</b> <br><br>
-
-          <b>This action cannot be undone</b>. <br>
-          Any test cases that rely on this file may have
-          to be updated before they'll run correctly again.
-        </div>
-
-        <APIErrors ref="delete_errors"></APIErrors>
-        <div class="button-footer-right modal-button-footer">
-          <button class="modal-delete-button"
-                  :disabled="d_delete_pending"
-                  @click="delete_file_permanently"> Delete </button>
-          <button class="modal-cancel-button"
-                  @click="d_show_delete_instructor_file_modal = false"> Cancel </button>
-        </div>
-      </modal>
-    </div>
-
     <progress-overlay v-if="d_downloading" :progress="d_download_progress"></progress-overlay>
   </div>
 </template>
@@ -109,11 +80,9 @@ export default class SingleInstructorFile extends Vue {
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
-  d_delete_pending = false;
   editing = false;
   new_file_name: string = "";
   new_name_is_valid = true;
-  d_show_delete_instructor_file_modal = false;
 
   d_download_progress: number | null = null;
   d_downloading = false;
@@ -142,18 +111,6 @@ export default class SingleInstructorFile extends Vue {
       FileSaver.saveAs(new File([await file_content], this.file.name));
       this.d_download_progress = null;
     });
-  }
-
-  @handle_api_errors_async(make_error_handler_func('delete_errors'))
-  async delete_file_permanently() {
-    try {
-      this.d_delete_pending = true;
-      await this.file.delete();
-      this.d_show_delete_instructor_file_modal = false;
-    }
-    finally {
-      this.d_delete_pending = false;
-    }
   }
 }
 
@@ -247,18 +204,4 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   font-size: .875rem;
 }
 
-/* ---------------- MODAL ---------------- */
-
-.file-to-delete {
-  color: darken($ocean-blue, 5%);
-  font-weight: bold;
-}
-
-.modal-cancel-button {
-  @extend .white-button;
-}
-
-.modal-delete-button {
-  @extend .red-button;
-}
 </style>
