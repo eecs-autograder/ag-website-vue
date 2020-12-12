@@ -302,10 +302,6 @@ export default class SuiteSettings extends Vue {
     return file.pattern.indexOf(filter_text) >= 0;
   }
 
-  is_in_batch(file) {
-    return this.d_batch_needed_files.has(file);
-  }
-
   get instructor_files_available() {
     return this.project.instructor_files!.filter((instructor_file: InstructorFile) => {
       return this.d_suite!.instructor_files_needed.findIndex(
