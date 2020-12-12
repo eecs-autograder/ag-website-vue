@@ -113,6 +113,10 @@
 
     <fieldset class="fieldset">
       <legend class="legend"> Student Files </legend>
+      <button class="instructor-file-batch-select-button"
+              @click="start_batch_selection_mode(1)">
+        Batch Select
+      </button>
       <div class="typeahead-search-bar">
         <dropdown-typeahead ref="student_files_typeahead"
                             placeholder_text="Enter a filename"
@@ -148,7 +152,9 @@
         <div class="modal-header">Select Files</div>
         <div>
           <ul>
-            <li :class="d_batch_needed_files.some((el) => el.pk == file.pk) ? 'selected' : ''" v-for="file of d_batch_available_files" :key="file.pk" @click="batch_toggle_select(file)">{{ file.name }}</li>
+            <li :class="d_batch_needed_files.some((el) => el.pk == file.pk) ?
+'selected' : ''" v-for="file of d_batch_available_files" :key="file.pk"
+@click="batch_toggle_select(file)">{{ file.name || file.pattern }}</li>
           </ul>
         </div>
 
@@ -239,6 +245,8 @@ export default class SuiteSettings extends Vue {
   d_batch_mode : BatchModeEnum;
 
   start_batch_selection_mode(mode: BatchModeEnum) {
+    this.d_batch_mode = mode;
+
     this.d_batch_available_files = (mode == BatchModeEnum.INSTRUCTOR_FILES ? this.project.instructor_files!: this.project.expected_student_files!);
     this.d_batch_needed_files = (mode == BatchModeEnum.INSTRUCTOR_FILES ? this.d_suite!.instructor_files_needed: this.d_suite!.student_files_needed!);
 
