@@ -27,7 +27,6 @@
             <button v-if="d_batch_mode" class="batch-delete-files-button red-button" @click.stop="request_batch_delete()">
               Delete
             </button>
-            <input class="batch-select-all-checkbox" type="checkbox" @click="batch_toggle_all()" />
           </div>
         </div>
 
