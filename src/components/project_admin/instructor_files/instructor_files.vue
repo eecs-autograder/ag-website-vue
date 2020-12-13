@@ -1,8 +1,10 @@
 <template>
   <div id="instructor-files-component">
-    <file-upload ref="instructor_files_upload"
-                 @upload_files="add_instructor_files($event)"
-                 :disable_upload_button="d_uploading">
+    <file-upload
+      ref="instructor_files_upload"
+      @upload_files="add_instructor_files($event)"
+      :disable_upload_button="d_uploading"
+    >
     </file-upload>
 
     <div v-if="d_upload_progress !== null" class="progress-wrapper">
@@ -13,68 +15,99 @@
 
     <div class="sidebar-container">
       <div class="sidebar-menu">
-        <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
+        <div
+          :class="['sidebar-header', { 'sidebar-header-closed': d_collapsed }]"
+        >
           <div>
-            <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+            <span
+              class="sidebar-collapse-button"
+              @click="d_collapsed = !d_collapsed"
+            >
               <i class="fas fa-bars"></i>
             </span>
-            <span class="sidebar-header-text"
-                  v-if="!d_collapsed || current_filename === null">
-                    Uploaded Files
+            <span
+              class="sidebar-header-text"
+              v-if="!d_collapsed || current_filename === null"
+            >
+              Uploaded Files
             </span>
           </div>
           <div>
-            <button v-if="d_batch_mode" class="batch-delete-files-button red-button" @click.stop="request_batch_delete()">
+            <button
+              v-if="d_batch_mode"
+              class="batch-delete-files-button red-button"
+              @click.stop="request_batch_delete()"
+            >
               Delete
             </button>
           </div>
         </div>
 
         <div class="sidebar-content" v-if="!d_collapsed">
-          <single-instructor-file v-for="instructor_file of instructor_files"
-                                  :key="instructor_file.pk"
-                                  :file="instructor_file"
-                                  @click="view_file(instructor_file)"
-                                  @selected="toggleFileForBatchOperation(instructor_file.pk)"
-                                  @delete_requested="request_single_delete(instructor_file)"
-                                  class="sidebar-item"
-                                  :class="{'active': current_filename === instructor_file.name}">
+          <single-instructor-file
+            v-for="instructor_file of instructor_files"
+            :key="instructor_file.pk"
+            :file="instructor_file"
+            @click="view_file(instructor_file)"
+            @selected="toggle_file_for_batch_operation(instructor_file.pk)"
+            @delete_requested="request_single_delete(instructor_file)"
+            class="sidebar-item"
+            :class="{ active: current_filename === instructor_file.name }"
+          >
           </single-instructor-file>
         </div>
       </div>
-      <div :class="['body', {'body-closed': d_collapsed}]" v-if="current_filename !== null">
-        <view-file :filename="current_filename"
-                   :file_contents="current_file_contents"
-                   :progress="load_contents_progress"></view-file>
+      <div
+        :class="['body', { 'body-closed': d_collapsed }]"
+        v-if="current_filename !== null"
+      >
+        <view-file
+          :filename="current_filename"
+          :file_contents="current_file_contents"
+          :progress="load_contents_progress"
+        ></view-file>
       </div>
     </div>
     <div @click.stop>
-      <modal v-if="d_show_delete_modal"
-             @close="d_show_delete_modal = false"
-             size="large"
-             click_outside_to_close>
+      <modal
+        v-if="d_show_delete_modal"
+        @close="d_show_delete_modal = false"
+        size="large"
+        click_outside_to_close
+      >
         <div class="modal-header">Confirm Delete</div>
-        <div> Are you sure you want to delete the following file(s):
+        <div>
+          Are you sure you want to delete the following file(s):
           <ul class="files-to-delete">
-            <li v-for="file of d_to_be_deleted" :key="file.pk" class="filename">{{file.name}}</li> 
+            <li v-for="file of d_to_be_deleted" :key="file.pk" class="filename">
+              {{ file.name }}
+            </li>
           </ul>
-          <br>
+          <br />
 
           If you want to <b>update the file's contents</b>, cancel this dialogue
-          and <b>re-upload the file instead.</b> <br><br>
+          and <b>re-upload the file instead.</b> <br /><br />
 
-          <b>This action cannot be undone</b>. <br>
-          Any test cases that rely on this file may have
-          to be updated before they'll run correctly again.
+          <b>This action cannot be undone</b>. <br />
+          Any test cases that rely on this file may have to be updated before
+          they'll run correctly again.
         </div>
 
         <APIErrors ref="delete_errors"></APIErrors>
         <div class="button-footer-right modal-button-footer">
-          <button class="modal-delete-button"
-                  :disabled="d_delete_pending"
-                  @click="delete_files_permanently"> Delete </button>
-          <button class="modal-cancel-button"
-                  @click="d_show_delete_modal = false"> Cancel </button>
+          <button
+            class="modal-delete-button"
+            :disabled="d_delete_pending"
+            @click="delete_files_permanently"
+          >
+            Delete
+          </button>
+          <button
+            class="modal-cancel-button"
+            @click="d_show_delete_modal = false"
+          >
+            Cancel
+          </button>
         </div>
       </modal>
     </div>
@@ -82,26 +115,30 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
 
-import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
+import {
+  InstructorFile,
+  InstructorFileObserver,
+  Project,
+} from "ag-client-typescript";
 
 import APIErrors from "@/components/api_errors.vue";
-import Modal from '@/components/modal.vue';
-import FileUpload from '@/components/file_upload.vue';
-import ProgressBar from '@/components/progress_bar.vue';
-import ViewFile from '@/components/view_file.vue';
+import FileUpload from "@/components/file_upload.vue";
+import Modal from "@/components/modal.vue";
+import ProgressBar from "@/components/progress_bar.vue";
+import ViewFile from "@/components/view_file.vue";
 import {
   handle_api_errors_async,
   handle_global_errors_async,
-  make_error_handler_func
-} from '@/error_handling';
-import { BeforeDestroy, Created } from '@/lifecycle';
-import { OpenFilesMixin } from '@/open_files_mixin';
-import { SafeMap } from '@/safe_map';
-import { toggle } from '@/utils';
+  make_error_handler_func,
+} from "@/error_handling";
+import { BeforeDestroy, Created } from "@/lifecycle";
+import { OpenFilesMixin } from "@/open_files_mixin";
+import { SafeMap } from "@/safe_map";
+import { toggle } from "@/utils";
 
-import SingleInstructorFile from './single_instructor_file.vue';
+import SingleInstructorFile from "./single_instructor_file.vue";
 
 @Component({
   components: {
@@ -111,12 +148,12 @@ import SingleInstructorFile from './single_instructor_file.vue';
     ProgressBar,
     SingleInstructorFile,
     ViewFile,
-  }
+  },
 })
-export default class InstructorFiles extends OpenFilesMixin implements InstructorFileObserver,
-                                                                       Created,
-                                                                       BeforeDestroy {
-  @Prop({required: true, type: Project})
+export default class InstructorFiles
+  extends OpenFilesMixin
+  implements InstructorFileObserver, Created, BeforeDestroy {
+  @Prop({ required: true, type: Project })
   project!: Project;
 
   d_collapsed = false;
@@ -132,14 +169,14 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
 
   d_batch_mode = false;
   // Set of file pks selected for deletion in batch mode
-  d_batch_to_be_deleted = new Set<Number>();
+  d_batch_to_be_deleted = new Set<number>();
 
-  toggleFileForBatchOperation(key: Number) {
-    if( this.d_batch_to_be_deleted.has(key) ){
-      this.d_batch_to_be_deleted.delete(key)
+  toggle_file_for_batch_operation(key: number) {
+    if (this.d_batch_to_be_deleted.has(key)) {
+      this.d_batch_to_be_deleted.delete(key);
     }
-    else{
-      this.d_batch_to_be_deleted.add(key)
+    else {
+      this.d_batch_to_be_deleted.add(key);
     }
 
     this.d_batch_mode = this.d_batch_to_be_deleted.size > 0;
@@ -147,40 +184,43 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
 
   // Called when a user presses the delete button inside of child SingleInstructorFile component
   request_single_delete(file: InstructorFile) {
-    this.d_to_be_deleted = []
-    this.d_to_be_deleted.push(file)
+    this.d_to_be_deleted = [];
+    this.d_to_be_deleted.push(file);
     this.d_show_delete_modal = true;
   }
 
   // Called when a user presses the batch delete button from this component
   request_batch_delete() {
-    this.d_to_be_deleted  = this.instructor_files.filter((file: InstructorFile) => this.d_batch_to_be_deleted.has(file.pk));
+    this.d_to_be_deleted = this.instructor_files.filter(
+      (file: InstructorFile) => this.d_batch_to_be_deleted.has(file.pk)
+    );
     this.d_show_delete_modal = true;
   }
 
-  @handle_api_errors_async(make_error_handler_func('delete_errors'))
+  @handle_api_errors_async(make_error_handler_func("delete_errors"))
   async delete_files_permanently() {
     try {
       this.d_delete_pending = true;
 
       // Delete all files in parallel
-      await Promise.all(this.d_to_be_deleted.map(async (file) => {
-        await file.delete();
-        this.d_batch_to_be_deleted.delete(file.pk);
-      }));
+      await Promise.all(
+        this.d_to_be_deleted.map(async (file) => {
+          await file.delete();
+          this.d_batch_to_be_deleted.delete(file.pk);
+        })
+      );
 
       this.d_show_delete_modal = false;
-
     }
     finally {
       this.d_delete_pending = false;
 
       // Allow for batch mode to operate consistently
-      if(this.d_batch_to_be_deleted.size == 0) {
+      if (this.d_batch_to_be_deleted.size === 0) {
         this.d_batch_mode = false;
       }
 
-      this.d_to_be_deleted = []
+      this.d_to_be_deleted = [];
     }
   }
 
@@ -200,39 +240,51 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   }
 
   view_file(file: InstructorFile) {
-    this.open_file(file.name, (progress_callback) => file.get_content(progress_callback));
+    this.open_file(file.name, (progress_callback) =>
+      file.get_content(progress_callback)
+    );
   }
 
   @handle_api_errors_async(handle_file_upload_errors)
   add_instructor_files(files: File[]) {
     this.d_upload_progress = null;
     (<APIErrors> this.$refs.api_errors).clear();
-    return toggle(this, 'd_uploading', async () => {
+    return toggle(this, "d_uploading", async () => {
       for (let file of files) {
-        let file_to_update = this.instructor_files.find(item => item.name === file.name);
+        let file_to_update = this.instructor_files.find(
+          (item) => item.name === file.name
+        );
         if (file_to_update !== undefined) {
           await file_to_update.set_content(file, (event: ProgressEvent) => {
             if (event.lengthComputable) {
-              this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
+              this.d_upload_progress =
+                100 * ((1.0 * event.loaded) / event.total);
             }
           });
         }
         else {
           await InstructorFile.create(
-            this.project.pk, file.name, file, (event: ProgressEvent) => {
+            this.project.pk,
+            file.name,
+            file,
+            (event: ProgressEvent) => {
               if (event.lengthComputable) {
-                this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
+                this.d_upload_progress =
+                  100 * ((1.0 * event.loaded) / event.total);
               }
             }
           );
         }
       }
-      this.d_upload_progress =  null;
+      this.d_upload_progress = null;
       (<FileUpload> this.$refs.instructor_files_upload).clear_files();
     });
   }
 
-  update_instructor_file_content_changed(instructor_file: InstructorFile, file_content: Blob) {
+  update_instructor_file_content_changed(
+    instructor_file: InstructorFile,
+    file_content: Blob
+  ) {
     if (instructor_file.project === this.project.pk) {
       this.update_file(instructor_file.name, Promise.resolve(file_content));
     }
@@ -244,7 +296,10 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     }
   }
 
-  update_instructor_file_renamed(instructor_file: InstructorFile, old_name: string) {
+  update_instructor_file_renamed(
+    instructor_file: InstructorFile,
+    old_name: string
+  ) {
     if (instructor_file.project === this.project.pk) {
       this.rename_file(old_name, instructor_file.name);
     }
@@ -256,15 +311,14 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
 function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
-
 </script>
 
 <style scoped lang="scss">
 @import "@/styles/colors.scss";
-@import '@/styles/button_styles.scss';
-@import '@/styles/collapsible_sidebar.scss';
-@import '@/styles/forms.scss';
-@import '@/styles/modal.scss';
+@import "@/styles/button_styles.scss";
+@import "@/styles/collapsible_sidebar.scss";
+@import "@/styles/forms.scss";
+@import "@/styles/modal.scss";
 
 * {
   box-sizing: border-box;
@@ -273,11 +327,11 @@ function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
 }
 
 #instructor-files-component {
-  margin-top: .625rem;
+  margin-top: 0.625rem;
 }
 
 .progress-wrapper {
-  padding-top: .625rem;
+  padding-top: 0.625rem;
 }
 
 $border-color: hsl(220, 40%, 94%);
@@ -292,14 +346,14 @@ $border-color: hsl(220, 40%, 94%);
 );
 
 .sidebar-container {
-  margin-top: .875rem;
+  margin-top: 0.875rem;
 }
 
 .sidebar-header {
   display: flex;
   justify-content: space-between;
-  padding-top: .5rem;
-  padding-bottom: .5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
   font-weight: bold;
   font-size: 1.125rem;
 }
@@ -339,7 +393,8 @@ $border-color: hsl(220, 40%, 94%);
 /* ---------------- MODAL ---------------- */
 
 .files-to-delete {
-  margin-left: 0; padding-left: 40px;
+  margin-left: 0;
+  padding-left: 40px;
 
   .filename {
     color: darken($ocean-blue, 5%);

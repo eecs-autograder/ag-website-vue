@@ -228,7 +228,7 @@ describe('InstructorFiles.vue', () => {
         expect(await view_file.vm.file_contents).toEqual(expected_content);
     });
 
-    test('Delete single file', async() => {
+    test('Delete single file', async () => {
         let delete_stub = sinon.stub(instructor_file_1, 'delete');
         delete_stub.callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
@@ -246,7 +246,7 @@ describe('InstructorFiles.vue', () => {
         expect(delete_stub.calledOnce).toBe(true);
     });
 
-    test('Delete single file while batched files are selected', async() => {
+    test('Delete single file while batched files are selected', async () => {
         let delete_stub = sinon.stub(instructor_file_1, 'delete');
         delete_stub.callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
@@ -270,7 +270,7 @@ describe('InstructorFiles.vue', () => {
         expect(delete_stub.calledOnce).toBe(true);
     });
 
-    test('Delete single file using batch delete', async() => {
+    test('Delete single file using batch delete', async () => {
         let delete_stub = sinon.stub(instructor_file_1, 'delete');
         delete_stub.callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
@@ -291,7 +291,7 @@ describe('InstructorFiles.vue', () => {
         expect(delete_stub.calledOnce).toBe(true);
     });
 
-    test('Delete multiple files using batch delete', async() => {
+    test('Delete multiple files using batch delete', async () => {
         let delete_stub1 = sinon.stub(instructor_file_1, 'delete');
         delete_stub1.callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
@@ -320,12 +320,6 @@ describe('InstructorFiles.vue', () => {
         expect(delete_stub1.calledOnce).toBe(true);
         expect(delete_stub2.calledOnce).toBe(true);
     });
-
-    test('Delete all files using select all and batch delete', async() => {
-        // TODO
-
-    });
-
 
     test('Instructor file deleted while being viewed', async () => {
         let get_content_stub = sinon.stub(
