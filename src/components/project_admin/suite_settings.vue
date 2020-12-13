@@ -212,8 +212,9 @@ class Suite {
 }
 
 enum BatchModeEnum {
-  INSTRUCTOR_FILES,
-  STUDENT_FILES
+  none,
+  instructor_files,
+  student_files,
 }
 
 @Component({
@@ -243,19 +244,20 @@ export default class SuiteSettings extends Vue {
   readonly is_not_empty = is_not_empty;
 
   d_show_batch_select_modal = false;
-  d_batch_available_files: Array<InstructorFile | ExpectedStudentFile> = [];
-  d_batch_needed_files: Array<InstructorFile | ExpectedStudentFile> = [];
+  d_batch_available_files: (InstructorFile | ExpectedStudentFile)[] = [];
+  d_batch_needed_files: (InstructorFile | ExpectedStudentFile)[] = [];
   d_batch_search_query: string = "";
-  d_batch_mode: BatchModeEnum;
+  d_batch_mode: BatchModeEnum = BatchModeEnum.none;
 
   start_batch_selection_mode(mode: BatchModeEnum) {
     this.d_batch_mode = mode;
 
-    if(mode == BatchModeEnum.INSTRUCTOR_FILES) {
+    if (mode === BatchModeEnum.instructor_files) {
       this.d_batch_available_files = this.project.instructor_files!;
       this.d_batch_needed_files = this.d_suite!.instructor_files_needed;
-    } else {
-      this.d_batch_available_files =  this.project.expected_student_files!;
+    }
+    else {
+      this.d_batch_available_files = this.project.expected_student_files!;
       this.d_batch_needed_files = this.d_suite!.student_files_needed!;
     }
 
@@ -263,20 +265,22 @@ export default class SuiteSettings extends Vue {
   }
 
   batch_toggle_select(file: InstructorFile | ExpectedStudentFile) {
-    if (this.d_batch_needed_files.some((el) => el.pk == file.pk)) {
+    if (this.d_batch_needed_files.some((el) => el.pk === file.pk)) {
       this.d_batch_needed_files = this.d_batch_needed_files.filter(
         (el) => el.pk !== file.pk
       );
-    } else {
+    }
+    else {
       this.d_batch_needed_files.push(file);
     }
   }
 
   end_batch_selection_mode() {
-    if(this.d_batch_mode === BatchModeEnum.INSTRUCTOR_FILES) {
-      this.d_suite!.instructor_files_needed = this.d_batch_needed_files
-    } else {
-      this.d_suite!.student_files_needed = this.d_batch_needed_files
+    if (this.d_batch_mode === BatchModeEnum.instructor_files) {
+      this.d_suite!.instructor_files_needed = this.d_batch_needed_files as InstructorFile[];
+    }
+    else {
+      this.d_suite!.student_files_needed = this.d_batch_needed_files as ExpectedStudentFile[];
     }
     this.$emit('field_change', this.d_suite);
 
@@ -311,13 +315,20 @@ export default class SuiteSettings extends Vue {
   }
 
   get batch_filtered_files() {
-    if(this.d_batch_search_query) {
-      if(this.d_batch_mode == BatchModeEnum.INSTRUCTOR_FILES) {
-        return this.d_batch_available_files.filter((file: InstructorFile) => this.instructor_file_filter_fn(file, this.d_batch_search_query));
-      } else {
-        return this.d_batch_available_files.filter((file) => this.expected_student_file_filter_fn(file, this.d_batch_search_query));
+    if (this.d_batch_search_query) {
+      if (this.d_batch_mode === BatchModeEnum.instructor_files) {
+        return this.d_batch_available_files.filter((file) =>
+          this.instructor_file_filter_fn(file as InstructorFile, this.d_batch_search_query)
+        );
       }
-    } else {
+      else {
+        return this.d_batch_available_files.filter((file) =>
+          this.expected_student_file_filter_fn(file as ExpectedStudentFile,
+                                               this.d_batch_search_query)
+        );
+      }
+    }
+    else {
       return this.d_batch_available_files;
     }
   }
@@ -430,7 +441,6 @@ export default class SuiteSettings extends Vue {
       background-color: $ocean-blue;
       overflow: visible;
     }
-
   }
 }
 
@@ -449,5 +459,4 @@ export default class SuiteSettings extends Vue {
 .modal-cancel-button {
   @extend .red-button;
 }
-
 </style>

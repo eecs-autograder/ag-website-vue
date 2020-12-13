@@ -398,7 +398,7 @@ describe('Field binding tests', () => {
 
     test('Adding instructor file using batch select', async () => {
         expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(2);
-        
+
         wrapper.findAll('.batch-select-button').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -413,7 +413,7 @@ describe('Field binding tests', () => {
 
     test('Removing instructor file using batch select', async () => {
         expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(2);
-        
+
         wrapper.findAll('.batch-select-button').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
@@ -428,7 +428,7 @@ describe('Field binding tests', () => {
 
     test('Cancelling instructor file batch select preserves state', async () => {
         expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(2);
-        
+
         wrapper.findAll('.batch-select-button').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
