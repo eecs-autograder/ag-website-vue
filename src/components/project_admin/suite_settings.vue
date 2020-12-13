@@ -422,11 +422,15 @@ export default class SuiteSettings extends Vue {
     padding: 1em;
     border-radius: 3px;
     background-color: $gray-blue-1;
+    overflow: hidden;
+    text-overflow: ellipsis;
     cursor: grabbing;
 
     &.selected {
       background-color: $ocean-blue;
+      overflow: visible;
     }
+
   }
 }
 
