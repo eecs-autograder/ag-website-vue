@@ -228,7 +228,7 @@ describe('InstructorFiles.vue', () => {
         expect(await view_file.vm.file_contents).toEqual(expected_content);
     });
 
-    test('Deleting a file removes it from the list of instructor files', async () => {
+    test('Delete single file', async() => {
         let delete_stub = sinon.stub(instructor_file_1, 'delete');
         delete_stub.callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
@@ -237,13 +237,95 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAll('.delete-file').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.find('.file-to-delete').text()).toContain(instructor_file_1.name);
+        expect(wrapper.find('.files-to-delete').findAll('li').length).toEqual(1);
+        expect(wrapper.find('.filename').text()).toContain(instructor_file_1.name);
 
         wrapper.find('.modal-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(delete_stub.calledOnce).toBe(true);
     });
+
+    test('Delete single file while batched files are selected', async() => {
+        let delete_stub = sinon.stub(instructor_file_1, 'delete');
+        delete_stub.callsFake(
+            async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
+
+        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        wrapper.findAll('.single-instructor-file-component input').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+
+
+        expect(delete_stub.callCount).toEqual(0);
+        wrapper.findAll('.delete-file').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('.files-to-delete').findAll('li').length).toEqual(1);
+        expect(wrapper.find('.filename').text()).toContain(instructor_file_1.name);
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(delete_stub.calledOnce).toBe(true);
+    });
+
+    test('Delete single file using batch delete', async() => {
+        let delete_stub = sinon.stub(instructor_file_1, 'delete');
+        delete_stub.callsFake(
+            async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
+
+        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(delete_stub.callCount).toEqual(0);
+        wrapper.find('.batch-delete-files-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('.files-to-delete').findAll('li').length).toEqual(1);
+        expect(wrapper.find('.filename').text()).toContain(instructor_file_1.name);
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(delete_stub.calledOnce).toBe(true);
+    });
+
+    test('Delete multiple files using batch delete', async() => {
+        let delete_stub1 = sinon.stub(instructor_file_1, 'delete');
+        delete_stub1.callsFake(
+            async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
+
+        let delete_stub2 = sinon.stub(instructor_file_2, 'delete');
+        delete_stub2.callsFake(
+            async () => InstructorFile.notify_instructor_file_deleted(instructor_file_2));
+
+        expect(delete_stub1.callCount).toEqual(0);
+        expect(delete_stub2.callCount).toEqual(0);
+        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        wrapper.findAll('.single-instructor-file-component input').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.batch-delete-files-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find('.files-to-delete').findAll('li').length).toEqual(2);
+        expect(wrapper.findAll('.filename').at(0).text()).toContain(instructor_file_1.name);
+        expect(wrapper.findAll('.filename').at(1).text()).toContain(instructor_file_2.name);
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(delete_stub1.calledOnce).toBe(true);
+        expect(delete_stub2.calledOnce).toBe(true);
+    });
+
+    test('Delete all files using select all and batch delete', async() => {
+        // TODO
+
+    });
+
 
     test('Instructor file deleted while being viewed', async () => {
         let get_content_stub = sinon.stub(
