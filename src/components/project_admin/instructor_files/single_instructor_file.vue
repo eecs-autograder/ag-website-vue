@@ -35,7 +35,7 @@
          @click.stop="download_file"></i>
       <i class="far fa-trash-alt delete-file"
          @click.stop="$emit('delete_requested')"></i>
-      <input @click="$emit('selected')" type="checkbox" />
+      <input @click.stop @change.stop="$emit('selected')" type="checkbox" />
     </div>
     <div class="display-timestamp">
       {{format_datetime(file.last_modified)}}
