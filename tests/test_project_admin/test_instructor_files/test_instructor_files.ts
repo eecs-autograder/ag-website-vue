@@ -278,6 +278,12 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
+        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
         expect(delete_stub.callCount).toEqual(0);
         wrapper.find('.batch-delete-files-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -354,6 +360,30 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(get_content_stub.calledTwice).toBe(true);
+    });
+
+    test('Users have the ability to cancel the process of deleting a file', async () => {
+        let delete_stub = sinon.stub(instructor_file_1, 'delete');
+
+        wrapper.find('.delete-file').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-cancel-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(delete_stub.callCount).toEqual(0);
+    });
+
+    test('API errors handled on delete', async () => {
+        sinon.stub(instructor_file_1, 'delete').rejects(new HttpError(403, "nope"));
+        wrapper.find('.delete-file').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
+        expect(api_errors.d_api_errors.length).toBe(1);
     });
 
     test('Open/close the sidebar', async () => {
