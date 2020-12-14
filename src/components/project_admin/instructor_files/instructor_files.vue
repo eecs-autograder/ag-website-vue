@@ -1,10 +1,8 @@
 <template>
   <div id="instructor-files-component">
-    <file-upload
-      ref="instructor_files_upload"
-      @upload_files="add_instructor_files($event)"
-      :disable_upload_button="d_uploading"
-    >
+    <file-upload ref="instructor_files_upload"
+                 @upload_files="add_instructor_files($event)"
+                 :disable_upload_button="d_uploading">
     </file-upload>
 
     <div v-if="d_upload_progress !== null" class="progress-wrapper">
@@ -15,28 +13,18 @@
 
     <div class="sidebar-container">
       <div class="sidebar-menu">
-        <div
-          :class="['sidebar-header', { 'sidebar-header-closed': d_collapsed }]"
-        >
-          <div>
-            <span
-              class="sidebar-collapse-button"
-              @click="d_collapsed = !d_collapsed"
-            >
-              <i class="fas fa-bars"></i>
-            </span>
-            <span
-              class="sidebar-header-text"
-              v-if="!d_collapsed || current_filename === null"
-            >
-              Uploaded Files
-            </span>
+        <div :class="['sidebar-header', { 'sidebar-header-closed': d_collapsed }]">
+        <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
+          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+            <i class="fas fa-bars"></i>
+          </span>
+          <span class="sidebar-header-text"
+                v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
           </div>
           <div>
-            <button
-              v-if="d_batch_mode"
-              class="batch-delete-files-button red-button"
-              @click.stop="request_batch_delete()"
+            <button v-if="d_batch_mode"
+                    class="batch-delete-files-button red-button"
+                    @click.stop="request_batch_delete()"
             >
               Delete
             </button>
@@ -57,15 +45,10 @@
           </single-instructor-file>
         </div>
       </div>
-      <div
-        :class="['body', { 'body-closed': d_collapsed }]"
-        v-if="current_filename !== null"
-      >
-        <view-file
-          :filename="current_filename"
-          :file_contents="current_file_contents"
-          :progress="load_contents_progress"
-        ></view-file>
+      <div :class="['body', {'body-closed': d_collapsed}]" v-if="current_filename !== null">
+        <view-file :filename="current_filename"
+                   :file_contents="current_file_contents"
+                   :progress="load_contents_progress"></view-file>
       </div>
     </div>
     <div @click.stop>
@@ -115,30 +98,25 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-
-import {
-  InstructorFile,
-  InstructorFileObserver,
-  Project,
-} from "ag-client-typescript";
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
 import APIErrors from "@/components/api_errors.vue";
-import FileUpload from "@/components/file_upload.vue";
-import Modal from "@/components/modal.vue";
-import ProgressBar from "@/components/progress_bar.vue";
-import ViewFile from "@/components/view_file.vue";
+import FileUpload from '@/components/file_upload.vue';
+import Modal from '@/components/modal.vue';
+import ProgressBar from '@/components/progress_bar.vue';
+import ViewFile from '@/components/view_file.vue';
 import {
   handle_api_errors_async,
   handle_global_errors_async,
   make_error_handler_func,
 } from "@/error_handling";
-import { BeforeDestroy, Created } from "@/lifecycle";
-import { OpenFilesMixin } from "@/open_files_mixin";
-import { SafeMap } from "@/safe_map";
-import { toggle } from "@/utils";
+import { BeforeDestroy, Created } from '@/lifecycle';
+import { OpenFilesMixin } from '@/open_files_mixin';
+import { SafeMap } from '@/safe_map';
+import { toggle } from '@/utils';
 
-import SingleInstructorFile from "./single_instructor_file.vue";
+import SingleInstructorFile from './single_instructor_file.vue';
 
 @Component({
   components: {
@@ -150,10 +128,10 @@ import SingleInstructorFile from "./single_instructor_file.vue";
     ViewFile,
   },
 })
-export default class InstructorFiles
-  extends OpenFilesMixin
-  implements InstructorFileObserver, Created, BeforeDestroy {
-  @Prop({ required: true, type: Project })
+export default class InstructorFiles extends OpenFilesMixin implements InstructorFileObserver,
+                                                                       Created,
+                                                                       BeforeDestroy {
+  @Prop({required: true, type: Project})
   project!: Project;
 
   d_collapsed = false;
@@ -240,37 +218,28 @@ export default class InstructorFiles
   }
 
   view_file(file: InstructorFile) {
-    this.open_file(file.name, (progress_callback) =>
-      file.get_content(progress_callback)
-    );
+    this.open_file(file.name, (progress_callback) => file.get_content(progress_callback));
   }
 
   @handle_api_errors_async(handle_file_upload_errors)
   add_instructor_files(files: File[]) {
     this.d_upload_progress = null;
     (<APIErrors> this.$refs.api_errors).clear();
-    return toggle(this, "d_uploading", async () => {
+    return toggle(this, 'd_uploading', async () => {
       for (let file of files) {
-        let file_to_update = this.instructor_files.find(
-          (item) => item.name === file.name
-        );
+        let file_to_update = this.instructor_files.find(item => item.name === file.name);
         if (file_to_update !== undefined) {
           await file_to_update.set_content(file, (event: ProgressEvent) => {
             if (event.lengthComputable) {
-              this.d_upload_progress =
-                100 * ((1.0 * event.loaded) / event.total);
+              this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
             }
           });
         }
         else {
           await InstructorFile.create(
-            this.project.pk,
-            file.name,
-            file,
-            (event: ProgressEvent) => {
+            this.project.pk, file.name, file, (event: ProgressEvent) => {
               if (event.lengthComputable) {
-                this.d_upload_progress =
-                  100 * ((1.0 * event.loaded) / event.total);
+                this.d_upload_progress = 100 * (1.0 * event.loaded / event.total);
               }
             }
           );
@@ -281,10 +250,7 @@ export default class InstructorFiles
     });
   }
 
-  update_instructor_file_content_changed(
-    instructor_file: InstructorFile,
-    file_content: Blob
-  ) {
+  update_instructor_file_content_changed(instructor_file: InstructorFile, file_content: Blob) {
     if (instructor_file.project === this.project.pk) {
       this.update_file(instructor_file.name, Promise.resolve(file_content));
     }
@@ -296,10 +262,7 @@ export default class InstructorFiles
     }
   }
 
-  update_instructor_file_renamed(
-    instructor_file: InstructorFile,
-    old_name: string
-  ) {
+  update_instructor_file_renamed(instructor_file: InstructorFile, old_name: string) {
     if (instructor_file.project === this.project.pk) {
       this.rename_file(old_name, instructor_file.name);
     }
@@ -327,11 +290,11 @@ function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
 }
 
 #instructor-files-component {
-  margin-top: 0.625rem;
+  margin-top: .625rem;
 }
 
 .progress-wrapper {
-  padding-top: 0.625rem;
+  padding-top: .625rem;
 }
 
 $border-color: hsl(220, 40%, 94%);
@@ -346,14 +309,14 @@ $border-color: hsl(220, 40%, 94%);
 );
 
 .sidebar-container {
-  margin-top: 0.875rem;
+  margin-top: .875rem;
 }
 
 .sidebar-header {
   display: flex;
   justify-content: space-between;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-top: .5rem;
+  padding-bottom: .5rem;
   font-weight: bold;
   font-size: 1.125rem;
 }
@@ -373,11 +336,11 @@ $border-color: hsl(220, 40%, 94%);
 
 .batch-delete-files-button {
   white-space: nowrap;
-  font-size: 0.875rem;
+  font-size: .875rem;
 }
 
 .batch-select-all-checkbox {
-  margin: 0 0.5em;
+  margin: 0 .5em;
 }
 
 .sidebar-item {

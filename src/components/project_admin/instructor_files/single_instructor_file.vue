@@ -1,35 +1,27 @@
 <template>
   <div class="single-instructor-file-component" v-on="$listeners">
     <div v-if="editing">
-      <validated-form
-        autocomplete="off"
-        spellcheck="false"
-        ref="rename_form"
-        @submit="rename_file"
-      >
-        <validated-input
-          ref="file_name"
-          v-model="new_file_name"
-          :validators="[is_not_empty]"
-          input_style="width: 200px;
+      <validated-form autocomplete="off"
+                      spellcheck="false"
+                      ref="rename_form"
+                      @submit="rename_file">
+        <validated-input ref="file_name"
+                         v-model="new_file_name"
+                         :validators="[is_not_empty]"
+                         input_style="width: 200px;
                                      padding: 3px 5px;
                                      margin-right: 10px;"
-          @input_validity_changed="new_name_is_valid = $event"
-        >
+                         @input_validity_changed="new_name_is_valid = $event">
         </validated-input>
         <div class="edit-name-buttons">
-          <button
-            class="update-file-name-button"
-            type="submit"
-            :disabled="!new_name_is_valid"
-            @click.stop
-          >
+          <button class="update-file-name-button"
+                  type="submit"
+                  :disabled="!new_name_is_valid"
+                  @click.stop>
             Save
           </button>
-          <button
-            class="update-file-name-cancel-button"
-            @click.stop="cancel_renaming_file"
-          >
+          <button class="update-file-name-cancel-button"
+                  @click.stop="cancel_renaming_file">
             Cancel
           </button>
         </div>
@@ -37,52 +29,41 @@
       <APIErrors ref="api_errors"></APIErrors>
     </div>
     <div v-else class="not-editing">
-      <div class="file-name">{{ file.name }}</div>
-      <i
-        class="fas fa-pencil-alt edit-file-name"
-        @click.stop="
-          new_file_name = file.name;
-          editing = true;
-        "
-      ></i>
-      <i
-        class="fas fa-file-download download-file"
-        @click.stop="download_file"
-      ></i>
-      <i
-        class="far fa-trash-alt delete-file"
-        @click.stop="$emit('delete_requested')"
+      <div class="file-name">{{file.name}}</div>
+      <i class="fas fa-pencil-alt edit-file-name"
+         @click.stop="new_file_name = file.name; editing = true;"></i>
+      <i class="fas fa-file-download download-file"
+         @click.stop="download_file"></i>
+      <i class="far fa-trash-alt delete-file"
+         @click.stop="$emit('delete_requested')"
       ></i>
       <input @click.stop @change.stop="$emit('selected')" type="checkbox" />
     </div>
     <div class="display-timestamp">
-      {{ format_datetime(file.last_modified) }}
+      {{format_datetime(file.last_modified)}}
     </div>
-    <progress-overlay
-      v-if="d_downloading"
-      :progress="d_download_progress"
-    ></progress-overlay>
+    <progress-overlay v-if="d_downloading" :progress="d_download_progress"></progress-overlay>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import { InstructorFile } from "ag-client-typescript";
-import * as FileSaver from "file-saver";
+import { InstructorFile } from 'ag-client-typescript';
+import * as FileSaver from 'file-saver';
 
-import APIErrors from "@/components/api_errors.vue";
-import Modal from "@/components/modal.vue";
-import ProgressOverlay from "@/components/progress_overlay.vue";
-import ValidatedForm from "@/components/validated_form.vue";
-import ValidatedInput from "@/components/validated_input.vue";
+import APIErrors from '@/components/api_errors.vue';
+import Modal from '@/components/modal.vue';
+import ProgressOverlay from '@/components/progress_overlay.vue';
+import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 import {
   handle_api_errors_async,
   handle_global_errors_async,
   make_error_handler_func,
 } from "@/error_handling";
-import { format_datetime, toggle } from "@/utils";
-import { is_not_empty } from "@/validators";
+import { format_datetime, toggle } from '@/utils';
+import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
@@ -90,11 +71,11 @@ import { is_not_empty } from "@/validators";
     Modal,
     ProgressOverlay,
     ValidatedForm,
-    ValidatedInput,
-  },
+    ValidatedInput
+  }
 })
 export default class SingleInstructorFile extends Vue {
-  @Prop({ required: true, type: InstructorFile })
+  @Prop({required: true, type: InstructorFile})
   file!: InstructorFile;
 
   readonly is_not_empty = is_not_empty;
@@ -122,10 +103,10 @@ export default class SingleInstructorFile extends Vue {
   @handle_global_errors_async
   download_file() {
     this.d_download_progress = null;
-    return toggle(this, "d_downloading", async () => {
+    return toggle(this, 'd_downloading', async () => {
       let file_content = this.file.get_content((event: ProgressEvent) => {
         if (event.lengthComputable) {
-          this.d_download_progress = 100 * ((1.0 * event.loaded) / event.total);
+          this.d_download_progress = 100 * (1.0 * event.loaded / event.total);
         }
       });
       FileSaver.saveAs(new File([await file_content], this.file.name));
@@ -134,19 +115,16 @@ export default class SingleInstructorFile extends Vue {
   }
 }
 
-export function handle_rename_file_error(
-  component: SingleInstructorFile,
-  error: unknown
-) {
+export function handle_rename_file_error(component: SingleInstructorFile, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
 </script>
 
 <style scoped lang="scss">
-@import "@/styles/button_styles.scss";
-@import "@/styles/colors.scss";
-@import "@/styles/forms.scss";
-@import "@/styles/modal.scss";
+@import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
@@ -155,13 +133,13 @@ export function handle_rename_file_error(
 .single-instructor-file-component {
   cursor: pointer;
 
-  padding: 0.5rem 0.75rem;
+  padding: .5rem .75rem;
   word-wrap: break-word;
   word-break: break-word;
 }
 
 .icon-holder {
-  padding-top: 0.125rem;
+  padding-top: .125rem;
 }
 
 .not-editing {
@@ -169,13 +147,11 @@ export function handle_rename_file_error(
 
   .file-name {
     font-size: 16px;
-    padding-bottom: 0.125rem;
+    padding-bottom: .125rem;
   }
 
-  .edit-file-name,
-  .download-file,
-  .delete-file {
-    margin: 0 0.375rem;
+  .edit-file-name, .download-file, .delete-file {
+    margin: 0 .375rem;
   }
 
   .edit-file-name {
@@ -206,7 +182,7 @@ export function handle_rename_file_error(
 
 .edit-name-buttons {
   display: flex;
-  padding: 0.5rem 0;
+  padding: .5rem 0;
 }
 
 .update-file-name-button {
@@ -215,17 +191,17 @@ export function handle_rename_file_error(
 
 .update-file-name-cancel-button {
   @extend .flat-white-button;
-  margin-left: 0.625rem;
+  margin-left: .625rem;
 }
 
 .update-file-name-button,
 .update-file-name-cancel-button {
-  padding: 0.25rem 0.375rem;
+  padding: .25rem .375rem;
 }
 
 .display-timestamp {
   display: block;
   color: hsl(220, 20%, 65%);
-  font-size: 0.875rem;
+  font-size: .875rem;
 }
 </style>
