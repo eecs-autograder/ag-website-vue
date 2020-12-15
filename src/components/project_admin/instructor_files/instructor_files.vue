@@ -13,22 +13,20 @@
 
     <div class="sidebar-container">
       <div class="sidebar-menu">
-        <div :class="['sidebar-header', { 'sidebar-header-closed': d_collapsed }]">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
-          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
-            <i class="fas fa-bars"></i>
-          </span>
-          <span class="sidebar-header-text"
-                v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
-          </div>
           <div>
-            <button v-if="!d_collapsed && batch_mode"
-                    class="batch-delete-files-button red-button"
-                    @click.stop="request_batch_delete()"
-            >
-              Delete
-            </button>
+            <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+              <i class="fas fa-bars"></i>
+            </span>
+            <span class="sidebar-header-text"
+                  v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
           </div>
+          <button v-if="!d_collapsed && batch_mode"
+                  class="batch-delete-files-button red-button"
+                  @click.stop="request_batch_delete()"
+          >
+            Delete
+          </button>
         </div>
 
         <div class="sidebar-content" v-if="!d_collapsed">
@@ -305,31 +303,6 @@ $border-color: hsl(220, 40%, 94%);
   $active-color: $pebble-light
 );
 
-.sidebar-container {
-  margin-top: .875rem;
-}
-
-.sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  padding-top: .5rem;
-  padding-bottom: .5rem;
-  font-weight: bold;
-  font-size: 1.125rem;
-}
-
-.sidebar-header-text {
-  white-space: nowrap;
-}
-
-.sidebar-collapse-button {
-  color: $ocean-blue;
-  outline: none;
-
-  &:hover {
-    color: darken($ocean-blue, 10);
-  }
-}
 
 .batch-delete-files-button {
   white-space: nowrap;
@@ -340,15 +313,44 @@ $border-color: hsl(220, 40%, 94%);
   margin: 0 .5em;
 }
 
-.sidebar-item {
-  border-top: 1px solid $border-color;
-}
-
 .sidebar-container {
+  margin-top: .875rem;
+
   .body {
     border-top: 1px solid hsl(220, 40%, 94%);
   }
+
+  .sidebar-menu {
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      padding-top: .5rem;
+      padding-bottom: .5rem;
+      font-weight: bold;
+      font-size: 1.125rem;
+
+      .sidebar-header-text {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .sidebar-content {
+    .sidebar-item {
+      border-top: 1px solid $border-color;
+    }
+
+    .sidebar-collapse-button {
+      color: $ocean-blue;
+      outline: none;
+
+      &:hover {
+        color: darken($ocean-blue, 10);
+      }
+    }
+  }
 }
+
 
 /* ---------------- MODAL ---------------- */
 
