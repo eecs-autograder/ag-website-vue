@@ -21,11 +21,13 @@
             <span class="sidebar-header-text"
                   v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
           </div>
-          <button v-if="!d_collapsed && batch_mode"
-                  class="batch-delete-files-button red-button"
+          <button v-if="!d_collapsed"
+                  class="batch-delete-files-button"
+                  :class="{'red-button': batch_mode, 'gray-button': !batch_mode}"
+                  :disabled="!batch_mode"
                   @click.stop="request_batch_delete()"
           >
-            Delete
+            Batch Delete
           </button>
         </div>
 
