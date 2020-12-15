@@ -29,15 +29,17 @@
       <APIErrors ref="api_errors"></APIErrors>
     </div>
     <div v-else class="not-editing">
-      <div class="file-name">{{file.name}}</div>
-      <i class="fas fa-pencil-alt edit-file-name"
-         @click.stop="new_file_name = file.name; editing = true;"></i>
-      <i class="fas fa-file-download download-file"
-         @click.stop="download_file"></i>
-      <i class="far fa-trash-alt delete-file"
-         @click.stop="$emit('delete_requested')"
-      ></i>
-      <input @click.stop v-model="selectedProxy" type="checkbox" />
+      <input class="select-checkbox" @click.stop v-model="selectedProxy" type="checkbox" />
+      <div class="file-info-actions">
+        <div class="file-name">{{file.name}}</div>
+        <i class="fas fa-pencil-alt edit-file-name"
+          @click.stop="new_file_name = file.name; editing = true;"></i>
+        <i class="fas fa-file-download download-file"
+          @click.stop="download_file"></i>
+        <i class="far fa-trash-alt delete-file"
+          @click.stop="$emit('delete_requested')"
+        ></i>
+      </div>
     </div>
     <div class="display-timestamp">
       {{format_datetime(file.last_modified)}}
@@ -144,7 +146,7 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 .single-instructor-file-component {
   cursor: pointer;
 
-  padding: .5rem .75rem;
+  padding: .5rem .10rem;
   word-wrap: break-word;
   word-break: break-word;
 }
@@ -156,38 +158,50 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 .not-editing {
   display: flex;
 
-  .file-name {
-    font-size: 16px;
-    padding-bottom: .125rem;
+  .select-checkbox {
+    width: 1.35rem;
+    transform: scale(1.35);
   }
 
-  .edit-file-name, .download-file, .delete-file {
-    margin: 0 .375rem;
-  }
+  .file-info-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
 
-  .edit-file-name {
-    color: hsl(220, 30%, 60%);
-    margin-left: auto;
-  }
+    .file-name {
+      font-size: 16px;
+      padding-bottom: .125rem;
+      margin-right: auto;
+    }
 
-  .edit-file-name:hover {
-    color: hsl(220, 30%, 35%);
-  }
+    .edit-file-name, .download-file, .delete-file {
+      margin: 0 .375rem;
+    }
 
-  .download-file {
-    color: hsl(220, 30%, 60%);
-  }
+    .edit-file-name {
+      color: hsl(220, 30%, 60%);
+      margin-left: auto;
+    }
 
-  .download-file:hover {
-    color: hsl(220, 30%, 35%);
-  }
+    .edit-file-name:hover {
+      color: hsl(220, 30%, 35%);
+    }
 
-  .delete-file {
-    color: hsl(220, 20%, 75%);
-  }
+    .download-file {
+      color: hsl(220, 30%, 60%);
+    }
 
-  .delete-file:hover {
-    color: hsl(220, 20%, 55%);
+    .download-file:hover {
+      color: hsl(220, 30%, 35%);
+    }
+
+    .delete-file {
+      color: hsl(220, 20%, 75%);
+    }
+
+    .delete-file:hover {
+      color: hsl(220, 20%, 55%);
+    }
   }
 }
 
@@ -214,5 +228,6 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   display: block;
   color: hsl(220, 20%, 65%);
   font-size: .875rem;
+  margin-left: 1.75rem;
 }
 </style>
