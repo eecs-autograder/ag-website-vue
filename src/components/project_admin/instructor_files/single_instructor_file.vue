@@ -37,7 +37,7 @@
       <i class="far fa-trash-alt delete-file"
          @click.stop="$emit('delete_requested')"
       ></i>
-      <input @click.stop @change.stop="$emit('selected')" type="checkbox" />
+      <input @click.stop v-model="selectedProxy" type="checkbox" />
     </div>
     <div class="display-timestamp">
       {{format_datetime(file.last_modified)}}
@@ -78,6 +78,9 @@ export default class SingleInstructorFile extends Vue {
   @Prop({required: true, type: InstructorFile})
   file!: InstructorFile;
 
+  @Prop({required: false, type: Boolean})
+  selected!: Boolean;
+
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
@@ -87,6 +90,14 @@ export default class SingleInstructorFile extends Vue {
 
   d_download_progress: number | null = null;
   d_downloading = false;
+
+  get selectedProxy() : Boolean {
+    return this.selected;
+  }
+
+  set selectedProxy(value: Boolean) {
+    this.$emit('update:selected', value);
+  }
 
   @handle_api_errors_async(handle_rename_file_error)
   async rename_file() {

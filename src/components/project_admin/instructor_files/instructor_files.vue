@@ -22,7 +22,7 @@
                 v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
           </div>
           <div>
-            <button v-if="d_batch_mode"
+            <button v-if="!d_collapsed && batch_mode"
                     class="batch-delete-files-button red-button"
                     @click.stop="request_batch_delete()"
             >
@@ -37,7 +37,8 @@
             :key="instructor_file.pk"
             :file="instructor_file"
             @click="view_file(instructor_file)"
-            @selected="toggle_file_for_batch_operation(instructor_file.pk)"
+            v-bind:selected="d_batch_to_be_deleted.some((f) => f.pk === instructor_file.pk)"
+            v-on:update:selected="toggle_file_for_batch_operation(instructor_file)"
             @delete_requested="request_single_delete(instructor_file)"
             class="sidebar-item"
             :class="{ active: current_filename === instructor_file.name }"
@@ -145,19 +146,17 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   d_delete_pending = false;
   d_show_delete_modal = false;
 
-  d_batch_mode = false;
-  // Set of file pks selected for deletion in batch mode
-  d_batch_to_be_deleted = new Set<number>();
+  // Array of files selected for deletion in batch mode
+  d_batch_to_be_deleted = new Array<InstructorFile>();
 
-  toggle_file_for_batch_operation(key: number) {
-    if (this.d_batch_to_be_deleted.has(key)) {
-      this.d_batch_to_be_deleted.delete(key);
+
+  toggle_file_for_batch_operation(file: InstructorFile) {
+    if (this.d_batch_to_be_deleted.some((f) => f.pk === file.pk)) {
+      this.d_batch_to_be_deleted = this.d_batch_to_be_deleted.filter((f) => f.pk !== file.pk);
     }
     else {
-      this.d_batch_to_be_deleted.add(key);
+      this.d_batch_to_be_deleted.push(file);
     }
-
-    this.d_batch_mode = this.d_batch_to_be_deleted.size > 0;
   }
 
   // Called when a user presses the delete button inside of child SingleInstructorFile component
@@ -169,9 +168,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
 
   // Called when a user presses the batch delete button from this component
   request_batch_delete() {
-    this.d_to_be_deleted = this.instructor_files.filter(
-      (file: InstructorFile) => this.d_batch_to_be_deleted.has(file.pk)
-    );
+    this.d_to_be_deleted = this.d_batch_to_be_deleted;
     this.d_show_delete_modal = true;
   }
 
@@ -184,22 +181,22 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
       await Promise.all(
         this.d_to_be_deleted.map(async (file) => {
           await file.delete();
-          this.d_batch_to_be_deleted.delete(file.pk);
         })
       );
 
+      this.d_batch_to_be_deleted = [];
       this.d_show_delete_modal = false;
     }
     finally {
       this.d_delete_pending = false;
-
-      // Allow for batch mode to operate consistently
-      if (this.d_batch_to_be_deleted.size === 0) {
-        this.d_batch_mode = false;
-      }
-
       this.d_to_be_deleted = [];
     }
+  }
+
+
+  // Returns whether we are in batch deletion mode
+  get batch_mode() {
+    return this.d_batch_to_be_deleted.length > 0;
   }
 
   // Do NOT modify the contents of this array!!
