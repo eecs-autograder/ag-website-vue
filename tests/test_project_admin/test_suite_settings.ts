@@ -412,16 +412,17 @@ describe('Field binding tests', () => {
     });
 
     test('InstructorFile filter function on batch select', async () => {
-        wrapper.findAll('.batch-select-button').at(0).trigger('click');
+        wrapper.find('.batch-select-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll('.batch-select-card').length).toBe(3);
+        expect(wrapper.findAll('.batch-select-card').length).toBe(project.instructor_files.length);
 
-        wrapper.findAll('.batch-search-field').at(0).setValue('wa');
+        let test_input = project.instructor_files[0].name;
+        await wrapper.find('.batch-search-field').setValue(test_input)
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll('.batch-select-card').length).toBe(1);
-        expect(wrapper.findAll('.batch-select-card').at(0).text()).toBe(instructor_file_3.name);
+        expect(wrapper.findAll('.batch-select-card').length).
+          toBe(project.instructor_files.filter(f => f.name === test_input).length);
     });
 
 
@@ -474,13 +475,16 @@ describe('Field binding tests', () => {
         wrapper.findAll('.batch-select-button').at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll('.batch-select-card').length).toBe(3);
+        expect(wrapper.findAll('.batch-select-card').length).
+          toBe(project.expected_student_files.length);
 
-        wrapper.findAll('.batch-search-field').at(0).setValue('ep');
+        let test_input = project.instructor_files[0].name;
+        await wrapper.find('.batch-search-field').setValue(test_input);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll('.batch-select-card').length).toBe(1);
-        expect(wrapper.findAll('.batch-select-card').at(0).text()).toBe(student_file_1.pattern);
+        expect(wrapper.findAll('.batch-select-card').length).toBe(
+          project.expected_student_files.filter(f => f.name === test_input).length
+        );
     });
 
     test('Removing student file using batch select', async () => {
