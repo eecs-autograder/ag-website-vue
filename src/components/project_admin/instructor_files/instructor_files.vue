@@ -14,13 +14,11 @@
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
-          <div>
-            <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
-              <i class="fas fa-bars"></i>
-            </span>
-            <span class="sidebar-header-text"
-                  v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
-          </div>
+          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+            <i class="fas fa-bars"></i>
+          </span>
+          <span class="sidebar-header-text"
+                v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
           <button v-if="!d_collapsed"
                   class="batch-delete-files-button"
                   :class="{'red-button': batch_mode, 'gray-button': !batch_mode}"
@@ -305,8 +303,9 @@ $border-color: hsl(220, 40%, 94%);
 
 
 .batch-delete-files-button {
-  white-space: nowrap;
   font-size: .875rem;
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 .batch-select-all-checkbox {
