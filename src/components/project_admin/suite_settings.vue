@@ -433,13 +433,13 @@ export default class SuiteSettings extends Vue {
     padding: 1em;
     border-radius: 3px;
     background-color: $gray-blue-1;
+    opacity: 0.5;
     overflow: hidden;
     text-overflow: ellipsis;
-    cursor: grabbing;
+    cursor: pointer;
 
     &.selected {
-      background-color: $ocean-blue;
-      overflow: visible;
+      opacity: 1;
     }
   }
 }
@@ -453,10 +453,10 @@ export default class SuiteSettings extends Vue {
 }
 
 .modal-confirm-button {
-  @extend .green-button;
+  @extend .blue-button;
 }
 
 .modal-cancel-button {
-  @extend .red-button;
+  @extend .white-button;
 }
 </style>
