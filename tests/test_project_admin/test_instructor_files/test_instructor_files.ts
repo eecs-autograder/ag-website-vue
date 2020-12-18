@@ -278,12 +278,6 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-
-        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-
         expect(delete_stub.callCount).toEqual(0);
         wrapper.find('.batch-delete-files-button').trigger('click');
         await wrapper.vm.$nextTick();
@@ -311,6 +305,12 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
         await wrapper.vm.$nextTick();
         wrapper.findAll('.single-instructor-file-component input').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        wrapper.findAll('.single-instructor-file-component input').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        // click again to test deselect behavior 
+        wrapper.findAll('.single-instructor-file-component input').at(2).trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.find('.batch-delete-files-button').trigger('click');
