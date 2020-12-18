@@ -273,7 +273,6 @@ function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
 @import "@/styles/colors.scss";
 @import "@/styles/button_styles.scss";
 @import "@/styles/collapsible_sidebar.scss";
-@import "@/styles/forms.scss";
 @import "@/styles/modal.scss";
 
 * {
@@ -308,10 +307,6 @@ $border-color: hsl(220, 40%, 94%);
   white-space: nowrap;
 }
 
-.batch-select-all-checkbox {
-  margin: 0 .5em;
-}
-
 .sidebar-container {
   margin-top: .875rem;
 
@@ -321,10 +316,6 @@ $border-color: hsl(220, 40%, 94%);
 
   .sidebar-menu {
     .sidebar-header {
-      display: flex;
-      justify-content: space-between;
-      padding-top: .5rem;
-      padding-bottom: .5rem;
       font-weight: bold;
       font-size: 1.125rem;
 
