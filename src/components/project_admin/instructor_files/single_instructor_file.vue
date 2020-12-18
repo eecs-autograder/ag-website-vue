@@ -63,7 +63,7 @@ import {
   handle_api_errors_async,
   handle_global_errors_async,
   make_error_handler_func,
-} from "@/error_handling";
+} from '@/error_handling';
 import { format_datetime, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -219,8 +219,7 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   margin-left: .625rem;
 }
 
-.update-file-name-button,
-.update-file-name-cancel-button {
+.update-file-name-button, .update-file-name-cancel-button {
   padding: .25rem .375rem;
 }
 
