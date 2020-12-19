@@ -422,7 +422,8 @@ describe('Field binding tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findAll('.batch-select-card').length).
-          toBe(project.instructor_files.filter(f => f.name === test_input).length);
+          toBe(project.instructor_files.filter(f => 
+            f.name.toLowerCase() === test_input.toLowerCase()).length);
     });
 
 

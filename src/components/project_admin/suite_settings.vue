@@ -307,11 +307,14 @@ export default class SuiteSettings extends Vue {
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
-    return file.name.indexOf(filter_text) >= 0;
+    return file.name.toLowerCase().indexOf(filter_text.toLowerCase()) >= 0;
   }
 
-  expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
-    return file.pattern.indexOf(filter_text) >= 0;
+  expected_student_file_filter_fn(
+    file: ExpectedStudentFile,
+    filter_text: string
+  ) {
+    return file.pattern.toLowerCase().indexOf(filter_text.toLowerCase()) >= 0;
   }
 
   get batch_filtered_files() {
