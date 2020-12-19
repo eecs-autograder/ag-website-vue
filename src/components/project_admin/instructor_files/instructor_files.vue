@@ -36,7 +36,7 @@
             :file="instructor_file"
             @click="view_file(instructor_file)"
             v-bind:selected="d_batch_to_be_deleted.some((f) => f.pk === instructor_file.pk)"
-            v-on:update:selected="toggle_file_for_batch_operation(instructor_file, $event)"
+            v-on:selected="toggle_file_for_batch_operation(instructor_file, $event)"
             @delete_requested="request_single_delete(instructor_file)"
             class="sidebar-item"
             :class="{ active: current_filename === instructor_file.name }"

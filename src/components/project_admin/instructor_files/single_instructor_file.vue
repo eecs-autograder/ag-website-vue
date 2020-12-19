@@ -98,7 +98,7 @@ export default class SingleInstructorFile extends Vue {
   }
 
   set selectedProxy(value: Boolean) {
-    this.$emit('update:selected', value);
+    this.$emit('selected', value);
   }
 
   @handle_api_errors_async(handle_rename_file_error)
