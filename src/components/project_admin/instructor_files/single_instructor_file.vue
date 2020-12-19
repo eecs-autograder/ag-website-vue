@@ -29,7 +29,11 @@
       <APIErrors ref="api_errors"></APIErrors>
     </div>
     <div v-else class="not-editing">
-      <input class="select-checkbox" @click.stop v-model="selectedProxy" type="checkbox" />
+      <input class="select-checkbox" 
+             @click.stop 
+             :checked="selected_for_deletion" 
+             @change="$emit('selected_for_deletion', $event.target.checked)"
+             type="checkbox" />
       <div class="file-info-actions">
         <div class="file-name">{{file.name}}</div>
         <i class="fas fa-pencil-alt edit-file-name"
@@ -81,7 +85,7 @@ export default class SingleInstructorFile extends Vue {
   file!: InstructorFile;
 
   @Prop({required: false, type: Boolean})
-  selected!: Boolean;
+  selected_for_deletion!: Boolean;
 
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
@@ -92,14 +96,6 @@ export default class SingleInstructorFile extends Vue {
 
   d_download_progress: number | null = null;
   d_downloading = false;
-
-  get selectedProxy() : Boolean {
-    return this.selected;
-  }
-
-  set selectedProxy(value: Boolean) {
-    this.$emit('selected', value);
-  }
 
   @handle_api_errors_async(handle_rename_file_error)
   async rename_file() {

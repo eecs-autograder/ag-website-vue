@@ -35,8 +35,8 @@
             :key="instructor_file.pk"
             :file="instructor_file"
             @click="view_file(instructor_file)"
-            v-bind:selected="d_batch_to_be_deleted.some((f) => f.pk === instructor_file.pk)"
-            v-on:selected="toggle_file_for_batch_operation(instructor_file, $event)"
+            :selected_for_deletion="d_batch_to_be_deleted.some((f) => f.pk === instructor_file.pk)"
+            @selected_for_deletion="toggle_file_for_batch_operation(instructor_file, $event)"
             @delete_requested="request_single_delete(instructor_file)"
             class="sidebar-item"
             :class="{ active: current_filename === instructor_file.name }"
@@ -177,10 +177,10 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
       await Promise.all(
         this.d_to_be_deleted.map(async (file) => {
           await file.delete();
+          this.d_batch_to_be_deleted = this.d_batch_to_be_deleted.filter(f => f.pk !== file.pk);
         })
       );
 
-      this.d_batch_to_be_deleted = [];
       this.d_show_delete_modal = false;
     }
     finally {
