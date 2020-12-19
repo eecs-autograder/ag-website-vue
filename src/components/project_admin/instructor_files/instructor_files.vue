@@ -21,8 +21,8 @@
                 v-if="!d_collapsed || current_filename === null">Uploaded Files</span>
           <button v-if="!d_collapsed"
                   class="batch-delete-files-button"
-                  :class="{'red-button': batch_mode, 'gray-button': !batch_mode}"
-                  :disabled="!batch_mode"
+                  :class="{'red-button': in_batch_mode, 'gray-button': !in_batch_mode}"
+                  :disabled="!in_batch_mode"
                   @click.stop="request_batch_delete()"
           >
             Batch Delete
@@ -191,7 +191,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
 
 
   // Returns whether we are in batch deletion mode
-  get batch_mode() {
+  get in_batch_mode() {
     return this.d_batch_to_be_deleted.length > 0;
   }
 
