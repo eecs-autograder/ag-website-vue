@@ -415,14 +415,15 @@ describe('Field binding tests', () => {
         wrapper.find('.batch-select-button').trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAll('.batch-select-card').length).toBe(project.instructor_files.length);
+        expect(wrapper.findAll('.batch-select-card').length).toBe(
+            project!.instructor_files!.length);
 
-        let test_input = project.instructor_files[0].name;
-        await wrapper.find('.batch-search-field').setValue(test_input)
+        let test_input = project!.instructor_files![0].name;
+        await wrapper.find('.batch-search-field').setValue(test_input);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findAll('.batch-select-card').length).
-          toBe(project.instructor_files.filter(f => 
+          toBe(project.instructor_files!.filter(f =>
             f.name.toLowerCase() === test_input.toLowerCase()).length);
     });
 
@@ -479,12 +480,12 @@ describe('Field binding tests', () => {
         expect(wrapper.findAll('.batch-select-card').length).
           toBe(project.expected_student_files.length);
 
-        let test_input = project.instructor_files[0].name;
+        let test_input = project!.instructor_files![0].name;
         await wrapper.find('.batch-search-field').setValue(test_input);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findAll('.batch-select-card').length).toBe(
-          project.expected_student_files.filter(f => f.name === test_input).length
+          project.expected_student_files.filter(f => f.pattern === test_input).length
         );
     });
 
