@@ -98,6 +98,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+
 import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
 import APIErrors from "@/components/api_errors.vue";
@@ -148,11 +149,13 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   d_batch_to_be_deleted = new Array<InstructorFile>();
 
   // Toggle a file to be included or excluded for a batch operation
-  toggle_file_for_batch_operation(file: InstructorFile, value: Boolean) {
-    if (value) 
+  toggle_file_for_batch_operation(file: InstructorFile, value: boolean) {
+    if (value) {
       this.d_batch_to_be_deleted.push(file);
-    else 
+    }
+    else {
       this.d_batch_to_be_deleted = this.d_batch_to_be_deleted.filter((f) => f.pk !== file.pk);
+    }
   }
 
   // Called when a user presses the delete button inside of child SingleInstructorFile component

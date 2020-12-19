@@ -85,7 +85,7 @@ export default class SingleInstructorFile extends Vue {
   file!: InstructorFile;
 
   @Prop({required: false, type: Boolean})
-  selected_for_deletion!: Boolean;
+  selected_for_deletion!: boolean;
 
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;

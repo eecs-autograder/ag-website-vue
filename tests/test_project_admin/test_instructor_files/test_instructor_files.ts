@@ -309,7 +309,7 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAll('.single-instructor-file-component input').at(2).trigger('click');
         await wrapper.vm.$nextTick();
 
-        // click again to test deselect behavior 
+        // click again to test deselect behavior
         wrapper.findAll('.single-instructor-file-component input').at(2).trigger('click');
         await wrapper.vm.$nextTick();
 
