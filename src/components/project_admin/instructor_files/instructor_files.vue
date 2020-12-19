@@ -273,6 +273,7 @@ function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
 @import "@/styles/colors.scss";
 @import "@/styles/button_styles.scss";
 @import "@/styles/collapsible_sidebar.scss";
+@import "@/styles/forms.scss";
 @import "@/styles/modal.scss";
 
 * {
