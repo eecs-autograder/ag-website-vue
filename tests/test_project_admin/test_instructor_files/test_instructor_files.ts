@@ -379,8 +379,8 @@ describe('InstructorFiles.vue', () => {
         wrapper.find('.delete-file').trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find('.modal-delete-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('.modal-delete-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_delete_pending)).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
