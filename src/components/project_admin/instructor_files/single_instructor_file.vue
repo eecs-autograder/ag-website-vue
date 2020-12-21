@@ -4,8 +4,8 @@
       <validated-form autocomplete="off"
                       spellcheck="false"
                       ref="rename_form"
-                      @submit=rename_file>
-        <validated-input ref='file_name'
+                      @submit="rename_file">
+        <validated-input ref="file_name"
                          v-model="new_file_name"
                          :validators="[is_not_empty]"
                          input_style="width: 200px;
@@ -21,53 +21,33 @@
             Save
           </button>
           <button class="update-file-name-cancel-button"
-                  @click.stop="cancel_renaming_file"> Cancel
+                  @click.stop="cancel_renaming_file">
+            Cancel
           </button>
         </div>
       </validated-form>
       <APIErrors ref="api_errors"></APIErrors>
     </div>
     <div v-else class="not-editing">
-      <div class="file-name">{{file.name}}</div>
-      <i class="fas fa-pencil-alt edit-file-name"
-         @click.stop="new_file_name = file.name; editing = true;"></i>
-      <i class="fas fa-file-download download-file"
-         @click.stop="download_file"></i>
-      <i class="far fa-trash-alt delete-file"
-         @click.stop="d_show_delete_instructor_file_modal = true"></i>
+      <input class="select-checkbox" 
+             @click.stop 
+             :checked="selected_for_deletion" 
+             @change="$emit('selected_for_deletion', $event.target.checked)"
+             type="checkbox" />
+      <div class="file-info-actions">
+        <div class="file-name">{{file.name}}</div>
+        <i class="fas fa-pencil-alt edit-file-name"
+          @click.stop="new_file_name = file.name; editing = true;"></i>
+        <i class="fas fa-file-download download-file"
+          @click.stop="download_file"></i>
+        <i class="far fa-trash-alt delete-file"
+          @click.stop="$emit('delete_requested')"
+        ></i>
+      </div>
     </div>
     <div class="display-timestamp">
       {{format_datetime(file.last_modified)}}
     </div>
-    <div @click.stop>
-      <modal v-if="d_show_delete_instructor_file_modal"
-             @close="d_show_delete_instructor_file_modal = false"
-             ref="delete_instructor_file_modal"
-             size="large"
-             click_outside_to_close>
-        <div class="modal-header">Confirm Delete</div>
-        <div> Are you sure you want to delete
-          <span class="file-to-delete">{{file.name}}</span>? <br><br>
-
-          If you want to <b>update the file's contents</b>, cancel this dialogue
-          and <b>re-upload the file instead.</b> <br><br>
-
-          <b>This action cannot be undone</b>. <br>
-          Any test cases that rely on this file may have
-          to be updated before they'll run correctly again.
-        </div>
-
-        <APIErrors ref="delete_errors"></APIErrors>
-        <div class="button-footer-right modal-button-footer">
-          <button class="modal-delete-button"
-                  :disabled="d_delete_pending"
-                  @click="delete_file_permanently"> Delete </button>
-          <button class="modal-cancel-button"
-                  @click="d_show_delete_instructor_file_modal = false"> Cancel </button>
-        </div>
-      </modal>
-    </div>
-
     <progress-overlay v-if="d_downloading" :progress="d_download_progress"></progress-overlay>
   </div>
 </template>
@@ -86,7 +66,7 @@ import ValidatedInput from '@/components/validated_input.vue';
 import {
   handle_api_errors_async,
   handle_global_errors_async,
-  make_error_handler_func
+  make_error_handler_func,
 } from '@/error_handling';
 import { format_datetime, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -101,18 +81,18 @@ import { is_not_empty } from '@/validators';
   }
 })
 export default class SingleInstructorFile extends Vue {
-
   @Prop({required: true, type: InstructorFile})
   file!: InstructorFile;
+
+  @Prop({required: false, type: Boolean})
+  selected_for_deletion!: boolean;
 
   readonly is_not_empty = is_not_empty;
   readonly format_datetime = format_datetime;
 
-  d_delete_pending = false;
   editing = false;
   new_file_name: string = "";
   new_name_is_valid = true;
-  d_show_delete_instructor_file_modal = false;
 
   d_download_progress: number | null = null;
   d_downloading = false;
@@ -142,24 +122,11 @@ export default class SingleInstructorFile extends Vue {
       this.d_download_progress = null;
     });
   }
-
-  @handle_api_errors_async(make_error_handler_func('delete_errors'))
-  async delete_file_permanently() {
-    try {
-      this.d_delete_pending = true;
-      await this.file.delete();
-      this.d_show_delete_instructor_file_modal = false;
-    }
-    finally {
-      this.d_delete_pending = false;
-    }
-  }
 }
 
 export function handle_rename_file_error(component: SingleInstructorFile, error: unknown) {
   (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
 }
-
 </script>
 
 <style scoped lang="scss">
@@ -175,7 +142,7 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 .single-instructor-file-component {
   cursor: pointer;
 
-  padding: .5rem .75rem;
+  padding: .5rem .10rem;
   word-wrap: break-word;
   word-break: break-word;
 }
@@ -187,38 +154,50 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 .not-editing {
   display: flex;
 
-  .file-name {
-    font-size: 16px;
-    padding-bottom: .125rem;
+  .select-checkbox {
+    width: 1.35rem;
+    transform: scale(1.35);
   }
 
-  .edit-file-name, .download-file, .delete-file {
-    margin: 0 .375rem;
-  }
+  .file-info-actions {
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
 
-  .edit-file-name {
-    color: hsl(220, 30%, 60%);
-    margin-left: auto;
-  }
+    .file-name {
+      font-size: 16px;
+      padding-bottom: .125rem;
+      margin-right: auto;
+    }
 
-  .edit-file-name:hover {
-    color: hsl(220, 30%, 35%);
-  }
+    .edit-file-name, .download-file, .delete-file {
+      margin: 0 .375rem;
+    }
 
-  .download-file {
-    color: hsl(220, 30%, 60%);
-  }
+    .edit-file-name {
+      color: hsl(220, 30%, 60%);
+      margin-left: auto;
+    }
 
-  .download-file:hover {
-    color: hsl(220, 30%, 35%);
-  }
+    .edit-file-name:hover {
+      color: hsl(220, 30%, 35%);
+    }
 
-  .delete-file {
-    color: hsl(220, 20%, 75%);
-  }
+    .download-file {
+      color: hsl(220, 30%, 60%);
+    }
 
-  .delete-file:hover {
-    color: hsl(220, 20%, 55%);
+    .download-file:hover {
+      color: hsl(220, 30%, 35%);
+    }
+
+    .delete-file {
+      color: hsl(220, 20%, 75%);
+    }
+
+    .delete-file:hover {
+      color: hsl(220, 20%, 55%);
+    }
   }
 }
 
@@ -244,20 +223,6 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   display: block;
   color: hsl(220, 20%, 65%);
   font-size: .875rem;
-}
-
-/* ---------------- MODAL ---------------- */
-
-.file-to-delete {
-  color: darken($ocean-blue, 5%);
-  font-weight: bold;
-}
-
-.modal-cancel-button {
-  @extend .white-button;
-}
-
-.modal-delete-button {
-  @extend .red-button;
+  margin-left: 1.75rem;
 }
 </style>

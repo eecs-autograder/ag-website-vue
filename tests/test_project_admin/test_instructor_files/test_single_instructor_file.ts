@@ -104,39 +104,10 @@ describe('SingleInstructorFile tests', () => {
     });
 
     test('Users have the ability to delete a file', async () => {
-        let delete_stub = sinon.stub(file_1, 'delete');
         wrapper.find('.delete-file').trigger('click');
         await component.$nextTick();
 
-        wrapper.find('.modal-delete-button').trigger('click');
-        await component.$nextTick();
-
-        expect(delete_stub.calledOnce).toBe(true);
-        expect(delete_stub.thisValues[0]).toEqual(file_1);
-    });
-
-    test('Users have the ability to cancel the process of deleting a file', async () => {
-        let delete_stub = sinon.stub(file_1, 'delete');
-
-        wrapper.find('.delete-file').trigger('click');
-        await component.$nextTick();
-
-        wrapper.find('.modal-cancel-button').trigger('click');
-        await component.$nextTick();
-
-        expect(delete_stub.callCount).toEqual(0);
-    });
-
-    test('API errors handled on delete', async () => {
-        sinon.stub(file_1, 'delete').rejects(new HttpError(403, "nope"));
-        wrapper.find('.delete-file').trigger('click');
-        await component.$nextTick();
-
-        wrapper.find('.modal-delete-button').trigger('click');
-        await component.$nextTick();
-
-        let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(wrapper.emitted().delete_requested).toBeTruthy();
     });
 
     test('Users have the ability to download a file', async () => {
