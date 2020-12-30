@@ -1,12 +1,10 @@
+
 <template>
   <!--
     This component provides a common abstraction for form segments
     that contain data common to all suites (AG test suite, mutation test suite, etc).
-
     This component does NOT support v-model. See below for usage.
-
     USAGE:
-
     <suite-settings :suite="my_suite"
                     :project="my_project"
                     :docker_images="my_docker_images"
@@ -91,10 +89,14 @@
             </span>
           </template>
         </dropdown-typeahead>
-        <button class="button white-button batch-select-button"
-                @click="start_batch_selection_mode(BatchModeEnum.INSTRUCTOR_FILES)">
-          Batch Select
-        </button>
+        <batch-select v-model="suite.instructor_files_needed"
+                      :choices="project.instructor_files"
+                      :are_items_equal="are_files_equal"
+                      :filter_fn="instructor_file_filter_fn"
+                      @items_selected="set_instructor_files($event)"
+                      v-slot="{ item }">
+          {{ item.name }}
+        </batch-select>
       </div>
 
       <div class="instructor-files">
@@ -125,10 +127,14 @@
             </span>
           </template>
         </dropdown-typeahead>
-        <button class="button white-button batch-select-button"
-                @click="start_batch_selection_mode(BatchModeEnum.STUDENT_FILES)">
-          Batch Select
-        </button>
+        <batch-select v-model="suite.student_files_needed"
+                      :choices="project.expected_student_files"
+                      :are_items_equal="are_files_equal"
+                      :filter_fn="expected_student_file_filter_fn"
+                      @items_selected="set_student_files($event)"
+                      v-slot="{ item }">
+          {{ item.pattern }}
+        </batch-select>
       </div>
 
       <div class="student-files">
@@ -143,31 +149,6 @@
         </div>
       </div>
     </fieldset>
-
-    <div @click.stop>
-      <modal v-if="d_show_batch_select_modal"
-             @close="d_show_batch_select_modal = false"
-             size="large"
-             click_outside_to_close>
-        <div class="modal-header">Select Files</div>
-        <div>
-          <ul class="batch-select-card-grid">
-            <li class="batch-select-card" :class="d_batch_needed_files.some((el) => el.pk == file.pk) ?
-'selected' : ''" v-for="file of d_batch_available_files" :key="file.pk"
-@click="batch_toggle_select(file)">
-          {{ file.name || file.pattern }}
-              </li>
-          </ul>
-        </div>
-
-        <div class="button-footer-right modal-button-footer">
-          <button class="modal-confirm-button"
-                  @click="end_batch_selection_mode"> Confirm </button>
-          <button class="modal-cancel-button"
-                  @click="d_show_batch_select_modal = false"> Cancel </button>
-        </div>
-      </modal>
-    </div>
   </div>
 </template>
 
@@ -183,7 +164,7 @@ import {
   SandboxDockerImageData,
 } from 'ag-client-typescript';
 
-import Modal from '@/components/modal.vue';
+import BatchSelect from '@/components/batch_select.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import SelectObject from '@/components/select_object.vue';
 import Toggle from '@/components/toggle.vue';
@@ -211,16 +192,10 @@ class Suite {
   }
 }
 
-enum BatchModeEnum {
-  none,
-  instructor_files,
-  student_files,
-}
-
 @Component({
   components: {
-    Modal,
     DropdownTypeahead,
+    BatchSelect,
     SelectObject,
     Toggle,
     Tooltip,
@@ -237,55 +212,9 @@ export default class SuiteSettings extends Vue {
   @Prop({required: true})
   docker_images!: SandboxDockerImageData[];
 
-  BatchModeEnum = BatchModeEnum;
-
   d_suite: Suite | null = null;
 
   readonly is_not_empty = is_not_empty;
-
-  d_show_batch_select_modal = false;
-  d_batch_available_files: (InstructorFile | ExpectedStudentFile)[] = [];
-  d_batch_needed_files: (InstructorFile | ExpectedStudentFile)[] = [];
-  d_batch_search_query: string = "";
-  d_batch_mode: BatchModeEnum = BatchModeEnum.none;
-
-  start_batch_selection_mode(mode: BatchModeEnum) {
-    this.d_batch_mode = mode;
-
-    if (mode === BatchModeEnum.instructor_files) {
-      this.d_batch_available_files = this.project.instructor_files!;
-      this.d_batch_needed_files = this.d_suite!.instructor_files_needed;
-    }
-    else {
-      this.d_batch_available_files = this.project.expected_student_files!;
-      this.d_batch_needed_files = this.d_suite!.student_files_needed!;
-    }
-
-    this.d_show_batch_select_modal = true;
-  }
-
-  batch_toggle_select(file: InstructorFile | ExpectedStudentFile) {
-    if (this.d_batch_needed_files.some((el) => el.pk === file.pk)) {
-      this.d_batch_needed_files = this.d_batch_needed_files.filter(
-        (el) => el.pk !== file.pk
-      );
-    }
-    else {
-      this.d_batch_needed_files.push(file);
-    }
-  }
-
-  end_batch_selection_mode() {
-    if (this.d_batch_mode === BatchModeEnum.instructor_files) {
-      this.d_suite!.instructor_files_needed = this.d_batch_needed_files as InstructorFile[];
-    }
-    else {
-      this.d_suite!.student_files_needed = this.d_batch_needed_files as ExpectedStudentFile[];
-    }
-    this.$emit('field_change', this.d_suite);
-
-    this.d_show_batch_select_modal = false;
-  }
 
   created() {
     this.d_suite = new Suite(this.suite);
@@ -301,9 +230,26 @@ export default class SuiteSettings extends Vue {
     this.$emit('field_change', this.d_suite);
   }
 
+  set_instructor_files(instructor_files: InstructorFile[]) {
+    this.d_suite!.instructor_files_needed = instructor_files;
+    this.$emit("field_change", this.d_suite);
+  }
+
   add_student_file(student_file: ExpectedStudentFile) {
     this.d_suite!.student_files_needed.push(student_file);
     this.$emit('field_change', this.d_suite);
+  }
+
+  are_files_equal(
+    rhs: InstructorFile | ExpectedStudentFile,
+    lhs: InstructorFile | ExpectedStudentFile
+  ) {
+    return lhs.pk === rhs.pk;
+  }
+
+  set_student_files(student_files: ExpectedStudentFile[]) {
+    this.d_suite!.student_files_needed = student_files;
+    this.$emit("field_change", this.d_suite);
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
@@ -315,25 +261,6 @@ export default class SuiteSettings extends Vue {
     filter_text: string
   ) {
     return file.pattern.toLowerCase().indexOf(filter_text.toLowerCase()) >= 0;
-  }
-
-  get batch_filtered_files() {
-    if (this.d_batch_search_query) {
-      if (this.d_batch_mode === BatchModeEnum.instructor_files) {
-        return this.d_batch_available_files.filter((file) =>
-          this.instructor_file_filter_fn(file as InstructorFile, this.d_batch_search_query)
-        );
-      }
-      else {
-        return this.d_batch_available_files.filter((file) =>
-          this.expected_student_file_filter_fn(file as ExpectedStudentFile,
-                                               this.d_batch_search_query)
-        );
-      }
-    }
-    else {
-      return this.d_batch_available_files;
-    }
   }
 
   get instructor_files_available() {
@@ -358,12 +285,10 @@ export default class SuiteSettings extends Vue {
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
   padding: 0;
-  margin: 0;
 }
 
 .toggle-container {
@@ -417,49 +342,6 @@ export default class SuiteSettings extends Vue {
   .dropdown-typeahead-container {
     flex: 1;
   }
-
-  .batch-select-button {
-    margin-left: 1em;
-  }
 }
 
-
-.batch-select-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  grid-gap: 0.5em;
-  align-items: stretch;
-  list-style-type: none;
-
-  .batch-select-card {
-    display: block;
-    padding: 1em;
-    border-radius: 3px;
-    background-color: $gray-blue-1;
-    opacity: 0.5;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-
-    &.selected {
-      opacity: 1;
-    }
-  }
-}
-
-
-/* ---------------- MODAL ---------------- */
-
-.file-to-delete {
-  color: darken($ocean-blue, 5%);
-  font-weight: bold;
-}
-
-.modal-confirm-button {
-  @extend .blue-button;
-}
-
-.modal-cancel-button {
-  @extend .white-button;
-}
 </style>

@@ -427,7 +427,6 @@ describe('Field binding tests', () => {
             f.name.toLowerCase() === test_input.toLowerCase()).length);
     });
 
-
     test('Removing instructor file using batch select', async () => {
         expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(2);
 
