@@ -39,6 +39,7 @@
       <div class="form-field-wrapper">
         <label class="label"> Sandbox environment </label>
 
+
         <select-object :items="docker_images"
                         id_field="pk"
                         v-model="d_suite.sandbox_docker_image"
@@ -89,11 +90,11 @@
             </span>
           </template>
         </dropdown-typeahead>
-        <batch-select v-model="suite.instructor_files_needed"
+        <batch-select v-model="d_suite.instructor_files_needed"
                       :choices="project.instructor_files"
                       :are_items_equal="are_files_equal"
                       :filter_fn="instructor_file_filter_fn"
-                      @items_selected="set_instructor_files($event)"
+                      @input="$emit('field_change', d_suite)"
                       v-slot="{ item }">
           {{ item.name }}
         </batch-select>
@@ -127,11 +128,11 @@
             </span>
           </template>
         </dropdown-typeahead>
-        <batch-select v-model="suite.student_files_needed"
+        <batch-select v-model="d_suite.student_files_needed"
                       :choices="project.expected_student_files"
                       :are_items_equal="are_files_equal"
                       :filter_fn="expected_student_file_filter_fn"
-                      @items_selected="set_student_files($event)"
+                      @input="$emit('field_change', d_suite)"
                       v-slot="{ item }">
           {{ item.pattern }}
         </batch-select>
@@ -230,11 +231,6 @@ export default class SuiteSettings extends Vue {
     this.$emit('field_change', this.d_suite);
   }
 
-  set_instructor_files(instructor_files: InstructorFile[]) {
-    this.d_suite!.instructor_files_needed = instructor_files;
-    this.$emit("field_change", this.d_suite);
-  }
-
   add_student_file(student_file: ExpectedStudentFile) {
     this.d_suite!.student_files_needed.push(student_file);
     this.$emit('field_change', this.d_suite);
@@ -245,11 +241,6 @@ export default class SuiteSettings extends Vue {
     lhs: InstructorFile | ExpectedStudentFile
   ) {
     return lhs.pk === rhs.pk;
-  }
-
-  set_student_files(student_files: ExpectedStudentFile[]) {
-    this.d_suite!.student_files_needed = student_files;
-    this.$emit("field_change", this.d_suite);
   }
 
   instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
@@ -334,7 +325,6 @@ export default class SuiteSettings extends Vue {
 .odd-index {
   background-color: hsl(210, 20%, 96%);
 }
-
 
 .typeahead-search-bar {
   display: flex;

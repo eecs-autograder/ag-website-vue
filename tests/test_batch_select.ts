@@ -36,7 +36,7 @@ let selected: TestObj[] = [obj1];
                      :choices="objects"
                      :are_items_equal="are_items_equal"
                      :filter_fn="filter_fn"
-                     @items_selected="items_selected($event)"
+                     @input="on_input($event)"
                      v-slot="{ item }"
                      ref="batch_select"
                  >
@@ -62,7 +62,7 @@ class WrapperComponent extends Vue {
         return lhs.value === rhs.value;
     }
 
-    items_selected(object: TestObj) {}
+    on_input(object: TestObj) {}
 
     change_selected() {
         this.selected = [obj3];
@@ -72,11 +72,11 @@ class WrapperComponent extends Vue {
 describe('BatchSelect', () => {
     let wrapper: Wrapper<WrapperComponent>;
     let batch_select_wrapper: Wrapper<BatchSelect>;
-    let items_selected_spy: sinon.SinonSpy;
+    let on_input_spy: sinon.SinonSpy;
 
     beforeEach(() => {
         wrapper = managed_mount(WrapperComponent);
-        items_selected_spy = sinon.spy(wrapper.vm, 'items_selected');
+        on_input_spy = sinon.spy(wrapper.vm, 'on_input');
         batch_select_wrapper = wrapper.findComponent({ref: 'batch_select'}) as Wrapper<BatchSelect>;
     });
 
@@ -95,9 +95,6 @@ describe('BatchSelect', () => {
 
         batch_select_wrapper.findAll('.modal-cancel-button').at(0).trigger('click');
         await batch_select_wrapper.vm.$nextTick();
-
-        expect(batch_select_wrapper.vm.d_show_batch_select_modal).toBe(false);
-
     });
 
     test('closes the modal after clicking close', async () => {
@@ -120,8 +117,8 @@ describe('BatchSelect', () => {
         batch_select_wrapper.find('.modal-confirm-button').trigger('click');
         await batch_select_wrapper.vm.$nextTick();
 
-        expect(emitted(batch_select_wrapper, 'items_selected')[0][0]).toEqual([obj1, obj2]);
-        expect(items_selected_spy.calledWith([obj1, obj2])).toBe(true);
+        expect(emitted(batch_select_wrapper, 'input')[0][0]).toEqual([obj1, obj2]);
+        expect(on_input_spy.calledWith([obj1, obj2])).toBe(true);
     });
 
     test('removes the selected item after selected again', async () => {
@@ -134,8 +131,8 @@ describe('BatchSelect', () => {
         batch_select_wrapper.find('.modal-confirm-button').trigger('click');
         await batch_select_wrapper.vm.$nextTick();
 
-        expect(emitted(batch_select_wrapper, 'items_selected')[0][0]).toEqual([]);
-        expect(items_selected_spy.calledWith([])).toBe(true);
+        expect(emitted(batch_select_wrapper, 'input')[0][0]).toEqual([]);
+        expect(on_input_spy.calledWith([])).toBe(true);
     });
 
     test('displays the object by slot attribute', async () => {
