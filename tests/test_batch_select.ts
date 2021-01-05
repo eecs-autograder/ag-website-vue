@@ -95,6 +95,9 @@ describe('BatchSelect', () => {
 
         batch_select_wrapper.findAll('.modal-cancel-button').at(0).trigger('click');
         await batch_select_wrapper.vm.$nextTick();
+
+        expect(batch_select_wrapper.vm.d_show_batch_select_modal).toBe(false);
+
     });
 
     test('closes the modal after clicking close', async () => {
