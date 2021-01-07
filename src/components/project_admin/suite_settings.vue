@@ -1,12 +1,10 @@
+
 <template>
   <!--
     This component provides a common abstraction for form segments
     that contain data common to all suites (AG test suite, mutation test suite, etc).
-
     This component does NOT support v-model. See below for usage.
-
     USAGE:
-
     <suite-settings :suite="my_suite"
                     :project="my_project"
                     :docker_images="my_docker_images"
@@ -40,6 +38,7 @@
 
       <div class="form-field-wrapper">
         <label class="label"> Sandbox environment </label>
+
 
         <select-object :items="docker_images"
                         id_field="pk"
@@ -91,6 +90,14 @@
             </span>
           </template>
         </dropdown-typeahead>
+        <batch-select v-model="d_suite.instructor_files_needed"
+                      :choices="project.instructor_files"
+                      :are_items_equal="are_files_equal"
+                      :filter_fn="instructor_file_filter_fn"
+                      @input="$emit('field_change', d_suite)"
+                      v-slot="{ item }">
+          {{ item.name }}
+        </batch-select>
       </div>
 
       <div class="instructor-files">
@@ -121,6 +128,14 @@
             </span>
           </template>
         </dropdown-typeahead>
+        <batch-select v-model="d_suite.student_files_needed"
+                      :choices="project.expected_student_files"
+                      :are_items_equal="are_files_equal"
+                      :filter_fn="expected_student_file_filter_fn"
+                      @input="$emit('field_change', d_suite)"
+                      v-slot="{ item }">
+          {{ item.pattern }}
+        </batch-select>
       </div>
 
       <div class="student-files">
@@ -150,6 +165,7 @@ import {
   SandboxDockerImageData,
 } from 'ag-client-typescript';
 
+import BatchSelect from '@/components/batch_select.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import SelectObject from '@/components/select_object.vue';
 import Toggle from '@/components/toggle.vue';
@@ -180,6 +196,7 @@ class Suite {
 @Component({
   components: {
     DropdownTypeahead,
+    BatchSelect,
     SelectObject,
     Toggle,
     Tooltip,
@@ -219,12 +236,22 @@ export default class SuiteSettings extends Vue {
     this.$emit('field_change', this.d_suite);
   }
 
-  instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
-    return file.name.indexOf(filter_text) >= 0;
+  are_files_equal(
+    rhs: InstructorFile | ExpectedStudentFile,
+    lhs: InstructorFile | ExpectedStudentFile
+  ) {
+    return lhs.pk === rhs.pk;
   }
 
-  expected_student_file_filter_fn(file: ExpectedStudentFile, filter_text: string) {
-    return file.pattern.indexOf(filter_text) >= 0;
+  instructor_file_filter_fn(file: InstructorFile, filter_text: string) {
+    return file.name.toLowerCase().indexOf(filter_text.toLowerCase()) >= 0;
+  }
+
+  expected_student_file_filter_fn(
+    file: ExpectedStudentFile,
+    filter_text: string
+  ) {
+    return file.pattern.toLowerCase().indexOf(filter_text.toLowerCase()) >= 0;
   }
 
   get instructor_files_available() {
@@ -246,12 +273,13 @@ export default class SuiteSettings extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 
 * {
   box-sizing: border-box;
   padding: 0;
-  margin: 0;
 }
 
 .toggle-container {
@@ -297,4 +325,13 @@ export default class SuiteSettings extends Vue {
 .odd-index {
   background-color: hsl(210, 20%, 96%);
 }
+
+.typeahead-search-bar {
+  display: flex;
+
+  .dropdown-typeahead-container {
+    flex: 1;
+  }
+}
+
 </style>

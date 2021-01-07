@@ -395,4 +395,126 @@ describe('Field binding tests', () => {
 
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
+
+    test('Adding instructor file using batch select', async () => {
+        expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(2);
+
+        wrapper.findAll('.batch-select-button').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.findAll('.batch-select-card').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-confirm-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(3);
+    });
+
+    test('InstructorFile filter function on batch select', async () => {
+        wrapper.find('.batch-select-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findAll('.batch-select-card').length).toBe(
+            project!.instructor_files!.length);
+
+        let test_input = project!.instructor_files![0].name;
+        await wrapper.find('.batch-search-field').setValue(test_input);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findAll('.batch-select-card').length).
+          toBe(project.instructor_files!.filter(f =>
+            f.name.toLowerCase() === test_input.toLowerCase()).length);
+    });
+
+    test('Removing instructor file using batch select', async () => {
+        expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(2);
+
+        wrapper.findAll('.batch-select-button').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.findAll('.batch-select-card').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-confirm-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(1);
+    });
+
+    test('Cancelling instructor file batch select preserves state', async () => {
+        expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(2);
+
+        wrapper.findAll('.batch-select-button').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.findAll('.batch-select-card').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-cancel-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_suite!.instructor_files_needed.length).toEqual(2);
+    });
+
+    test('Adding student file using batch select', async () => {
+        expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(2);
+
+        wrapper.findAll('.batch-select-button').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.findAll('.batch-select-card').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-confirm-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(3);
+    });
+
+    test('ExpectedStudentFile filter function on batch select', async () => {
+        wrapper.findAll('.batch-select-button').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findAll('.batch-select-card').length).
+          toBe(project.expected_student_files.length);
+
+        let test_input = project!.instructor_files![0].name;
+        await wrapper.find('.batch-search-field').setValue(test_input);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findAll('.batch-select-card').length).toBe(
+          project.expected_student_files.filter(f => f.pattern === test_input).length
+        );
+    });
+
+    test('Removing student file using batch select', async () => {
+        expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(2);
+
+        wrapper.findAll('.batch-select-button').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.findAll('.batch-select-card').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-confirm-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(1);
+    });
+
+    test('Cancelling instructor file batch select preserves state', async () => {
+        expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(2);
+
+        wrapper.findAll('.batch-select-button').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.findAll('.batch-select-card').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('.modal-cancel-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_suite!.student_files_needed.length).toEqual(2);
+    });
 });
