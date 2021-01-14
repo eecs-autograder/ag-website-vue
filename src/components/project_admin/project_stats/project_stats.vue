@@ -3,14 +3,19 @@
     <div class="beta-msg">
       This page is still in an experimental phase. If you encounter a bug
       or have an idea for a new graph, please post a comment in
-      <a href="https://github.com/eecs-autograder/autograder.io/issues/4">
+      <a href="https://github.com/eecs-autograder/autograder.io/issues/4" target="_blank">
         this issue on GitHub.
       </a>
     </div>
 
     <div class="checkbox-input-container">
       <label class="checkbox-label">
-        <input type="checkbox" class="checkbox" v-model="d_include_staff">
+        <input
+          data-testid="include_staff_checkbox"
+          type="checkbox"
+          class="checkbox"
+          v-model="d_include_staff"
+        >
         Include staff
       </label>
     </div>
@@ -22,6 +27,7 @@
         :indentation_level="null"
         @click="initial_load_submission_results"
         :use_v_if="true"
+        ref="histogram_collapsible"
       >
         <template v-slot:header_text>
           <div class="stats-header-text">
@@ -49,7 +55,6 @@
           <submission-score-histogram
             v-if="submission_results !== null"
             :ultimate_submission_entries="submission_results"
-            @stats_updated="d_submission_result_stats = $event"
           />
         </template>
       </collapsible>
@@ -62,10 +67,11 @@
         :indentation_level="null"
         @click="initial_load_all_submissions"
         :use_v_if="true"
+        ref="submissions_over_time_collapsible"
       >
         <template v-slot:header_text>
           <div class="stats-header-text">
-            Submissions over time
+            Submissions Over Time
           </div>
         </template>
 
@@ -99,6 +105,7 @@
         :indentation_level="null"
         @click="initial_load_submission_results"
         :use_v_if="true"
+        ref="pass_fail_counts_collapsible"
       >
         <template v-slot:header_text>
           <div class="stats-header-text">
@@ -138,10 +145,11 @@
         :indentation_level="null"
         @click="initial_load_final_score_vs_first_submission"
         :use_v_if="true"
+        ref="final_score_vs_first_submission_collapsible"
       >
         <template v-slot:header_text>
           <div class="stats-header-text">
-            Final Score vs. First Submission time
+            Final Score vs. First Submission Time
           </div>
         </template>
 
@@ -152,6 +160,7 @@
               class="blue-button"
               @click="reload_final_score_vs_first_submission"
               :disabled="d_loading_submission_results || d_loading_all_submissions"
+              data-testid="reload_final_score_vs_first_submission_button"
             >
               Reload Data
             </button>
@@ -190,19 +199,6 @@ import PassFailCounts from './pass_fail_counts.vue';
 import SubmissionScoreHistogram from './submission_score_histogram/submission_score_histogram.vue';
 import SubmissionsOverTimeGraph from './submissions_over_time_graph';
 
-interface UltimateSubmissionEntryPage {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: UltimateSubmissionEntry[];
-}
-
-export interface UltimateSubmissionEntry {
-  username: string;
-  group: ag_cli.Group;
-  ultimate_submission: ag_cli.SubmissionWithResults;
-}
-
 export interface FirstSubmissionData {
   group: ag_cli.Group;
   first_submission: ag_cli.Submission;
@@ -230,9 +226,7 @@ export default class ProjectStats extends Vue {
 
   d_loading_submission_results = false;
   d_submission_results_progress = 0;
-  d_submission_results: UltimateSubmissionEntry[] | null = null;
-
-  d_submission_result_stats: {[key: string]: number} | null = null;
+  d_submission_results: ag_cli.FullUltimateSubmissionResult[] | null = null;
 
   d_loading_all_submissions = false;
   d_all_submissions_progress = 0;
@@ -272,15 +266,17 @@ export default class ProjectStats extends Vue {
       let page_size = 200;
 
       let results = [];
-      let page: UltimateSubmissionEntryPage;
+      let page: ag_cli.FullUltimateSubmissionResultPage;
       do {
-        let response = await ag_cli.HttpClient.get_instance().get<UltimateSubmissionEntryPage>(
-          `projects/${this.project.pk}/all_ultimate_submission_results/`
-          + `?page=${page_num}&groups_per_page=${page_size}`
-          // Staff will be filtered out after we load the data
-          + `&full_results=true&include_staff=true`
+        page = await ag_cli.SubmissionResults.get_all_ultimate_submission_results(
+            this.project.pk,
+            {
+                page_num: page_num,
+                page_size: page_size,
+                // Staff will be filtered out after we load the data
+                include_staff: true
+            }
         );
-        page = response.data;
         results.push(...page.results);
 
         this.d_submission_results_progress = (page_num * page_size / page.count) * 100;

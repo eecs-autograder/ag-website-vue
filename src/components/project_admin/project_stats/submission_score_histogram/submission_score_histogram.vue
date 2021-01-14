@@ -27,8 +27,9 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import { FullUltimateSubmissionResult } from 'ag-client-typescript';
+
 import DescriptiveStatsTable from '../descriptive_stats_table.vue';
-import { UltimateSubmissionEntry } from '../project_stats.vue';
 
 import SubmissionScoreHistogramChart from './submission_score_histogram_chart';
 
@@ -40,7 +41,7 @@ import SubmissionScoreHistogramChart from './submission_score_histogram_chart';
 })
 export default class SubmissionScoreHistogram extends Vue {
   @Prop({required: true})
-  ultimate_submission_entries!: UltimateSubmissionEntry[];
+  ultimate_submission_entries!: FullUltimateSubmissionResult[];
 
   readonly num_buckets = 20;
 
@@ -72,7 +73,7 @@ export default class SubmissionScoreHistogram extends Vue {
     return result;
   }
 
-  get percentages_by_entry(): [UltimateSubmissionEntry, number][] {
+  get percentages_by_entry(): [FullUltimateSubmissionResult, number][] {
     return this.ultimate_submission_entries.map(entry => {
       let submission_result = entry.ultimate_submission.results;
       let percent = 0;

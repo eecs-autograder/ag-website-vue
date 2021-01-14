@@ -4,7 +4,6 @@ import * as sinon from 'sinon';
 import BugsExposedHistogram from '@/components/project_admin/project_stats/bugs_exposed_histogram';
 import DescriptiveStatsTable from '@/components/project_admin/project_stats/descriptive_stats_table.vue';
 import PassFailCounts from '@/components/project_admin/project_stats/pass_fail_counts.vue';
-import { UltimateSubmissionEntry } from '@/components/project_admin/project_stats/project_stats.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
@@ -35,7 +34,7 @@ test('Pass fail counts and bugs exposed', async () => {
     let mutation_suite1 = data_ut.make_mutation_test_suite(project.pk);
     let mutation_suite2 = data_ut.make_mutation_test_suite(project.pk);
 
-    let ultimate_submission_entries: UltimateSubmissionEntry[] = [
+    let ultimate_submission_entries: ag_cli.FullUltimateSubmissionResult[] = [
         {
             username: groups[0].member_names[0],
             group: groups[0],

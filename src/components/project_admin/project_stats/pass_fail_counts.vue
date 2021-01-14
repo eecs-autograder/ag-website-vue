@@ -52,7 +52,6 @@ import { SafeMap } from '@/safe_map';
 
 import BugsExposedHistogram from './bugs_exposed_histogram';
 import DescriptiveStatsTable from './descriptive_stats_table.vue';
-import { UltimateSubmissionEntry } from './project_stats.vue';
 
 @Component({
   components: {
@@ -65,7 +64,7 @@ export default class PassFailCounts extends Vue {
   project!: ag_cli.Project;
 
   @Prop({required: true})
-  ultimate_submission_entries!: UltimateSubmissionEntry[];
+  ultimate_submission_entries!: ag_cli.FullUltimateSubmissionResult[];
 
   d_ag_test_suites: ag_cli.AGTestSuite[] = [];
   d_mutation_suites: ag_cli.MutationTestSuite[] = [];

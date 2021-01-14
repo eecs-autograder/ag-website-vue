@@ -1,17 +1,18 @@
-// CommitChart.ts
 import { Scatter } from 'vue-chartjs';
-import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
+
+import { FullUltimateSubmissionResult } from 'ag-client-typescript';
 
 import { SafeMap } from '@/safe_map';
 
-import { FirstSubmissionData, UltimateSubmissionEntry } from './project_stats.vue';
+import { FirstSubmissionData } from './project_stats.vue';
 
 @Component({
     extends: Scatter,
 })
 export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
     @Prop({required: true})
-    ultimate_submission_entries!: UltimateSubmissionEntry[];
+    ultimate_submission_entries!: FullUltimateSubmissionResult[];
 
     @Prop({required: true})
     first_submissions_by_group!: SafeMap<number, FirstSubmissionData>;

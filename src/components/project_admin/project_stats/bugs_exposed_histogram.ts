@@ -1,11 +1,9 @@
 import { Bar } from 'vue-chartjs';
-import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
 import { SafeMap } from '@/safe_map';
-
-import { UltimateSubmissionEntry } from './project_stats.vue';
 
 @Component({
     extends: Bar,
@@ -15,7 +13,7 @@ export default class BugsExposedHistogram extends Mixins(Bar) {
     mutation_test_suite!: ag_cli.MutationTestSuite;
 
     @Prop({required: true, type: Array})
-    ultimate_submission_entries!: UltimateSubmissionEntry[];
+    ultimate_submission_entries!: ag_cli.FullUltimateSubmissionResult[];
 
     mounted() {
         this.update_chart();

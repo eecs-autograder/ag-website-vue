@@ -1,7 +1,8 @@
 import { WrapperArray } from '@vue/test-utils';
 
+import { FullUltimateSubmissionResult } from 'ag-client-typescript';
+
 import DescriptiveStatsTable from '@/components/project_admin/project_stats/descriptive_stats_table.vue';
-import { UltimateSubmissionEntry } from '@/components/project_admin/project_stats/project_stats.vue';
 import SubmissionScoreHistogram from '@/components/project_admin/project_stats/submission_score_histogram/submission_score_histogram.vue';
 import SubmissionScoreHistogramChart from '@/components/project_admin/project_stats/submission_score_histogram/submission_score_histogram_chart';
 
@@ -21,7 +22,7 @@ test('All, individuals, and group percentages', () => {
         data_ut.make_group(project.pk, 2, {members: [students[8], students[9]]}),
     ];
 
-    let ultimate_submission_entries: UltimateSubmissionEntry[] = [
+    let ultimate_submission_entries: FullUltimateSubmissionResult[] = [
         {
             username: students[0].username,
             group: groups[0],

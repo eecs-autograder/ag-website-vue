@@ -1,6 +1,5 @@
-// CommitChart.ts
 import { Bar } from 'vue-chartjs';
-import { Component, Mixins, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
     extends: Bar,

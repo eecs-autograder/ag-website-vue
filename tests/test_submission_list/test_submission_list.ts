@@ -36,7 +36,8 @@ beforeEach(() => {
     get_ultimate_submission_stub = sinon.stub(
         ag_cli.Submission, 'get_final_graded_submission_from_group'
     ).rejects(new ag_cli.HttpError(403, ''));
-    get_submission_result_stub = sinon.stub(ag_cli, 'get_submission_result').rejects();
+    get_submission_result_stub = sinon.stub(
+        ag_cli.SubmissionResults, 'get_submission_result').rejects();
 });
 
 describe('Submission list tests', () => {
