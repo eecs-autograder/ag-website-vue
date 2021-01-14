@@ -68,7 +68,6 @@ import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     Course,
     FeedbackCategory,
-    get_submission_result,
     GradingStatus,
     Group,
     HttpError,
@@ -76,6 +75,7 @@ import {
     Submission,
     SubmissionData,
     SubmissionObserver,
+    SubmissionResults,
     SubmissionWithResults,
 } from 'ag-client-typescript';
 
@@ -226,7 +226,7 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
           submission => submission.pk === ultimate_submission.pk)!;
       }
       else {
-        let results = await get_submission_result(
+        let results = await SubmissionResults.get_submission_result(
           ultimate_submission.pk, FeedbackCategory.ultimate_submission);
         this.d_ultimate_submission = {
           results: results,

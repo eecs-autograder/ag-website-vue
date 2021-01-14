@@ -1,6 +1,6 @@
 import { Vue } from "vue-property-decorator";
 
-import { RefSelector, Wrapper } from "@vue/test-utils";
+import { RefSelector, VueClass, Wrapper, WrapperArray } from "@vue/test-utils";
 
 import APIErrors from "@/components/api_errors.vue";
 import ValidatedInput from "@/components/validated_input.vue";
@@ -149,6 +149,24 @@ export async function do_input_blank_or_not_integer_test(
 // Use find_component() instead
 export function find_by_name<T extends Vue>(wrapper: Wrapper<Vue>, name: string): Wrapper<T> {
     return <Wrapper<T>> wrapper.findComponent({name: name});
+}
+
+// Thin wrapper around Wrapper.findComponent(<component class>) to ensure that
+// .vm on the returned wrapper has the right type when running the vue build.
+export function find_component<T extends Vue>(
+    wrapper: Wrapper<Vue>,
+    component: VueClass<T>
+): Wrapper<T> {
+    return <Wrapper<T>> wrapper.findComponent(component);
+}
+
+// Thin wrapper around Wrapper.findAllComponents(<component class>) to ensure that
+// .vm on the returned wrappers has the right type when running the vue build.
+export function find_all_components<T extends Vue>(
+    wrapper: Wrapper<Vue>,
+    component: VueClass<T>
+): WrapperArray<T> {
+    return <WrapperArray<T>> wrapper.findAllComponents(component);
 }
 
 // Thin wrapper function around the vue-test-utils Wrapper.emitted('string') method.

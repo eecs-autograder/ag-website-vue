@@ -226,11 +226,11 @@ import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 import {
     Course,
     FeedbackCategory,
-    get_submission_result,
     GradingStatus,
     Group,
     Submission,
     SubmissionResultFeedback,
+    SubmissionResults,
     SubmissionWithResults,
 } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
@@ -349,7 +349,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
   @handle_global_errors_async
   private load_adjusted_fdbk(fdbk_category: FeedbackCategory) {
     return toggle(this, 'd_loading_results', async () => {
-      this.d_submission_fdbk_override = await get_submission_result(
+      this.d_submission_fdbk_override = await SubmissionResults.get_submission_result(
         this.submission.pk, fdbk_category
       );
       this.d_fdbk_category_override = fdbk_category;

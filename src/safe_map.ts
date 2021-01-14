@@ -61,19 +61,19 @@ export class SafeMap<K, V>  {
         return this._map.has(key);
     }
 
-    set(key: K, value: V): Map<K, V> {
+    set(key: K, value: V) {
         return this._map.set(key, value);
     }
 
-    entries(): Iterator<[K, V]> {
+    entries() {
         return this._map.entries();
     }
 
-    keys(): Iterator<K> {
+    keys() {
         return this._map.keys();
     }
 
-    values(): Iterator<V> {
+    values() {
         return this._map.values();
     }
 

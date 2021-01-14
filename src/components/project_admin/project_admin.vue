@@ -51,6 +51,11 @@
             @click="set_current_tab('handgrading')">
         Handgrading
       </div>
+      <div class="nav-link"
+            :class="{'active': d_current_tab === 'stats'}"
+            @click="set_current_tab('stats')">
+        Stats (Beta)
+      </div>
     </div>
 
     <div class="body">
@@ -83,6 +88,12 @@
       <handgrading-settings v-show="d_current_tab === 'handgrading'"
                             v-if="d_loaded_tabs.has('handgrading')"
                             :project="d_project"></handgrading-settings>
+      <project-stats
+        v-show="d_current_tab === 'stats'"
+        v-if="d_loaded_tabs.has('stats')"
+        :course="d_globals.current_course"
+        :project="d_project"
+      />
     </div>
   </div>
 </template>
@@ -109,6 +120,7 @@ import HandgradingSettings from '@/components/project_admin/handgrading_settings
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import MutationSuites from '@/components/project_admin/mutation_suites/mutation_suites.vue';
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
+import ProjectStats from '@/components/project_admin/project_stats/project_stats.vue';
 import RerunSubmissions from '@/components/project_admin/rerun_submissions/rerun_submissions.vue';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
@@ -125,6 +137,7 @@ import { assert_not_null, deep_copy, get_query_param, safe_assign } from "@/util
     InstructorFiles,
     MutationSuites,
     ProjectSettings,
+    ProjectStats,
     RerunSubmissions,
   }
 })

@@ -46,7 +46,7 @@ beforeEach(() => {
         group, {status: ag_cli.GradingStatus.finished_grading});
 
     get_submission_result_stub = sinon.stub(
-        ag_cli, 'get_submission_result'
+        ag_cli.SubmissionResults, 'get_submission_result'
     ).resolves(submission_with_results.results);
 
     data_ut.set_global_current_user(user);

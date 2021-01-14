@@ -27,7 +27,14 @@ module.exports = {
     testURL: 'http://localhost/',
 
     collectCoverage: true,
-    collectCoverageFrom: ["<rootDir>/src/**/*.{ts,vue}", "!<rootDir>/src/demos/**"],
+    collectCoverageFrom: [
+        "<rootDir>/src/**/*.{ts,vue}",
+        "!<rootDir>/src/demos/**",
+        "!<rootDir>/src/components/project_admin/project_stats/bugs_exposed_histogram.ts",
+        "!<rootDir>/src/components/project_admin/project_stats/submission_score_histogram/submission_score_histogram_chart.ts",
+        "!<rootDir>/src/components/project_admin/project_stats/first_submission_time_vs_final_score.ts",
+        "!<rootDir>/src/components/project_admin/project_stats/submissions_over_time_graph.ts",
+    ],
     coverageThreshold: {
         global: {
             branches: 95,

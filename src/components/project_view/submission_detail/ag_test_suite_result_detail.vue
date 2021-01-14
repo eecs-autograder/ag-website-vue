@@ -55,7 +55,13 @@ import {
 
 import AGTestCaseResultDetail from '@/components/project_view/submission_detail/ag_test_case_result_detail.vue';
 import AGTestSuiteSetupResultDetail from '@/components/project_view/submission_detail/ag_test_suite_setup_result_detail.vue';
-import { CorrectnessLevel, setup_return_code_correctness } from "@/components/project_view/submission_detail/correctness";
+import {
+  ag_test_case_result_correctness,
+  ag_test_case_result_output_correctness,
+  ag_test_case_result_return_code_correctness,
+  CorrectnessLevel,
+  setup_return_code_correctness
+} from "@/components/project_view/submission_detail/correctness";
 import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
 
 
@@ -109,102 +115,16 @@ export default class AGTestSuiteResultDetail extends Vue {
     return null;
   }
 
-  case_result_correctness(case_result: AGTestCaseResultFeedback): CorrectnessLevel {
-    let return_code_correctness = this.case_result_return_code_correctness(case_result);
-    let output_correctness = this.case_result_output_correctness(case_result);
-
-    if (case_result.total_points === 0 && case_result.total_points_possible !== 0) {
-      return CorrectnessLevel.none_correct;
-    }
-
-    let correctnesses = [return_code_correctness, output_correctness];
-
-    correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.not_available);
-    if (correctnesses.length === 0) {
-      return CorrectnessLevel.not_available;
-    }
-
-    correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.info_only);
-    if (correctnesses.length === 0) {
-      return CorrectnessLevel.info_only;
-    }
-
-    if (correctnesses.every(val => val === CorrectnessLevel.all_correct)) {
-      return CorrectnessLevel.all_correct;
-    }
-
-    if (correctnesses.every(val => val === CorrectnessLevel.none_correct)) {
-      return CorrectnessLevel.none_correct;
-    }
-
-    return CorrectnessLevel.some_correct;
+  case_result_correctness(case_result: AGTestCaseResultFeedback) {
+    return ag_test_case_result_correctness(case_result);
   }
 
   case_result_return_code_correctness(case_result: AGTestCaseResultFeedback) {
-    let without_not_available = case_result.ag_test_command_results.filter(
-      (cmd_result) => cmd_result.return_code_correct !== null
-                      || cmd_result.timed_out!
-                      || cmd_result.actual_return_code !== null);
-    if (without_not_available.length === 0) {
-      return CorrectnessLevel.not_available;
-    }
-
-    let all_show_return_code_only = without_not_available.every(
-      (cmd_result) => cmd_result.return_code_correct === null
-                      && (cmd_result.actual_return_code !== null || cmd_result.timed_out!));
-
-    if (all_show_return_code_only) {
-      return CorrectnessLevel.info_only;
-    }
-
-    let all_correct = case_result.ag_test_command_results.every(
-      (cmd_result) => cmd_result.return_code_correct === null || cmd_result.return_code_correct);
-    if (all_correct) {
-      return CorrectnessLevel.all_correct;
-    }
-
-    let none_correct = !case_result.ag_test_command_results.some(
-      (cmd_result) => cmd_result.return_code_correct !== null && cmd_result.return_code_correct);
-    if (none_correct) {
-      return CorrectnessLevel.none_correct;
-    }
-    return CorrectnessLevel.some_correct;
+    return ag_test_case_result_return_code_correctness(case_result);
   }
 
   case_result_output_correctness(case_result: AGTestCaseResultFeedback) {
-    let not_available = case_result.ag_test_command_results.every(
-        (cmd_result) => cmd_result.stdout_correct === null
-                        && cmd_result.stderr_correct === null
-    );
-
-    let some_show_info_only = case_result.ag_test_command_results.some(
-        (cmd_result) => (cmd_result.stdout_points_possible === 0
-                        && cmd_result.stderr_points_possible === 0)
-                        && (cmd_result.fdbk_settings.show_actual_stdout
-                        || cmd_result.fdbk_settings.show_actual_stderr)
-    );
-
-    if (not_available) {
-      if (some_show_info_only) {
-          return CorrectnessLevel.info_only;
-      }
-      return CorrectnessLevel.not_available;
-    }
-
-    let all_correct = case_result.ag_test_command_results.every(
-        (cmd_result) => (cmd_result.stdout_correct === null || cmd_result.stdout_correct) &&
-                        (cmd_result.stderr_correct === null || cmd_result.stderr_correct));
-    if (all_correct) {
-      return CorrectnessLevel.all_correct;
-    }
-
-    let none_correct = !case_result.ag_test_command_results.some(
-        (cmd_result) => cmd_result.stdout_correct !== null && cmd_result.stdout_correct
-                        || cmd_result.stderr_correct !== null && cmd_result.stderr_correct);
-    if (none_correct) {
-      return CorrectnessLevel.none_correct;
-    }
-    return CorrectnessLevel.some_correct;
+    return ag_test_case_result_output_correctness(case_result);
   }
 }
 </script>
