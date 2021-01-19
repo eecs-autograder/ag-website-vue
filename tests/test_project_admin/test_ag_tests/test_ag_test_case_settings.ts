@@ -107,11 +107,9 @@ describe('AG test case settings form tests', () => {
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
-    test('FeedbackCongfigAGCase component only available when ag_test_case has more than ' +
-         'one command',
-         async () => {
+    test('Feedback config panels always visible', async () => {
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(0);
-        expect(wrapper.findComponent({ref: 'fdbk_panels'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'fdbk_panels'}).exists()).toBe(true);
 
         wrapper.setProps({ag_test_case: ag_case_with_multiple_commands});
         await component.$nextTick();
@@ -128,7 +126,7 @@ describe('AG test case settings form tests', () => {
         await component.$nextTick();
 
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(1);
-        expect(wrapper.findComponent({ref: 'fdbk_panels'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'fdbk_panels'}).exists()).toBe(true);
     });
 
     test('update config settings in ag_case_config_panel - changes reflected in ' +

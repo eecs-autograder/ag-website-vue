@@ -20,7 +20,7 @@
               <i class="fas fa-plus"></i>
               <span class="menu-item-text">Add command</span>
             </div>
-            <template v-if="ag_test_case.ag_test_commands.length > 1">
+            <template>
               <div class="menu-divider"> </div>
               <div ref="edit_ag_test_case_menu_item"
                   @click="d_show_ag_test_case_settings_modal = true"
