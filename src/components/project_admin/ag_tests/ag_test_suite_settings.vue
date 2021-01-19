@@ -49,11 +49,13 @@
               <input data-testid="reject_submission_if_setup_fails"
                      type="checkbox"
                      class="checkbox"
-                     v-model="d_ag_test_suite.reject_submission_if_setup_fails"/>
+                     v-model="d_ag_test_suite.reject_submission_if_setup_fails"
+                     :disabled="!is_first_suite"/>
               Reject submission if setup fails
             </label>
             <tooltip width="large" placement="top">
               If this suite's setup command fails, stop grading the current submission. <br>
+              - Only allowed for the FIRST TEST SUITE in a project. <br>
               - The submission will not be counted toward the
               {{project.min_group_size === 1 ? 'student' : 'group'}}'s daily limit. <br>
               - If a bonus submission token was used, it will be refunded. <br>
@@ -269,6 +271,9 @@ export default class AGTestSuiteSettings extends Vue {
 
   @Prop({required: true, type: Project})
   project!: Project;
+
+  @Prop({default: false, type: Boolean})
+  is_first_suite!: boolean;
 
   @Watch('ag_test_suite')
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
