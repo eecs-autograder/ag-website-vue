@@ -4,12 +4,15 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
+import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_panel.vue';
+import AGTestSuiteSettings from '@/components/project_admin/ag_tests/ag_test_suite_settings.vue';
 import AGTestSuites from '@/components/project_admin/ag_tests/ag_test_suites.vue';
 import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    find_component,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid,
@@ -165,6 +168,31 @@ describe('Changing ag_test_suite', () => {
     });
 });
 
+test('is_first_suite passed to suite settings for active suite', async () => {
+    let suites = Array(3).fill(null).map(item => data_ut.make_ag_test_suite(project.pk));
+    get_all_suites_from_project.resolves(suites);
+    let wrapper = make_wrapper();
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    wrapper.findAllComponents(AGTestSuitePanel).at(0).vm.$emit('update_active_item', suites[0]);
+    await wrapper.vm.$nextTick();
+    expect(
+        find_component(wrapper, AGTestSuiteSettings).vm.is_first_suite
+    ).toBe(true);
+
+    wrapper.findAllComponents(AGTestSuitePanel).at(1).vm.$emit('update_active_item', suites[1]);
+    await wrapper.vm.$nextTick();
+    expect(
+        find_component(wrapper, AGTestSuiteSettings).vm.is_first_suite
+    ).toBe(false);
+
+    wrapper.findAllComponents(AGTestSuitePanel).at(2).vm.$emit('update_active_item', suites[2]);
+    await wrapper.vm.$nextTick();
+    expect(
+        find_component(wrapper, AGTestSuiteSettings).vm.is_first_suite
+    ).toBe(false);
+});
+
 describe('Deleting ag_test_suite', () => {
     let wrapper: Wrapper<AGTestSuites>;
     let first_suite: ag_cli.AGTestSuite;
@@ -179,14 +207,6 @@ describe('Deleting ag_test_suite', () => {
         get_all_suites_from_project.resolves([first_suite, middle_suite, last_suite]);
 
         wrapper = make_wrapper();
-    });
-
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('Delete first suite in suites', async () => {

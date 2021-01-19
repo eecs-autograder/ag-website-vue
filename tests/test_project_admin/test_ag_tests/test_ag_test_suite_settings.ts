@@ -15,6 +15,7 @@ import {
     find_by_name,
     get_validated_input_text,
     set_data,
+    set_props,
     set_validated_input_text,
     validated_input_is_valid,
     wait_for_load,
@@ -125,6 +126,18 @@ describe('AGTestSuiteSettings tests', () => {
         expect(get_validated_input_text(setup_suite_cmd_input)).toEqual(
             "four to the left"
         );
+    });
+
+    test('Reject submission checkbox disabled when is_first_suite is false', async () => {
+        // Disabled is the default
+        expect(
+            wrapper.find('[data-testid=reject_submission_if_setup_fails]').element
+        ).toBeDisabled();
+
+        await set_props(wrapper, {is_first_suite: true});
+        expect(
+            wrapper.find('[data-testid=reject_submission_if_setup_fails]').element
+        ).not.toBeDisabled();
     });
 
     test('Save suite settings - successful', async () => {

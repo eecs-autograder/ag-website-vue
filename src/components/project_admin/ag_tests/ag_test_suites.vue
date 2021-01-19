@@ -43,7 +43,11 @@
 
       <div id="viewing-window" class="body" :class="{'body-closed': d_collapsed}">
         <template v-if="d_active_ag_test_suite !== null">
-          <AGTestSuiteSettings :ag_test_suite="d_active_ag_test_suite" :project="project"/>
+          <AGTestSuiteSettings
+            :ag_test_suite="d_active_ag_test_suite"
+            :project="project"
+            :is_first_suite="d_active_ag_test_suite.pk === d_ag_test_suites[0].pk"
+          />
         </template>
         <template v-else-if="active_level_is_command">
           <AGTestCommandSettings :ag_test_command="d_active_ag_test_command"
