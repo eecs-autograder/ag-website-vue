@@ -13,8 +13,7 @@
         </validated-input>
       </div>
 
-      <div v-if="d_ag_test_case.ag_test_commands.length > 1"
-           ref="fdbk_panels">
+      <div ref="fdbk_panels">
         <AGTestCaseFdbkConfigPanel ref="normal"
                                    v-model="d_ag_test_case.normal_fdbk_config"
                                    :config_name="FeedbackConfigLabel.normal">
