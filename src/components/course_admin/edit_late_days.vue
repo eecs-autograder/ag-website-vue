@@ -103,7 +103,9 @@ export default class EditLateDays extends Vue {
 
   @handle_global_errors_async
   async created() {
-    this.d_students = (await this.course.get_students()).map(user => user.username);
+    this.d_students = (
+      await this.course.get_students()
+    ).map(user => user.username).sort((first, second) => first.localeCompare(second));
     this.d_loading = false;
   }
 

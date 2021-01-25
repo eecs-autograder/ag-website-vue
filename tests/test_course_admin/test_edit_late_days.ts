@@ -88,6 +88,12 @@ test('Search for empty string does nothing', async () => {
     expect(stub.callCount).toEqual(0);
 });
 
+test('Usernames sorted', async () => {
+    expect(wrapper.vm.d_students).toEqual(
+        users.map(user => user.username).sort((first, second) => first.localeCompare(second))
+    );
+});
+
 test('404 handled on search', async () => {
     let stub = sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, 'steve').rejects(new ag_cli.HttpError(404, ''));
