@@ -655,3 +655,91 @@ test('Suite updates from other project ignored', async () => {
 
     expect(wrapper.vm.d_mutation_test_suites).toEqual([]);
 });
+
+describe('InstructorFile and ExpectedStudentFile observer tests', () => {
+    let wrapper: Wrapper<MutationSuites>;
+    let project: Project;
+    let mutation_test_suites: ag_cli.MutationTestSuite[];
+    let expected_student_files: ag_cli.ExpectedStudentFile[];
+    let instructor_files: ag_cli.InstructorFile[];
+
+    beforeEach(async () => {
+        project = data_ut.make_project(data_ut.make_course().pk);
+        expected_student_files = [
+            data_ut.make_expected_student_file(project.pk, "file1.cpp"),
+            data_ut.make_expected_student_file(project.pk, "file2.cpp"),
+        ];
+        instructor_files =  [
+            data_ut.make_instructor_file(project.pk, "file3.cpp"),
+            data_ut.make_instructor_file(project.pk, "file4.cpp"),
+        ];
+        project.expected_student_files = expected_student_files;
+        project.instructor_files = instructor_files;
+
+        mutation_test_suites = [
+            data_ut.make_mutation_test_suite(project.pk, {
+                instructor_files_needed: instructor_files,
+                student_files_needed: expected_student_files,
+            }),
+            data_ut.make_mutation_test_suite(project.pk, {
+                instructor_files_needed: [instructor_files[0]],
+                student_files_needed: [expected_student_files[0]],
+            }),
+        ];
+
+        sinon.stub(MutationTestSuite, 'get_all_from_project').resolves(mutation_test_suites);
+        sinon.stub(ag_cli.SandboxDockerImage, 'get_images').resolves([]);
+
+        wrapper = managed_mount(MutationSuites, {
+            propsData: {
+                project: project
+            }
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+    });
+
+    test('Deleted InstructorFile removed from instructor_files_needed', async () => {
+        ag_cli.InstructorFile.notify_instructor_file_deleted(instructor_files[0]);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_mutation_test_suites[0].instructor_files_needed.length).toEqual(1);
+        expect(
+            wrapper.vm.d_mutation_test_suites[0].instructor_files_needed[0]
+        ).toEqual(instructor_files[1]);
+
+        expect(wrapper.vm.d_mutation_test_suites[1].instructor_files_needed.length).toEqual(0);
+
+        ag_cli.InstructorFile.notify_instructor_file_deleted(instructor_files[1]);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_mutation_test_suites[0].instructor_files_needed.length).toEqual(0);
+        expect(wrapper.vm.d_mutation_test_suites[1].instructor_files_needed.length).toEqual(0);
+
+        // Make sure we didn't delete the wrong kind of file
+        expect(wrapper.vm.d_mutation_test_suites[0].student_files_needed.length).toEqual(2);
+        expect(wrapper.vm.d_mutation_test_suites[1].student_files_needed.length).toEqual(1);
+    });
+
+    test('Deleted ExpectedStudentFile removed from student_files_needed', async () => {
+        ag_cli.ExpectedStudentFile.notify_expected_student_file_deleted(
+            expected_student_files[0]);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_mutation_test_suites[0].student_files_needed.length).toEqual(1);
+        expect(
+            wrapper.vm.d_mutation_test_suites[0].student_files_needed[0]
+        ).toEqual(expected_student_files[1]);
+
+        expect(wrapper.vm.d_mutation_test_suites[1].student_files_needed.length).toEqual(0);
+
+        ag_cli.ExpectedStudentFile.notify_expected_student_file_deleted(expected_student_files[1]);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_mutation_test_suites[0].student_files_needed.length).toEqual(0);
+        expect(wrapper.vm.d_mutation_test_suites[1].student_files_needed.length).toEqual(0);
+
+        // Make sure we didn't delete the wrong kind of file
+        expect(wrapper.vm.d_mutation_test_suites[0].instructor_files_needed.length).toEqual(2);
+        expect(wrapper.vm.d_mutation_test_suites[1].instructor_files_needed.length).toEqual(1);
+    });
+});
