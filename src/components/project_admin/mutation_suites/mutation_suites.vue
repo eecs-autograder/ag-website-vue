@@ -253,6 +253,10 @@ import Draggable from 'vuedraggable';
 
 import {
     BugsExposedFeedbackLevel,
+  ExpectedStudentFile,
+  ExpectedStudentFileObserver,
+  InstructorFile,
+  InstructorFileObserver,
     MutationTestSuite,
     MutationTestSuiteObserver,
     Project,
@@ -274,7 +278,7 @@ import MutationTestSuiteAdvancedFdbkSettings from '@/components/project_admin/mu
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import Tooltip from "@/components/tooltip.vue";
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, toggle } from '@/utils';
@@ -299,7 +303,9 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
     ValidatedInput
   }
 })
-export default class MutationSuites extends Vue implements MutationTestSuiteObserver {
+export default class MutationSuites extends Vue implements MutationTestSuiteObserver,
+                                                           InstructorFileObserver,
+                                                           ExpectedStudentFileObserver {
   @Prop({required: true, type: Project})
   project!: Project;
 
@@ -327,6 +333,8 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   @handle_global_errors_async
   async created() {
     MutationTestSuite.subscribe(this);
+    InstructorFile.subscribe(this);
+    ExpectedStudentFile.subscribe(this);
     this.d_mutation_test_suites = await MutationTestSuite.get_all_from_project(this.project.pk);
     let global_images = await SandboxDockerImage.get_images(null);
     let course_images = await SandboxDockerImage.get_images(this.project.course);
@@ -336,6 +344,8 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
 
   beforeDestroy() {
     MutationTestSuite.unsubscribe(this);
+    InstructorFile.unsubscribe(this);
+    ExpectedStudentFile.unsubscribe(this);
   }
 
   @handle_api_errors_async(handle_add_mutation_test_suite_error)
@@ -374,6 +384,29 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     Vue.nextTick(() => {
       (<ValidatedInput> this.$refs.new_mutation_test_suite_name).focus();
     });
+  }
+
+  update_instructor_file_created(instructor_file: InstructorFile): void {}
+  update_instructor_file_renamed(instructor_file: InstructorFile, old_name: string): void { }
+  update_instructor_file_content_changed(
+    instructor_file: InstructorFile, new_content: Blob): void {}
+  update_instructor_file_deleted(instructor_file: InstructorFile): void {
+    for (let suite of this.d_mutation_test_suites) {
+      suite.instructor_files_needed.splice(
+        suite.instructor_files_needed.findIndex(file => file.pk === instructor_file.pk),
+        1
+      );
+    }
+  }
+  update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {}
+  update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {}
+  update_expected_student_file_deleted(expected_student_file: ExpectedStudentFile): void {
+    for (let suite of this.d_mutation_test_suites) {
+      suite.student_files_needed.splice(
+        suite.student_files_needed.findIndex(file => file.pk === expected_student_file.pk),
+        1
+      );
+    }
   }
 
   update_mutation_test_suite_created(mutation_test_suite: MutationTestSuite): void {
