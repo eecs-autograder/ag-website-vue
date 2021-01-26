@@ -7,12 +7,13 @@ import * as sinon from 'sinon';
 
 import APIErrors from "@/components/api_errors.vue";
 import FileUpload from "@/components/file_upload.vue";
+import ExpectedStudentFilesList from '@/components/project_view/expected_student_files_list.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
 import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { compress_whitespace, emitted, find_by_name, set_data } from '@/tests/utils';
+import { compress_whitespace, emitted, find_by_name, find_component, set_data } from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -451,6 +452,42 @@ describe('Submission limit, bonus submission, late day tests', () => {
         expect(wrapper.find('#late-days-remaining').exists()).toBe(false);
 
         expect(late_days_stub.notCalled).toBe(true);
+    });
+});
+
+describe('Expected file list tests', () => {
+    test('Expected files list passed to component', async () => {
+        project.expected_student_files = [
+            data_ut.make_expected_student_file(project.pk, 'fileo'),
+        ];
+
+        const wrapper = mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(
+            find_component(wrapper, ExpectedStudentFilesList).vm.expected_student_files
+        ).toBe(project.expected_student_files);
+    });
+
+    test('No expected files, component hidden', async () => {
+        project.expected_student_files = [];
+
+        const wrapper = mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findComponent(ExpectedStudentFilesList).exists()).toBe(false);
     });
 });
 
