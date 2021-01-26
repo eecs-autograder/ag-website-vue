@@ -2,7 +2,7 @@ import {  mount, Wrapper } from '@vue/test-utils';
 
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
-import { emitted, expect_html_element_has_value, set_validated_input_text, sleep } from './utils';
+import { emitted, expect_html_element_has_value, set_validated_input_text, sleep } from '@/tests/utils';
 
 
 const IS_NUMBER = (value: string): ValidatorResponse => {

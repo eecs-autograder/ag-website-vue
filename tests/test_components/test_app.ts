@@ -11,9 +11,9 @@ import * as cookie from '@/cookie';
 import { GlobalErrorsSubject } from '@/error_handling';
 
 import { make_course, make_project, make_user, make_user_roles } from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import { compress_whitespace, wait_for_load } from '@/tests/utils';
 
-import { managed_mount } from './setup';
 
 function make_wrapper() {
     const local_vue = createLocalVue();

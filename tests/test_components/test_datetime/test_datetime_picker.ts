@@ -7,7 +7,7 @@ import * as timezone_mock from 'timezone-mock';
 import DatetimePicker, { InvalidDatetimeStrError } from '@/components/datetime/datetime_picker.vue';
 import TimePicker from "@/components/datetime/time_picker.vue";
 
-import { emitted, set_props } from '../utils';
+import { emitted, set_props } from '@/tests/utils';
 
 
 beforeEach(() => {

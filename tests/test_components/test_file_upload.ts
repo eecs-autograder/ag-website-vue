@@ -6,7 +6,7 @@ import * as sinon from 'sinon';
 
 import FileUpload from '@/components/file_upload.vue';
 
-import { emitted } from './utils';
+import { emitted } from '@/tests/utils';
 
 
 interface HTMLInputEvent extends Event {

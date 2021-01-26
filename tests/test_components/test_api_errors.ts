@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 
 import APIErrors from "@/components/api_errors.vue";
 
-import { emitted } from './utils';
+import { emitted } from '@/tests/utils';
 
 describe('APIErrors component tests', () => {
     let wrapper: Wrapper<APIErrors>;

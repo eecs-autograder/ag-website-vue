@@ -6,8 +6,8 @@ import * as sinon from 'sinon';
 import APIErrors from '@/components/api_errors.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
 
-import { make_course } from '../data_utils';
-import { api_error_count, wait_until } from '../utils';
+import { make_course } from '@/tests/data_utils';
+import { api_error_count, wait_until } from '@/tests/utils';
 
 describe('Course settings', () => {
     let wrapper: Wrapper<CourseSettings>;

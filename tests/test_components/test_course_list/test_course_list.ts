@@ -8,8 +8,7 @@ import CourseList from '@/components/course_list/course_list.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-
-import { wait_for_load, wait_until } from '../utils';
+import { wait_for_load, wait_until } from '@/tests/utils';
 
 let can_create_courses_stub: sinon.SinonStub;
 

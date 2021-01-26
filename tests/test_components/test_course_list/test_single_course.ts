@@ -6,9 +6,8 @@ import SingleCourse from '@/components/course_list/single_course.vue';
 import { assert_not_null } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_mount } from '@/tests/setup';
 import { expect_html_element_has_value, set_data, set_validated_input_text, validated_input_is_valid } from '@/tests/utils';
-
-import { managed_mount } from '../setup';
 
 
 describe('SingleCourse.vue', () => {

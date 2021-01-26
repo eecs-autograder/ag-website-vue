@@ -3,8 +3,8 @@ import { mount, Wrapper } from '@vue/test-utils';
 import { Course, Semester } from 'ag-client-typescript';
 
 import CourseForm from '@/components/course_admin/course_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
 
+import * as data_ut from '@/tests/data_utils';
 import {
     expect_html_element_has_value,
     get_validated_input_text,
@@ -13,7 +13,6 @@ import {
     validated_input_is_valid
 } from "@/tests/utils";
 
-import * as data_ut from '../data_utils';
 
 
 test('Course form default year and allowed guest domain', async () => {

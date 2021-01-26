@@ -11,8 +11,7 @@ import { SafeMap } from '@/safe_map';
 import {
     make_ag_test_suite_fdbk_config
 } from '@/tests/data_utils';
-
-import { emitted } from '../utils';
+import { emitted } from '@/tests/utils';
 
 
 describe('FeedbackConfigPanel tests', () => {

@@ -8,7 +8,7 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { is_number } from "@/validators";
 
-import { get_validated_input_text, set_validated_input_text, sleep } from './utils';
+import { get_validated_input_text, set_validated_input_text, sleep } from '@/tests/utils';
 
 
 describe('ValidatedForm.vue', () => {
