@@ -4,7 +4,7 @@ import { mount, Wrapper } from '@vue/test-utils';
 
 import Toggle from '@/components/toggle.vue';
 
-import { set_data } from './utils';
+import { set_data } from '@/tests/utils';
 
 
 describe('Toggle.vue', () => {

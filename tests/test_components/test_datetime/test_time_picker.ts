@@ -8,7 +8,7 @@ import TimePicker, {
     MinuteInputState,
 } from "@/components/datetime/time_picker.vue";
 
-import { emitted, set_props } from '../utils';
+import { emitted, set_props } from '@/tests/utils';
 
 describe('TimePicker Tests', () => {
     let wrapper: Wrapper<TimePicker>;

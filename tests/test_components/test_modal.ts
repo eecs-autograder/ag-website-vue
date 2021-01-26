@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 
 import Modal from '@/components/modal.vue';
 
-import { emitted } from './utils';
+import { emitted } from '@/tests/utils';
 
 describe('Modal.vue', () => {
     test('Open and close modal using external boolean', async () => {

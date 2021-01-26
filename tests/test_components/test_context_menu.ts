@@ -8,7 +8,7 @@ import * as sinon from 'sinon';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 
-import { emitted } from './utils';
+import { emitted } from '@/tests/utils';
 
 
 @Component({

@@ -10,8 +10,7 @@ import GroupLookup from '@/components/group_lookup.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-
-import { emitted } from './utils';
+import { emitted } from '@/tests/utils';
 
 
 let groups: ag_cli.Group[];

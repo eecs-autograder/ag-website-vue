@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 import Dropdown from '@/components/dropdown.vue';
 import { zip } from '@/utils';
 
-import { emitted, set_props } from './utils';
+import { emitted, set_props } from '@/tests/utils';
 
 
 test('Scoped slot can be used to specify custom menu item text', () => {
