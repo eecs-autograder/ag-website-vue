@@ -275,7 +275,11 @@ export default class AGTestSuiteSettings extends Vue {
   @Prop({default: false, type: Boolean})
   is_first_suite!: boolean;
 
-  @Watch('ag_test_suite')
+  // {deep: true} is needed so that we detect changes to instructor_files_needed
+  // and student_files_needed. Such changes can happen when an InstructorFile
+  // or ExpectedStudentFile is deleted. AGTestSuites (this component's parent)
+  // observes deletion of those two types and updates the _files_needed arrays.
+  @Watch('ag_test_suite', {deep: true})
   on_test_suite_change(new_test_suite: AGTestSuite, old_test_suite: AGTestSuite) {
     this.d_ag_test_suite = deep_copy(new_test_suite, AGTestSuite);
   }

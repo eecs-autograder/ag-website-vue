@@ -202,7 +202,7 @@ describe('AGTestSuiteSettings tests', () => {
         expect(api_errors.d_api_errors.length).toEqual(1);
     });
 
-    test('Parent component changes the value of the test_suite prop', async () => {
+    test('Parent component changes the value of the ag_test_suite prop', async () => {
         let another_ag_suite = data_ut.make_ag_test_suite(project.pk);
         another_ag_suite.instructor_files_needed = [instructor_files[1], instructor_files[0]];
         another_ag_suite.student_files_needed = [

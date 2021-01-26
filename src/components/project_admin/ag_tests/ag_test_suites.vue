@@ -118,7 +118,10 @@ import {
   AGTestCommandObserver,
   AGTestSuite,
   AGTestSuiteObserver,
-  HttpError,
+  ExpectedStudentFile,
+  ExpectedStudentFileObserver,
+  InstructorFile,
+  InstructorFileObserver,
   Project
 } from 'ag-client-typescript';
 
@@ -129,9 +132,9 @@ import AGTestCommandSettings from '@/components/project_admin/ag_tests/ag_test_c
 import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_panel.vue';
 import AGTestSuiteSettings from '@/components/project_admin/ag_tests/ag_test_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedInput from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
-import { deep_copy, toggle } from '@/utils';
+import { deep_copy } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 import {
@@ -155,7 +158,9 @@ import {
 })
 export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
                                                          AGTestCaseObserver,
-                                                         AGTestCommandObserver {
+                                                         AGTestCommandObserver,
+                                                         InstructorFileObserver,
+                                                         ExpectedStudentFileObserver {
   @Prop({required: true, type: Project})
   project!: Project;
 
@@ -181,6 +186,8 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     AGTestSuite.subscribe(this);
     AGTestCase.subscribe(this);
     AGTestCommand.subscribe(this);
+    InstructorFile.subscribe(this);
+    ExpectedStudentFile.subscribe(this);
     this.d_ag_test_suites = await AGTestSuite.get_all_from_project(this.project.pk);
     this.d_loading = false;
   }
@@ -189,6 +196,8 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     AGTestSuite.unsubscribe(this);
     AGTestCase.unsubscribe(this);
     AGTestCommand.unsubscribe(this);
+    InstructorFile.unsubscribe(this);
+    ExpectedStudentFile.unsubscribe(this);
   }
 
   get parent_ag_test_case(): AGTestCase | null {
@@ -399,6 +408,31 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     }
     finally {
       this.d_adding_suite = false;
+    }
+  }
+
+  // InstructorFileObserver and ExpectedStudentFileObserver ---------------------------------------
+
+  update_instructor_file_created(instructor_file: InstructorFile): void {}
+  update_instructor_file_renamed(instructor_file: InstructorFile, old_name: string): void { }
+  update_instructor_file_content_changed(
+    instructor_file: InstructorFile, new_content: Blob): void {}
+  update_instructor_file_deleted(instructor_file: InstructorFile): void {
+    for (let suite of this.d_ag_test_suites) {
+      suite.instructor_files_needed.splice(
+        suite.instructor_files_needed.findIndex(file => file.pk === instructor_file.pk),
+        1
+      );
+    }
+  }
+  update_expected_student_file_created(expected_student_file: ExpectedStudentFile): void {}
+  update_expected_student_file_changed(expected_student_file: ExpectedStudentFile): void {}
+  update_expected_student_file_deleted(expected_student_file: ExpectedStudentFile): void {
+    for (let suite of this.d_ag_test_suites) {
+      suite.student_files_needed.splice(
+        suite.student_files_needed.findIndex(file => file.pk === expected_student_file.pk),
+        1
+      );
     }
   }
 

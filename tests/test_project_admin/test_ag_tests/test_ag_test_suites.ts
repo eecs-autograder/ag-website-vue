@@ -355,6 +355,89 @@ test('Original order restored after bad update suites order request', async () =
     expect(wrapper.vm.d_ag_test_suites).toEqual(suites);
 });
 
+describe('InstructorFile and ExpectedStudentFile observer tests', () => {
+    let ag_test_suites: ag_cli.AGTestSuite[];
+    let expected_student_files: ag_cli.ExpectedStudentFile[];
+    let instructor_files: ag_cli.InstructorFile[];
+
+    beforeEach(() => {
+        expected_student_files = [
+            data_ut.make_expected_student_file(project.pk, "file1.cpp"),
+            data_ut.make_expected_student_file(project.pk, "file2.cpp"),
+        ];
+        instructor_files =  [
+            data_ut.make_instructor_file(project.pk, "file3.cpp"),
+            data_ut.make_instructor_file(project.pk, "file4.cpp"),
+        ];
+        project.expected_student_files = expected_student_files;
+        project.instructor_files = instructor_files;
+
+        ag_test_suites = [
+            data_ut.make_ag_test_suite(project.pk, {
+                instructor_files_needed: instructor_files,
+                student_files_needed: expected_student_files,
+            }),
+            data_ut.make_ag_test_suite(project.pk, {
+                instructor_files_needed: [instructor_files[0]],
+                student_files_needed: [expected_student_files[0]],
+            }),
+        ];
+
+        get_all_suites_from_project.resolves(ag_test_suites);
+    });
+
+    test('Deleted InstructorFile removed from instructor_files_needed', async () => {
+        let wrapper = make_wrapper();
+        await wrapper.vm.$nextTick();
+
+        ag_cli.InstructorFile.notify_instructor_file_deleted(instructor_files[0]);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].instructor_files_needed.length).toEqual(1);
+        expect(
+            wrapper.vm.d_ag_test_suites[0].instructor_files_needed[0]
+        ).toEqual(instructor_files[1]);
+
+        expect(wrapper.vm.d_ag_test_suites[1].instructor_files_needed.length).toEqual(0);
+
+        ag_cli.InstructorFile.notify_instructor_file_deleted(instructor_files[1]);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].instructor_files_needed.length).toEqual(0);
+        expect(wrapper.vm.d_ag_test_suites[1].instructor_files_needed.length).toEqual(0);
+
+        // Make sure we didn't delete the wrong kind of file
+        expect(wrapper.vm.d_ag_test_suites[0].student_files_needed.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[1].student_files_needed.length).toEqual(1);
+    });
+
+    test('Deleted ExpectedStudentFile removed from student_files_needed', async () => {
+        let wrapper = make_wrapper();
+        await wrapper.vm.$nextTick();
+
+        ag_cli.ExpectedStudentFile.notify_expected_student_file_deleted(
+            expected_student_files[0]);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].student_files_needed.length).toEqual(1);
+        expect(
+            wrapper.vm.d_ag_test_suites[0].student_files_needed[0]
+        ).toEqual(expected_student_files[1]);
+
+        expect(wrapper.vm.d_ag_test_suites[1].student_files_needed.length).toEqual(0);
+
+        ag_cli.ExpectedStudentFile.notify_expected_student_file_deleted(expected_student_files[1]);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.d_ag_test_suites[0].student_files_needed.length).toEqual(0);
+        expect(wrapper.vm.d_ag_test_suites[1].student_files_needed.length).toEqual(0);
+
+        // Make sure we didn't delete the wrong kind of file
+        expect(wrapper.vm.d_ag_test_suites[0].instructor_files_needed.length).toEqual(2);
+        expect(wrapper.vm.d_ag_test_suites[1].instructor_files_needed.length).toEqual(1);
+    });
+});
+
 describe('Creating ag_test_case', () => {
     // Note that this also covers the case where a test was cloned
     test('Case created', async () => {
