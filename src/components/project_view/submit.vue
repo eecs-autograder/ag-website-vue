@@ -58,6 +58,11 @@
       </div>
     </div>
 
+    <expected-student-files-list
+      v-if="project.expected_student_files.length !== 0"
+      :expected_student_files="project.expected_student_files"
+    />
+
     <file-upload ref="submit_file_upload" @upload_files="process_files"
                  :disable_upload_button="!honor_pledged_signed">
       <template v-slot:before_upload_button v-if="project.use_honor_pledge">
@@ -165,8 +170,11 @@ import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
+import Tooltip from '@/components/tooltip.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { assert_not_null, format_datetime, toggle } from '@/utils';
+
+import ExpectedStudentFilesList from './expected_student_files_list.vue';
 
 interface ExpectedFilePatternMismatch {
   pattern: string;
@@ -177,10 +185,12 @@ interface ExpectedFilePatternMismatch {
 @Component({
   components: {
     APIErrors,
+    ExpectedStudentFilesList,
     FileUpload,
     GroupMembers,
     Modal,
     ProgressBar,
+    Tooltip,
   }
 })
 export default class Submit extends Vue {
