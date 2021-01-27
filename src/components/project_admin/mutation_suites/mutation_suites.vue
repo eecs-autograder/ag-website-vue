@@ -156,12 +156,19 @@
                 </feedback-config-panel>
               </div>
 
-              <APIErrors ref="api_errors"></APIErrors>
+              <APIErrors ref="save_errors" @num_errors_changed="d_num_save_api_errors = $event"/>
               <div class="button-footer">
                 <button type="submit"
                         class="save-button"
                         id="save-mutation-test-suite-button"
                         :disabled="!d_settings_form_is_valid || d_saving">Save</button>
+
+                <button type="submit"
+                        class="sticky-save-button"
+                        :disabled="!d_settings_form_is_valid || d_saving">
+                  <i v-if="d_num_save_api_errors === 0" class="far fa-save"></i>
+                  <i v-else class="fas fa-exclamation-triangle"></i>
+                </button>
 
                 <last-saved
                   :last_modified="d_active_mutation_test_suite.last_modified"
@@ -234,7 +241,7 @@
             </validated-input>
           </div>
 
-          <APIErrors ref="api_errors"></APIErrors>
+          <APIErrors ref="create_errors"></APIErrors>
           <div class="modal-button-footer">
             <button class="modal-create-suite-button green-button"
                     :disabled="!d_add_mutation_test_suite_form_is_valid || d_adding_suite">
@@ -324,6 +331,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   d_new_mutation_test_suite_name = "";
   d_deleting = false;
   d_saving = false;
+  d_num_save_api_errors = 0;
   d_settings_form_is_valid = true;
   d_show_new_mutation_test_suite_modal = false;
   d_show_delete_mutation_test_suite_modal = false;
@@ -603,7 +611,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   async save_mutation_test_suite() {
     try {
       this.d_saving = true;
-      (<APIErrors> this.$refs.api_errors).clear();
+      (<APIErrors> this.$refs.save_errors).clear();
       await this.d_active_mutation_test_suite!.save();
     }
     finally {
@@ -613,11 +621,15 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
 }
 
 function handle_save_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  let api_errors_elt = <APIErrors> component.$refs.save_errors;
+  api_errors_elt.show_errors_from_response(error);
+  if (component.d_num_save_api_errors !== 0) {
+    api_errors_elt.$el.scrollIntoView({behavior: 'smooth'});
+  }
 }
 
 function handle_add_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-    (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+    (<APIErrors> component.$refs.create_errors).show_errors_from_response(error);
 }
 </script>
 
@@ -667,5 +679,26 @@ $border-color: $gray-blue-1;
 
 .item-to-delete {
   color: $ocean-blue;
+}
+
+.sticky-save-button {
+  @extend .green-button;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+
+  font-size: 1.25rem;
+  padding: .375rem .625rem;
+  margin: 0!important;
+
+  color: white;
+
+  border-radius: 1px;
+}
+
+.danger-zone-container {
+  // We want to have ample space between the delete button and the
+  // sticky save button
+  max-width: 75%;
 }
 </style>
