@@ -85,7 +85,7 @@ import SubmissionPanel from '@/components/submission_list/submission_panel.vue';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
-import { deep_copy, safe_assign, sleep, toggle, zip } from '@/utils';
+import { safe_assign, zip } from '@/utils';
 
 @Component({
   components: {
@@ -195,16 +195,12 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
       return true;
     }
 
-    let current_statuses = this.d_submissions.map(s => s.status);
-    let new_statuses = new_submissions.map(s => s.status);
+    let last_modified_pairs = zip(
+      this.d_submissions.map(s => s.last_modified),
+      new_submissions.map(s => s.last_modified)
+    );
 
-    for (let [current_status, new_status] of zip(current_statuses, new_statuses)) {
-      if (current_status !== new_status) {
-        return true;
-      }
-    }
-
-    return false;
+    return Array.from(last_modified_pairs).some(pair => pair[0] !== pair[1]);
   }
 
   get is_ultimate_submission(): boolean {
