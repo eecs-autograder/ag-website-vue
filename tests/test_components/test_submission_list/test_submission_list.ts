@@ -459,12 +459,14 @@ describe('Polling tests', () => {
         expect(wrapper.vm.d_submissions).toEqual([new_submission, submission]);
     });
 
-    test('Submission status changed when refreshed, results reloaded', async () => {
-        submission.status = ag_cli.GradingStatus.received;
-        let new_status_submission = new ag_cli.Submission(submission);
-        new_status_submission.status = ag_cli.GradingStatus.finished_grading;
+    test('Submission last_modified changed when refreshed, results reloaded', async () => {
+        submission.status = ag_cli.GradingStatus.being_graded;
+        let new_last_modified_submission = new ag_cli.Submission(submission);
+        let current_last_modified = new Date(submission.last_modified);
+        current_last_modified.setHours(current_last_modified.getHours() + 1);
+        new_last_modified_submission.last_modified = current_last_modified.toISOString();
         get_submissions_stub.withArgs(group.pk).onFirstCall().resolves(
-            [new_status_submission]
+            [new_last_modified_submission]
         );
 
         let submission_with_updated_results
