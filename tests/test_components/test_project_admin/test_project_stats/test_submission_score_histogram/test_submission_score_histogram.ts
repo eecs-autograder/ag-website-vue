@@ -12,7 +12,7 @@ import { find_by_name } from '@/tests/utils';
 
 test('All, individuals, and group percentages', () => {
     let project = data_ut.make_project(data_ut.make_course().pk);
-    let students = Array(10).fill(null).map(val => data_ut.make_user());
+    let students = Array(12).fill(null).map(val => data_ut.make_user());
     let groups = [
         data_ut.make_group(project.pk, 1, {members: [students[0]]}),
         data_ut.make_group(project.pk, 2, {members: [students[1], students[2]]}),
@@ -20,6 +20,8 @@ test('All, individuals, and group percentages', () => {
         data_ut.make_group(project.pk, 1, {members: [students[4]]}),
         data_ut.make_group(project.pk, 3, {members: [students[5], students[6], students[7]]}),
         data_ut.make_group(project.pk, 2, {members: [students[8], students[9]]}),
+        data_ut.make_group(project.pk, 1, {members: [students[10]]}),
+        data_ut.make_group(project.pk, 1, {members: [students[11]]}),
     ];
 
     let ultimate_submission_entries: FullUltimateSubmissionResult[] = [
@@ -83,10 +85,21 @@ test('All, individuals, and group percentages', () => {
             ultimate_submission: data_ut.make_submission_with_results(
                 groups[5], undefined, {total_points: 60, total_points_possible: 100})
         },
+        {
+            username: students[10].username,
+            group: groups[6],
+            ultimate_submission: null
+        },
+        {
+            username: students[11].username,
+            group: groups[6],
+            ultimate_submission: data_ut.make_submission_with_results(
+                groups[6], undefined, {total_points: 10, total_points_possible: 0})
+        },
     ];
 
-    let expected_all_percentages = [10, 20, 20, 30, 40, 50, 50, 50, 60, 60];
-    let expected_individuals_percentages = [10, 30, 40];
+    let expected_all_percentages = [10, 20, 20, 30, 40, 50, 50, 50, 60, 60, 0];
+    let expected_individuals_percentages = [10, 30, 40, 0];
     let expected_groups_percentages = [20, 50, 60];
 
     let wrapper = managed_shallow_mount(SubmissionScoreHistogram, {
