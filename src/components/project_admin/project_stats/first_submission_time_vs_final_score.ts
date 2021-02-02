@@ -90,6 +90,10 @@ export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
                 continue;
             }
 
+            if (entry.ultimate_submission === null) {
+                continue;
+            }
+
             if (Number(entry.ultimate_submission.results.total_points_possible) === 0) {
                 continue;
             }

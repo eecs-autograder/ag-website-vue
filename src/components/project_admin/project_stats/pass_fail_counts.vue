@@ -76,8 +76,16 @@ export default class PassFailCounts extends Vue {
   // <test case pk>: <num fail>
   d_fail_counts = new SafeMap<number, number>();
 
-  get submission_results() {
-    return this.ultimate_submission_entries.map(entry => entry.ultimate_submission.results);
+  get submission_results(): ag_cli.SubmissionResultFeedback[] {
+    return this.ultimate_submission_entries.reduce(
+      (so_far, entry) => {
+        if (entry.ultimate_submission !== null) {
+          so_far.push(entry.ultimate_submission.results);
+        }
+        return so_far;
+      },
+      [] as ag_cli.SubmissionResultFeedback[]
+    );
   }
 
   @handle_global_errors_async

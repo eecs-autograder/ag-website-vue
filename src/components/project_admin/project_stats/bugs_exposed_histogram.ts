@@ -77,6 +77,9 @@ export default class BugsExposedHistogram extends Mixins(Bar) {
         }
 
         for (let entry of this.ultimate_submission_entries) {
+            if (entry.ultimate_submission === null) {
+                continue;
+            }
             let mutation_test_suite_results
                 = entry.ultimate_submission.results.mutation_test_suite_results;
             for (let suite_result of mutation_test_suite_results) {

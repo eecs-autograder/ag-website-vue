@@ -74,16 +74,23 @@ export default class SubmissionScoreHistogram extends Vue {
   }
 
   get percentages_by_entry(): [FullUltimateSubmissionResult, number][] {
-    return this.ultimate_submission_entries.map(entry => {
-      let submission_result = entry.ultimate_submission.results;
-      let percent = 0;
-      let points_possible = Number(submission_result.total_points_possible);
-      if (points_possible !== 0) {
-        percent = Math.floor((Number(submission_result.total_points) / points_possible) * 100);
-      }
+    return this.ultimate_submission_entries.reduce(
+      (so_far, entry) => {
+        if (entry.ultimate_submission === null) {
+          return so_far;
+        }
+        let submission_result = entry.ultimate_submission.results;
+        let percent = 0;
+        let points_possible = Number(submission_result.total_points_possible);
+        if (points_possible !== 0) {
+          percent = Math.floor((Number(submission_result.total_points) / points_possible) * 100);
+        }
 
-      return [entry, percent];
-    });
+        so_far.push([entry, percent]);
+        return so_far;
+      },
+      [] as [FullUltimateSubmissionResult, number][]
+    );
   }
 }
 </script>

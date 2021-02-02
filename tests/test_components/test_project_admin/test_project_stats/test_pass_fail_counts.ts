@@ -11,7 +11,7 @@ import { find_all_components, set_props, wait_for_load } from '@/tests/utils';
 
 test('Pass fail counts and bugs exposed', async () => {
     let project = data_ut.make_project(data_ut.make_course().pk);
-    let groups = Array(2).fill(null).map(val => data_ut.make_group(project.pk));
+    let groups = Array(3).fill(null).map(val => data_ut.make_group(project.pk));
 
     // Note that we're not specifying specific values for the AG tests themselves,
     // as all the needed information is present in the result data.
@@ -102,8 +102,8 @@ test('Pass fail counts and bugs exposed', async () => {
             )
         },
         {
-            username: groups[0].member_names[0],
-            group: groups[0],
+            username: groups[1].member_names[0],
+            group: groups[1],
             ultimate_submission: data_ut.make_submission_with_results(
                 groups[0], undefined, {
                     ag_test_suite_results: [
@@ -167,6 +167,11 @@ test('Pass fail counts and bugs exposed', async () => {
                 }
             )
         },
+        {
+            username: groups[2].member_names[0],
+            group: groups[2],
+            ultimate_submission: null,
+        }
     ];
 
     sinon.stub(ag_cli.AGTestSuite, 'get_all_from_project').resolves([suite1, suite2]);
