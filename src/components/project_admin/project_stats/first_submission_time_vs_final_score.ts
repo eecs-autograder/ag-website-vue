@@ -2,6 +2,8 @@ import { Scatter } from 'vue-chartjs';
 import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
 import { FullUltimateSubmissionResult } from 'ag-client-typescript';
+// @ts-ignore
+import zoom from 'chartjs-plugin-zoom';
 
 import { SafeMap } from '@/safe_map';
 
@@ -18,6 +20,7 @@ export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
     first_submissions_by_group!: SafeMap<number, FirstSubmissionData>;
 
     mounted() {
+        this.addPlugin(zoom);
         this.update_chart();
     }
 
@@ -46,12 +49,12 @@ export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
                     xAxes: [{
                         type: 'time',
                         time: {
+                            unit: 'hour',
+                            unitStepSize: 1,
                             displayFormats: {
-                                // Don't display seconds or milliseconds.
-                                millisecond: 'h:mm a',
-                                second: 'h:mm a',
+                                hour: 'MMM D, h:mm a',
                             },
-                            tooltipFormat: 'MMM D, YYYY, h:mm a'
+                            tooltipFormat: 'MMM D, YYYY, h:mm a',
                         },
                         distribution: 'linear',
                         bounds: 'data',
@@ -74,6 +77,18 @@ export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
                             labelString: '% Score'
                         }
                     }]
+                },
+                plugins: {
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'x',
+                        },
+                        zoom: {
+                            enabled: true,
+                            mode: 'x',
+                        }
+                    },
                 }
             }
         );
