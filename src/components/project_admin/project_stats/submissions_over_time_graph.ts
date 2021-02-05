@@ -1,8 +1,9 @@
-// CommitChart.ts
 import { Line } from 'vue-chartjs';
 import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
 import { Submission } from 'ag-client-typescript';
+// @ts-ignore
+import zoom from 'chartjs-plugin-zoom';
 // @ts-ignore
 import moment from "moment";
 
@@ -14,6 +15,7 @@ export default class SubmissionsOverTimeGraph extends Mixins(Line) {
     submissions!: Submission[];
 
     mounted() {
+        this.addPlugin(zoom);
         this.update_chart();
     }
 
@@ -42,12 +44,12 @@ export default class SubmissionsOverTimeGraph extends Mixins(Line) {
                     xAxes: [{
                         type: 'time',
                         time: {
+                            unit: 'hour',
+                            unitStepSize: 1,
                             displayFormats: {
-                                // Don't display seconds or milliseconds.
-                                millisecond: 'h:mm a',
-                                second: 'h:mm a',
+                                hour: 'MMM D, h:mm a',
                             },
-                            tooltipFormat: 'MMM D, YYYY, h:mm a'
+                            tooltipFormat: 'MMM D, YYYY, h:mm a',
                         },
                         distribution: 'linear',
                         bounds: 'data',
@@ -70,6 +72,18 @@ export default class SubmissionsOverTimeGraph extends Mixins(Line) {
                             labelString: '# of Submissions'
                         }
                     }]
+                },
+                plugins: {
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'x',
+                        },
+                        zoom: {
+                            enabled: true,
+                            mode: 'x',
+                        }
+                    },
                 }
             }
         );
