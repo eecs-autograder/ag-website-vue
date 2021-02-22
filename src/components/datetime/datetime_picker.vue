@@ -7,7 +7,7 @@
           <i class="fas fa-chevron-left"></i>
         </button>
         <div class="display-month-and-year">
-          {{months[d_month]}} <span>{{d_year}}</span>
+          {{months[d_month - 1]}} <span>{{d_year}}</span>
         </div>
         <button type="button" @click="go_to_next_month" class="next-month-button">
           <i class="fas fa-chevron-right"></i>
@@ -45,8 +45,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-// @ts-ignore
-import moment from 'moment';
+import { DateTime } from 'luxon';
 
 import TimePicker from "@/components/datetime/time_picker.vue";
 
@@ -65,7 +64,7 @@ export default class DatetimePicker extends Vue {
     this.set_date_and_time(new_value);
   }
 
-  d_date: moment.Moment = moment();
+  d_date: DateTime = DateTime.now();
   d_time: string = '12:00';
 
   private d_is_open = false;
@@ -74,8 +73,8 @@ export default class DatetimePicker extends Vue {
   d_selected_month: number | null = null;
   d_selected_year: number | null = null;
 
-  d_month = moment().month();  // The current month shown on the calendar
-  d_year = moment().year();  // The current year shown on the calendar
+  d_month = DateTime.now().month;  // The current month shown on the calendar
+  d_year = DateTime.now().year;  // The current year shown on the calendar
 
   calendar: number[][] = [
     [0, 0, 0, 0, 0, 0, 0],
@@ -96,28 +95,34 @@ export default class DatetimePicker extends Vue {
   created() {
     this.set_date_and_time(this.value);
 
-    this.d_year = this.d_date.year();
-    this.d_month = this.d_date.month();
+    this.d_year = this.d_date.year;
+    this.d_month = this.d_date.month;
     this.calculate_days();
   }
 
   set_date_and_time(value: string | null) {
     if (value === null) {
-      this.d_date = moment();
+      this.d_date = DateTime.now();
     }
     else {
-      this.d_date = moment(value);
-      if (!this.d_date.isValid()) {
-        throw new InvalidDatetimeStrError(`Invalid datetime string: ${value}`);
+      this.d_date = DateTime.fromISO(value);
+      if (!this.d_date.isValid) {
+        throw new InvalidDatetimeStrError(
+          `Invalid datetime string: ${value}\n`
+          + `Reason: ${this.d_date.invalidReason}\n`
+          + `Explanation: ${this.d_date.invalidExplanation}`
+        );
       }
 
-      this.d_selected_day = this.d_date.date();
-      this.d_selected_month = this.d_date.month();
-      this.d_selected_year = this.d_date.year();
+      this.d_selected_day = this.d_date.day;
+      this.d_selected_month = this.d_date.month;
+      this.d_selected_year = this.d_date.year;
     }
 
-    this.d_time = moment({hours: this.d_date.hours(),
-                          minutes: this.d_date.minutes()}).format('HH:mm');
+    this.d_time = DateTime.fromObject({
+      hour: this.d_date.hour,
+      minute: this.d_date.minute
+    }).toFormat('HH:mm');
   }
 
   get is_visible() {
@@ -137,20 +142,23 @@ export default class DatetimePicker extends Vue {
   }
 
   go_to_next_month() {
-    if (this.d_month === 11) {
+    if (this.d_month === this.months.length) {
       this.d_year += 1;
+      this.d_month = 1
     }
-    this.d_month = (this.d_month + 1) % this.months.length;
+    else {
+      this.d_month += 1;
+    }
     this.calculate_days();
   }
 
   go_to_prev_month() {
-    if (this.d_month === 0) {
-      this.d_month = this.months.length - 1;
+    if (this.d_month === 1) {
+      this.d_month = this.months.length;
       this.d_year -= 1;
     }
     else {
-      this.d_month = this.d_month - 1;
+      this.d_month -= 1;
     }
     this.calculate_days();
   }
@@ -179,19 +187,19 @@ export default class DatetimePicker extends Vue {
     this.d_selected_day = day;
     this.d_selected_month = this.d_month;
     this.d_selected_year = this.d_year;
-    this.d_date = this.d_date.clone().set({
+    this.d_date = this.d_date.set({
       year: this.d_selected_year,
       month: this.d_selected_month,
-      date: this.d_selected_day,
+      day: this.d_selected_day,
     });
-    this.$emit('input', this.d_date.format());
+    this.$emit('input', this.d_date.toISO());
   }
 
   update_time_selected() {
-    let time = moment(this.d_time, 'HH:mm');
-    this.d_date = this.d_date.clone().set({hours: time.hours(), minutes: time.minutes()});
+    let time = DateTime.fromISO(this.d_time);
+    this.d_date = this.d_date.set({hour: time.hour, minute: time.minute});
     if (this.d_selected_day !== null) {
-      this.$emit('input', this.d_date.format());
+      this.$emit('input', this.d_date.toISO());
     }
   }
 

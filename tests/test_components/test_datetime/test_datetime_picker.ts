@@ -29,16 +29,16 @@ describe('DatetimePicker tests', () => {
         wrapper.vm.show();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_month).toEqual(11);
+        expect(wrapper.vm.d_month).toEqual(12);
         expect(wrapper.vm.d_year).toEqual(2019);
 
         expect(wrapper.vm.d_selected_day).toEqual(25);
-        expect(wrapper.vm.d_selected_month).toEqual(11);
+        expect(wrapper.vm.d_selected_month).toEqual(12);
         expect(wrapper.vm.d_selected_year).toEqual(2019);
 
-        expect(wrapper.vm.d_date.date()).toEqual(25);
-        expect(wrapper.vm.d_date.month()).toEqual(11);
-        expect(wrapper.vm.d_date.year()).toEqual(2019);
+        expect(wrapper.vm.d_date.day).toEqual(25);
+        expect(wrapper.vm.d_date.month).toEqual(12);
+        expect(wrapper.vm.d_date.year).toEqual(2019);
 
         let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
         expect(time_picker.vm.d_time.hours).toEqual(13);
@@ -52,16 +52,17 @@ describe('DatetimePicker tests', () => {
 
         let now = new Date();
 
-        expect(wrapper.vm.d_month).toEqual(now.getMonth());
+        // Date is 0-indexed, Luxon is 1-indexed
+        expect(wrapper.vm.d_month).toEqual(now.getMonth() + 1);
         expect(wrapper.vm.d_year).toEqual(now.getFullYear());
 
         expect(wrapper.vm.d_selected_day).toBeNull();
         expect(wrapper.vm.d_selected_month).toBeNull();
         expect(wrapper.vm.d_selected_year).toBeNull();
 
-        expect(wrapper.vm.d_date.date()).toEqual(now.getDate());
-        expect(wrapper.vm.d_date.month()).toEqual(now.getMonth());
-        expect(wrapper.vm.d_date.year()).toEqual(now.getFullYear());
+        expect(wrapper.vm.d_date.day).toEqual(now.getDate());
+        expect(wrapper.vm.d_date.month).toEqual(now.getMonth() + 1);
+        expect(wrapper.vm.d_date.year).toEqual(now.getFullYear());
 
         let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
         expect(time_picker.vm.d_time.hours).toEqual(now.getHours());
@@ -78,7 +79,7 @@ describe('DatetimePicker tests', () => {
         await first_week.findAll('.available-day').at(0).trigger('click');
 
         expect(wrapper.vm.d_selected_day).toEqual(1);
-        expect(wrapper.vm.d_selected_month).toEqual(now.getMonth());
+        expect(wrapper.vm.d_selected_month).toEqual(now.getMonth() + 1);
         expect(wrapper.vm.d_selected_year).toEqual(now.getFullYear());
 
         expect(emitted(wrapper, 'input').length).toBe(1);
@@ -132,21 +133,21 @@ describe('DatetimePicker tests', () => {
         wrapper.vm.show();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_date.month()).toEqual(11);
+        expect(wrapper.vm.d_date.month).toEqual(12);
         await wrapper.find('.next-month-button').trigger('click');
 
-        expect(wrapper.vm.d_month).toEqual(0);
+        expect(wrapper.vm.d_month).toEqual(1);
         expect(wrapper.vm.d_year).toEqual(2020);
 
         let second_week = wrapper.findAll('.week').at(1);
         await second_week.findAll('.available-day').at(0).trigger('click');
 
-        expect(wrapper.vm.d_selected_day).toEqual(5);
+        expect(wrapper.vm.d_selected_day).toEqual(2);
         expect(wrapper.findAll('.selected-day').length).toEqual(1);
 
-        expect(wrapper.vm.d_date.month()).toEqual(0);
-        expect(wrapper.vm.d_selected_month).toEqual(0);
-        expect(wrapper.vm.d_date.year()).toEqual(2020);
+        expect(wrapper.vm.d_date.month).toEqual(1);
+        expect(wrapper.vm.d_selected_month).toEqual(1);
+        expect(wrapper.vm.d_date.year).toEqual(2020);
         expect(wrapper.vm.d_selected_year).toEqual(2020);
 
         expect(emitted(wrapper, 'input').length).toBe(1);
@@ -154,7 +155,7 @@ describe('DatetimePicker tests', () => {
         let emitted_date = new Date(emitted(wrapper, 'input')[0][0]);
         expect(emitted_date.getFullYear()).toEqual(2020);
         expect(emitted_date.getMonth()).toEqual(0);
-        expect(emitted_date.getDate()).toEqual(5);
+        expect(emitted_date.getDate()).toEqual(2);
     });
 
     test("Value passed into 'value' prop changed by parent component", async () => {
@@ -168,12 +169,12 @@ describe('DatetimePicker tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_selected_day).toEqual(21);
-        expect(wrapper.vm.d_selected_month).toEqual(6);
+        expect(wrapper.vm.d_selected_month).toEqual(7);
         expect(wrapper.vm.d_selected_year).toEqual(2019);
 
-        expect(wrapper.vm.d_date.date()).toEqual(21);
-        expect(wrapper.vm.d_date.month()).toEqual(6);
-        expect(wrapper.vm.d_date.year()).toEqual(2019);
+        expect(wrapper.vm.d_date.day).toEqual(21);
+        expect(wrapper.vm.d_date.month).toEqual(7);
+        expect(wrapper.vm.d_date.year).toEqual(2019);
 
         let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
         expect(time_picker.vm.d_time.hours).toEqual(8);
@@ -182,12 +183,12 @@ describe('DatetimePicker tests', () => {
         await set_props(wrapper, {'value': "2021-03-08T23:49:40.746Z"});
 
         expect(wrapper.vm.d_selected_day).toEqual(8);
-        expect(wrapper.vm.d_selected_month).toEqual(2);
+        expect(wrapper.vm.d_selected_month).toEqual(3);
         expect(wrapper.vm.d_selected_year).toEqual(2021);
 
-        expect(wrapper.vm.d_date.date()).toEqual(8);
-        expect(wrapper.vm.d_date.month()).toEqual(2);
-        expect(wrapper.vm.d_date.year()).toEqual(2021);
+        expect(wrapper.vm.d_date.day).toEqual(8);
+        expect(wrapper.vm.d_date.month).toEqual(3);
+        expect(wrapper.vm.d_date.year).toEqual(2021);
 
         expect(time_picker.vm.d_time.hours).toEqual(18);
         expect(time_picker.vm.d_time.minutes).toEqual(49);
@@ -231,16 +232,16 @@ describe('DatetimePicker keyboard inputs', () => {
         wrapper.vm.show();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_month).toEqual(0);
+        expect(wrapper.vm.d_month).toEqual(1);
         expect(wrapper.vm.d_year).toEqual(2019);
 
         await wrapper.find('.prev-month-button').trigger('click');
-        expect(wrapper.vm.d_month).toEqual(11);
+        expect(wrapper.vm.d_month).toEqual(12);
         expect(wrapper.vm.d_year).toEqual(2018);
         await wrapper.find('.prev-month-button').trigger('click');
-        expect(wrapper.vm.d_month).toEqual(10);
+        expect(wrapper.vm.d_month).toEqual(11);
         await wrapper.find('.prev-month-button').trigger('click');
-        expect(wrapper.vm.d_month).toEqual(9);
+        expect(wrapper.vm.d_month).toEqual(10);
     });
 
     test('Pressing right arrow goes to the next month (with year wraparound)', async () => {
@@ -252,15 +253,15 @@ describe('DatetimePicker keyboard inputs', () => {
         wrapper.vm.show();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_month).toEqual(11);
+        expect(wrapper.vm.d_month).toEqual(12);
         expect(wrapper.vm.d_year).toEqual(2019);
 
         await wrapper.find('.next-month-button').trigger('click');
-        expect(wrapper.vm.d_month).toEqual(0);
+        expect(wrapper.vm.d_month).toEqual(1);
         expect(wrapper.vm.d_year).toEqual(2020);
         await wrapper.find('.next-month-button').trigger('click');
-        expect(wrapper.vm.d_month).toEqual(1);
-        await wrapper.find('.next-month-button').trigger('click');
         expect(wrapper.vm.d_month).toEqual(2);
+        await wrapper.find('.next-month-button').trigger('click');
+        expect(wrapper.vm.d_month).toEqual(3);
     });
 });

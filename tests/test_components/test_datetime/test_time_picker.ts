@@ -26,8 +26,8 @@ describe('TimePicker Tests', () => {
         expect(wrapper.vm.hours_str).toEqual('12');
         expect(wrapper.vm.minutes_str).toEqual('00');
         expect(wrapper.vm.am_pm_str).toEqual('PM');
-        expect(wrapper.vm.d_time.hours).toEqual(12);
-        expect(wrapper.vm.d_time.minutes).toEqual(0);
+        expect(wrapper.vm.d_time.hour).toEqual(12);
+        expect(wrapper.vm.d_time.minute).toEqual(0);
     });
 
     test('Null input value', () => {
@@ -39,18 +39,18 @@ describe('TimePicker Tests', () => {
         expect(wrapper.vm.hours_str).toEqual('12');
         expect(wrapper.vm.minutes_str).toEqual('00');
         expect(wrapper.vm.am_pm_str).toEqual('PM');
-        expect(wrapper.vm.d_time.hours).toEqual(12);
-        expect(wrapper.vm.d_time.minutes).toEqual(0);
+        expect(wrapper.vm.d_time.hour).toEqual(12);
+        expect(wrapper.vm.d_time.minute).toEqual(0);
     });
 
     test('Input watcher', async () => {
-        expect(wrapper.vm.d_time.hours).toEqual(13);
-        expect(wrapper.vm.d_time.minutes).toEqual(58);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
+        expect(wrapper.vm.d_time.minute).toEqual(58);
 
         await set_props(wrapper, {value: '04:22'});
 
-        expect(wrapper.vm.d_time.hours).toEqual(4);
-        expect(wrapper.vm.d_time.minutes).toEqual(22);
+        expect(wrapper.vm.d_time.hour).toEqual(4);
+        expect(wrapper.vm.d_time.minute).toEqual(22);
     });
 
     test('Invalid time str throws exception', () => {
@@ -66,89 +66,89 @@ describe('TimePicker Tests', () => {
     });
 
     test('Valid time string formats', async  () => {
-        expect(wrapper.vm.d_time.hours).toEqual(13);
-        expect(wrapper.vm.d_time.minutes).toEqual(58);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
+        expect(wrapper.vm.d_time.minute).toEqual(58);
 
         await set_props(wrapper, {value: '05:21:00'});
 
-        expect(wrapper.vm.d_time.hours).toEqual(5);
-        expect(wrapper.vm.d_time.minutes).toEqual(21);
+        expect(wrapper.vm.d_time.hour).toEqual(5);
+        expect(wrapper.vm.d_time.minute).toEqual(21);
     });
 
     test('Pressing the up and down buttons increases/decreases hours_str', async () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.am_pm_str).toEqual("PM");
-        expect(wrapper.vm.d_time.hours).toEqual(13);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
 
         await wrapper.find('[data-testid=prev_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("12");
         expect(wrapper.vm.am_pm_str).toEqual("PM");
-        expect(wrapper.vm.d_time.hours).toEqual(12);
+        expect(wrapper.vm.d_time.hour).toEqual(12);
 
         await wrapper.find('[data-testid=prev_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("11");
         expect(wrapper.vm.am_pm_str).toEqual("AM");
-        expect(wrapper.vm.d_time.hours).toEqual(11);
+        expect(wrapper.vm.d_time.hour).toEqual(11);
 
         await wrapper.find('[data-testid=next_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("12");
         expect(wrapper.vm.am_pm_str).toEqual("PM");
-        expect(wrapper.vm.d_time.hours).toEqual(12);
+        expect(wrapper.vm.d_time.hour).toEqual(12);
 
         await wrapper.find('[data-testid=next_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("01");
-        expect(wrapper.vm.d_time.hours).toEqual(13);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
         expect(emitted(wrapper, 'input').length).toBe(4);
 
         await set_props(wrapper, {value: '23:00'});
         expect(wrapper.vm.hours_str).toEqual("11");
         expect(wrapper.vm.am_pm_str).toEqual("PM");
-        expect(wrapper.vm.d_time.hours).toEqual(23);
+        expect(wrapper.vm.d_time.hour).toEqual(23);
 
         await wrapper.find('[data-testid=next_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("12");
         expect(wrapper.vm.am_pm_str).toEqual("AM");
-        expect(wrapper.vm.d_time.hours).toEqual(0);
+        expect(wrapper.vm.d_time.hour).toEqual(0);
 
         await wrapper.find('[data-testid=prev_hour_button]').trigger('click');
         expect(wrapper.vm.hours_str).toEqual("11");
         expect(wrapper.vm.am_pm_str).toEqual("PM");
-        expect(wrapper.vm.d_time.hours).toEqual(23);
+        expect(wrapper.vm.d_time.hour).toEqual(23);
     });
 
     test('Pressing the up arrow while the hours input has focus', async () => {
         let hours_input = wrapper.find('.hour-input');
         expect(wrapper.vm.hours_str).toEqual("01");
-        expect(wrapper.vm.d_time.hours).toEqual(13);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
 
         await hours_input.trigger('keydown', {code: "ArrowUp"});
 
         expect(wrapper.vm.hours_str).toEqual("02");
-        expect(wrapper.vm.d_time.hours).toEqual(14);
+        expect(wrapper.vm.d_time.hour).toEqual(14);
 
         await hours_input.trigger('keydown', {code: "ArrowUp"});
 
         expect(wrapper.vm.hours_str).toEqual("03");
-        expect(wrapper.vm.d_time.hours).toEqual(15);
+        expect(wrapper.vm.d_time.hour).toEqual(15);
         expect(emitted(wrapper, 'input').length).toBe(2);
     });
 
     test('Pressing the down arrow while the hours input has focus', async () => {
         let hours_input = wrapper.find('.hour-input');
         expect(wrapper.vm.hours_str).toEqual("01");
-        expect(wrapper.vm.d_time.hours).toEqual(13);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
 
         await hours_input.trigger('keydown', {code: "ArrowDown"});
 
         expect(wrapper.vm.hours_str).toEqual("12");
-        expect(wrapper.vm.d_time.hours).toEqual(12);
+        expect(wrapper.vm.d_time.hour).toEqual(12);
 
         await hours_input.trigger('keydown', {code: "ArrowDown"});
         await hours_input.trigger('keydown', {code: "ArrowDown"});
         await hours_input.trigger('keydown', {code: "ArrowDown"});
 
         expect(wrapper.vm.hours_str).toEqual("09");
-        expect(wrapper.vm.d_time.hours).toEqual(9);
+        expect(wrapper.vm.d_time.hour).toEqual(9);
         expect(emitted(wrapper, 'input').length).toBe(4);
     });
 
@@ -156,95 +156,95 @@ describe('TimePicker Tests', () => {
     test('Pressing key besides digit, backspace, up arrow has no effect on hours', async () => {
         let hours_input = wrapper.find('.hour-input');
         expect(wrapper.vm.hours_str).toEqual("01");
-        expect(wrapper.vm.d_time.hours).toEqual(13);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
 
         await hours_input.trigger('keydown', {code: "ArrowLeft"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
-        expect(wrapper.vm.d_time.hours).toEqual(13);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
 
         await hours_input.trigger('keydown', {code: "KeyE"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
-        expect(wrapper.vm.d_time.hours).toEqual(13);
+        expect(wrapper.vm.d_time.hour).toEqual(13);
 
         expect(wrapper.emitted('input')).toBeUndefined();
     });
 
     test('Pressing the up and down buttons increases/decreases the minutes_str', async () => {
         expect(wrapper.vm.minutes_str).toEqual("58");
-        expect(wrapper.vm.d_time.minutes).toEqual(58);
+        expect(wrapper.vm.d_time.minute).toEqual(58);
 
         await wrapper.find('[data-testid=next_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("59");
-        expect(wrapper.vm.d_time.minutes).toEqual(59);
+        expect(wrapper.vm.d_time.minute).toEqual(59);
 
         await wrapper.find('[data-testid=next_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("00");
-        expect(wrapper.vm.d_time.minutes).toEqual(0);
+        expect(wrapper.vm.d_time.minute).toEqual(0);
 
         await wrapper.find('[data-testid=next_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("01");
-        expect(wrapper.vm.d_time.minutes).toEqual(1);
+        expect(wrapper.vm.d_time.minute).toEqual(1);
 
         await wrapper.find('[data-testid=prev_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("00");
-        expect(wrapper.vm.d_time.minutes).toEqual(0);
+        expect(wrapper.vm.d_time.minute).toEqual(0);
 
         await wrapper.find('[data-testid=prev_minute_button]').trigger('click');
         expect(wrapper.vm.minutes_str).toEqual("59");
-        expect(wrapper.vm.d_time.minutes).toEqual(59);
+        expect(wrapper.vm.d_time.minute).toEqual(59);
         expect(emitted(wrapper, 'input').length).toBe(5);
     });
 
     test('Pressing the up arrow while the minutes input has focus', async () => {
         let minute_input = wrapper.find('.minute-input');
         expect(wrapper.vm.minutes_str).toEqual("58");
-        expect(wrapper.vm.d_time.minutes).toEqual(58);
+        expect(wrapper.vm.d_time.minute).toEqual(58);
 
         await minute_input.trigger('keydown', {code: "ArrowUp"});
 
         expect(wrapper.vm.minutes_str).toEqual("59");
-        expect(wrapper.vm.d_time.minutes).toEqual(59);
+        expect(wrapper.vm.d_time.minute).toEqual(59);
 
         await minute_input.trigger('keydown', {code: "ArrowUp"});
 
         expect(wrapper.vm.minutes_str).toEqual("00");
-        expect(wrapper.vm.d_time.minutes).toEqual(0);
+        expect(wrapper.vm.d_time.minute).toEqual(0);
         expect(emitted(wrapper, 'input').length).toBe(2);
     });
 
     test('Pressing the down arrow while the minutes input has focus', async () => {
         let minute_input = wrapper.find('.minute-input');
         expect(wrapper.vm.minutes_str).toEqual("58");
-        expect(wrapper.vm.d_time.minutes).toEqual(58);
+        expect(wrapper.vm.d_time.minute).toEqual(58);
 
         await minute_input.trigger('keydown', {code: "ArrowDown"});
 
         expect(wrapper.vm.minutes_str).toEqual("57");
-        expect(wrapper.vm.d_time.minutes).toEqual(57);
+        expect(wrapper.vm.d_time.minute).toEqual(57);
 
         await minute_input.trigger('keydown', {code: "ArrowDown"});
 
         expect(wrapper.vm.minutes_str).toEqual("56");
-        expect(wrapper.vm.d_time.minutes).toEqual(56);
+        expect(wrapper.vm.d_time.minute).toEqual(56);
         expect(emitted(wrapper, 'input').length).toBe(2);
     });
 
     test('Pressing key besides digit, backspace, up arrow has no effect on minutes', async () => {
         let minutes_input = wrapper.find('.minute-input');
         expect(wrapper.vm.minutes_str).toEqual("58");
-        expect(wrapper.vm.d_time.minutes).toEqual(58);
+        expect(wrapper.vm.d_time.minute).toEqual(58);
 
         await minutes_input.trigger('keydown', {code: "ArrowLeft"});
 
         expect(wrapper.vm.minutes_str).toEqual("58");
-        expect(wrapper.vm.d_time.minutes).toEqual(58);
+        expect(wrapper.vm.d_time.minute).toEqual(58);
 
         await minutes_input.trigger('keydown', {code: "KeyE"});
 
         expect(wrapper.vm.minutes_str).toEqual("58");
-        expect(wrapper.vm.d_time.minutes).toEqual(58);
+        expect(wrapper.vm.d_time.minute).toEqual(58);
         expect(wrapper.emitted('input')).toBeUndefined();
     });
 
@@ -267,7 +267,7 @@ describe('TimePicker Tests', () => {
         await hours_input.trigger('keydown', {code: "Backspace"});
 
         expect(wrapper.vm.hours_str).toEqual("12");
-        expect(wrapper.vm.d_time.hours).toEqual(12);
+        expect(wrapper.vm.d_time.hour).toEqual(12);
     });
 
     test('Pressing backspace in the minutes input sets the value to "00"', async () => {
@@ -278,7 +278,7 @@ describe('TimePicker Tests', () => {
         await minutes_input.trigger('keydown', {code: "Backspace"});
 
         expect(wrapper.vm.minutes_str).toEqual("00");
-        expect(wrapper.vm.d_time.minutes).toEqual(0);
+        expect(wrapper.vm.d_time.minute).toEqual(0);
     });
 });
 
@@ -288,7 +288,7 @@ describe('TimePicker HourInputState tests', () => {
     beforeEach(() => {
         wrapper = mount(TimePicker, {
             propsData: {
-                value: '1:58'
+                value: '01:58'
             }
         });
     });

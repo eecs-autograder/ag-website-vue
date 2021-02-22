@@ -64,34 +64,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-// @ts-ignore
-import moment from 'moment';
-
-export class Time {
-  readonly hours: number;
-  readonly minutes: number;
-
-  constructor(hours: number = 12, minutes: number = 0) {
-    this.hours =  hours;
-    this.minutes = minutes;
-  }
-
-  with_hours(hours: number) {
-    return new Time(hours, this.minutes);
-  }
-
-  with_minutes(minutes: number) {
-    return new Time(this.hours, minutes);
-  }
-
-  static from_moment(moment_: moment.Moment): Time {
-    return new Time(moment_.hours(), moment_.minutes());
-  }
-
-  as_moment() {
-    return moment({hours: this.hours, minutes: this.minutes});
-  }
-}
+import { DateTime } from 'luxon';
 
 export enum HourInputState {
   awaiting_first_digit,
@@ -113,7 +86,7 @@ export default class TimePicker extends Vue {
     this.set_d_time(new_value);
   }
 
-  d_time: Time = new Time();
+  d_time: DateTime = DateTime.fromObject({hour: 12});
 
   hour_input_state: HourInputState = HourInputState.awaiting_first_digit;
   minute_input_state: MinuteInputState = MinuteInputState.awaiting_first_digit;
@@ -124,51 +97,53 @@ export default class TimePicker extends Vue {
 
   set_d_time(value: string | null) {
     if (value === null) {
-      this.d_time = new Time();
+      this.d_time = DateTime.fromObject({hour: 12});
       return;
     }
 
-    let time = moment(this.value, ['HH:mm', 'HH:mm:ss']);
-    if (!time.isValid()) {
-      throw new InvalidTimeStrError(`Invalid time string: ${value}`);
+    let time = DateTime.fromISO(this.value);
+    if (!time.isValid) {
+      throw new InvalidTimeStrError(
+        `Invalid time string: ${value}`
+        + `Reason: ${time.invalidReason}\n`
+        + `Explanation: ${time.invalidExplanation}`
+      );
     }
 
-    this.d_time = new Time(time.hours(), time.minutes());
+    this.d_time = time;
   }
 
   get hours_str(): string {
-    return this.d_time.as_moment().format('hh');
+    return this.d_time.toFormat('hh');
   }
 
   get minutes_str(): string {
-    return this.d_time.as_moment().format('mm');
+    return this.d_time.toFormat('mm');
   }
 
-  get am_pm_str() {
-    return this.d_time.as_moment().format('A');
+  get am_pm_str(): 'AM' | 'PM' {
+    return this.d_time.hour < 12 ? 'AM' : 'PM';
   }
 
   // Note: When incrementing/decrementing hours and minutes, we don't want changing
-  // minutes to change hours, so we won't use moment's add or subtract methods.
+  // minutes to change hours, so we won't use Luxon's add or subtract methods.
   go_to_next_minute() {
-    this.d_time = this.d_time.with_minutes((this.d_time.minutes + 1) % 60);
+    this.d_time = this.d_time.set({minute: (this.d_time.minute + 1) % 60});
     this.update_time_selected();
   }
 
   go_to_prev_minute() {
-    // +59 and -1 are equivalent mod 60
-    this.d_time = this.d_time.with_minutes((this.d_time.minutes + 59) % 60);
+    this.d_time = this.d_time.set({minute: (this.d_time.minute + 59) % 60});
     this.update_time_selected();
   }
 
   go_to_next_hour() {
-    this.d_time = this.d_time.with_hours((this.d_time.hours + 1) % 24);
+    this.d_time = this.d_time.set({hour: (this.d_time.hour + 1) % 24});
     this.update_time_selected();
   }
 
   go_to_prev_hour() {
-    // +23 and -1 are equivalent mod 24
-    this.d_time = this.d_time.with_hours((this.d_time.hours + 23) % 24);
+    this.d_time = this.d_time.set({hour: (this.d_time.hour + 23) % 24});
     this.update_time_selected();
   }
 
@@ -181,20 +156,21 @@ export default class TimePicker extends Vue {
       this.go_to_prev_minute();
     }
     else if (event.code === "Backspace") {
-      this.d_time = this.d_time.with_minutes(0);
+      this.d_time = this.d_time.set({minute: 0});
       this.update_time_selected();
     }
     else if (this.is_number(event.key)) {
       if (this.minute_input_state === MinuteInputState.awaiting_first_digit) {
-        this.d_time = this.d_time.with_minutes(Number(event.key));
+        this.d_time = this.d_time.set({minute: Number(event.key)});
         this.update_time_selected();
         if (Number(event.key) <= 5) {
           this.minute_input_state = MinuteInputState.awaiting_second_digit;
         }
       }
       else if (this.minute_input_state === MinuteInputState.awaiting_second_digit) {
-        this.d_time = this.d_time.with_minutes(
-          this.d_time.minutes * 10 + Number(event.key));
+        this.d_time = this.d_time.set({
+          minute: this.d_time.minute * 10 + Number(event.key)
+        });
         this.minute_input_state = MinuteInputState.awaiting_first_digit;
         this.update_time_selected();
       }
@@ -210,12 +186,12 @@ export default class TimePicker extends Vue {
       this.go_to_prev_hour();
     }
     else if (event.code === "Backspace") {
-      this.d_time = this.d_time.with_hours(12);
+      this.d_time = this.d_time.set({hour: 12});
       this.update_time_selected();
     }
     else if (this.is_number(event.key)) {
       if (this.hour_input_state === HourInputState.awaiting_first_digit && event.key !== '0') {
-        this.d_time = this.d_time.with_hours(Number(event.key));
+        this.d_time = this.d_time.set({hour: Number(event.key)});
         this.update_time_selected();
         if (event.key === '1') {
           this.hour_input_state = HourInputState.first_digit_was_one;
@@ -223,10 +199,10 @@ export default class TimePicker extends Vue {
       }
       else if (this.hour_input_state === HourInputState.first_digit_was_one) {
         if (Number(event.key) > 2) {
-          this.d_time = this.d_time.with_hours(Number(event.key));
+          this.d_time = this.d_time.set({hour: Number(event.key)});
         }
         else {
-          this.d_time = this.d_time.with_hours(this.d_time.hours * 10 + Number(event.key));
+          this.d_time = this.d_time.set({hour: this.d_time.hour * 10 + Number(event.key)});
         }
         this.hour_input_state = HourInputState.awaiting_first_digit;
         this.update_time_selected();
@@ -243,16 +219,16 @@ export default class TimePicker extends Vue {
 
   toggle_period_value() {
     if (this.am_pm_str === "AM") {
-      this.d_time = Time.from_moment(this.d_time.as_moment().add(12, 'hours'));
+      this.d_time = this.d_time.set({hour: this.d_time.hour + 12});
     }
     else {
-      this.d_time = Time.from_moment(this.d_time.as_moment().subtract(12, 'hours'));
+      this.d_time = this.d_time.set({hour: this.d_time.hour - 12});
     }
     this.update_time_selected();
   }
 
   update_time_selected() {
-    this.$emit('input', this.d_time.as_moment().format('HH:mm'));
+    this.$emit('input', this.d_time.toFormat('HH:mm'));
   }
 }
 
