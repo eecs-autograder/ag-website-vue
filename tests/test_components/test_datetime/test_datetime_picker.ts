@@ -41,8 +41,8 @@ describe('DatetimePicker tests', () => {
         expect(wrapper.vm.d_date.year).toEqual(2019);
 
         let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
-        expect(time_picker.vm.d_time.hours).toEqual(13);
-        expect(time_picker.vm.d_time.minutes).toEqual(36);
+        expect(time_picker.vm.d_time.hour).toEqual(13);
+        expect(time_picker.vm.d_time.minute).toEqual(36);
     });
 
     test('Initial value null, no day highlighted until day selected', async () => {
@@ -65,8 +65,8 @@ describe('DatetimePicker tests', () => {
         expect(wrapper.vm.d_date.year).toEqual(now.getFullYear());
 
         let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
-        expect(time_picker.vm.d_time.hours).toEqual(now.getHours());
-        let minutes_diff = Math.abs(time_picker.vm.d_time.minutes - now.getMinutes());
+        expect(time_picker.vm.d_time.hour).toEqual(now.getHours());
+        let minutes_diff = Math.abs(time_picker.vm.d_time.minute - now.getMinutes());
         expect(minutes_diff).toBeLessThan(1);
 
         wrapper.vm.show();
@@ -177,8 +177,8 @@ describe('DatetimePicker tests', () => {
         expect(wrapper.vm.d_date.year).toEqual(2019);
 
         let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
-        expect(time_picker.vm.d_time.hours).toEqual(8);
-        expect(time_picker.vm.d_time.minutes).toEqual(20);
+        expect(time_picker.vm.d_time.hour).toEqual(8);
+        expect(time_picker.vm.d_time.minute).toEqual(20);
 
         await set_props(wrapper, {'value': "2021-03-08T23:49:40.746Z"});
 
@@ -190,8 +190,8 @@ describe('DatetimePicker tests', () => {
         expect(wrapper.vm.d_date.month).toEqual(3);
         expect(wrapper.vm.d_date.year).toEqual(2021);
 
-        expect(time_picker.vm.d_time.hours).toEqual(18);
-        expect(time_picker.vm.d_time.minutes).toEqual(49);
+        expect(time_picker.vm.d_time.hour).toEqual(18);
+        expect(time_picker.vm.d_time.minute).toEqual(49);
     });
 
     test("Toggle visibility of the DatetimePicker", async () => {

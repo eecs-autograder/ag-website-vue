@@ -4,6 +4,7 @@ import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 import { FullUltimateSubmissionResult } from 'ag-client-typescript';
 // @ts-ignore
 import zoom from 'chartjs-plugin-zoom';
+import { DateTime } from 'luxon';
 
 import { SafeMap } from '@/safe_map';
 
@@ -38,6 +39,7 @@ export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
                     {
                         label: 'Final Score vs. First Submission Time',
                         backgroundColor: '#f87979',
+                        // @ts-ignore  // chart.js's annotations here don't allow luxon DateTime
                         data: this.compute_data_points(),
                     }
                 ],
@@ -52,9 +54,9 @@ export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
                             unit: 'hour',
                             unitStepSize: 1,
                             displayFormats: {
-                                hour: 'MMM D, h:mm a',
+                                hour: 'MMM d, h:mm a ZZZZ',
                             },
-                            tooltipFormat: 'MMM D, YYYY, h:mm a',
+                            tooltipFormat: 'MMM d, YYYY, h:mm a ZZZZ',
                         },
                         distribution: 'linear',
                         bounds: 'data',
@@ -118,7 +120,9 @@ export default class FirstSubmissionTimeVsFinalScore extends Mixins(Scatter) {
                 * 100
             );
             result.push({
-                x: this.first_submissions_by_group.get(entry.group.pk).first_submission.timestamp,
+                x: DateTime.fromISO(
+                    this.first_submissions_by_group.get(entry.group.pk).first_submission.timestamp
+                ),
                 y: percent,
             });
         }

@@ -144,7 +144,7 @@ export default class DatetimePicker extends Vue {
   go_to_next_month() {
     if (this.d_month === this.months.length) {
       this.d_year += 1;
-      this.d_month = 1
+      this.d_month = 1;
     }
     else {
       this.d_month += 1;
