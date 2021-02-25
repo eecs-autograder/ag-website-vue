@@ -610,6 +610,8 @@ describe('Submit tests', () => {
                     discarded_files: [],
                     missing_files: {},
                     status: GradingStatus.received,
+                    grading_start_time: null,
+                    non_deferred_grading_end_time: null,
                     is_past_daily_limit: false,
                     is_bonus_submission: false,
                     count_towards_total_limit: true,

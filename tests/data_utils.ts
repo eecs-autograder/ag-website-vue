@@ -261,6 +261,8 @@ export function make_submission(group: Group, args: Partial<Submission> = {}): S
         discarded_files: [],
         missing_files: {},
         status: GradingStatus.received,
+        grading_start_time: null,
+        non_deferred_grading_end_time: null,
         count_towards_daily_limit: true,
         is_past_daily_limit: false,
         is_bonus_submission: false,
