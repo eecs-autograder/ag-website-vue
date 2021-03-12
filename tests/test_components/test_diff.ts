@@ -65,7 +65,9 @@ describe('Diff tests', () => {
             propsData: {
                 diff_contents: Promise.resolve([
                     '  line \tone\r\n',
-                    '- line \tone\r\n'
+                    '- line \tone\r\n',
+                    '  line\b\f\v\0\n',
+                    '  line \u0001\n',
                 ]),
             }
         });
@@ -75,11 +77,15 @@ describe('Diff tests', () => {
         let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
             {line_number: 2, prefix: '-', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
+            {line_number: 3, prefix: '', content: 'line\\b\\f\\v\\0\u21b5'},
+            {line_number: 4, prefix: '', content: 'line\u2219\\u0001\u21b5'},
         ];
 
         let expected_right: RenderedDiffCell[] = [
             {line_number: 1, prefix: '', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
             {line_number: '', prefix: '', content: ''},
+            {line_number: 2, prefix: '', content: 'line\\b\\f\\v\\0\u21b5'},
+            {line_number: 3, prefix: '', content: 'line\u2219\\u0001\u21b5'},
         ];
 
         do_diff_render_test(wrapper, expected_left, expected_right, true);

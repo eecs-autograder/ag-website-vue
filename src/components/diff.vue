@@ -73,7 +73,6 @@
 </template>
 
 <script lang="ts">
-import { CreateElement } from 'vue';
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import ProgressBar from './progress_bar.vue';
@@ -216,9 +215,31 @@ export default class Diff extends Vue {
     '  ': ''
   };
 
+  get whitespace_regex() {
+    // Some browsers might not yet support \p (unicode property escapes)
+    try {
+      // Match whitespace sequences and the "Other" unicode property category
+      // https://unicode.org/reports/tr18/#General_Category_Property
+      return new RegExp('[ \t\n\r\b\f\v\0]|\\p{C}', 'gu');
+    }
+    catch (e) {
+      // It's unclear how/maybe impossible to mock a constructor call, so we
+      // don't have a unit test for this fallback behavior currently.
+      // istanbul ignore next
+      return new RegExp('[ \t\n\r\b\f\v\0]', 'g');
+    }
+  }
+
   replace_whitespace(str: string): string {
-    return str.replace(/[ \t\n\r]/g, (matched) => {
-      return this.special_char_replacements[matched];
+    return str.replace(this.whitespace_regex, (matched) => {
+      if (matched in this.special_char_replacements) {
+        return this.special_char_replacements[matched];
+      }
+
+      // Replace "Other" unicode characters with their escape sequences
+      let unpadded_char_code = matched.charCodeAt(0).toString(16);
+      let num_leading_zeros = Math.max(0, 4 - unpadded_char_code.length);
+      return `\\u${('0'.repeat(num_leading_zeros) + unpadded_char_code)}`;
     });
   }
 
@@ -227,6 +248,10 @@ export default class Diff extends Vue {
     '\t': '\u21e5\t',
     '\n': '\u21b5\n',
     '\r': '\\r\r',
+    '\b': '\\b',  // backspace
+    '\f': '\\f',  // form-feed
+    '\v': '\\v',  // vertical tab
+    '\0': '\\0',  // null character
   };
 
   private get num_lines_to_show() {
