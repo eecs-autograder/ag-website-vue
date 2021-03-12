@@ -15,6 +15,7 @@ import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
+import { wait_until } from '@/tests/utils';
 
 describe('InvitationReceived tests', () => {
     let wrapper: Wrapper<InvitationReceived>;
@@ -96,7 +97,8 @@ describe('InvitationReceived tests', () => {
         expect(wrapper.findComponent({ref: 'confirm_reject_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(true);
 
-        wrapper.find('[data-testid=confirm_reject_button]').trigger('click');
+        await wrapper.find('[data-testid=confirm_reject_button]').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_accepting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let api_errors
@@ -159,7 +161,7 @@ describe('InvitationReceived tests', () => {
 
 
         wrapper.find('[data-testid=confirm_accept_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_accepting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(accept_invitation_stub.calledOnce).toBe(true);
@@ -197,7 +199,8 @@ describe('InvitationReceived tests', () => {
         expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(true);
         expect(wrapper.findComponent({ref: 'confirm_accept_modal'}).exists()).toBe(true);
 
-        wrapper.find('[data-testid=confirm_accept_button]').trigger('click');
+        await wrapper.find('[data-testid=confirm_accept_button]').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_accepting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(accept_invitation_stub.calledOnce).toBe(true);
@@ -219,13 +222,13 @@ describe('InvitationReceived tests', () => {
 
         expect(wrapper.find('[data-testid=accept_invitation_button]').element).not.toBeDisabled();
 
-        wrapper.find('[data-testid=accept_invitation_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=accept_invitation_button]').trigger('click');
 
         expect(wrapper.findComponent({ref: 'confirm_accept_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(true);
 
-        wrapper.find('[data-testid=confirm_accept_button]').trigger('click');
+        await wrapper.find('[data-testid=confirm_accept_button]').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_accepting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let api_errors

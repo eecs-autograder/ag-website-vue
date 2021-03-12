@@ -9,6 +9,8 @@ import CourseView from '@/components/course_view.vue';
 
 import * as data_ut from '@/tests/data_utils';
 
+import { wait_for_load } from '../utils';
+
 
 describe('CourseView tests', () => {
     let wrapper: Wrapper<CourseView>;
@@ -85,12 +87,9 @@ describe('CourseView tests', () => {
                 $route
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll('.project').length).toEqual(2);
-
-        expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.findAll('.cog').length).toEqual(2);
     });
 
@@ -103,12 +102,9 @@ describe('CourseView tests', () => {
                 $route
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll('.project').length).toEqual(0);
-
-        expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.find('#no-projects-message').exists()).toBe(true);
     });
 });

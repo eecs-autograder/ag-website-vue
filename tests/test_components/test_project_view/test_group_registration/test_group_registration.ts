@@ -14,6 +14,7 @@ import InvitationReceived from '@/components/project_view/group_registration/inv
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
+import { wait_for_load, wait_until } from '@/tests/utils';
 
 describe('GroupRegistration tests', () => {
     let wrapper: Wrapper<GroupRegistration>;
@@ -36,10 +37,6 @@ describe('GroupRegistration tests', () => {
         data_ut.set_global_current_user(user);
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     test('Max group size 1, automatically work alone', async () => {
         let work_alone_stub = sinon.stub(Group, 'create_solo_group').resolves(
             data_ut.make_group(project.pk, 1, {member_names: [user.username]})
@@ -51,11 +48,8 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-
+        expect(await wait_for_load(wrapper)).toBe(true);
         expect(work_alone_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_loading).toBe(false);
     });
 
     test('Min group size 2, work alone button hidden', async () => {
@@ -69,8 +63,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_loading).toBe(false);
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.find('#registration-buttons #work-alone-button').exists()).toBe(false);
         expect(
@@ -106,7 +99,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll('#registration-open').length).toEqual(1);
         expect(wrapper.vm.invitation_sent).toEqual(null);
@@ -135,10 +128,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_loading).toBe(false);
+        expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.findAll('#registration-open').length).toEqual(1);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
         expect(wrapper.vm.invitations_received.length).toEqual(0);
@@ -167,9 +157,8 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.findAll('#registration-open').length).toEqual(1);
         expect(wrapper.vm.invitation_sent).toEqual(null);
         expect(wrapper.vm.invitations_received.length).toEqual(0);
@@ -208,8 +197,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.invitations_received.length).toEqual(2);
         expect(wrapper.vm.invitations_received).toEqual(
@@ -259,7 +247,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.invitation_sent).toEqual(invitation_sent_2);
     });
@@ -274,12 +262,11 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'confirm_working_alone_modal'}).exists()).toBe(false);
 
-        wrapper.find('#work-alone-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#work-alone-button').trigger('click');
 
         expect(wrapper.findComponent({ref: 'confirm_working_alone_modal'}).exists()).toBe(true);
 
@@ -302,20 +289,20 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.invitation_sent).toBeNull();
         expect(wrapper.vm.invitations_received.length).toEqual(0);
         expect(wrapper.findComponent({ref: 'confirm_working_alone_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(false);
 
-        wrapper.find('#work-alone-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#work-alone-button').trigger('click');
 
         expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(true);
         expect(wrapper.findComponent({ref: 'confirm_working_alone_modal'}).exists()).toBe(true);
 
-        wrapper.find('#confirm-working-alone-button').trigger('click');
+        await wrapper.find('#confirm-working-alone-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_awaiting_action)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(work_alone_stub.callCount).toEqual(1);
@@ -340,20 +327,22 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.invitation_sent).toBeNull();
         expect(wrapper.vm.invitations_received.length).toEqual(0);
         expect(wrapper.findComponent({ref: 'confirm_working_alone_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(false);
 
-        wrapper.find('#work-alone-button').trigger('click');
+        await wrapper.find('#work-alone-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_awaiting_action)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findComponent({ref: 'confirm_working_alone_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(true);
 
-        wrapper.find('#confirm-working-alone-button').trigger('click');
+        await wrapper.find('#confirm-working-alone-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_awaiting_action)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(work_alone_stub.callCount).toEqual(1);
@@ -383,7 +372,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'delete_invitation_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_delete_invitation_modal).toBe(false);
@@ -395,8 +384,7 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findComponent({ref: 'delete_invitation_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_delete_invitation_modal).toBe(true);
 
-        wrapper.find('#confirm-keep-sent-invitation-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#confirm-keep-sent-invitation-button').trigger('click');
 
         expect(reject_invitation_stub.callCount).toEqual(0);
         expect(wrapper.findComponent({ref: 'delete_invitation_modal'}).exists()).toBe(false);
@@ -423,7 +411,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'delete_invitation_modal'}).exists()).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
@@ -434,7 +422,8 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findComponent({ref: 'delete_invitation_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_delete_invitation_modal).toBe(true);
 
-        wrapper.find('#confirm-delete-invitation-button').trigger('click');
+        await wrapper.find('#confirm-delete-invitation-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting_invitation)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
@@ -469,7 +458,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'delete_invitation_modal'}).exists()).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(group_invitation_sent);
@@ -480,7 +469,8 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findComponent({ref: 'delete_invitation_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_delete_invitation_modal).toBe(true);
 
-        wrapper.find('#confirm-delete-invitation-button').trigger('click');
+        await wrapper.find('#confirm-delete-invitation-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting_invitation)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(reject_invitation_stub.calledOnce).toBe(true);
@@ -504,20 +494,18 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(null);
 
-        wrapper.find('#send-group-invitation-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#send-group-invitation-button').trigger('click');
 
         expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
 
-        wrapper.find('#cancel-send-invitation-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#cancel-send-invitation-button').trigger('click');
 
         expect(send_invitation_stub.callCount).toEqual(0);
         expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
@@ -544,18 +532,18 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(null);
 
-        wrapper.find('#send-group-invitation-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#send-group-invitation-button').trigger('click');
 
         expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
 
         wrapper.findComponent({ref: 'send_invitation_form'}).vm.$emit('submit', ['milo@umich.edu']);
+        expect(await wait_until(wrapper, w => !w.vm.d_sending_invitation)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(true);
@@ -586,19 +574,19 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(false);
         expect(wrapper.vm.invitation_sent).toEqual(null);
 
-        wrapper.find('#send-group-invitation-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('#send-group-invitation-button').trigger('click');
 
         expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
 
         wrapper.findComponent({ref: 'send_invitation_form'}).vm.$emit('submit', [user.username]);
+        expect(await wait_until(wrapper, w => !w.vm.d_sending_invitation)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(send_invitation_stub.calledOnce).toBe(true);
@@ -653,9 +641,7 @@ describe('GroupRegistration tests', () => {
                 course: course
             }
         });
-        await wrapper.vm.$nextTick();
-        // this second await needs to be here for the invitation_received component to render
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAllComponents({ref: 'invitation_received'}).length).toEqual(4);
         expect(wrapper.vm.invitations_received.length).toEqual(4);

@@ -18,10 +18,10 @@ export class CurrentTabMixin extends Vue {
         return new Set(this.d_loaded_tabs);
     }
 
-    protected initialize_current_tab(default_val: string) {
+    protected async initialize_current_tab(default_val: string) {
         let requested_tab = get_query_param(this.$route.query, "current_tab");
         if (requested_tab !== null) {
-            this.set_current_tab(requested_tab);
+            await this.set_current_tab(requested_tab);
         }
         else {
             this.d_current_tab = default_val;
@@ -29,9 +29,9 @@ export class CurrentTabMixin extends Vue {
         }
     }
 
-    protected set_current_tab(tab_id: string) {
+    protected async set_current_tab(tab_id: string) {
         this.d_current_tab = tab_id;
-        this.$router.replace({query: {...this.$route.query, current_tab: tab_id}});
+        await this.$router.replace({query: {...this.$route.query, current_tab: tab_id}});
         this.mark_tab_as_loaded(tab_id);
     }
 

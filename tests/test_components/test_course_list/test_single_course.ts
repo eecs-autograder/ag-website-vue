@@ -7,7 +7,7 @@ import { assert_not_null } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { expect_html_element_has_value, set_data, set_validated_input_text, validated_input_is_valid } from '@/tests/utils';
+import { expect_html_element_has_value, set_data, set_validated_input_text, validated_input_is_valid, wait_until } from '@/tests/utils';
 
 
 describe('SingleCourse.vue', () => {
@@ -201,6 +201,7 @@ describe('SingleCourse.vue', () => {
             new HttpError(400, {__all__: "This data is bad."})
         );
         await wrapper.findComponent({ref: 'clone_course_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_cloning)).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(copy_course_stub.calledOnce);

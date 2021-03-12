@@ -681,7 +681,7 @@ describe('DropdownTypeahead.vue', () => {
         choices.push('4');
         expect(wrapper.vm.filtered_choices).toEqual(choices);
 
-        wrapper.setProps({choices: ['new1', 'new2']});
+        await wrapper.setProps({choices: ['new1', 'new2']});
         expect(wrapper.vm.filtered_choices).toEqual(['new1', 'new2']);
     });
 });

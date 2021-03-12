@@ -450,58 +450,56 @@ describe('ViewFile handgrading tests', () => {
     });
 
     test('Highlighting events ignored while saving', async () => {
-        wrapper.setData({d_saving: true});
-        await wrapper.vm.$nextTick();
+        await wrapper.setData({d_saving: true});
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
         let code_lines = wrapper.findAllComponents({ref: 'code_line'});
-        code_lines.at(0).trigger('mousedown');
-        code_lines.at(1).trigger('mouseenter');
-        code_lines.at(2).trigger('mouseenter');
-        code_lines.at(2).trigger('mouseup');
+        await code_lines.at(0).trigger('mousedown');
+        await code_lines.at(1).trigger('mouseenter');
+        await code_lines.at(2).trigger('mouseenter');
+        await code_lines.at(2).trigger('mouseup');
 
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
     });
 
-    test('Highlight events out of order ignored', () => {
+    test('Highlight events out of order ignored', async () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
         let code_lines = wrapper.findAllComponents({ref: 'code_line'});
-        code_lines.at(0).trigger('mouseenter');
+        await code_lines.at(0).trigger('mouseenter');
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        code_lines.at(0).trigger('mouseup');
+        await code_lines.at(0).trigger('mouseup');
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        code_lines.at(0).trigger('mousedown');
-        code_lines.at(1).trigger('mousedown');
+        await code_lines.at(0).trigger('mousedown');
+        await code_lines.at(1).trigger('mousedown');
         expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
         expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
     });
 
     test('Highlighting disabled when context menu open', async () => {
         let code_lines = wrapper.findAllComponents({ref: 'code_line'});
-        code_lines.at(0).trigger('mousedown');
-        code_lines.at(0).trigger('mouseup');
-        await wrapper.vm.$nextTick();
+        await code_lines.at(0).trigger('mousedown');
+        await code_lines.at(0).trigger('mouseup');
         expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).element).toBeVisible();
 
         expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
         expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
 
-        code_lines.at(1).trigger('mouseenter');
-        code_lines.at(2).trigger('mouseenter');
-        code_lines.at(3).trigger('mouseenter');
+        await code_lines.at(1).trigger('mouseenter');
+        await code_lines.at(2).trigger('mouseenter');
+        await code_lines.at(3).trigger('mouseenter');
         expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
         expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
 
-        code_lines.at(4).trigger('mousedown');
-        code_lines.at(4).trigger('mouseup');
+        await code_lines.at(4).trigger('mousedown');
+        await code_lines.at(4).trigger('mouseup');
         expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
         expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
     });
@@ -534,10 +532,10 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
         let code_lines = wrapper.findAllComponents({ref: 'code_line'});
-        code_lines.at(0).trigger('mousedown');
-        code_lines.at(1).trigger('mouseenter');
-        code_lines.at(2).trigger('mouseenter');
-        code_lines.at(2).trigger('mouseup');
+        await code_lines.at(0).trigger('mousedown');
+        await code_lines.at(1).trigger('mouseenter');
+        await code_lines.at(2).trigger('mouseenter');
+        await code_lines.at(2).trigger('mouseup');
 
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
@@ -554,11 +552,11 @@ describe('ViewFile handgrading tests', () => {
                 enable_custom_comments: false,
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let code_lines = wrapper.findAllComponents({ref: 'code_line'});
-        code_lines.at(0).trigger('mousedown');
-        code_lines.at(0).trigger('mouseup');
+        await code_lines.at(0).trigger('mousedown');
+        await code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).element).toBeVisible();

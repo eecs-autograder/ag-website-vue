@@ -188,6 +188,7 @@ describe('Initialize handgrading tests', () => {
         expect(wrapper.vm.d_selected_course_projects).toEqual([]);
         await set_select_object_value(
             wrapper.findComponent({ref: 'course_to_import_from'}), course_to_import_from.pk);
+        await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_project_to_import_from).toBeNull();
         expect(wrapper.vm.d_selected_course_projects).toEqual(
@@ -431,16 +432,11 @@ describe('Criteria and annotation tests', () => {
                 project: current_project
             }
         });
-
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.vm.d_handgrading_rubric).toEqual(rubric);
 
         expect(wrapper.findAllComponents({name: 'SingleCriterion'}).length).toEqual(2);
         expect(wrapper.findAllComponents({name: 'SingleAnnotation'}).length).toEqual(2);
-    });
-
-    afterEach(() => {
-        sinon.restore();
     });
 
     test('Create criterion', async () => {
@@ -464,6 +460,7 @@ describe('Criteria and annotation tests', () => {
         expect(wrapper.find('[data-testid=create_criterion_button]').element).not.toBeDisabled();
 
         criterion_form.vm.submit();
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_criterion)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({ref: 'create_criterion_modal'}).exists()).toBe(false);
 
@@ -487,7 +484,7 @@ describe('Criteria and annotation tests', () => {
             = <Wrapper<CriterionForm>> wrapper.findComponent({ref: 'create_criterion_form'});
         criterion_form.vm.submit();
 
-        await wrapper.vm.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_criterion)).toBe(true);
         expect(api_errors.d_api_errors.length).toEqual(1);
         expect(wrapper.findComponent({ref: 'create_criterion_modal'}).exists()).toBe(true);
     });
@@ -545,6 +542,7 @@ describe('Criteria and annotation tests', () => {
         expect(wrapper.find('[data-testid=create_annotation_button]').element).not.toBeDisabled();
 
         annotation_form.vm.submit();
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_annotation)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({ref: 'create_annotation_modal'}).exists()).toBe(false);
 
@@ -568,6 +566,7 @@ describe('Criteria and annotation tests', () => {
             = <Wrapper<AnnotationForm>> wrapper.findComponent({ref: 'create_annotation_form'});
         annotation_form.vm.submit();
 
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_annotation)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(api_errors.d_api_errors.length).toEqual(1);
         expect(wrapper.findComponent({ref: 'create_annotation_modal'}).exists()).toBe(true);

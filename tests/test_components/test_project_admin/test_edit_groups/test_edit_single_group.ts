@@ -132,7 +132,8 @@ describe('EditSingleGroup tests', () => {
             )
         );
 
-        wrapper.findComponent({ref: 'edit_group_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'edit_group_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;

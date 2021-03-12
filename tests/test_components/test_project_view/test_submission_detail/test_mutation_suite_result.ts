@@ -6,6 +6,7 @@ import * as sinon from 'sinon';
 import MutationSuiteResult from '@/components/project_view/submission_detail/mutation_suite_result.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { wait_fixed } from '@/tests/utils';
 let group: ag_cli.Group;
 let mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
 let submission: ag_cli.Submission;
@@ -566,7 +567,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
 
         // show
         wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
@@ -593,7 +594,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
 
         // show again
         wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
@@ -689,8 +690,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
 
         // show
         wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
@@ -717,7 +717,7 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
 
         // show again
         wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
@@ -856,7 +856,7 @@ describe('MutationSuiteResult student tests section tests', () => {
 
         // show
         wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
@@ -886,7 +886,7 @@ describe('MutationSuiteResult student tests section tests', () => {
 
         // show again
         wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
@@ -989,8 +989,7 @@ describe('MutationSuiteResult student tests section tests', () => {
 
         // show
         wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
@@ -1020,7 +1019,7 @@ describe('MutationSuiteResult student tests section tests', () => {
 
         // show again
         wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
@@ -1357,8 +1356,7 @@ describe('MutationSuiteResult validity check related tests', () => {
 
         // show
         wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
@@ -1388,7 +1386,7 @@ describe('MutationSuiteResult validity check related tests', () => {
 
         // show again
         wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
@@ -1492,8 +1490,7 @@ describe('MutationSuiteResult validity check related tests', () => {
 
         // show
         wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
@@ -1523,7 +1520,7 @@ describe('MutationSuiteResult validity check related tests', () => {
 
         // show again
         wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
@@ -1840,6 +1837,7 @@ async function make_wrapper() {
             fdbk_category: ag_cli.FeedbackCategory.max
         }
     });
+
 
     for (let i = 0; i < 9; ++i) {
         await wrapper.vm.$nextTick();

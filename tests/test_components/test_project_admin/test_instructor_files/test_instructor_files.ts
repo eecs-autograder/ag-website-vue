@@ -167,8 +167,8 @@ describe('InstructorFiles.vue', () => {
         sinon.stub(InstructorFile, 'create').rejects(
             new HttpError(413, 'Too large'));
 
-        final_upload_button.trigger('click');
-        await wrapper.vm.$nextTick();
+        await final_upload_button.trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_uploading)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;

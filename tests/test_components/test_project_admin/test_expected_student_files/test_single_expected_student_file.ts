@@ -7,6 +7,8 @@ import APIErrors from '@/components/api_errors.vue';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import SingleExpectedStudentFile from '@/components/project_admin/expected_student_files/single_expected_student_file.vue';
 
+import { wait_until } from '@/tests/utils';
+
 
 describe('ExpectedStudentFiles tests', () => {
     let wrapper: Wrapper<SingleExpectedStudentFile>;
@@ -96,6 +98,8 @@ describe('ExpectedStudentFiles tests', () => {
         await component.$nextTick();
 
         await wrapper.findComponent({ref: 'form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+        await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBeGreaterThan(0);

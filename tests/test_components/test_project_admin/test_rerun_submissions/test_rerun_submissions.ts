@@ -120,8 +120,8 @@ describe('Rerun list tests', () => {
 
     test('Manual refresh', async () => {
         let wrapper = await make_wrapper();
-        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun));
         expect(wrapper.find('.progress-cell').text()).toEqual('0%');
         expect(wrapper.find('.refresh-icon').exists()).toBe(true);
 
@@ -129,7 +129,7 @@ describe('Rerun list tests', () => {
         updated.progress = 100;
         sinon.stub(ag_cli.RerunSubmissionTask, 'get_by_pk').withArgs(
             new_tasks[0].pk).resolves(updated);
-        wrapper.find('.refresh-icon').trigger('click');
+        await wrapper.find('.refresh-icon').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find('.progress-cell').text()).toEqual('100%');

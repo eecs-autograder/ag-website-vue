@@ -812,7 +812,7 @@ describe('AGTestCaseResult tests concerning props', () => {
             }
         );
 
-        wrapper.setProps({ag_test_case_result: updated_ag_test_case_result});
+        await wrapper.setProps({ag_test_case_result: updated_ag_test_case_result});
 
         expect(wrapper.vm.command_result_correctness(
             wrapper.vm.ag_test_case_result.ag_test_command_results[0]

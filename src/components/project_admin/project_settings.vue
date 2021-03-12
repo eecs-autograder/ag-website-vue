@@ -537,7 +537,7 @@ export default class ProjectSettings extends Vue {
   async delete_project() {
     return toggle(this, 'd_deleting', async () => {
       await this.project.delete();
-      this.$router.push({
+      return this.$router.push({
         name: 'course_admin',
         params: {course_id: this.project.course.toString()},
         query: {current_tab: 'projects'}

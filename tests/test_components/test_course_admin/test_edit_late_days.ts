@@ -39,7 +39,7 @@ test('Select and edit student from list', async () => {
     sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, users[1].username).resolves({late_days_remaining: 3});
     wrapper.findComponent({ref: 'lookup'}).vm.$emit('item_selected', users[1].username);
-    await wrapper.vm.$nextTick();
+    expect(await wait_until(wrapper, w => !w.vm.d_searching)).toBe(true);
 
     expect(get_validated_input_text(wrapper.findComponent({ref: 'late_days_input'}))).toEqual('3');
     expect(validated_input_is_valid(wrapper.findComponent({ref: 'late_days_input'}))).toBe(true);
@@ -118,10 +118,12 @@ test('API Errors handled on save', async () => {
         course.pk, users[1].username).resolves({late_days_remaining: 3});
     wrapper.findComponent({ref: 'lookup'}).vm.$emit('item_selected', users[1].username);
     await wrapper.vm.$nextTick();
+    expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
     sinon.stub(ag_cli.User, 'set_num_late_days').rejects(new ag_cli.HttpError(403, ''));
     await wrapper.findComponent({ref: 'late_day_form'}).trigger('submit');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+    await wrapper.vm.$nextTick();
 
     expect(find_by_name<APIErrors>(wrapper, 'APIErrors').vm.d_api_errors.length).toEqual(1);
 });

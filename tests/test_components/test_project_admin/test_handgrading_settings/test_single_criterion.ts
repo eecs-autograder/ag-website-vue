@@ -7,6 +7,8 @@ import APIErrors from "@/components/api_errors.vue";
 import CriterionForm from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import SingleCriterion from "@/components/project_admin/handgrading_settings/single_criterion.vue";
 
+import { wait_until } from "@/tests/utils";
+
 let criterion: Criterion;
 
 beforeEach(() => {
@@ -122,8 +124,8 @@ describe('Save criterion tests', () => {
         expect(api_errors.d_api_errors.length).toEqual(0);
 
         expect(wrapper.vm.d_criterion_form_is_valid).toEqual(true);
-        wrapper.findComponent({ref: 'criterion_form'}).trigger('submit');
-
+        await wrapper.findComponent({ref: 'criterion_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(api_errors.d_api_errors.length).toEqual(1);
@@ -144,7 +146,8 @@ describe('Delete criterion tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);
 
-        wrapper.find('.delete-button').trigger('click');
+        await wrapper.find('.delete-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(delete_stub.calledOnce).toEqual(true);
         expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(false);
@@ -155,7 +158,7 @@ describe('Delete criterion tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);
 
-        wrapper.find('.cancel-delete-button').trigger('click');
+        await wrapper.find('.cancel-delete-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(delete_stub.called).toEqual(false);
         expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(false);
@@ -171,7 +174,8 @@ describe('Delete criterion tests', () => {
 
         delete_stub.returns(Promise.reject(new HttpError(403, 'Permission denied')));
 
-        wrapper.find('.delete-button').trigger('click');
+        await wrapper.find('.delete-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(api_errors.d_api_errors.length).toEqual(1);
         expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);

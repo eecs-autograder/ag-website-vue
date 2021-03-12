@@ -322,7 +322,7 @@ test('Update suites order', async () => {
     ];
     get_all_suites_from_project.resolves(suites);
     let wrapper = make_wrapper();
-    await wrapper.vm.$nextTick();
+    expect(await wait_for_load(wrapper)).toBe(true);
 
     wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('change');
     await wrapper.vm.$nextTick();
@@ -341,7 +341,7 @@ test('Original order restored after bad update suites order request', async () =
     ];
     get_all_suites_from_project.resolves(suites.slice());
     let wrapper = make_wrapper();
-    await wrapper.vm.$nextTick();
+    expect(await wait_for_load(wrapper)).toBe(true);
 
     wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('start');
     await wrapper.vm.$nextTick();

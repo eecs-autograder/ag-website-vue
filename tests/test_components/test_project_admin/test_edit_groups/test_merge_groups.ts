@@ -136,7 +136,7 @@ describe('MergeGroups tests', () => {
             )
         ));
 
-        wrapper.find('#merge-groups-button').trigger('click');
+        await wrapper.find('#merge-groups-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;

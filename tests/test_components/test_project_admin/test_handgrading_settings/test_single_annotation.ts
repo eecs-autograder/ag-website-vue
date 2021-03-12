@@ -7,6 +7,8 @@ import APIErrors from "@/components/api_errors.vue";
 import AnnotationForm from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 import SingleAnnotation from "@/components/project_admin/handgrading_settings/single_annotation.vue";
 
+import { wait_until } from "@/tests/utils";
+
 let annotation: Annotation;
 
 beforeEach(() => {
@@ -102,9 +104,8 @@ describe('Save annotation tests', () => {
             long_description: 'new long description',
         };
 
-        wrapper.findComponent({ref: 'annotation_form'}).trigger('submit');
-
-        await wrapper.vm.$nextTick();
+        await wrapper.findComponent({ref: 'annotation_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
         expect(save_stub.calledOnce).toEqual(true);
         expect(wrapper.vm.d_edit_mode).toEqual(false);
@@ -133,8 +134,8 @@ describe('Save annotation tests', () => {
         expect(api_errors.d_api_errors.length).toEqual(0);
 
         expect(wrapper.vm.d_annotation_form_is_valid).toEqual(true);
-        wrapper.findComponent({ref: 'annotation_form'}).trigger('submit');
-
+        await wrapper.findComponent({ref: 'annotation_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(api_errors.d_api_errors.length).toEqual(1);
@@ -155,7 +156,8 @@ describe('Delete annotation tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(true);
 
-        wrapper.find('.delete-button').trigger('click');
+        await wrapper.find('.delete-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(delete_stub.calledOnce).toEqual(true);
         expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(false);
@@ -166,8 +168,7 @@ describe('Delete annotation tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(true);
 
-        wrapper.find('.cancel-delete-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('.cancel-delete-button').trigger('click');
         expect(delete_stub.called).toEqual(false);
         expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(false);
     });
@@ -182,7 +183,8 @@ describe('Delete annotation tests', () => {
 
         delete_stub.returns(Promise.reject(new HttpError(403, 'Permission denied')));
 
-        wrapper.find('.delete-button').trigger('click');
+        await wrapper.find('.delete-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(api_errors.d_api_errors.length).toEqual(1);
         expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(true);

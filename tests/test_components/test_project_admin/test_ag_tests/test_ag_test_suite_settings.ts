@@ -19,6 +19,7 @@ import {
     set_validated_input_text,
     validated_input_is_valid,
     wait_for_load,
+    wait_until,
 } from '@/tests/utils';
 
 
@@ -160,6 +161,8 @@ describe('AGTestSuiteSettings tests', () => {
         );
 
         await wrapper.get('[data-testid=ag_test_suite_settings_form]').trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+        await wrapper.vm.$nextTick();
         expect(save_stub.calledOnce).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
@@ -191,11 +194,10 @@ describe('AGTestSuiteSettings tests', () => {
         sinon.stub(wrapper.vm.d_ag_test_suite!, 'delete').rejects(new ag_cli.HttpError(403, 'err'));
         await wrapper.vm.$nextTick();
 
-        wrapper.get('.delete-ag-test-suite-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.get('.delete-ag-test-suite-button').trigger('click');
 
-        wrapper.get('.modal-delete-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.get('.modal-delete-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
@@ -232,10 +234,6 @@ describe('AG test suite feedback tests', () => {
         sinon.stub(ag_cli.SandboxDockerImage, 'get_images').returns(Promise.resolve([]));
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     test('Normal fdbk binding', async () => {
         ag_test_suite.normal_fdbk_config = data_ut.make_ag_test_suite_fdbk_config({
             show_setup_return_code: true,
@@ -248,8 +246,7 @@ describe('AG test suite feedback tests', () => {
                 project: project
             }
         });
-
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let normal_config_panel
             = <Wrapper<FeedbackConfigPanel>> wrapper.findComponent({ref: 'normal_config_panel'});
@@ -287,7 +284,8 @@ describe('AG test suite feedback tests', () => {
                 project: project
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
+
 
         let final_graded_config_panel = <Wrapper<FeedbackConfigPanel>> wrapper.findComponent({
             ref: 'final_graded_config_panel'
@@ -328,7 +326,8 @@ describe('AG test suite feedback tests', () => {
                 project: project
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
+
 
         let past_limit_config_panel = <Wrapper<FeedbackConfigPanel>> wrapper.findComponent({
             ref: 'past_limit_config_panel'
@@ -369,7 +368,8 @@ describe('AG test suite feedback tests', () => {
                 project: project
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
+
 
         let student_lookup_config_panel = <Wrapper<FeedbackConfigPanel>> wrapper.findComponent({
             ref: 'student_lookup_config_panel'

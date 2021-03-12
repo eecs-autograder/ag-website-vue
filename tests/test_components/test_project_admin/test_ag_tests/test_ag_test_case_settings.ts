@@ -16,7 +16,8 @@ import * as data_ut from '@/tests/data_utils';
 import {
     get_validated_input_text,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
+    wait_until
 } from '@/tests/utils';
 
 describe('AG test case settings form tests', () => {
@@ -99,7 +100,8 @@ describe('AG test case settings form tests', () => {
             )
         );
 
-        wrapper.findComponent({ref: 'ag_test_case_settings_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'ag_test_case_settings_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
         await component.$nextTick();
 
         expect(save_case_stub.calledOnce).toBe(true);

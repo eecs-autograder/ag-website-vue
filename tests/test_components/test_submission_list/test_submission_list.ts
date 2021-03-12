@@ -9,7 +9,7 @@ import * as utils from '@/utils';
 
 
 import * as data_ut from '@/tests/data_utils';
-import { wait_for_load } from '@/tests/utils';
+import { wait_fixed, wait_for_load } from '@/tests/utils';
 
 let user: ag_cli.User;
 let course: ag_cli.Course;
@@ -50,11 +50,8 @@ describe('Submission list tests', () => {
                 group: group,
             }
         });
+        expect(await wait_for_load(wrapper)).toBe(true);
 
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_loading).toBe(false);
         expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(0);
         expect(wrapper.findAll('.active').length).toEqual(0);
         expect(wrapper.vm.d_selected_submission).toBeNull();
@@ -71,9 +68,7 @@ describe('Submission list tests', () => {
                 group: group,
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'submission_detail'}).exists()).toBe(false);
     });
@@ -92,9 +87,7 @@ describe('Submission list tests', () => {
                 group: group,
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_selected_submission).toEqual(submission1);
         expect(wrapper.findComponent({ref: 'submission_detail'}).exists()).toBe(true);
@@ -183,9 +176,8 @@ describe('Submission list tests', () => {
                 group: group,
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
         expect(
@@ -193,9 +185,8 @@ describe('Submission list tests', () => {
         ).toEqual(1);
         expect(wrapper.vm.d_submissions).toEqual([current_group_submission]);
 
-        wrapper.setProps({group: other_group});
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({group: other_group});
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
         expect(
@@ -219,9 +210,7 @@ describe('Submission list tests', () => {
                 group: group,
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(1);
         expect(wrapper.vm.d_submissions).toEqual([submission]);
@@ -276,9 +265,7 @@ describe('Submission list tests', () => {
                 group: group,
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let other_group = data_ut.make_group(project.pk);
         let other_submission = data_ut.make_submission(other_group);
@@ -368,8 +355,7 @@ describe('Ultimate submission tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.vm.d_ultimate_submission).toBeNull();
     });
 
@@ -383,8 +369,7 @@ describe('Ultimate submission tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.vm.d_ultimate_submission).toBeNull();
     });
 });
@@ -418,8 +403,7 @@ describe('Polling tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_submissions).toEqual([submission]);
         resolve_sleep();
@@ -447,13 +431,11 @@ describe('Polling tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_submissions).toEqual([submission]);
         resolve_sleep();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 5);
 
         expect(get_submissions_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_submissions).toEqual([new_submission, submission]);
@@ -487,13 +469,11 @@ describe('Polling tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.vm.d_submissions).toEqual([submission]);
         resolve_sleep();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 5);
 
         expect(get_submissions_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_submissions).toEqual([submission_with_updated_results]);
@@ -508,8 +488,7 @@ describe('Polling tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let current_poller = wrapper.vm.plain_submissions_poller;
         expect(current_poller!.continue).toBe(true);
@@ -517,9 +496,8 @@ describe('Polling tests', () => {
         let current_resolve_sleep = resolve_sleep;
 
         let new_group = data_ut.make_group(project.pk);
-        wrapper.setProps({group: new_group});
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({group: new_group});
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         current_resolve_sleep();
         await wrapper.vm.$nextTick();
@@ -541,8 +519,7 @@ describe('Polling tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let current_poller = wrapper.vm.plain_submissions_poller;
         expect(current_poller!.continue).toBe(true);

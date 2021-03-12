@@ -19,7 +19,8 @@ import {
     emitted,
     get_validated_input_text,
     set_validated_input_text,
-    validated_input_is_valid
+    validated_input_is_valid,
+    wait_until
 } from '@/tests/utils';
 
 
@@ -193,6 +194,8 @@ describe('AGTestSuitePanel tests', () => {
         await wrapper.vm.$nextTick();
 
         await wrapper.findComponent({ref: 'create_ag_test_case_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_case)).toBe(true);
+        await wrapper.vm.$nextTick();
 
         expect(create_case_stub.calledOnce).toBe(true);
         expect(create_case_stub.firstCall.args[1].name).toEqual("Casey");
@@ -227,6 +230,8 @@ describe('AGTestSuitePanel tests', () => {
         await wrapper.vm.$nextTick();
 
         await wrapper.findComponent({ref: 'create_ag_test_case_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_case)).toBe(true);
+        await wrapper.vm.$nextTick();
 
         expect(create_case_stub.calledOnce).toBe(true);
         expect(create_case_stub.firstCall.args[1].name).toEqual("Casey");
@@ -289,6 +294,8 @@ describe('AGTestSuitePanel tests', () => {
         await wrapper.vm.$nextTick();
 
         await wrapper.findComponent({ref: 'create_ag_test_case_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_case)).toBe(true);
+        await wrapper.vm.$nextTick();
         expect(create_case_stub.callCount).toEqual(1);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'new_ag_test_case_api_errors'}).vm;
