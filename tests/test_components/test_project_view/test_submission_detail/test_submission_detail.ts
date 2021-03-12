@@ -291,6 +291,7 @@ describe('Submitted files tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(get_file_content_stub.callCount).toEqual(1);
+        // tslint:disable-next-line:deprecation
         expect(FileSaver.saveAs).toBeCalled();
     });
 

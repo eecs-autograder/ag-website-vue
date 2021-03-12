@@ -13,7 +13,7 @@ import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { compress_whitespace, emitted, find_by_name, find_component, set_data } from '@/tests/utils';
+import { compress_whitespace, emitted, find_by_name, find_component, set_data, wait_fixed, wait_for_load, wait_until } from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -398,7 +398,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
         expect(wrapper.find('#late-days-remaining').exists()).toBe(false);
     });
 
@@ -412,7 +412,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(
             compress_whitespace(wrapper.find('#late-days-remaining').text())
@@ -429,7 +429,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
 
         expect(
             compress_whitespace(wrapper.find('#late-days-remaining').text())
@@ -448,7 +448,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
                 group: group,
             }
         });
-        await wrapper.vm.$nextTick();
+        await wait_fixed(wrapper, 3);
         expect(wrapper.find('#late-days-remaining').exists()).toBe(false);
 
         expect(late_days_stub.notCalled).toBe(true);
@@ -643,7 +643,8 @@ describe('Submit tests', () => {
         expect(wrapper.vm.d_submit_progress).toEqual(0);
 
         let submit_button = wrapper.find('[data-testid=submit_button]');
-        submit_button.trigger('click');
+        await submit_button.trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_submitting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(submit_stub.calledWith(group.pk, files_to_submit)).toBe(true);
@@ -675,8 +676,8 @@ describe('Submit tests', () => {
         await wrapper.vm.$nextTick();
 
         let submit_button = wrapper.find('[data-testid=submit_button]');
-        submit_button.trigger('click');
-        await wrapper.vm.$nextTick();
+        await submit_button.trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_submitting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let api_errors = <Wrapper<APIErrors>> wrapper.findComponent({ref: 'api_errors'});

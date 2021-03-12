@@ -156,10 +156,10 @@ export default class CourseAdmin extends CurrentTabMixin implements CourseObserv
 
     let requested_tab = get_query_param(this.$route.query, "current_tab");
     if (requested_tab === 'late_days' && this.d_course!.num_late_days === 0) {
-      this.set_current_tab('settings');
+      await this.set_current_tab('settings');
     }
     else {
-      this.initialize_current_tab('settings');
+      await this.initialize_current_tab('settings');
     }
 
     let query_val = get_query_param(this.$route.query, 'current_tab');

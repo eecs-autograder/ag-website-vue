@@ -153,7 +153,7 @@ export default class CourseSettings extends Vue {
   delete_course() {
     return toggle(this, 'd_deleting', async () => {
       await this.course.delete();
-      this.$router.push({name: 'course_list'});
+      return this.$router.push({name: 'course_list'});
     });
   }
 }

@@ -155,7 +155,7 @@ export default class ProjectView extends Vue implements GroupObserver {
 
     await this.d_globals.set_current_project(this.project, this.course);
     await Promise.all([this.load_handgrading(), this.load_handgrading_result()]);
-    this.initialize_current_tab();
+    await this.initialize_current_tab();
 
     Group.subscribe(this);
     this.d_loading = false;
@@ -165,10 +165,10 @@ export default class ProjectView extends Vue implements GroupObserver {
     Group.unsubscribe(this);
   }
 
-  private initialize_current_tab() {
+  private async initialize_current_tab() {
     let requested_tab = get_query_param(this.$route.query, "current_tab");
     if (requested_tab !== null) {
-      this.set_current_tab(requested_tab);
+      await this.set_current_tab(requested_tab);
     }
     else {
       if (this.d_globals.user_roles.is_handgrader) {
@@ -178,7 +178,7 @@ export default class ProjectView extends Vue implements GroupObserver {
     }
   }
 
-  private set_current_tab(tab_id: string) {
+  private async set_current_tab(tab_id: string) {
     if (tab_id === 'my_submissions' && this.group === null
         || tab_id === 'handgrading' && this.handgrading_rubric === null
         || tab_id === 'handgrading_result' && this.handgrading_result === null) {
@@ -186,7 +186,7 @@ export default class ProjectView extends Vue implements GroupObserver {
     }
 
     this.d_current_tab = tab_id;
-    this.$router.replace({query: {...this.$route.query, current_tab: tab_id}});
+    await this.$router.replace({query: {...this.$route.query, current_tab: tab_id}});
     this.mark_tab_as_loaded(tab_id);
   }
 
@@ -233,8 +233,8 @@ export default class ProjectView extends Vue implements GroupObserver {
   }
 
   @handle_global_errors_async
-  on_submit() {
-    this.set_current_tab('my_submissions');
+  async on_submit() {
+    await this.set_current_tab('my_submissions');
     return this.group!.refresh();
   }
 

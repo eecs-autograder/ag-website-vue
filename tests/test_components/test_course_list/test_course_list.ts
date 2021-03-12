@@ -145,8 +145,7 @@ describe('CourseList tests', () => {
 
         wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(2);
         expect(component.courses_by_term.length).toEqual(1);
@@ -175,8 +174,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         copy_of_course.name = "EECS 281";
         copy_of_course.year = 2018;
@@ -203,8 +201,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let course_displayed = wrapper.find('.course');
         expect(course_displayed.html()).toContain(fall18_eecs280.name);
@@ -225,7 +222,7 @@ describe('CourseList tests', () => {
          stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await component.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(component.is_admin(fall18_eecs280)).toBe(true);
         expect(component.is_admin(fall18_eecs370)).toBe(false);
@@ -247,8 +244,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(1);
         expect(component.d_all_courses!.courses_is_admin_for[0]).toEqual(fall18_eecs280);
@@ -287,8 +283,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(component.courses_by_term.length).toBe(0);
         expect(wrapper.text()).toContain("You are not enrolled in any courses.");
@@ -307,8 +302,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let all_terms = wrapper.findAll('.semester-name');
 
@@ -334,8 +328,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll('.single-semester-container').length).toEqual(1);
         let fall_2018_courses = wrapper.findAllComponents({name: 'SingleCourse'});
@@ -359,7 +352,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await component.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(component.courses_by_term[0].term.semester).toEqual(Semester.fall);
         expect(component.courses_by_term[0].term.year).toEqual(2018);
@@ -393,7 +386,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await component.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let fall_18_term = component.courses_by_term[0];
         expect(fall_18_term.term.semester).toEqual(Semester.fall);
@@ -404,7 +397,7 @@ describe('CourseList tests', () => {
         expect(fall_18_term.course_list[2]).toEqual(fall18_eecs441);
     });
 
-    test('Course user is multiple roles for only displays once', async () => {
+    test('Course user is multiple roles for only listed once', async () => {
         all_courses = {
             courses_is_admin_for: [],
             courses_is_staff_for: [fall18_eecs280],
@@ -418,8 +411,7 @@ describe('CourseList tests', () => {
             stubs: ['router-link', 'router-view']
         });
         component = wrapper.vm;
-        await component.$nextTick();
-        await component.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll('.course').length).toEqual(1);
 

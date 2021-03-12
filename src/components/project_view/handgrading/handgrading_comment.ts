@@ -102,6 +102,7 @@ class CommentWrapper implements HandgradingComment {
     }
 
     compare(other: HandgradingComment) {
+        // istanbul ignore next
         return location_compare(this.location!, other.location);
     }
 

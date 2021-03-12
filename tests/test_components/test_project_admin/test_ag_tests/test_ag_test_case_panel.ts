@@ -326,7 +326,8 @@ describe('AGTestCasePanel tests', () => {
         wrapper.vm.d_new_command = "New command";
         await wrapper.vm.$nextTick();
 
-        wrapper.findComponent({ref: 'add_ag_test_command_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'add_ag_test_command_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_adding_command)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(create_command_stub.calledOnce).toBe(true);
@@ -396,6 +397,8 @@ describe('AGTestCasePanel tests', () => {
         ).not.toBeDisabled();
 
         await wrapper.findComponent({ref: 'clone_ag_test_case_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_cloning)).toBe(true);
+        await wrapper.vm.$nextTick();
 
         expect(clone_case_stub.calledOnce).toBe(true);
         expect(clone_case_stub.firstCall.calledWith("Water")).toBe(true);
@@ -466,6 +469,7 @@ describe('AGTestCasePanel tests', () => {
         ).not.toBeDisabled();
 
         await wrapper.findComponent({ref: 'clone_ag_test_case_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_cloning)).toBe(true);
 
         expect(clone_case_stub.calledOnce).toBe(true);
         expect(clone_case_stub.firstCall.calledWith("Purple Case")).toBe(true);
@@ -504,7 +508,8 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.vm.d_show_delete_ag_test_case_modal).toBe(true);
         expect(wrapper.findComponent({ref: 'delete_ag_test_case_modal'}).exists()).toBe(true);
 
-        wrapper.find('.modal-delete-button').trigger('click');
+        await wrapper.find('.modal-delete-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(delete_case_stub.calledOnce).toBe(true);
@@ -519,8 +524,8 @@ describe('AGTestCasePanel tests', () => {
         wrapper.findComponent({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
         await wrapper.vm.$nextTick();
 
-        wrapper.find('.modal-delete-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('.modal-delete-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;

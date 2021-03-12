@@ -91,6 +91,7 @@ describe('SingleProject.vue', () => {
         sinon.stub(project_1, 'copy_to_course').returns(Promise.resolve(same_course_project_clone));
 
         await wrapper.find('.clone-project-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_cloning)).toBe(true);
 
         expect(wrapper.findComponent({ref: 'clone_project_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_clone_project_modal).toBe(false);
@@ -121,6 +122,7 @@ describe('SingleProject.vue', () => {
             other_course_project_clone);
 
         await wrapper.find('.clone-project-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_cloning)).toBe(true);
 
         expect(
             copy_to_course_stub.calledOnceWith(course_2.pk, other_course_project_clone.name)

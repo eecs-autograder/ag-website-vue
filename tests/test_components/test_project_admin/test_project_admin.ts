@@ -290,9 +290,7 @@ describe('InstructorFileObserver tests', () => {
                 },
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
     });
 
     test('Instructor file created', () => {
@@ -347,9 +345,7 @@ describe('ExpectedStudentFileObserver tests', () => {
                 },
             }
         });
-
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
     });
 
     test('Expected file created', () => {

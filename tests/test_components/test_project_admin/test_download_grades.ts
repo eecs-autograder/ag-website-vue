@@ -10,7 +10,7 @@ import { safe_assign } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { wait_for_load } from '@/tests/utils';
+import { wait_for_load, wait_until } from '@/tests/utils';
 
 jest.mock('file-saver');
 
@@ -107,7 +107,8 @@ describe('Create task tests', () => {
 
     test('Grades for final graded submissions', async () => {
         // Grades for final graded submission without staff should be the default
-        wrapper.find('.download-button').trigger('click');
+        await wrapper.find('.download-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let row = wrapper.findAll('.download-row').at(0);
@@ -120,7 +121,8 @@ describe('Create task tests', () => {
 
     test('Grades for all submissions', async () => {
         wrapper.find('#all-choice').setChecked();
-        wrapper.find('.download-button').trigger('click');
+        await wrapper.find('.download-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let row = wrapper.findAll('.download-row').at(0);
@@ -131,7 +133,8 @@ describe('Create task tests', () => {
 
     test('Files for final graded submissions', async () => {
         wrapper.find('#files-choice').setChecked();
-        wrapper.find('.download-button').trigger('click');
+        await wrapper.find('.download-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let row = wrapper.findAll('.download-row').at(0);
@@ -145,7 +148,8 @@ describe('Create task tests', () => {
     test('Files for all submissions', async () => {
         wrapper.find('#files-choice').setChecked();
         wrapper.find('#all-choice').setChecked();
-        wrapper.find('.download-button').trigger('click');
+        await wrapper.find('.download-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let row = wrapper.findAll('.download-row').at(0);
@@ -157,7 +161,8 @@ describe('Create task tests', () => {
 
     test('With staff', async () => {
         wrapper.find('#include-staff').setChecked();
-        wrapper.find('.download-button').trigger('click');
+        await wrapper.find('.download-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let row = wrapper.findAll('.download-row').at(0);
@@ -170,8 +175,8 @@ describe('Create task tests', () => {
 
     test('API errors handled', async () => {
         http_post_stub.rejects(new ag_cli.HttpError(403, "forbid"));
-        wrapper.find('.download-button').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('.download-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
         await wrapper.vm.$nextTick();
 
         let errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
@@ -190,7 +195,9 @@ test('Download task result', async () => {
 
     let wrapper = managed_mount(DownloadGrades, {propsData: {project: project}});
     expect(await wait_for_load(wrapper)).toBe(true);
-    wrapper.findAll('.download-row').at(0).find('.file-name').trigger('click');
+    await wrapper.findAll('.download-row').at(0).find('.file-name').trigger('click');
+    expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
     await wrapper.vm.$nextTick();
+    // tslint:disable-next-line:deprecation
     expect(FileSaver.saveAs).toBeCalled();
 });

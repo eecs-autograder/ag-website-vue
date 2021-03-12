@@ -69,7 +69,7 @@ test('Late days shown and updated on group change', async () => {
         course.pk, new_group.member_names[0]
     ).resolves({late_days_remaining: 10});
 
-    wrapper.setProps({group: new_group});
+    await wrapper.setProps({group: new_group});
     await wrapper.vm.$nextTick();
     totals = wrapper.findAllComponents({ref: 'late_days'});
     expect(totals.at(0).text()).toEqual('10');

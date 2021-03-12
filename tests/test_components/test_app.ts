@@ -124,6 +124,7 @@ test('API error handled in login', async () => {
     let wrapper = make_wrapper();
     expect(await wait_for_load(wrapper)).toBe(true);
     await wrapper.find('[data-testid=login_button]').trigger('click');
+    await wrapper.vm.$nextTick();
 
     expect(
         (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).d_api_errors.length

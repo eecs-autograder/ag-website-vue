@@ -1,4 +1,4 @@
-import { config, mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper } from '@vue/test-utils';
 
 import {
     Course,
@@ -13,6 +13,7 @@ import GroupMembersForm from '@/components/group_members_form.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 
 import * as data_ut from '@/tests/data_utils';
+import { wait_until } from '@/tests/utils';
 
 
 describe('CreateSingleGroup tests', () => {
@@ -46,6 +47,7 @@ describe('CreateSingleGroup tests', () => {
             = <Wrapper<GroupMembersForm>> wrapper.findComponent({ref: 'create_group_form'});
         group_form.vm.$emit('submit', group_members);
         await component.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_group)).toBe(true);
 
         expect(create_group_stub.firstCall.calledWith(project.pk, {member_names: group_members}));
     });
@@ -63,6 +65,8 @@ describe('CreateSingleGroup tests', () => {
         let group_form
             = <Wrapper<GroupMembersForm>> wrapper.findComponent({ref: 'create_group_form'});
         group_form.vm.$emit('submit', ["abernard@cornell.edu", "amartin@cornell.edu"]);
+        await component.$nextTick();
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_group)).toBe(true);
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;

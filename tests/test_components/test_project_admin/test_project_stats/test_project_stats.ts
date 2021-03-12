@@ -197,7 +197,9 @@ test('Data load for Final Score vs First Submission Time', async () => {
     // Collapse and re-open the collapsible, no data should be reloaded
     await wrapper.findComponent(
         {ref: 'final_score_vs_first_submission_collapsible'}).trigger('click');
-    await wrapper.vm.$nextTick();
+    expect(
+        await wait_until(wrapper, w => !w.vm.d_loading_first_submissions_by_group)
+    ).toBe(true);
     await wrapper.findComponent(
         {ref: 'final_score_vs_first_submission_collapsible'}).trigger('click');
     expect(

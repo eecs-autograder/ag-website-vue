@@ -81,26 +81,26 @@ describe('Modal.vue', () => {
 
     test('Modal emits "close" when clicking outside the modal and ' +
          'click_outside_to_close is true',
-         () => {
+         async () => {
         const wrapper = mount(Modal);
         const outside_modal = wrapper.find('.modal-mask');
         const inside_modal = wrapper.find('.modal-container');
 
         expect(wrapper.vm.click_outside_to_close).toBe(false);
 
-        inside_modal.trigger('click');
+        await inside_modal.trigger('click');
         expect(wrapper.emitted('close')).toBeUndefined();
 
-        outside_modal.trigger('click');
+        await outside_modal.trigger('click');
         expect(wrapper.emitted('close')).toBeUndefined();
 
-        wrapper.setProps({click_outside_to_close: true});
+        await wrapper.setProps({click_outside_to_close: true});
         expect(wrapper.vm.click_outside_to_close).toBe(true);
 
-        inside_modal.trigger('click');
+        await inside_modal.trigger('click');
         expect(wrapper.emitted('close')).toBeUndefined();
 
-        outside_modal.trigger('click');
+        await outside_modal.trigger('click');
         expect(emitted(wrapper, 'close').length).toEqual(1);
     });
 

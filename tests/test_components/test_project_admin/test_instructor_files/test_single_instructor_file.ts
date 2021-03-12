@@ -122,6 +122,7 @@ describe('SingleInstructorFile tests', () => {
         await component.$nextTick();
 
         expect(get_content_stub.calledOnce).toBe(true);
+        // tslint:disable-next-line:deprecation
         expect(FileSaver.saveAs).toBeCalled();
     });
 
@@ -137,7 +138,7 @@ describe('SingleInstructorFile tests', () => {
         sinon.stub(file_1, 'rename').returns(Promise.reject(
             new HttpError(400, {__all__: "File with this name already exists in project"})
         ));
-        wrapper.findComponent({ref: 'rename_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'rename_form'}).trigger('submit');
         await component.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;

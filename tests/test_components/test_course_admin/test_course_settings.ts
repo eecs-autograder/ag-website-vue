@@ -59,7 +59,7 @@ describe('Course settings', () => {
 
         expect(wrapper.vm.d_settings_form_is_valid).toBe(true);
 
-        wrapper.findComponent({ref: 'course_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'course_form'}).trigger('submit');
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;

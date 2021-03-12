@@ -277,16 +277,12 @@
 import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
-  Annotation,
   AppliedAnnotation,
   AppliedAnnotationObserver,
   Comment,
-  CommentData,
   CommentObserver,
   CriterionResult,
-  CriterionResultObserver,
   HandgradingResult,
-  Location,
   UltimateSubmissionPolicy,
 } from 'ag-client-typescript';
 
@@ -300,7 +296,7 @@ import {
   make_error_handler_func,
 } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
-import { assert_not_null, deep_copy, toggle } from '@/utils';
+import { deep_copy, toggle } from '@/utils';
 import {
   is_integer,
   is_not_empty,

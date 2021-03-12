@@ -99,7 +99,10 @@ export function format_course_name(course: Course) {
 
 // Returns the value associated with key in query params. If more than one value is associated with
 // the key, returns the first of those values.
-export function get_query_param(query_params: Dictionary<string | string[]>, key: string) {
+export function get_query_param(
+    query_params: Dictionary<string | (string | null)[]>,
+    key: string
+) {
     let query_value = query_params[key];
     // istanbul ignore next
     if (Array.isArray(query_value)) {

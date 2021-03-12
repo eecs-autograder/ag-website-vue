@@ -2,6 +2,8 @@ import { mount, Wrapper } from '@vue/test-utils';
 
 import Diff from '@/components/diff.vue';
 
+import { wait_for_load } from '../utils';
+
 
 describe('Diff tests', () => {
     test('Diff rendering no whitespace', async () => {
@@ -22,7 +24,7 @@ describe('Diff tests', () => {
                 ]),
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(11);
@@ -67,8 +69,8 @@ describe('Diff tests', () => {
                 ]),
             }
         });
-        wrapper.setData({d_show_whitespace: true});
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
+        await wrapper.setData({d_show_whitespace: true});
 
         let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
@@ -85,12 +87,13 @@ describe('Diff tests', () => {
 });
 
 describe('Diff test edge cases', () => {
-    test('Empty diff input', () => {
+    test('Empty diff input', async () => {
         const wrapper = mount(Diff, {
             propsData: {
                 diff_contents: Promise.resolve([]),
             }
         });
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let rows = wrapper.findAll('.diff-body tr');
         expect(rows.length).toEqual(0);
@@ -106,7 +109,7 @@ describe('Diff test edge cases', () => {
                 ]),
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let expected_left: RenderedDiffCell[] = [
             {line_number: '', prefix: '', content: ''},
@@ -134,7 +137,7 @@ describe('Diff test edge cases', () => {
                 ])
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '-', content: 'one'},
@@ -161,7 +164,7 @@ describe('Diff test edge cases', () => {
                 ])
             }
         });
-        await wrapper.vm.$nextTick();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
         let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '-', content: 'two'},
@@ -184,7 +187,7 @@ test('1000 lines initially rendered, show more button used', async () => {
             diff_contents: diff_contents
         }
     });
-    await wrapper.vm.$nextTick();
+    expect(await wait_for_load(wrapper)).toBe(true);
 
     expect(wrapper.findAll('.diff-body tr').length).toEqual(1000);
 

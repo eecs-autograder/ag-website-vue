@@ -499,7 +499,8 @@ describe('ProjectSettings tests', () => {
             wrapper.findComponent({ref: 'project_name_input'}), "AlreadyExists.cpp");
         expect(wrapper.vm.settings_form_is_valid).toBe(true);
 
-        wrapper.findComponent({ref: 'project_settings_form'}).trigger('submit');
+        await wrapper.findComponent({ref: 'project_settings_form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
         await wrapper.vm.$nextTick();
 
         expect(save_settings_stub.calledOnce).toBe(true);

@@ -36,7 +36,6 @@ import { Component, Inject, Vue } from 'vue-property-decorator';
 import {
   Course,
   Project,
-  User
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';

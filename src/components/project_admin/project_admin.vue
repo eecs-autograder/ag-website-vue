@@ -166,7 +166,7 @@ export default class ProjectAdmin extends CurrentTabMixin implements ProjectObse
   }
 
   mounted() {
-    this.initialize_current_tab('settings');
+    return this.initialize_current_tab('settings');
   }
 
   beforeDestroy() {

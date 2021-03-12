@@ -8,6 +8,7 @@ import CreateExpectedStudentFile from '@/components/project_admin/expected_stude
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 
 import { make_course, make_project } from '@/tests/data_utils';
+import { wait_until } from '@/tests/utils';
 
 
 describe('CreateExpectedStudentFile tests', () => {
@@ -26,14 +27,6 @@ describe('CreateExpectedStudentFile tests', () => {
         component = wrapper.vm;
     });
 
-    afterEach(() => {
-        sinon.restore();
-
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
-    });
-
     test('Successful creation of a file', async () => {
         let create_stub = sinon.stub(ExpectedStudentFile, 'create');
         let form_wrapper = wrapper.findComponent({ref: 'form'});
@@ -41,8 +34,8 @@ describe('CreateExpectedStudentFile tests', () => {
         form_component.d_expected_student_file.pattern = "Giraffe.cpp";
         await component.$nextTick();
 
-        wrapper.findComponent({ref: 'form'}).trigger('submit');
-        await component.$nextTick();
+        await wrapper.findComponent({ref: 'form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_create_pending)).toBe(true);
 
         expect(create_stub.getCall(0).args[0]).toEqual(project.pk);
         expect(create_stub.getCall(0).args[1]
@@ -62,8 +55,9 @@ describe('CreateExpectedStudentFile tests', () => {
         sinon.stub(ExpectedStudentFile, 'create').rejects(
             new HttpError(400, {__all__: "File with this name already exists in project"})
         );
-        wrapper.findComponent({ref: 'form'}).trigger('submit');
-        await component.$nextTick();
+        await wrapper.findComponent({ref: 'form'}).trigger('submit');
+        expect(await wait_until(wrapper, w => !w.vm.d_create_pending)).toBe(true);
+        await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBeGreaterThan(0);
