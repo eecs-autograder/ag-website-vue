@@ -46,7 +46,7 @@ describe('Changing tabs in project admin', () => {
         project = data_ut.make_project(course.pk);
 
         sinon.stub(Project, 'get_by_pk').withArgs(project.pk).returns(Promise.resolve(project));
-        router_replace = sinon.stub();
+        router_replace = sinon.stub().resolves();
 
         wrapper = managed_shallow_mount(ProjectAdmin, {
             mocks: {

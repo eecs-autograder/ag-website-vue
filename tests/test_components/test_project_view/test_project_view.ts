@@ -57,7 +57,7 @@ beforeEach(async () => {
     ]);
     sinon.stub(Submission, 'get_all_from_group_with_results').resolves([]);
 
-    router_replace = sinon.stub();
+    router_replace = sinon.stub().resolves();
 });
 
 function get_router_mocks(query = {}) {
