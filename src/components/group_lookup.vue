@@ -41,11 +41,11 @@ export default class GroupLookup extends Vue implements Created {
   @Prop({default: false, type: Boolean})
   initialize_from_url!: boolean;
 
-  async created() {
+  created() {
     if (this.initialize_from_url) {
       let requested_group_pk = get_query_param(this.$route.query, "current_student_lookup");
       if (requested_group_pk !== null) {
-        await this.on_group_selected(
+        this.on_group_selected(
           this.groups.find(group => group.pk === Number(requested_group_pk))!
         );
       }
@@ -63,8 +63,9 @@ export default class GroupLookup extends Vue implements Created {
 
   on_group_selected(group: Group) {
     this.$emit('update_group_selected', group);
-    return this.$router.replace(
-      {query: {...this.$route.query, current_student_lookup: group.pk.toString()}});
+    this.$router.replace({
+      query: {...this.$route.query, current_student_lookup: group.pk.toString()}}
+    ).catch(err => {});  // Ignore "NavigationDuplicated"
   }
 }
 </script>

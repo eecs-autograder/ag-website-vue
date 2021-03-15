@@ -30,7 +30,7 @@ function get_router_mocks(query = {}) {
 
 beforeEach(() => {
     course = data_ut.make_course();
-    router_replace = sinon.stub();
+    router_replace = sinon.stub().resolves();
     sinon.stub(User, 'get_current_user_roles').withArgs(course.pk).resolves(
         data_ut.make_user_roles({is_admin: true}));
     sinon.stub(Course, 'get_by_pk').withArgs(course.pk).resolves(course);

@@ -25,7 +25,7 @@ beforeEach(() => {
         data_ut.make_group(project.pk, 2, {member_names: ['userrr', 'filtermee2']}),
         data_ut.make_group(project.pk),
     ];
-    router_replace = sinon.stub();
+    router_replace = sinon.stub().resolves();
 });
 
 describe('GroupLookup tests', () => {
