@@ -1,5 +1,6 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
+import moment from 'moment-timezone';
 import * as sinon from 'sinon';
 // @ts-ignore
 import * as timezone_mock from 'timezone-mock';
@@ -10,15 +11,16 @@ import TimePicker from "@/components/datetime/time_picker.vue";
 import { emitted, set_props } from '@/tests/utils';
 
 
-beforeEach(() => {
-    timezone_mock.register('US/Eastern');
-});
-
-afterEach(() => {
-    timezone_mock.unregister();
-});
 
 describe('DatetimePicker tests', () => {
+    beforeEach(() => {
+        timezone_mock.register('US/Eastern');
+    });
+
+    afterEach(() => {
+        timezone_mock.unregister();
+    });
+
     test('Month, year, day, and time are initialized from input', async () => {
         let wrapper = mount(DatetimePicker, {
             propsData: {
@@ -222,6 +224,14 @@ describe('DatetimePicker tests', () => {
 });
 
 describe('DatetimePicker keyboard inputs', () => {
+    beforeEach(() => {
+        timezone_mock.register('US/Eastern');
+    });
+
+    afterEach(() => {
+        timezone_mock.unregister();
+    });
+
     test('Pressing left arrow goes to previous month (with year wraparound)', async () => {
         let wrapper = mount(DatetimePicker, {
             propsData: {
@@ -262,5 +272,36 @@ describe('DatetimePicker keyboard inputs', () => {
         expect(wrapper.vm.d_month).toEqual(1);
         await wrapper.find('.next-month-button').trigger('click');
         expect(wrapper.vm.d_month).toEqual(2);
+    });
+});
+
+describe.only('Timezone select tests', () => {
+    beforeEach(() => {
+        timezone_mock.register('US/Pacific');
+        sinon.stub(moment.tz, 'guess').returns('US/Pacific');
+    });
+
+    afterEach(() => {
+        timezone_mock.unregister();
+    });
+
+    test('Change timezone', async () => {
+        let original_time = moment().seconds(0).milliseconds(0);  // Avoid precision issues
+        let wrapper = mount(DatetimePicker, {
+            propsData: {
+                value: original_time.format()
+            }
+        });
+        wrapper.vm.show();
+        await wrapper.vm.$nextTick();
+
+        wrapper.find('[data-testid=timezone-select]').setValue('US/Eastern');
+        let new_time = emitted(wrapper, 'input')[0][0] as string;
+        let diff = moment.duration(moment(original_time).diff(new_time));
+        expect(diff.asHours()).toEqual(3);
+
+        set_props(wrapper, {value: new_time});
+        expect(wrapper.vm.d_timezone).toEqual('US/Eastern');
+        expect(wrapper.vm.d_date.format()).toEqual(new_time);
     });
 });

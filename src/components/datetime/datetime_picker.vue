@@ -57,11 +57,13 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-// @ts-ignore
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 import TimePicker from "@/components/datetime/time_picker.vue";
-import { assert_not_null } from '@/utils';
+
+interface HTMLInputEvent extends Event {
+  target: HTMLInputElement & EventTarget;
+}
 
 @Component({
   components: {
@@ -217,11 +219,9 @@ export default class DatetimePicker extends Vue {
     }
   }
 
-  update_timezone_selected(event: Event) {
-    let timezone = event?.target?.value;
-    assert_not_null(timezone);
-    this.d_timezone = timezone;
-    this.d_date = this.d_date.tz(timezone, true);
+  update_timezone_selected(event: HTMLInputEvent) {
+    this.d_timezone = event.target.value;
+    this.d_date = this.d_date.tz(this.d_timezone, true);
     this.$emit('input', this.d_date.format());
   }
 
