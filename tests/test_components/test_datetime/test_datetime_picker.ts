@@ -13,15 +13,8 @@ import { emitted, set_props } from '@/tests/utils';
 
 
 describe('DatetimePicker tests', () => {
-    beforeEach(() => {
-        timezone_mock.register('US/Eastern');
-    });
-
-    afterEach(() => {
-        timezone_mock.unregister();
-    });
-
     test('Month, year, day, and time are initialized from input', async () => {
+        sinon.stub(moment.tz, 'guess').returns('US/Eastern');
         let wrapper = mount(DatetimePicker, {
             propsData: {
                 value: "2019-12-25T18:36:37.746Z"
@@ -48,26 +41,29 @@ describe('DatetimePicker tests', () => {
     });
 
     test('Initial value null, no day highlighted until day selected', async () => {
+        // Intentionally NOT mocking moment.tz.guess()
         let wrapper = mount(DatetimePicker);
         wrapper.vm.show();
         await wrapper.vm.$nextTick();
 
-        let now = new Date();
+        let now = moment();
+        console.log(now);
+        console.log(wrapper.vm.d_date);
 
-        expect(wrapper.vm.d_month).toEqual(now.getMonth());
-        expect(wrapper.vm.d_year).toEqual(now.getFullYear());
+        expect(wrapper.vm.d_month).toEqual(now.month());
+        expect(wrapper.vm.d_year).toEqual(now.year());
 
         expect(wrapper.vm.d_selected_day).toBeNull();
         expect(wrapper.vm.d_selected_month).toBeNull();
         expect(wrapper.vm.d_selected_year).toBeNull();
 
-        expect(wrapper.vm.d_date.date()).toEqual(now.getDate());
-        expect(wrapper.vm.d_date.month()).toEqual(now.getMonth());
-        expect(wrapper.vm.d_date.year()).toEqual(now.getFullYear());
+        expect(wrapper.vm.d_date.date()).toEqual(now.date());
+        expect(wrapper.vm.d_date.month()).toEqual(now.month());
+        expect(wrapper.vm.d_date.year()).toEqual(now.year());
 
         let time_picker = <Wrapper<TimePicker>> wrapper.findComponent({ref: 'time_picker'});
-        expect(time_picker.vm.d_time.hours).toEqual(now.getHours());
-        let minutes_diff = Math.abs(time_picker.vm.d_time.minutes - now.getMinutes());
+        expect(time_picker.vm.d_time.hours).toEqual(now.hours());
+        let minutes_diff = Math.abs(time_picker.vm.d_time.minutes - now.minutes());
         expect(minutes_diff).toBeLessThan(1);
 
         wrapper.vm.show();
@@ -80,17 +76,18 @@ describe('DatetimePicker tests', () => {
         await first_week.findAll('.available-day').at(0).trigger('click');
 
         expect(wrapper.vm.d_selected_day).toEqual(1);
-        expect(wrapper.vm.d_selected_month).toEqual(now.getMonth());
-        expect(wrapper.vm.d_selected_year).toEqual(now.getFullYear());
+        expect(wrapper.vm.d_selected_month).toEqual(now.month());
+        expect(wrapper.vm.d_selected_year).toEqual(now.year());
 
         expect(emitted(wrapper, 'input').length).toBe(1);
         let emitted_date = new Date(emitted(wrapper, 'input')[0][0]);
-        expect(emitted_date.getFullYear()).toEqual(now.getFullYear());
-        expect(emitted_date.getMonth()).toEqual(now.getMonth());
+        expect(emitted_date.getFullYear()).toEqual(now.year());
+        expect(emitted_date.getMonth()).toEqual(now.month());
         expect(emitted_date.getDate()).toEqual(1);
     });
 
     test('Initial value null, time change before day selected does not emit', async () => {
+        sinon.stub(moment.tz, 'guess').returns('US/Eastern');
         let wrapper = mount(DatetimePicker);
         wrapper.vm.show();
         await wrapper.vm.$nextTick();
@@ -114,7 +111,7 @@ describe('DatetimePicker tests', () => {
     test('Invalid date str throws exception', () => {
         sinon.stub(console, 'error');
         sinon.stub(console, 'warn');
-        timezone_mock.unregister();
+        // timezone_mock.unregister();
         expect(() => {
             mount(DatetimePicker, {
                 propsData: {
@@ -160,6 +157,7 @@ describe('DatetimePicker tests', () => {
     });
 
     test("Value passed into 'value' prop changed by parent component", async () => {
+        sinon.stub(moment.tz, 'guess').returns('US/Eastern');
         let orig_date_string = "2019-07-21T12:20:40.746Z";
         let wrapper = mount(DatetimePicker, {
             propsData: {
@@ -225,11 +223,7 @@ describe('DatetimePicker tests', () => {
 
 describe('DatetimePicker keyboard inputs', () => {
     beforeEach(() => {
-        timezone_mock.register('US/Eastern');
-    });
-
-    afterEach(() => {
-        timezone_mock.unregister();
+        sinon.stub(moment.tz, 'guess').returns('US/Eastern');
     });
 
     test('Pressing left arrow goes to previous month (with year wraparound)', async () => {
@@ -275,9 +269,8 @@ describe('DatetimePicker keyboard inputs', () => {
     });
 });
 
-describe.only('Timezone select tests', () => {
+describe('Timezone select tests', () => {
     beforeEach(() => {
-        timezone_mock.register('US/Pacific');
         sinon.stub(moment.tz, 'guess').returns('US/Pacific');
     });
 

@@ -7,7 +7,7 @@ import {
     Project,
 } from 'ag-client-typescript';
 // @ts-ignore
-import moment from 'moment';
+import moment from 'moment-timezone';
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
@@ -36,7 +36,7 @@ describe('EditSingleGroup tests', () => {
         });
 
         group = data_ut.make_group(project.pk, 2, {
-            extended_due_date: "2019-04-18T15:26:06.965696Z",
+            extended_due_date: "2019-04-18T15:26:06Z",
             member_names: [
                 "kevin@cornell.edu",
                 "oscar@cornell.edu"
@@ -118,7 +118,7 @@ describe('EditSingleGroup tests', () => {
         let now = moment();
         picker.vm.set_date_and_time(now.format());
         picker.vm.update_time_selected();
-        expect(wrapper.vm.d_group?.extended_due_date).toEqual(now.format());
+        expect(moment(wrapper.vm.d_group?.extended_due_date).format()).toEqual(now.format());
     });
 
     test('API errors displayed on submit', async () => {
