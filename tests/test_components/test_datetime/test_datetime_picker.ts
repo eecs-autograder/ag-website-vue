@@ -47,8 +47,6 @@ describe('DatetimePicker tests', () => {
         await wrapper.vm.$nextTick();
 
         let now = moment();
-        console.log(now);
-        console.log(wrapper.vm.d_date);
 
         expect(wrapper.vm.d_month).toEqual(now.month());
         expect(wrapper.vm.d_year).toEqual(now.year());
