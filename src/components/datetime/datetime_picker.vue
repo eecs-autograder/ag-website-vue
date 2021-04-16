@@ -35,20 +35,35 @@
       </div>
     </div>
 
-    <time-picker v-model="d_time"
-                 @input="update_time_selected"
-                 ref="time_picker"
-                 class="time-picker"></time-picker>
+    <div class="time-column">
+      <time-picker v-model="d_time"
+                  @input="update_time_selected"
+                  ref="time_picker"></time-picker>
+
+      <select
+        :value="d_timezone"
+        @change="update_timezone_selected"
+        data-testid="timezone-select"
+        class="select timezone-select"
+      >
+        <option v-for="timezone of timezones" :value="timezone" :key="timezone">
+          {{timezone}}
+        </option>
+      </select>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-// @ts-ignore
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 import TimePicker from "@/components/datetime/time_picker.vue";
+
+interface HTMLInputEvent extends Event {
+  target: HTMLInputElement & EventTarget;
+}
 
 @Component({
   components: {
@@ -76,6 +91,8 @@ export default class DatetimePicker extends Vue {
 
   d_month = moment().month();  // The current month shown on the calendar
   d_year = moment().year();  // The current year shown on the calendar
+
+  d_timezone: string | null = null;
 
   calendar: number[][] = [
     [0, 0, 0, 0, 0, 0, 0],
@@ -115,6 +132,13 @@ export default class DatetimePicker extends Vue {
       this.d_selected_month = this.d_date.month();
       this.d_selected_year = this.d_date.year();
     }
+    // We only want to guess the timezone the first time this component
+    // instance is inintalized, so that when the user changes the timezone
+    // it shows their selected datetime in that timezone unless they refresh
+    // the page.
+    this.d_timezone = this.d_timezone ?? moment.tz.guess();
+
+    this.d_date.tz(this.d_timezone, false);
 
     this.d_time = moment({hours: this.d_date.hours(),
                           minutes: this.d_date.minutes()}).format('HH:mm');
@@ -195,6 +219,16 @@ export default class DatetimePicker extends Vue {
     }
   }
 
+  update_timezone_selected(event: HTMLInputEvent) {
+    this.d_timezone = event.target.value;
+    this.d_date = this.d_date.tz(this.d_timezone, true);
+    this.$emit('input', this.d_date.format());
+  }
+
+  get timezones() {
+    return moment.tz.names();
+  }
+
   readonly months = [
     "January",
     "February",
@@ -250,7 +284,7 @@ export class InvalidDatetimeStrError extends Error {
   flex-wrap: wrap;
 }
 
-.calendar, .time-picker {
+.calendar, .time-column {
   border: 1px solid $pebble-dark;
   border-radius: 2px;
 }
@@ -274,7 +308,7 @@ export class InvalidDatetimeStrError extends Error {
   display: flex;
   flex-wrap: nowrap;
   font-weight: bold;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
   padding: .5rem .75rem;
 }
@@ -347,13 +381,19 @@ export class InvalidDatetimeStrError extends Error {
 
 // TIMEPICKER ***********************************************************
 
-.time-picker {
+.time-column {
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  width: 100%;
-  max-width: 210px;
+  padding: 1rem;
+
+  // width: 100%;
+  // max-width: 210px;
+}
+
+.timezone-select {
+  margin-top: .5rem;
 }
 
 </style>

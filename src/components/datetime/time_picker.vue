@@ -1,61 +1,59 @@
 <template>
   <div class="timepicker">
-    <div class="timepicker-header">
 
-      <div class="time-unit-col">
-        <button type="button"
-                data-testid="next_hour_button"
-                @click="go_to_next_hour"
-                class="up-button">
-          <i class="fas fa-chevron-up up-arrow"></i>
-        </button>
-        <div>
-          <input type="text"
-                 data-testid="hour_input"
-                 class="hour-input"
-                 :value="hours_str"
-                 @keydown="update_hours">
-        </div>
-        <button type="button"
-                data-testid="prev_hour_button"
-                @click="go_to_prev_hour"
-                class="down-button">
-          <i class="fas fa-chevron-down down-arrow"></i>
-        </button>
+    <div class="time-unit-col">
+      <button type="button"
+              data-testid="next_hour_button"
+              @click="go_to_next_hour"
+              class="up-button">
+        <i class="fas fa-chevron-up up-arrow"></i>
+      </button>
+      <div>
+        <input type="text"
+                data-testid="hour_input"
+                class="hour-input"
+                :value="hours_str"
+                @keydown="update_hours">
       </div>
+      <button type="button"
+              data-testid="prev_hour_button"
+              @click="go_to_prev_hour"
+              class="down-button">
+        <i class="fas fa-chevron-down down-arrow"></i>
+      </button>
+    </div>
 
-      <div> : </div>
+    <div> : </div>
 
-      <div class="time-unit-col">
-        <button type="button"
-                data-testid="next_minute_button"
-                @click="go_to_next_minute"
-                class="up-button">
-          <i class="fas fa-chevron-up up-arrow"></i>
-        </button>
-        <div>
-          <input type="text"
-                 class="minute-input"
-                 :value="minutes_str"
-                 @keydown="update_minutes"/>
-        </div>
-        <button type="button"
-                data-testid="prev_minute_button"
-                @click="go_to_prev_minute"
-                class="down-button">
-          <i class="fas fa-chevron-down down-arrow"></i>
-        </button>
+    <div class="time-unit-col">
+      <button type="button"
+              data-testid="next_minute_button"
+              @click="go_to_next_minute"
+              class="up-button">
+        <i class="fas fa-chevron-up up-arrow"></i>
+      </button>
+      <div>
+        <input type="text"
+                class="minute-input"
+                :value="minutes_str"
+                @keydown="update_minutes"/>
       </div>
+      <button type="button"
+              data-testid="prev_minute_button"
+              @click="go_to_prev_minute"
+              class="down-button">
+        <i class="fas fa-chevron-down down-arrow"></i>
+      </button>
+    </div>
 
-      <div></div>
+    <div></div>
 
-      <div class="time-unit-col">
-        <div>
-          <input class="period-input"
-                 type="button"
-                 v-model="am_pm_str"
-                 @click="toggle_period_value"/>
-        </div>
+    <div class="time-unit-col">
+      <div>
+        <input class="period-input"
+                type="button"
+                v-model="am_pm_str"
+                @click="toggle_period_value"/>
       </div>
     </div>
   </div>
@@ -273,20 +271,15 @@ export class InvalidTimeStrError extends Error {
 @import '@/styles/button_styles.scss';
 
 .timepicker {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 210px;
-}
-
-.timepicker-header {
   align-items: center;
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
-  padding: .875rem;
   text-align: center;
+}
+
+.time-unit-col {
+  padding: 0 .125rem;
 }
 
 .hour-input, .minute-input {
