@@ -236,9 +236,13 @@ export default class Submit extends Vue {
 
   @handle_global_errors_async
   async created() {
-    this.d_now_timer_id = setInterval(() => {
-      this.d_now = moment();
-    }, 30 * 1000);
+    this.d_now_timer_id = setInterval(
+      () => {
+        // istanbul ignore next
+        this.d_now = moment();
+      },
+      30 * 1000
+    );
 
     if (this.project.allow_late_days) {
       let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user!.pk);
@@ -260,8 +264,7 @@ export default class Submit extends Vue {
     assert_not_null(this.project.soft_closing_time);
     let deadline = moment(this.project.soft_closing_time);
     if (this.d_now.isAfter(deadline)) {
-      console.log(this.d_now, deadline)
-      return '(past due)';
+      return '';
     }
 
     return this._format_time_diff(deadline, this.d_now);
@@ -271,7 +274,7 @@ export default class Submit extends Vue {
     assert_not_null(this.group.extended_due_date);
     let extension = moment(this.group.extended_due_date);
     if (this.d_now.isAfter(extension)) {
-      return '(past due)';
+      return '';
     }
 
     return this._format_time_diff(extension, this.d_now);
@@ -282,7 +285,7 @@ export default class Submit extends Vue {
 
     let days = diff.days();
     let hours = diff.hours();
-    let hours_str = `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+    let hours_str = `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
     if (days >= 1) {
       return `(${days} ${days === 1 ? 'day' : 'days'} ${hours_str})`;
     }
@@ -293,11 +296,10 @@ export default class Submit extends Vue {
       return `(${hours_str} ${minutes_str})`;
     }
 
-    console.log(diff.asMinutes());
     if (diff.asMinutes() < 1) {
-      return '(< 1 minute)'
+      return '(< 1 minute)';
     }
-    return `${minutes_str}`;
+    return `(${minutes_str})`;
   }
 
   get num_submissions_per_day() {

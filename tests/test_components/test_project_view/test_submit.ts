@@ -1,4 +1,4 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import { Course, GradingStatus, Group, HttpError, Project, Submission, User } from "ag-client-typescript";
 // @ts-ignore
@@ -13,7 +13,8 @@ import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
-import { compress_whitespace, emitted, find_by_name, find_component, set_data, wait_fixed, wait_for_load, wait_until } from '@/tests/utils';
+import { managed_mount } from '@/tests/setup';
+import { compress_whitespace, emitted, find_by_name, find_component, set_data, wait_fixed, wait_until } from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -39,15 +40,11 @@ beforeEach(() => {
     });
 });
 
-afterEach(() => {
-    sinon.restore();
-});
-
 describe('Deadline info tests', () => {
     test('Project has soft closing time, group has no extension', () => {
         project.soft_closing_time = moment([2018, 4, 18, 16, 33]).toISOString();
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -64,7 +61,7 @@ describe('Deadline info tests', () => {
     });
 
     test('Soft closing time null', () => {
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -78,7 +75,7 @@ describe('Deadline info tests', () => {
     test('Group has extension', () => {
         group.extended_due_date = moment([2019, 5, 13, 18, 29]).toISOString();
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -94,7 +91,7 @@ describe('Deadline info tests', () => {
 
     test('Current user used late day', async () => {
         group.late_days_used[current_user.username] = 1;
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -117,6 +114,166 @@ describe('Deadline info tests', () => {
             compress_whitespace(late_days_wrapper.text())
         ).toEqual('2 late days used on this project.');
     });
+
+    test('Days until soft closing time', async () => {
+        project.soft_closing_time
+            = moment().add(3, 'days').add(7, 'hours').add(5, 'minutes').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('(3 days 7 hours)');
+    });
+
+    test('Hours until soft closing time', async () => {
+        project.soft_closing_time
+            = moment().add(10, 'hours').add(6, 'minutes').add(30, 'seconds').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('(10 hours 6 minutes)');
+    });
+
+    test('Minutes until soft closing time', async () => {
+        project.soft_closing_time = moment().add(49, 'minutes').add(30, 'seconds').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('(49 minutes)');
+    });
+
+    test('Less than one minute until soft closing time', async () => {
+        project.soft_closing_time = moment().add(58, 'seconds').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('(< 1 minute)');
+    });
+
+    test('Soft closing time countdown updates when d_now changes', async () => {
+        let deadline = moment().add(49, 'minutes').add(58, 'seconds');
+        project.soft_closing_time = deadline.format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('(49 minutes)');
+
+        await set_data(wrapper, {d_now: deadline.clone().subtract(55, 'seconds')});
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('(< 1 minute)');
+    });
+
+    test('Days until extension', async () => {
+        project.soft_closing_time = moment().subtract(7, 'hours').format();
+        group.extended_due_date
+            = moment().add(5, 'days').add(12, 'hours').add(5, 'minutes').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('');
+        expect(wrapper.find('#extension-countdown').text()).toEqual('(5 days 12 hours)');
+    });
+
+    test('Hours until extension', async () => {
+        project.soft_closing_time = moment().subtract(7, 'hours').format();
+        group.extended_due_date
+            = moment().add(9, 'hours').add(35, 'minutes').add(30, 'seconds').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('');
+        expect(wrapper.find('#extension-countdown').text()).toEqual('(9 hours 35 minutes)');
+    });
+
+    test('Minutes until extension', async () => {
+        project.soft_closing_time = moment().subtract(7, 'hours').format();
+        group.extended_due_date = moment().add(32, 'minutes').add(30, 'seconds').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('');
+        expect(wrapper.find('#extension-countdown').text()).toEqual('(32 minutes)');
+    });
+
+    test('Less than one minute until extension', async () => {
+        project.soft_closing_time = moment().subtract(7, 'hours').format();
+        group.extended_due_date = moment().add(56, 'seconds').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('');
+        expect(wrapper.find('#extension-countdown').text()).toEqual('(< 1 minute)');
+    });
+
+    test('Extension countdown updates when d_now changes', async () => {
+        let deadline = moment().add(35, 'minutes').add(58, 'seconds');
+        group.extended_due_date = deadline.format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#extension-countdown').text()).toEqual('(35 minutes)');
+
+        await set_data(wrapper, {d_now: deadline.clone().subtract(55, 'seconds')});
+        expect(wrapper.find('#extension-countdown').text()).toEqual('(< 1 minute)');
+    });
 });
 
 describe('Submit button text tests', () => {
@@ -124,7 +281,7 @@ describe('Submit button text tests', () => {
         project.soft_closing_time = moment().subtract(3, 'h').toISOString();
         late_days_remaining = 1;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -146,7 +303,7 @@ describe('Submit button text tests', () => {
         group.extended_due_date = moment(project.soft_closing_time).add(1, 'h').toISOString();
         late_days_remaining = 1;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -169,7 +326,7 @@ describe('Submit button text tests', () => {
         group.late_days_used[current_user.username] = 1;
         late_days_remaining = 1;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -191,7 +348,7 @@ describe('Submit button text tests', () => {
         project.allow_late_days = false;
         late_days_remaining = 1;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -211,7 +368,7 @@ describe('Submit button text tests', () => {
     test('Deadline past and user has no late days', async () => {
         project.soft_closing_time = moment().subtract(3, 'h').toISOString();
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -229,7 +386,7 @@ describe('Submit button text tests', () => {
     });
 
     test('Soft closing time is null', async () => {
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -249,7 +406,7 @@ describe('Submit button text tests', () => {
 
 describe('Group members tests', () => {
     test('GroupMembers component values, late days not shown', async () => {
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -264,7 +421,7 @@ describe('Group members tests', () => {
 
 describe('Submission limit, bonus submission, late day tests', () => {
     test('No submissions per day limit', () => {
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -279,7 +436,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
         project.submission_limit_per_day = 3;
         group.num_submits_towards_limit = 0;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -298,7 +455,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
         group.member_names = ['llama@llama.net', 'ninja@ninja.net'];
         group.num_submits_towards_limit = 2;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -316,7 +473,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
          () => {
         project.total_submission_limit = null;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -333,7 +490,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
         project.total_submission_limit = 10;
         group.num_submits_towards_limit = 4;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -347,7 +504,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
     });
 
     test("Project doesn't allot bonus submissions, group has no bonus submissions", () => {
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -361,7 +518,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
     test('Project allots bonus submissions, groups num bonus submissions shown', () => {
         project.num_bonus_submissions = 2;
         group.bonus_submissions_remaining = 2;
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -377,7 +534,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
     test("Project doesn't allot bonus submissions, group has bonus submissions", () => {
         project.num_bonus_submissions = 0;
         group.bonus_submissions_remaining = 1;
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -391,7 +548,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
     });
 
     test("Course doesn't allot late days, user has no late days", async () => {
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -405,7 +562,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
     test('Course allots late days, user late days shown', async () => {
         course.num_late_days = 2;
         late_days_remaining = 2;
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -422,7 +579,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
     test("Course doesn't allot late days, user has late days", async () => {
         course.num_late_days = 0;
         late_days_remaining = 1;
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -441,7 +598,7 @@ describe('Submission limit, bonus submission, late day tests', () => {
         late_days_remaining = 2;
         project.allow_late_days = false;
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -461,7 +618,7 @@ describe('Expected file list tests', () => {
             data_ut.make_expected_student_file(project.pk, 'fileo'),
         ];
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -478,7 +635,7 @@ describe('Expected file list tests', () => {
     test('No expected files, component hidden', async () => {
         project.expected_student_files = [];
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -508,7 +665,7 @@ describe('Submitted file validation tests', () => {
             new File(['spam'], 'too_few_1'),
         ];
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -543,7 +700,7 @@ describe('Submitted file validation tests', () => {
             new File(['spam'], 'unexpected'),
         ];
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -622,7 +779,7 @@ describe('Submit tests', () => {
             }
         );
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -662,7 +819,7 @@ describe('Submit tests', () => {
             )
         );
 
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -688,7 +845,7 @@ describe('Submit tests', () => {
     });
 
     test('Cancel submit', async () => {
-        const wrapper = mount(Submit, {
+        const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
@@ -710,7 +867,7 @@ describe('Submit tests', () => {
 
 describe('Honor pledge tests', () => {
     function make_wrapper() {
-        return mount(Submit, {
+        return managed_mount(Submit, {
             propsData: {
                 course: course,
                 project: project,
