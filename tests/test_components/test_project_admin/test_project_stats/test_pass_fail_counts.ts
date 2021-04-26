@@ -1,7 +1,7 @@
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import BugsExposedHistogram from '@/components/project_admin/project_stats/bugs_exposed_histogram';
+import BugsExposedHistogram from '@/components/project_admin/project_stats/bugs_exposed_histogram.vue';
 import DescriptiveStatsTable from '@/components/project_admin/project_stats/descriptive_stats_table.vue';
 import PassFailCounts from '@/components/project_admin/project_stats/pass_fail_counts.vue';
 

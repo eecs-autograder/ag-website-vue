@@ -34,33 +34,38 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import { Submission } from 'ag-client-typescript';
-import { BarController, BarElement, Chart, Legend, LinearScale, TimeScale, Tooltip } from 'chart.js';
+import { FullUltimateSubmissionResult } from 'ag-client-typescript';
+import { Chart, Legend, LinearScale, LineElement, PointElement, ScatterController, TimeScale, Tooltip } from 'chart.js';
 import 'chartjs-adapter-moment';
 // @ts-ignore
 import * as zoom_plugin from 'chartjs-plugin-zoom';
 import moment from "moment-timezone";
 
+import { SafeMap } from '@/safe_map';
 import { assert_not_null } from '@/utils';
 
-Chart.register(LinearScale, TimeScale, BarElement, BarController);
+import { FirstSubmissionData } from './project_stats.vue';
+
+Chart.register(LinearScale, TimeScale, ScatterController, PointElement, LineElement);
 Chart.register(zoom_plugin.default, Legend, Tooltip);
 
 @Component
-export default class SubmissionsOverTimeGraph extends Vue {
+export default class FirstSubmissionTimeVsFinalScore extends Vue {
   @Prop({required: true})
-  submissions!: Submission[];
+  ultimate_submission_entries!: FullUltimateSubmissionResult[];
+
+  @Prop({required: true})
+  first_submissions_by_group!: SafeMap<number, FirstSubmissionData>;
 
   d_timezone: string = moment.tz.guess();
-  d_chart: Chart<'bar', {x: moment.Moment, y: number}[]> | null = null;
+  d_chart: Chart<'scatter', {x: string, y: number}[]> | null = null;
 
   mounted() {
-    // this.addPlugin(zoom);
     this.update_chart();
   }
 
-  @Watch('submissions')
-  on_submissions_change() {
+  @Watch('ultimate_submission_entries')
+  on_ultimate_submission_entries_change() {
     this.update_chart();
   }
 
@@ -83,11 +88,11 @@ export default class SubmissionsOverTimeGraph extends Vue {
     this.d_chart = new Chart(
       context,
       {
-        type: 'bar',
+        type: 'scatter',
         data: {
           datasets: [
             {
-              label: 'Submissions Per Hour',
+              label: 'Final Score vs. First Submission Time',
               backgroundColor: '#f87979',
               data: this.compute_data_points(),
             }
@@ -101,7 +106,7 @@ export default class SubmissionsOverTimeGraph extends Vue {
               type: 'time',
               title: {
                 display: true,
-                text: 'Time'
+                text: 'Time of First Submission'
               },
               time: {
                 unit: 'hour',
@@ -114,7 +119,7 @@ export default class SubmissionsOverTimeGraph extends Vue {
                     values[index].value
                   ).tz(this.d_timezone).format('MMM D, h:mm a z');
                   return res;
-                }
+                },
               },
             },
             y: {
@@ -125,7 +130,7 @@ export default class SubmissionsOverTimeGraph extends Vue {
               },
               title: {
                 display: true,
-                text: '# of Submissions'
+                text: '% Score'
               }
             }
           },
@@ -151,48 +156,44 @@ export default class SubmissionsOverTimeGraph extends Vue {
               }
             },
           }
-        },
-      },
+        }
+      }
     );
   }
 
   compute_data_points() {
-    if (this.submissions.length === 0) {
+    if (this.ultimate_submission_entries.length === 0) {
       return [];
     }
 
-    let timestamps = this.submissions.map(submission => moment(submission.timestamp));
-    timestamps.sort((first, second) => first.diff(second));
-
-    // The first and last ticks should be the nearest hour before/after the
-    // first and last submissions.
-    let start = moment(timestamps[0]).minutes(0).seconds(0).milliseconds(0);
-    let end = moment(
-      timestamps[timestamps.length - 1]
-    ).add(1, 'hour').minutes(0).seconds(0).milliseconds(0);
-
-    let num_hours = Math.ceil(moment.duration(end.diff(start)).asHours());
-    // console.log(num_hours);
-    let buckets: number[] = Array(num_hours).fill(0);
-
-    for (let timestamp of timestamps) {
-      // console.log(timestamp)
-      let offset = moment.duration(timestamp.diff(start));
-      // console.log(offset.asHours());
-      buckets[Math.floor(offset.asHours())] += 1;
-    }
-
     let result = [];
-    for (let i = 0; i < num_hours; ++i) {
+    for (let entry of this.ultimate_submission_entries) {
+      if (!this.first_submissions_by_group.has(entry.group.pk)) {
+        continue;
+      }
+
+      if (entry.ultimate_submission === null) {
+        continue;
+      }
+
+      if (Number(entry.ultimate_submission.results.total_points_possible) === 0) {
+        continue;
+      }
+      let percent = Math.floor(
+        Number(entry.ultimate_submission.results.total_points)
+        / Number(entry.ultimate_submission.results.total_points_possible)
+        * 100
+      );
       result.push({
-        x: start.clone().add(i, 'hour').set('second', 0).set('millisecond', 0),
-        y: buckets[i],
+        x: this.first_submissions_by_group.get(entry.group.pk).first_submission.timestamp,
+        y: percent,
       });
     }
     return result;
   }
 }
 </script>
+
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
