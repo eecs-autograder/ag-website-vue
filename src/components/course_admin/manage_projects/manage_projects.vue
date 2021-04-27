@@ -50,6 +50,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { Course, Project, ProjectObserver } from 'ag-client-typescript';
+import moment from 'moment-timezone';
 
 import APIErrors from "@/components/api_errors.vue";
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
@@ -105,7 +106,11 @@ export default class ManageProjects extends Vue implements ProjectObserver,
       this.d_adding_project = true;
       this.new_project_name.trim();
       let new_project: Project = await Project.create(
-        this.course.pk, {name: this.new_project_name}
+        this.course.pk,
+        {
+          name: this.new_project_name,
+          submission_limit_reset_timezone: moment.tz.guess()
+        }
       );
       this.new_project_name = "";
       (<ValidatedForm> this.$refs.new_project_form).reset_warning_state();

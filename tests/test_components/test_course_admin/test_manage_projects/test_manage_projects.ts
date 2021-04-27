@@ -1,6 +1,7 @@
 import { Wrapper } from '@vue/test-utils';
 
 import { Course, HttpError, Project, User } from 'ag-client-typescript';
+import moment from 'moment-timezone';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -88,7 +89,8 @@ describe('Manage projects tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(create_project_stub.firstCall.calledWith(
-            current_course.pk, { name: new_project.name }
+            current_course.pk,
+            {name: new_project.name, submission_limit_reset_timezone: moment.tz.guess()}
         )).toBe(true);
         expect(wrapper.vm.projects.length).toEqual(3);
         expect(wrapper.vm.projects[0]).toEqual(new_project);
