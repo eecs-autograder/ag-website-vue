@@ -143,6 +143,7 @@ export default class FirstSubmissionTimeVsFinalScore extends Vue {
                 title: ctx => ''
               }
             },
+            // @ts-ignore
             zoom: {
               pan: {
                 enabled: true,

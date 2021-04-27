@@ -138,6 +138,7 @@ export default class SubmissionsOverTimeGraph extends Vue {
                 title: ctx => ''
               }
             },
+            // @ts-ignore
             zoom: {
               pan: {
                 enabled: true,
