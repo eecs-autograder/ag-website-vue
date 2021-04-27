@@ -25,45 +25,54 @@ export default class BugsExposedHistogram extends Vue {
   @Prop({required: true, type: Array})
   ultimate_submission_entries!: ag_cli.FullUltimateSubmissionResult[];
 
+  d_chart: Chart | null = null;
+
   mounted() {
-    this.update_chart();
+    this.create_chart();
   }
 
-  d_chart: Chart | null = null;
+  destroyed() {
+    this.d_chart?.destroy();
+  }
 
   @Watch('mutation_test_suite')
   on_mutation_test_suite_change() {
-    this.update_chart();
+    if (this.d_chart !== null) {
+      this.d_chart.data = this.get_data();
+      this.d_chart.update();
+    }
   }
 
   @Watch('ultimate_submission_entries')
   on_ultimate_submission_entries_change() {
-    this.update_chart();
+    if (this.d_chart !== null) {
+      this.d_chart.data = this.get_data();
+      this.d_chart.update();
+    }
   }
 
-  update_chart() {
+  get_data() {
     let bug_counts = this.buggy_impl_exposed_count();
+    return {
+      labels: Array.from(bug_counts.keys()),
+      datasets: [
+        {
+          label: '# Students who exposed the bug',
+          backgroundColor: '#38C1C7',
+          data: Array.from(bug_counts.values()),
+        },
+      ],
+    };
+  }
 
-    if (this.d_chart !== null) {
-      this.d_chart.destroy();
-    }
-
+  create_chart() {
     let context = (<HTMLCanvasElement> this.$refs.submissions_over_time_canvas).getContext('2d');
     assert_not_null(context);
     this.d_chart = new Chart(
       context,
       {
         type: 'bar',
-        data: {
-          labels: Array.from(bug_counts.keys()),
-          datasets: [
-            {
-              label: '# Students who exposed the bug',
-              backgroundColor: '#38C1C7',
-              data: Array.from(bug_counts.values()),
-            },
-          ],
-        },
+        data: this.get_data(),
         options: {
           responsive: true,
           maintainAspectRatio: false,

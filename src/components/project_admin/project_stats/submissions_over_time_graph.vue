@@ -55,29 +55,31 @@ export default class SubmissionsOverTimeGraph extends Vue {
   d_chart: Chart<'bar', {x: moment.Moment, y: number}[]> | null = null;
 
   mounted() {
-    // this.addPlugin(zoom);
-    this.update_chart();
+    this.create_chart();
+  }
+
+  destroyed() {
+    this.d_chart?.destroy();
   }
 
   @Watch('submissions')
   on_submissions_change() {
-    this.update_chart();
+    if (this.d_chart !== null) {
+      this.d_chart.data.datasets[0].data = this.compute_data_points();
+      this.d_chart.update();
+    }
   }
 
   @Watch('d_timezone')
   on_timezone_change(new_value: string, old_value: string) {
-    this.update_chart();
+    this.d_chart?.update();
   }
 
   get timezones() {
     return moment.tz.names();
   }
 
-  update_chart() {
-    if (this.d_chart !== null) {
-      this.d_chart.destroy();
-    }
-
+  create_chart() {
     let context = (<HTMLCanvasElement> this.$refs.submissions_over_time_canvas).getContext('2d');
     assert_not_null(context);
     this.d_chart = new Chart(

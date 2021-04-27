@@ -36,46 +36,53 @@ export default class SubmissionScoreHistogramChart extends Vue {
   d_chart: Chart | null = null;
 
   mounted() {
-    this.update_chart();
+    this.create_chart();
+  }
+
+  destroyed() {
+    this.d_chart?.destroy();
   }
 
   @Watch('all_percentages')
   on_all_percentages_change() {
-    this.update_chart();
+    if (this.d_chart !== null) {
+      this.d_chart.data = this.get_data();
+      this.d_chart.update();
+    }
   }
 
-  update_chart() {
-    if (this.d_chart !== null) {
-      this.d_chart.destroy();
-    }
+  get_data() {
+    return {
+      labels: this.labels,
+      datasets: [
+        {
+          label: 'All Students',
+          backgroundColor: '#38C1C7',
+          data: this.compute_buckets(this.all_percentages)
+        },
+        {
+          label: 'Individuals Only',
+          backgroundColor: '#C738C1',
+          data: this.compute_buckets(this.individual_percentages)
+        },
+        {
+          label: 'Groups Only',
+          backgroundColor: '#C1C738',
+          data: this.compute_buckets(this.group_percentages)
+        }
 
+      ],
+    };
+  }
+
+  create_chart() {
     let context = (<HTMLCanvasElement> this.$refs.submissions_over_time_canvas).getContext('2d');
     assert_not_null(context);
     this.d_chart = new Chart(
       context,
       {
         type: 'bar',
-        data: {
-          labels: this.labels,
-          datasets: [
-            {
-              label: 'All Students',
-              backgroundColor: '#38C1C7',
-              data: this.compute_buckets(this.all_percentages)
-            },
-            {
-              label: 'Individuals Only',
-              backgroundColor: '#C738C1',
-              data: this.compute_buckets(this.individual_percentages)
-            },
-            {
-              label: 'Groups Only',
-              backgroundColor: '#C1C738',
-              data: this.compute_buckets(this.group_percentages)
-            }
-
-          ],
-        },
+        data: this.get_data(),
         options: {
           responsive: true,
           maintainAspectRatio: false,
