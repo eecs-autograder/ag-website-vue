@@ -25,13 +25,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { FullUltimateSubmissionResult } from 'ag-client-typescript';
 
 import DescriptiveStatsTable from '../descriptive_stats_table.vue';
 
-import SubmissionScoreHistogramChart from './submission_score_histogram_chart';
+import SubmissionScoreHistogramChart from './submission_score_histogram_chart.vue';
 
 @Component({
   components: {

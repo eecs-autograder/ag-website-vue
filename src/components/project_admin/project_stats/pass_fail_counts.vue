@@ -50,7 +50,7 @@ import {
 import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 
-import BugsExposedHistogram from './bugs_exposed_histogram';
+import BugsExposedHistogram from './bugs_exposed_histogram.vue';
 import DescriptiveStatsTable from './descriptive_stats_table.vue';
 
 @Component({

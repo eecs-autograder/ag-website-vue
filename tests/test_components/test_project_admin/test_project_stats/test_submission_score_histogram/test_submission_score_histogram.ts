@@ -4,7 +4,7 @@ import { FullUltimateSubmissionResult } from 'ag-client-typescript';
 
 import DescriptiveStatsTable from '@/components/project_admin/project_stats/descriptive_stats_table.vue';
 import SubmissionScoreHistogram from '@/components/project_admin/project_stats/submission_score_histogram/submission_score_histogram.vue';
-import SubmissionScoreHistogramChart from '@/components/project_admin/project_stats/submission_score_histogram/submission_score_histogram_chart';
+import SubmissionScoreHistogramChart from '@/components/project_admin/project_stats/submission_score_histogram/submission_score_histogram_chart.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
