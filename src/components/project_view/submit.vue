@@ -3,11 +3,17 @@
     <div id="deadline-container">
       <div id="deadline-text" v-if="project.soft_closing_time !== null">
         Due on
-        <span id="deadline" class="date">{{format_datetime(project.soft_closing_time)}}</span>
+        <span id="deadline" class="date">
+          {{format_datetime(project.soft_closing_time)}}
+        </span>
+        <span id="deadline-countdown">{{time_until_soft_closing_time}}</span>
       </div>
       <div id="extension-text" v-if="group.extended_due_date !== null">
         Extension:
-        <span id="extension" class="date">{{format_datetime(group.extended_due_date)}}</span>
+        <span id="extension" class="date">
+          {{format_datetime(group.extended_due_date)}}
+        </span>
+        <span id="extension-countdown">{{time_until_extension}}</span>
       </div>
       <div id="late-days-used"
             class="limit-container"
@@ -224,12 +230,76 @@ export default class Submit extends Vue {
 
   late_days_remaining: number | null = null;
 
+  // This will get updated once per minute
+  d_now: moment.Moment = moment();
+  d_now_timer_id: ReturnType<typeof setInterval> | null = null;
+
   @handle_global_errors_async
   async created() {
+    this.d_now_timer_id = setInterval(
+      () => {
+        // istanbul ignore next
+        this.d_now = moment();
+      },
+      30 * 1000
+    );
+
     if (this.project.allow_late_days) {
       let late_days = await User.get_num_late_days(this.course.pk, this.d_globals.current_user!.pk);
       this.late_days_remaining = late_days.late_days_remaining;
     }
+  }
+
+  destroyed() {
+    if (this.d_now_timer_id !== null) {
+      clearInterval(this.d_now_timer_id);
+    }
+  }
+
+  get time_until_soft_closing_time() {
+    if (this.group.extended_due_date !== null) {
+      return '';
+    }
+
+    assert_not_null(this.project.soft_closing_time);
+    let deadline = moment(this.project.soft_closing_time);
+    if (this.d_now.isAfter(deadline)) {
+      return '';
+    }
+
+    return this._format_time_diff(deadline, this.d_now);
+  }
+
+  get time_until_extension() {
+    assert_not_null(this.group.extended_due_date);
+    let extension = moment(this.group.extended_due_date);
+    if (this.d_now.isAfter(extension)) {
+      return '';
+    }
+
+    return this._format_time_diff(extension, this.d_now);
+  }
+
+  _format_time_diff(first: moment.Moment, second: moment.Moment): string {
+    let diff = moment.duration(first.diff(second));
+
+    let days = diff.days();
+    let hours = diff.hours();
+    let hours_str = `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+    if (days >= 1) {
+      return `(${days} ${days === 1 ? 'day' : 'days'} ${hours_str})`;
+    }
+
+    let minutes = diff.minutes();
+    let minutes_str = `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
+    if (hours >= 1) {
+      return `(${hours_str} ${minutes_str})`;
+    }
+
+    if (diff.asMinutes() < 1) {
+      return '(< 1 minute)';
+    }
+    return `(${minutes_str})`;
   }
 
   get num_submissions_per_day() {
@@ -270,7 +340,7 @@ export default class Submit extends Vue {
       deadline = deadline.add(late_days_used, 'd');
     }
 
-    return moment().isAfter(deadline);
+    return this.d_now.isAfter(deadline);
   }
 
   get file_mismatches_present() {
