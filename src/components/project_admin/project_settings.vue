@@ -443,6 +443,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
+import moment from "moment-timezone";
 
 import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
@@ -484,13 +485,9 @@ export default class ProjectSettings extends Vue {
   @Prop({required: true, type: Project})
   project!: Project;
 
-  readonly timezones: ReadonlyArray<string> = [
-    'US/Central',
-    'US/Eastern',
-    'US/Mountain',
-    'US/Pacific',
-    'UTC'
-  ];
+  get timezones() {
+    return moment.tz.names();
+  }
 
   d_project: Project | null = null;
   d_saving = false;
