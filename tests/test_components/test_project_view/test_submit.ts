@@ -115,6 +115,19 @@ describe('Deadline info tests', () => {
         ).toEqual('2 late days used on this project.');
     });
 
+    test('More than one month until soft closing time', async () => {
+        project.soft_closing_time = moment().add(1, 'months').add(1, 'minutes').format();
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('(> 1 month)');
+    });
+
     test('Days until soft closing time', async () => {
         project.soft_closing_time
             = moment().add(3, 'days').add(7, 'hours').add(5, 'minutes').format();
@@ -271,6 +284,22 @@ describe('Deadline info tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#deadline-countdown').text()).toEqual('');
         expect(wrapper.find('#extension-countdown').text()).toEqual('(< 1 minute)');
+    });
+
+    test('More than one month until extension', async () => {
+        project.soft_closing_time = moment().subtract(7, 'hours').format();
+        group.extended_due_date = moment().add(1, 'months').add(1, 'minutes').format();
+
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('');
+        expect(wrapper.find('#extension-countdown').text()).toEqual('(> 1 month)');
     });
 
     test('Extension countdown updates when d_now changes', async () => {

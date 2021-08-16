@@ -283,6 +283,10 @@ export default class Submit extends Vue {
   _format_time_diff(first: moment.Moment, second: moment.Moment): string {
     let diff = moment.duration(first.diff(second));
 
+    if (diff.asMonths() >= 1) {
+      return '(> 1 month)';
+    }
+
     let days = diff.days();
     let hours = diff.hours();
     let hours_str = `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
