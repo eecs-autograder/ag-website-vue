@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+import APITokenView from '@/components/api_token.vue';
 import CourseAdmin from '@/components/course_admin/course_admin.vue';
 import CourseList from '@/components/course_list/course_list.vue';
 import ProjectList from '@/components/course_view.vue';
@@ -23,7 +24,8 @@ const ROUTES = [
     { path: '/web/project_admin/:project_id', name: 'project_admin', component: ProjectAdmin },
     { path: '/web/project/:project_id', component: ProjectView },
     { path: '/web/superusers', component: SuperuserDashboard },
-    { path: '/__demos__', component: UIDemos }
+    { path: '/__demos__', component: UIDemos },
+    { path: '/web/__apitoken__', component: APITokenView}
 ];
 
 const ROUTER = new VueRouter ({
