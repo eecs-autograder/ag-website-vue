@@ -49,8 +49,20 @@
       <div class="option-container">
         <div class="checkbox-input-container">
           <label class="checkbox-label">
-          <input id="include-staff" type="checkbox" class="checkbox" v-model="d_include_staff"/>
+            <input id="include-staff" type="checkbox" class="checkbox" v-model="d_include_staff"/>
             Include staff
+          </label>
+        </div>
+      </div>
+
+      <div class="option-container" v-if="d_download_grades && d_final_graded_submissions_only">
+        <div class="checkbox-input-container">
+          <label class="checkbox-label">
+            <input id="include-pending-extensions"
+                   type="checkbox"
+                   class="checkbox"
+                   v-model="d_include_pending_extensions"/>
+            Include students with pending extensions
           </label>
         </div>
       </div>
@@ -148,6 +160,7 @@ export default class DownloadGrades extends Vue implements Created, BeforeDestro
 
   d_download_grades = true;
   d_include_staff = false;
+  d_include_pending_extensions = false;
   d_final_graded_submissions_only = true;
   d_creating_download_task = false;
 
@@ -216,9 +229,20 @@ export default class DownloadGrades extends Vue implements Created, BeforeDestro
       base_url += 'ultimate_submission_files/';
     }
 
+    let query_options: {[param_name: string]: boolean} = {};
     if (this.d_include_staff) {
-      base_url += '?include_staff=true';
+      query_options['include_staff'] = true;
     }
+    if (this.d_include_pending_extensions) {
+      query_options['include_pending_extensions'] = true;
+    }
+    if (Object.keys(query_options).length !== 0) {
+      base_url += '?';
+      base_url += Object.entries(query_options).filter(
+        entry => entry[1]
+      ).map(entry => `${entry[0]}=true`).join('&');
+    }
+
     return base_url;
   }
 

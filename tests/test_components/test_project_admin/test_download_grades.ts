@@ -169,8 +169,59 @@ describe('Create task tests', () => {
         expect(row.find('.file-name').text()).toEqual(
             project.name + '_final_graded_submission_scores.csv');
 
-        expect(http_post_stub.calledOnceWith(
-            `/projects/${project.pk}/final_graded_submission_scores/?include_staff=true`));
+        expect(http_post_stub.calledOnce).toBe(true);
+        let args = http_post_stub.getCall(0).args;
+        expect(args[0]).toEqual(
+            `/projects/${project.pk}/ultimate_submission_scores/?include_staff=true`
+        );
+    });
+
+    test('With pending extensions', async () => {
+        wrapper.find('#include-pending-extensions').setChecked();
+        await wrapper.find('.download-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
+        await wrapper.vm.$nextTick();
+
+        let row = wrapper.findAll('.download-row').at(0);
+        expect(row.find('.file-name').text()).toEqual(
+            project.name + '_final_graded_submission_scores.csv');
+
+        expect(http_post_stub.calledOnce).toBe(true);
+        let args = http_post_stub.getCall(0).args;
+        expect(args[0]).toEqual(
+            `/projects/${project.pk}/ultimate_submission_scores/?include_pending_extensions=true`
+        );
+    });
+
+    test('With staff and pending extensions', async () => {
+        wrapper.find('#include-staff').setChecked();
+        wrapper.find('#include-pending-extensions').setChecked();
+        await wrapper.find('.download-button').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
+        await wrapper.vm.$nextTick();
+
+        let row = wrapper.findAll('.download-row').at(0);
+        expect(row.find('.file-name').text()).toEqual(
+            project.name + '_final_graded_submission_scores.csv');
+
+        expect(http_post_stub.calledOnce).toBe(true);
+        let args = http_post_stub.getCall(0).args;
+        expect(args[0]).toEqual(
+            `/projects/${project.pk}/ultimate_submission_scores/`
+            + `?include_staff=true&include_pending_extensions=true`
+        );
+    });
+
+    test('Include pending extensions hidden when not relevant', async () => {
+        expect(wrapper.find('#include-pending-extensions').exists()).toBe(true);
+        await wrapper.find('#all-choice').setChecked();
+        expect(wrapper.find('#include-pending-extensions').exists()).toBe(false);
+
+        await wrapper.find('#final-graded-choice').setChecked();
+        expect(wrapper.find('#include-pending-extensions').exists()).toBe(true);
+
+        await wrapper.find('#files-choice').setChecked();
+        expect(wrapper.find('#include-pending-extensions').exists()).toBe(false);
     });
 
     test('API errors handled', async () => {
