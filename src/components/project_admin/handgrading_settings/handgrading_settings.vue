@@ -99,6 +99,11 @@
                        type="checkbox"
                        v-model="d_handgrading_rubric.show_only_applied_rubric_to_students"/>
                 Show only applied rubric items
+                <tooltip placement="top" width="large">
+                  Student will only see the rubric items that were applied to their submission.
+                  <br><br>
+                  All other rubric items will be hidden, including those with positive points.
+                </tooltip>
               </label>
             </div>
 
