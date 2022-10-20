@@ -301,6 +301,16 @@ describe('Handgrading settings tests', () => {
         expect(wrapper.vm.d_handgrading_rubric!.show_grades_and_rubric_to_students).toEqual(true);
     });
 
+    test('Show only applied rubric binding', () => {
+        expect(checkbox_is_checked(
+            wrapper.find('#show-only-applied-rubrics'))
+        ).toEqual(wrapper.vm.d_handgrading_rubric!.show_only_applied_rubric_to_students);
+
+        wrapper.find('#show-only-applied-rubrics').setChecked(true);
+
+        expect(wrapper.vm.d_handgrading_rubric!.show_only_applied_rubric_to_students).toEqual(true);
+    });
+
     test('Points style binding', () => {
         expect_html_element_has_value(
             wrapper.find('#points-style'), PointsStyle.start_at_zero_and_add);
