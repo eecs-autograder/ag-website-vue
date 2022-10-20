@@ -92,6 +92,16 @@
               </label>
             </div>
 
+            <div class="checkbox-input-container">
+              <label class="checkbox-label">
+                <input id="show-only-applied-rubrics"
+                       class="checkbox"
+                       type="checkbox"
+                       v-model="d_handgrading_rubric.show_only_applied_rubric_to_students"/>
+                Show only applied rubric items
+              </label>
+            </div>
+
             <div class="form-field-wrapper extra-space">
               <label for="points-style" class="label">Points style</label> <br>
               <select v-model="d_handgrading_rubric.points_style"
