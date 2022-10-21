@@ -58,6 +58,7 @@ describe('Initialize handgrading tests', () => {
             project: project.pk,
             last_modified: '',
             points_style: PointsStyle.start_at_zero_and_add,
+            show_only_applied_rubric_to_students: false,
             max_points: null,
             show_grades_and_rubric_to_students: false,
             handgraders_can_leave_comments: false,
@@ -102,6 +103,7 @@ describe('Initialize handgrading tests', () => {
             project: project_to_import_from.pk,
             last_modified: '',
             points_style: PointsStyle.start_at_zero_and_add,
+            show_only_applied_rubric_to_students: false,
             max_points: null,
             show_grades_and_rubric_to_students: false,
             handgraders_can_leave_comments: false,
@@ -167,6 +169,7 @@ describe('Initialize handgrading tests', () => {
             points_style: PointsStyle.start_at_zero_and_add,
             max_points: null,
             show_grades_and_rubric_to_students: false,
+            show_only_applied_rubric_to_students: false,
             handgraders_can_leave_comments: false,
             handgraders_can_adjust_points: false,
             criteria: [],
@@ -268,6 +271,7 @@ describe('Handgrading settings tests', () => {
             points_style: PointsStyle.start_at_zero_and_add,
             max_points: null,
             show_grades_and_rubric_to_students: false,
+            show_only_applied_rubric_to_students: false,
             handgraders_can_leave_comments: false,
             handgraders_can_adjust_points: false,
             criteria: [],
@@ -299,6 +303,16 @@ describe('Handgrading settings tests', () => {
         wrapper.find('#publish-grades').setChecked(true);
 
         expect(wrapper.vm.d_handgrading_rubric!.show_grades_and_rubric_to_students).toEqual(true);
+    });
+
+    test('Show only applied rubric binding', () => {
+        expect(checkbox_is_checked(
+            wrapper.find('#show-only-applied-rubrics'))
+        ).toEqual(wrapper.vm.d_handgrading_rubric!.show_only_applied_rubric_to_students);
+
+        wrapper.find('#show-only-applied-rubrics').setChecked(true);
+
+        expect(wrapper.vm.d_handgrading_rubric!.show_only_applied_rubric_to_students).toEqual(true);
     });
 
     test('Points style binding', () => {
@@ -414,6 +428,7 @@ describe('Criteria and annotation tests', () => {
             points_style: PointsStyle.start_at_zero_and_add,
             max_points: null,
             show_grades_and_rubric_to_students: false,
+            show_only_applied_rubric_to_students: false,
             handgraders_can_leave_comments: false,
             handgraders_can_adjust_points: false,
             criteria: [],

@@ -92,6 +92,21 @@
               </label>
             </div>
 
+            <div class="checkbox-input-container">
+              <label class="checkbox-label">
+                <input id="show-only-applied-rubrics"
+                       class="checkbox"
+                       type="checkbox"
+                       v-model="d_handgrading_rubric.show_only_applied_rubric_to_students"/>
+                Show only applied rubric items
+                <tooltip placement="top" width="large">
+                  Student will only see the rubric items that were applied to their submission.
+                  <br><br>
+                  All other rubric items will be hidden, including those with positive points.
+                </tooltip>
+              </label>
+            </div>
+
             <div class="form-field-wrapper extra-space">
               <label for="points-style" class="label">Points style</label> <br>
               <select v-model="d_handgrading_rubric.points_style"
