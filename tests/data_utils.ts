@@ -659,6 +659,7 @@ export function make_handgrading_rubric(project_pk: number,
         handgraders_can_leave_comments: false,
         handgraders_can_adjust_points: false,
         points_style: PointsStyle.start_at_zero_and_add,
+        show_only_applied_rubric_to_students: false,
         max_points: null,
         show_grades_and_rubric_to_students: false,
     };
