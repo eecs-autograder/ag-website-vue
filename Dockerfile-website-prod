@@ -1,4 +1,4 @@
-FROM nginx:1.13
+FROM nginx:1.25
 
 RUN apt-get update --fix-missing
 RUN mkdir -p /usr/src/app/src
@@ -6,7 +6,7 @@ RUN mkdir -p /usr/src/app/src
 WORKDIR /usr/src/app
 
 RUN apt-get install -y curl gnupg
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
 COPY package.json .
@@ -16,7 +16,7 @@ COPY .postcssrc.js .
 COPY vue.config.js .
 COPY tsconfig.json .
 
-RUN npm install
+RUN npm ci
 
 COPY . /usr/src/app
 RUN npm run build

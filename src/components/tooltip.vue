@@ -24,14 +24,14 @@ export default class Tooltip extends Vue {
   @Prop({
     default: "top",
     type: String,
-    validator: value => ['top', 'bottom', 'left', 'right'].includes(value)
+    validator: value => ['top', 'bottom', 'left', 'right'].includes(<string> value)
   })
   placement!: 'top' | 'bottom' | 'left' | 'right';
 
   @Prop({
     default: "small",
     type: String,
-    validator: value => ['small', 'medium', 'large'].includes(value)
+    validator: value => ['small', 'medium', 'large'].includes(<string> value)
   })
   width!: 'small' | 'medium' | 'large';
 
@@ -140,28 +140,28 @@ $text-position: calc(100% + #{$caret-size});
   &.position-top {
     border-color: $background-color transparent transparent transparent;
     top: -$caret-size;
-    margin-right: -($caret-size / 2);
+    margin-right: calc($caret-size / -2);
     right: $caret-size;
   }
 
   &.position-bottom  {
     border-color: transparent transparent $background-color transparent;
     bottom: -$caret-size;
-    margin-left: -($caret-size / 2);
+    margin-left: calc($caret-size / -2);
     left: $caret-size;
   }
 
   &.position-left {
     border-color: transparent transparent transparent $background-color;
     left: -$caret-size;
-    margin-top: -($caret-size / 2);
+    margin-top: calc($caret-size / -2);
     top: $caret-size;
   }
 
   &.position-right {
     border-color: transparent $background-color transparent transparent;
     right: -$caret-size;
-    margin-top: -($caret-size / 2);
+    margin-top: calc($caret-size / -2);
     top: $caret-size;
   }
 }

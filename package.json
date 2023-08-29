@@ -8,22 +8,22 @@
     "test": "python3 run_tests.py"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.2",
-    "@types/minimatch": "^3.0.3",
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "@types/minimatch": "^3.0.5",
     "ag-client-typescript": "2.5.0",
-    "chart.js": "^3.1.0",
-    "chartjs-adapter-moment": "^1.0.0",
-    "chartjs-plugin-zoom": "^1.0.0-beta.5",
+    "chart.js": "^3.9.1",
+    "chartjs-adapter-moment": "^1.0.1",
+    "chartjs-plugin-zoom": "^1.2.1",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.9.0",
     "lodash": "^4.17.21",
-    "minimatch": "^3.0.4",
-    "moment": "^2.29.1",
-    "moment-timezone": "^0.5.33",
-    "vue": "^2.6.12",
+    "minimatch": "^3.1.2",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
+    "vue": "^2.7.14",
     "vue-class-component": "^7.2.6",
     "vue-property-decorator": "^8.5.1",
-    "vue-router": "^3.5.1",
+    "vue-router": "^3.6.5",
     "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
@@ -36,9 +36,10 @@
     "@vue/cli-plugin-unit-jest": "^4.5.11",
     "@vue/cli-service": "^4.5.11",
     "@vue/test-utils": "^1.1.3",
+    "cache-loader": "^4.1.0",
     "jest": "^25.0.0",
-    "node-sass": "^4.14.1",
-    "sass-loader": "^7.3.1",
+    "sass": "^1.66.1",
+    "sass-loader": "^10.1.1",
     "sinon": "^7.5.0",
     "timezone-mock": "^1.1.3",
     "ts-jest": "^25.0.0",
@@ -47,6 +48,7 @@
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.9.9",
     "vue-jest": "^3.0.7",
-    "vue-template-compiler": "^2.6.12"
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "4.45.0"
   }
 }
