@@ -326,17 +326,17 @@ describe('Checkbox tests', () => {
 
     test('Expand/collapse checkbox list', async () => {
         expect(wrapper.findAll('.criterion').length).toEqual(2);
-        expect(wrapper.findAll('.criterion').at(0).element).toBeVisible();
+        expect(wrapper.findAll('.criterion').at(0).isVisible()).toBe(true);
 
         wrapper.findAll('.collapsible-section-header').at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.criterion').length).toEqual(2);
-        expect(wrapper.findAll('.criterion').at(0).element).not.toBeVisible();
+        expect(wrapper.findAll('.criterion').at(0).isVisible()).toBe(false);
 
         wrapper.findAll('.collapsible-section-header').at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.criterion').length).toEqual(2);
-        expect(wrapper.findAll('.criterion').at(0).element).toBeVisible();
+        expect(wrapper.findAll('.criterion').at(0).isVisible()).toBe(true);
     });
 
     test('Checkboxes displayed', async () => {
@@ -487,17 +487,17 @@ describe('Comment tests', () => {
 
     test('Expand/collapse comment list', async () => {
         expect(wrapper.findAll('.comment').length).toEqual(4);
-        expect(wrapper.findAll('.comment').at(0).element).toBeVisible();
+        expect(wrapper.findAll('.comment').at(0).isVisible()).toBe(true);
 
         wrapper.findAll('.collapsible-section-header').at(1).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(4);
-        expect(wrapper.findAll('.comment').at(0).element).not.toBeVisible();
+        expect(wrapper.findAll('.comment').at(0).isVisible()).toBe(false);
 
         wrapper.findAll('.collapsible-section-header').at(1).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.comment').length).toEqual(4);
-        expect(wrapper.findAll('.comment').at(0).element).toBeVisible();
+        expect(wrapper.findAll('.comment').at(0).isVisible()).toBe(true);
     });
 
     test('Staff can leave custom comment', async () => {
@@ -676,17 +676,17 @@ describe('Annotations reference list', () => {
 
     test('Expand/collapse annotation list', async () => {
         expect(wrapper.findAll('.annotation').length).toEqual(2);
-        expect(wrapper.findAll('.annotation').at(0).element).not.toBeVisible();
+        expect(wrapper.findAll('.annotation').at(0).isVisible()).toBe(false);
 
         wrapper.findAll('.collapsible-section-header').at(2).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.annotation').length).toEqual(2);
-        expect(wrapper.findAll('.annotation').at(0).element).toBeVisible();
+        expect(wrapper.findAll('.annotation').at(0).isVisible()).toBe(true);
 
         wrapper.findAll('.collapsible-section-header').at(2).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.annotation').length).toEqual(2);
-        expect(wrapper.findAll('.annotation').at(0).element).not.toBeVisible();
+        expect(wrapper.findAll('.annotation').at(0).isVisible()).toBe(false);
     });
 
     test('Annotations listed', async () => {

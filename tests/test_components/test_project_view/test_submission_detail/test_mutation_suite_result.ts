@@ -446,24 +446,24 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
 
     test('All bug names shown', async () => {
         mutation_test_suite_result.num_bugs_exposed = 3;
-        mutation_test_suite_result.bugs_exposed = ['test1', 'test2', 'test5'];
-        mutation_test_suite_result.all_bug_names = ['test1', 'test2', 'test3', 'test4', 'test5'];
+        mutation_test_suite_result.bugs_exposed = ['bug1', 'bug2', 'bug5'];
+        mutation_test_suite_result.all_bug_names = ['bug1', 'bug2', 'bug3', 'bug4', 'bug5'];
         wrapper = await make_wrapper();
 
         let bug_names = wrapper.findAll('[data-testid=bugs_exposed] .list-item');
         expect(bug_names.length).toEqual(5);
 
-        expect(bug_names.at(0).find('.list-icon').element).toBeVisible();
-        expect(bug_names.at(1).find('.list-icon').element).toBeVisible();
+        expect(bug_names.at(0).find('.list-icon').isVisible()).toBe(true);
+        expect(bug_names.at(1).find('.list-icon').isVisible()).toBe(true);
 
-        // These toBeVisible() checks don't work for some reason, even though
-        // we've verified that this behaves correctly in the browser.
-        // expect(bug_names.at(2).find('.list-icon').element).not.toBeVisible();
+        // These visibility checks don't work, likely because of the use of a set
+        // in the implementation.
+        // expect(bug_names.at(2).find('.list-icon').isVisible()).toBe(false);
         expect(bug_names.at(2).find('.list-icon').exists()).toBe(true);
-        // expect(bug_names.at(3).find('.list-icon').element).not.toBeVisible();
+        // expect(bug_names.at(3).find('.list-icon').isVisible()).toBe(false);
         expect(bug_names.at(3).find('.list-icon').exists()).toBe(true);
 
-        expect(bug_names.at(4).find('.list-icon').element).toBeVisible();
+        expect(bug_names.at(4).find('.list-icon').isVisible()).toBe(true);
 
         expect(bug_names.at(0).element).not.toHaveClass('unexposed-bug');
         expect(bug_names.at(1).element).not.toHaveClass('unexposed-bug');
