@@ -5,9 +5,9 @@ RUN mkdir -p /usr/src/app/src
 
 WORKDIR /usr/src/app
 
-RUN apt-get install -y curl gnupg
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs
+RUN apt-get install -y curl gnupg wget
+RUN wget https://nodejs.org/dist/v16.9.1/node-v16.9.1-linux-x64.tar.gz
+RUN tar -xf node-v16.9.1-linux-x64.tar.gz -C /usr/local --strip-components=1 --no-same-owner
 
 COPY package.json .
 COPY package-lock.json .
