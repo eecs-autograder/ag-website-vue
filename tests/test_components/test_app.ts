@@ -110,7 +110,7 @@ describe('Breadcrumb and global error tests', () => {
         GlobalErrorsSubject.get_instance().report_error(new HttpError(401, 'log in plz'));
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findComponent({ref: 'global_errors'}).element).toBeVisible();
+        expect(wrapper.findComponent({ref: 'global_errors'}).isVisible()).toBe(true);
         expect(
             (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).d_api_errors.length
         ).toBe(1);

@@ -887,6 +887,8 @@ describe('AGTestCommandSettings tests', () => {
         await wrapper.find('.modal-delete-button').trigger('click');
 
         expect(delete_command_stub.calledOnce).toBe(true);
+        await wait_until(
+            wrapper, w => !wrapper.findComponent({ref: 'delete_ag_test_command_modal'}).exists());
         expect(wrapper.findComponent({ref: 'delete_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(false);
     });
@@ -923,6 +925,8 @@ describe('AGTestCommandSettings tests', () => {
         await wrapper.find('.modal-delete-button').trigger('click');
 
         expect(delete_case_stub.calledOnce).toBe(true);
+        await wait_until(
+            wrapper, w => !wrapper.findComponent({ref: 'delete_ag_test_command_modal'}).exists());
         expect(wrapper.findComponent({ref: 'delete_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_delete_ag_test_command_modal).toBe(false);
     });

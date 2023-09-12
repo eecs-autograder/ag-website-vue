@@ -629,8 +629,14 @@ describe('Remove from queue tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(remove_submission_from_queue_stub.calledOnce).toBe(true);
+        await wait_until(
+            wrapper,
+            w => !wrapper.findComponent({ref: 'remove_submission_from_queue_modal'}).exists()
+        );
         expect(wrapper.vm.d_show_remove_submission_from_queue_modal).toBe(false);
-        expect(wrapper.findComponent({ref: 'api_errors'}).exists()).toBe(false);
+        expect(
+            wrapper.findComponent({ref: 'remove_submission_from_queue_modal'}).exists()
+        ).toBe(false);
     });
 
     test('Remove submission from queue - confirm action - unsuccessful', async () => {

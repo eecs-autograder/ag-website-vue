@@ -669,7 +669,7 @@ $light-green: hsl(97, 42%, 79%);
       background-color: $white-gray;
     }
   }
-  
+
 }
 
 </style>

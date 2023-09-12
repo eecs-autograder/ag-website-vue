@@ -16,10 +16,11 @@
     <tr v-for="(member, index) of group.member_names"
         :key="member"
         :class="{'odd-row': index % 2 !== 0}">
-      <td ref="member_name" class="body-cell">
+      <td ref="member_name" data-testid="member_name" class="body-cell">
         {{member}}
       </td>
-      <td ref="late_days" class="body-cell" v-if="member in d_late_day_totals">
+      <td ref="late_days" data-testid="late_days"
+          class="body-cell" v-if="member in d_late_day_totals">
         {{d_late_day_totals[member]}}
       </td>
     </tr>
