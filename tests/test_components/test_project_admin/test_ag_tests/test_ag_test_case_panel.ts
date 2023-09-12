@@ -284,8 +284,7 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(false);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(false);
 
-        await wrapper.findAllComponents(
-            {ref: 'add_ag_test_command_menu_item'}).at(0).trigger('click');
+        await wrapper.findComponent({ref: 'add_ag_test_command_menu_item'}).trigger('click');
         expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
 

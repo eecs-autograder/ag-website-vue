@@ -35,6 +35,7 @@
         </div>
         <div class="checkbox-input-container"
              ref="submission_checkbox"
+             data-testid="submission_checkbox"
              v-for="submission of d_submissions" :key="submission.pk">
           <label>
             <input

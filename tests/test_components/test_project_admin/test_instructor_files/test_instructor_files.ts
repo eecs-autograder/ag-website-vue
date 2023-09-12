@@ -389,7 +389,7 @@ describe('InstructorFiles.vue', () => {
     test('Open/close the sidebar', async () => {
         let sidebar_header = wrapper.find('.sidebar-header');
         expect(wrapper.vm.d_collapsed).toBe(false);
-        expect(wrapper.find('.sidebar-content').element).toBeVisible();
+        expect(wrapper.find('.sidebar-content').isVisible()).toBe(true);
         expect(sidebar_header.text().includes('Uploaded Files')).toBe(true);
 
         // Header text still shows up if we haven't selected a file
@@ -408,7 +408,7 @@ describe('InstructorFiles.vue', () => {
         wrapper.find('.sidebar-collapse-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_collapsed).toBe(false);
-        expect(wrapper.find('.sidebar-content').element).toBeVisible();
+        expect(wrapper.find('.sidebar-content').isVisible()).toBe(true);
         expect(sidebar_header.text().includes('Uploaded Files')).toBe(true);
     });
 });

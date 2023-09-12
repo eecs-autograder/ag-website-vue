@@ -186,6 +186,8 @@ describe('AGTestSuiteSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(delete_stub.calledOnce).toBe(true);
+        await wait_until(
+            wrapper, w => !w.findComponent({ref: 'delete_ag_test_suite_modal'}).exists());
         expect(wrapper.vm.d_show_delete_ag_test_suite_modal).toBe(false);
         expect(wrapper.findComponent({ref: 'delete_ag_test_suite_modal'}).exists()).toBe(false);
     });

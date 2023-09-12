@@ -181,6 +181,7 @@ describe('SingleCourse.vue', () => {
         let copy_course_stub = sinon.stub(wrapper.vm.course, 'copy');
         await wrapper.findComponent({ref: 'clone_course_form'}).trigger('submit');
 
+        await wait_until(wrapper, w => !w.findComponent({ref: 'clone_course_modal'}).exists());
         assert_not_null(course.semester);
         assert_not_null(course.year);
         expect(copy_course_stub.firstCall.calledWith(

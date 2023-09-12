@@ -180,8 +180,7 @@ describe('ViewFile handgrading tests', () => {
             10, 11, 12, 13
         ];
         expect(wrapper.findAll('.commented-line').length).toEqual(highlighted_line_indices.length);
-
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         for (let index of highlighted_line_indices) {
             expect(code_lines.at(index).classes()).toEqual(['commented-line']);
         }
@@ -216,7 +215,7 @@ describe('ViewFile handgrading tests', () => {
     });
 
     test('Hovered comment highlighted differently', async () => {
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         let single_line_comment = wrapper.findAll('.comment').at(1);
         await single_line_comment.trigger('mouseenter');
         expect(code_lines.at(5).classes()).toContain('hovered-comment-line');
@@ -250,7 +249,7 @@ describe('ViewFile handgrading tests', () => {
             let new_applied_annotation = make_create_result(0, 0);
             create_stub.resolves(new_applied_annotation);
 
-            let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+            let code_lines = wrapper.findAll('[data-testid=code_line]');
             code_lines.at(0).trigger('mousedown');
             code_lines.at(0).trigger('mouseup');
 
@@ -294,7 +293,7 @@ describe('ViewFile handgrading tests', () => {
             let new_applied_annotation = make_create_result(0, 2);
             create_stub.resolves(new_applied_annotation);
 
-            let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+            let code_lines = wrapper.findAll('[data-testid=code_line]');
             // Highlighed region expands up and down
             code_lines.at(1).trigger('mousedown');
             code_lines.at(0).trigger('mouseenter');
@@ -353,7 +352,7 @@ describe('ViewFile handgrading tests', () => {
         );
         let create_stub = sinon.stub(ag_cli.Comment, 'create').resolves(new_comment);
 
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         code_lines.at(0).trigger('mousedown');
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
@@ -398,7 +397,7 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.findAll('.comment').at(1).find('.delete').exists()).toBe(true);
         expect(wrapper.findAll('.comment').at(2).find('.delete').exists()).toBe(true);
 
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         code_lines.at(0).trigger('mousedown');
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
@@ -439,7 +438,7 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         code_lines.at(0).trigger('mousedown');
         code_lines.at(1).trigger('mouseenter');
         code_lines.at(2).trigger('mouseenter');
@@ -454,7 +453,7 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');
         await code_lines.at(1).trigger('mouseenter');
         await code_lines.at(2).trigger('mouseenter');
@@ -468,7 +467,7 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mouseenter');
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
@@ -484,10 +483,10 @@ describe('ViewFile handgrading tests', () => {
     });
 
     test('Highlighting disabled when context menu open', async () => {
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');
         await code_lines.at(0).trigger('mouseup');
-        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).element).toBeVisible();
+        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
         expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
@@ -531,7 +530,7 @@ describe('ViewFile handgrading tests', () => {
         expect(wrapper.vm.d_first_highlighted_line).toBeNull();
         expect(wrapper.vm.d_last_highlighted_line).toBeNull();
 
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');
         await code_lines.at(1).trigger('mouseenter');
         await code_lines.at(2).trigger('mouseenter');
@@ -554,12 +553,12 @@ describe('ViewFile handgrading tests', () => {
         });
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        let code_lines = wrapper.findAllComponents({ref: 'code_line'});
+        let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');
         await code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).element).toBeVisible();
+        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
         expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).text()).toEqual('');
     });
 });

@@ -14,7 +14,8 @@
     <template v-else>
       <table class="viewing-container" :class="{'saving': d_saving}">
         <template v-for="(line_num, index) of num_lines_to_show">
-          <tr :class="{'commented-line': line_in_comment(index),
+          <tr :key="line_num"
+              :class="{'commented-line': line_in_comment(index),
                         'hovered-comment-line': d_hovered_comment !== null
                                                 && index >= d_hovered_comment.location.first_line
                                                 && index <= d_hovered_comment.location.last_line,
@@ -24,7 +25,7 @@
               @mousedown="start_highlighting(index)"
               @mouseenter="grow_highlighted_region(index)"
               @mouseup="stop_highlighting($event, index)"
-              ref="code_line">
+              data-testid="code_line">
             <td class="line-number">{{line_num}}</td>
             <td class="line-of-file-content"
                 :style="{'user-select': (handgrading_enabled
