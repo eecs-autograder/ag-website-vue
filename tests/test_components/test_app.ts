@@ -5,7 +5,7 @@ import { createLocalVue, Wrapper } from "@vue/test-utils";
 import { Course, HttpClient, HttpError, User } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import App, { GlobalData } from '@/app.vue';
+import App, { GlobalData, window_location } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import * as cookie from '@/cookie';
 import { GlobalErrorsSubject } from '@/error_handling';
@@ -147,22 +147,11 @@ describe('Login tests', () => {
     });
 
     describe('Auth redirect tests', () => {
-        let window_location = window.location;
-        let location_assign_stub: sinon.SinonSpy;
-
         beforeEach(() => {
-            delete window.location;
-            location_assign_stub = sinon.spy();
-            // @ts-ignore
-            window.location = {assign: location_assign_stub};
-        });
-
-        afterEach(() => {
-            window.location = window_location;
+            sinon.stub(window_location, 'assign');
         });
 
         test('Token cookie unavailable, auth redirect called on button click', async () => {
-            // let location_assign_stub = sinon.stub(window.location, 'assign');
             sinon.stub(cookie, 'get_cookie').returns(null);
             let authenticate_stub = sinon.stub(HttpClient.get_instance(), 'authenticate');
             let fake_redirect_url = '/oauth2/something/or/other/';
@@ -176,13 +165,13 @@ describe('Login tests', () => {
             let wrapper = make_wrapper();
             expect(await wait_for_load(wrapper)).toBe(true);
 
-            expect(location_assign_stub.callCount).toEqual(0);
+            expect(window_location.assign.callCount).toEqual(0);
             expect(wrapper.vm.globals.current_user).toBeNull();
 
             wrapper.find('[data-testid=login_button]').trigger('click');
             await wrapper.vm.$nextTick();
 
-            expect(location_assign_stub.calledOnceWith(fake_redirect_url)).toBe(true);
+            expect(window_location.assign.calledOnceWith(fake_redirect_url)).toBe(true);
             expect(authenticate_stub.callCount).toEqual(0);
             expect(wrapper.vm.globals.current_user).toBeNull();
         });
