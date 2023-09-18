@@ -149,7 +149,11 @@ export default class FirstSubmissionTimeVsFinalScore extends Vue {
               zoom: {
                 mode: 'x',
                 wheel: {
+                  enabled: true,
                   modifierKey: 'shift',
+                },
+                pinch: {
+                  enabled: true
                 }
               }
             },
