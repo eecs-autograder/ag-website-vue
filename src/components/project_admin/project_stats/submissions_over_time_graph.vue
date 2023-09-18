@@ -147,7 +147,11 @@ export default class SubmissionsOverTimeGraph extends Vue {
               zoom: {
                 mode: 'x',
                 wheel: {
+                  enabled: true,
                   modifierKey: 'shift',
+                },
+                pinch: {
+                  enabled: true
                 }
               }
             },
