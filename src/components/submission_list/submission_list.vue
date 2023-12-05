@@ -43,8 +43,26 @@
       </div>
     </div>
 
-
     <div :class="['body', {'body-closed': d_collapsed}]">
+      <div v-if="d_all_unlocked_mutant_hints.length !== 0" style="margin: .875rem;">
+        <h3>Hints</h3>
+        <div style="margin-bottom: .25rem;">
+          We appreciate your feedback. Were these hints useful?
+        </div>
+
+        <div
+          class="unlocked-hint-wrapper"
+          v-for="hint of d_all_unlocked_mutant_hints"
+          :key="hint.pk"
+        >
+          <unlocked-hint
+            :hint="hint"
+            @hint_updated="on_hint_updated"
+          ></unlocked-hint>
+            <!-- FIXME: Update list here when hints are rated in submission detail and vice versa -->
+        </div>
+      </div>
+
       <div class="screen-too-small-msg">
         <i class="fas fa-exclamation-triangle"></i>
         Your screen may be too small to display this content properly.
@@ -70,6 +88,7 @@ import {
     FeedbackCategory,
     GradingStatus,
     Group,
+    HttpClient,
     HttpError,
     Project,
     Submission,
@@ -87,10 +106,24 @@ import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { safe_assign, zip } from '@/utils';
 
+import UnlockedHint from '../project_view/submission_detail/mutant_hints/unlocked_hint.vue';
+
+interface UnlockedHintData {
+  pk: number;
+  mutation_test_suite_result: number;
+  mutation_test_suite_hint_config: number;
+  mutant_name: string;
+  hint_number: number;
+  hint_text: string;
+  hint_rating: number | null;
+  user_comment: string;
+}
+
 @Component({
   components: {
     SubmissionDetail,
-    SubmissionPanel
+    SubmissionPanel,
+    UnlockedHint,
   }
 })
 export default class SubmissionList extends Vue implements SubmissionObserver,
@@ -118,6 +151,8 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
   plain_submissions_poller: Poller | null = null;
 
   d_collapsed = false;
+
+  d_all_unlocked_mutant_hints: UnlockedHintData[] = [];
 
   @Watch('group')
   on_group_changed(new_value: Group, old_value: Group) {
@@ -176,6 +211,11 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
     this.plain_submissions_poller.start_after_delay();
 
     this.d_loading = false;
+
+    let all_hints_response = await HttpClient.get_instance().get<UnlockedHintData[]>(
+      `/groups/${this.group.pk}/all_unlocked_mutant_hints/`
+    );
+    this.d_all_unlocked_mutant_hints = all_hints_response.data;
   }
 
   private async refresh_submissions() {
@@ -272,6 +312,13 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
     if (index !== -1) {
       safe_assign(this.d_submissions[index], new SubmissionData(submission));
     }
+  }
+
+  on_hint_updated(data: {pk: number, hint_rating: number, user_comment: string}) {
+    this.d_all_unlocked_mutant_hints.splice(
+      this.d_all_unlocked_mutant_hints.findIndex(item => item.pk === data.pk),
+      1
+    );
   }
 }
 </script>
@@ -371,6 +418,10 @@ $border-color: $pebble-medium;
   @media only screen and (min-width: 500px) {
     display: none;
   }
+}
+
+.unlocked-hint-wrapper {
+  margin-bottom: .5rem;
 }
 
 </style>

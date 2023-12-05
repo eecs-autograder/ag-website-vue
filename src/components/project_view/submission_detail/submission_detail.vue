@@ -168,6 +168,8 @@
       </select>
     </div>
 
+    <!-- show old hints here -->
+
     <mutation-suite-results
       ref="mutation_suite_results"
       v-if="submission_result.mutation_test_suite_results.length"

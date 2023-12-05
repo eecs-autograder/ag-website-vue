@@ -140,7 +140,7 @@ export default class BuggyImplementations extends Vue {
   d_saving = false;
   d_override_max_points = false;
 
-  @Watch('value')
+  @Watch('value', {deep: true})
   on_value_changed(new_value: MutationTestSuite, old_value: MutationTestSuite) {
     this.d_mutation_test_suite = deep_copy(new_value, MutationTestSuite);
   }
