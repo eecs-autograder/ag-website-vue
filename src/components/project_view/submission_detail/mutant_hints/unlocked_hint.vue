@@ -23,7 +23,7 @@
           >
           <label
             class="label"
-            for="`very-useful-${d_radio_button_random_num}`">
+            :for="`very-useful-${d_radio_button_random_num}`">
             Very useful
           </label>
         </div>
@@ -38,7 +38,7 @@
           >
           <label
             class="label"
-            for="`somewhat-useful-${d_radio_button_random_num}`">
+            :for="`somewhat-useful-${d_radio_button_random_num}`">
             Somewhat useful
           </label>
         </div>
@@ -53,7 +53,7 @@
           >
           <label
             class="label"
-            for="`not-useful-${d_radio_button_random_num}`">
+            :for="`not-useful-${d_radio_button_random_num}`">
             Not useful
           </label>
         </div>
@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
     HttpClient,
@@ -85,6 +85,8 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import { handle_global_errors_async } from '@/error_handling';
 import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
+import { assert_not_null, toggle } from '@/utils';
+import { MutantHintService } from './mutant_hint_service';
 
 // FIXME: De-duplicate (also in submission_list.vue)
 interface UnlockedHintData {
@@ -120,24 +122,15 @@ export default class UnlockedHint extends Vue {
   }
 
   @handle_api_errors_async(make_error_handler_func())
-  async rate_hint() {
-    try {
-      // assert_not_null(this.d_project);
-      this.d_saving = true;
+  rate_hint() {
+    return toggle(this, 'd_saving', () => {
+      assert_not_null(this.d_hint_rating);
       (<APIErrors> this.$refs.api_errors).clear();
-
-      let response = await HttpClient.get_instance().patch<unknown>(
-        `/unlocked_mutant_hints/${this.hint.pk}/`,
+      return MutantHintService.rate_hint(
+        this.hint.pk,
         {hint_rating: this.d_hint_rating, user_comment: this.d_user_comment}
       );
-      this.$emit(
-        'hint_updated',
-        {pk: this.hint.pk, hint_rating: this.d_hint_rating, user_comment: this.d_user_comment}
-      );
-    }
-    finally {
-      this.d_saving = false;
-    }
+    });
   }
 }
 </script>

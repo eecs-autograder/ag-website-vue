@@ -12,10 +12,7 @@
         v-for="hint of d_unlocked_hints"
         :key="hint.pk"
       >
-        <unlocked-hint
-          :hint="hint"
-          @hint_updated="on_hint_updated"
-        ></unlocked-hint>
+        <unlocked-hint :hint="hint" ref="unlocked_hint" tabindex="-1"></unlocked-hint>
       </div>
 
       <div v-if="d_hint_limits !== null && d_unlocked_hints.length !== 0" class="hint-limits">
@@ -47,7 +44,7 @@
         more hint(s) remain for bug
         "{{ d_hints_remaining.mutant_name }}"
         <div class="request-hint-button-wrapper">
-          <button @click="request_hint" class="blue-button request-hint-button">
+          <button @click="request_hint" class="blue-button request-hint-button" :disabled="d_requesting_new_hint">
             Request a hint
           </button>
         </div>
@@ -58,15 +55,55 @@
       >
         All hints unlocked for bug "{{ d_hints_remaining.mutant_name }}".
       </div>
-      <!-- <div v-else>
-        You've unlocked all the available hints for
-      </div> -->
     </fieldset>
+
+    <modal ref="unrated_hints_modal"
+           v-if="d_show_unrated_hints_modal"
+           @close="d_show_unrated_hints_modal = false"
+           :click_outside_to_close="true"
+           size="large"
+           :include_closing_x="true">
+      <div class="modal-header" style="font-size: 1.5rem; font-weight: bold;">
+        We value your feedback
+      </div>
+
+      <div style="margin: .5rem 0;">
+        <template v-if="has_unrated_hints">
+          Please take a moment to tell us about the hint(s) you've received
+        </template>
+        <template>
+          Thank you! Please request your hint by clicking the button below.
+        </template>
+      </div>
+
+      <div
+        class="unlocked-hint-wrapper"
+        v-for="hint of unrated_hints"
+        :key="hint.pk"
+      >
+        <unlocked-hint :hint="hint"></unlocked-hint>
+      </div>
+
+      <div class="modal-button-footer">
+        <label class="checkbox-label" v-if="has_unrated_hints">
+          <input type="checkbox" class="checkbox" v-model="d_decline_to_give_feedback"/>
+          I decline to give feedback, <br> please give me a hint anyway
+        </label>
+        <button type="button"
+                data-testid="submit_button"
+                :class="has_unrated_hints ? 'orange-button' : 'blue-button'"
+                style="margin-left: auto;"
+                @click="request_hint"
+                :disabled="!d_decline_to_give_feedback && has_unrated_hints">
+          Request Hint
+        </button>
+      </div>
+    </modal>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
     FeedbackCategory,
@@ -79,18 +116,16 @@ import {
 import { handle_global_errors_async } from '@/error_handling';
 
 import UnlockedHint from './unlocked_hint.vue';
-
-// FIXME: De-duplicate (also in submission_list.vue)
-interface UnlockedHintData {
-  pk: number;
-  mutation_test_suite_result: number;
-  mutation_test_suite_hint_config: number;
-  mutant_name: string;
-  hint_number: number;
-  hint_text: string;
-  hint_rating: number | null;
-  user_comment: string;
-}
+import {
+  HintRatingData,
+  MutantHintObserver,
+  MutantHintService,
+  UnlockedHintData
+} from './mutant_hint_service';
+import { toggle } from '@/utils';
+import { BeforeDestroy, Created } from '@/lifecycle';
+import Modal from '@/components/modal.vue';
+import { UnratedMutantHintData } from '@/components/submission_list/submission_list.vue';
 
 interface HintLimits {
   num_hints_unlocked: {
@@ -110,10 +145,12 @@ interface HintsRemaining {
 
 @Component({
   components: {
-    UnlockedHint
+    Modal,
+    UnlockedHint,
   }
 })
-export default class MutationSuiteResult extends Vue {
+export default class MutantHints extends Vue implements MutantHintObserver,
+                                                        Created, BeforeDestroy {
   @Prop({required: true, type: Object})
   mutation_test_suite_result!: MutationTestSuiteResultFeedback;
 
@@ -135,27 +172,37 @@ export default class MutationSuiteResult extends Vue {
   d_unlocked_hints: UnlockedHintData[] = [];
   d_hint_limits: HintLimits | null = null;
 
+  d_requesting_new_hint: boolean = false;
+
+  @Inject({from: 'unrated_mutant_hint_data'})
+  unrated_mutant_hint_data!: UnratedMutantHintData;
+
+  get unrated_hints() {
+    return this.unrated_mutant_hint_data.unrated_hints
+  }
+
+  d_show_unrated_hints_modal: boolean = false;
+  d_decline_to_give_feedback: boolean = false;
+
   async created() {
     await this.load_hint_info();
+    MutantHintService.subscribe(this);
+  }
+
+  beforeDestroy() {
+    MutantHintService.unsubscribe(this);
   }
 
   @handle_global_errors_async
   async load_hint_info() {
     try {
-      let limits_response = await HttpClient.get_instance().get<HintLimits>(
-        `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/mutant_hint_limits/`
-      );
-      this.d_hint_limits = limits_response.data;
-
-      let hints_available_response = await HttpClient.get_instance().get<HintsRemaining>(
-        `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/num_hints_remaining/`
-      );
-      this.d_hints_remaining = hints_available_response.data;
+      await this.load_hint_limits();
 
       let unlocked_hints_response = await HttpClient.get_instance().get<UnlockedHintData[]>(
         `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/hints/`
       );
       this.d_unlocked_hints = unlocked_hints_response.data;
+      this.d_unlocked_hints.sort((a, b) => a.pk - b.pk);
 
       this.d_has_hints = true;
     }
@@ -170,18 +217,52 @@ export default class MutationSuiteResult extends Vue {
     }
   }
 
-  async request_hint() {
-    let response = await HttpClient.get_instance().post<UnlockedHintData>(
-      `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/hints/`
-    );
-    this.d_unlocked_hints?.push(response.data);
+  @handle_global_errors_async
+  async load_hint_limits() {
+      let limits_response = await HttpClient.get_instance().get<HintLimits>(
+        `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/mutant_hint_limits/`
+      );
+      this.d_hint_limits = limits_response.data;
+
+      let hints_available_response = await HttpClient.get_instance().get<HintsRemaining>(
+        `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/num_hints_remaining/`
+      );
+      this.d_hints_remaining = hints_available_response.data;
   }
 
-  on_hint_updated(data: {pk: number, hint_rating: number, user_comment: string}) {
-    let hint = this.d_unlocked_hints.find(item => item.pk === data.pk);
-    if (hint !== undefined) {
-      hint.hint_rating = data.hint_rating;
-      hint.user_comment = data.user_comment;
+  get has_unrated_hints() {
+    return this.unrated_hints.length !== 0;
+  }
+
+  async request_hint() {
+    return toggle(this, 'd_requesting_new_hint', async () => {
+      if (this.has_unrated_hints && !this.d_show_unrated_hints_modal) {
+        this.d_show_unrated_hints_modal = true;
+      }
+      else {
+        await MutantHintService.request_new_hint(this.mutation_test_suite_result.pk);
+        this.d_show_unrated_hints_modal = false;
+      }
+    });
+  }
+
+  update_hint_unlocked(hint: UnlockedHintData): void {
+    if (hint.mutation_test_suite_result === this.mutation_test_suite_result.pk) {
+      this.d_unlocked_hints.push(hint);
+    }
+
+    Vue.nextTick(() => {
+      (<Vue[]> this.$refs.unlocked_hint)[this.d_unlocked_hints.length - 1].$el.focus();
+    });
+
+    this.load_hint_limits();
+  }
+
+  update_hint_rated(hint_pk: number, data: HintRatingData): void {
+    let index = this.d_unlocked_hints.findIndex(item => item.pk === hint_pk);
+    if (index !== -1) {
+      this.d_unlocked_hints[index].hint_rating = data.hint_rating;
+      this.d_unlocked_hints[index].user_comment = data.user_comment;
     }
   }
 }

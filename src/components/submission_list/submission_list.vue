@@ -44,21 +44,19 @@
     </div>
 
     <div :class="['body', {'body-closed': d_collapsed}]">
-      <div v-if="d_all_unlocked_mutant_hints.length !== 0" style="margin: .875rem;">
+      <div v-if="unrated_hints.length !== 0" style="margin: .875rem;">
         <h3>Hints</h3>
         <div style="margin-bottom: .25rem;">
           We appreciate your feedback. Were these hints useful?
         </div>
 
+        <!-- FIXME: Sort hints -->
         <div
           class="unlocked-hint-wrapper"
-          v-for="hint of d_all_unlocked_mutant_hints"
+          v-for="hint of unrated_hints"
           :key="hint.pk"
         >
-          <unlocked-hint
-            :hint="hint"
-            @hint_updated="on_hint_updated"
-          ></unlocked-hint>
+          <unlocked-hint :hint="hint"></unlocked-hint>
             <!-- FIXME: Update list here when hints are rated in submission detail and vice versa -->
         </div>
       </div>
@@ -81,7 +79,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Provide, Vue, Watch } from 'vue-property-decorator';
 
 import {
     Course,
@@ -107,16 +105,15 @@ import { Poller } from '@/poller';
 import { safe_assign, zip } from '@/utils';
 
 import UnlockedHint from '../project_view/submission_detail/mutant_hints/unlocked_hint.vue';
+import {
+HintRatingData,
+  MutantHintObserver,
+  MutantHintService,
+  UnlockedHintData
+} from '../project_view/submission_detail/mutant_hints/mutant_hint_service';
 
-interface UnlockedHintData {
-  pk: number;
-  mutation_test_suite_result: number;
-  mutation_test_suite_hint_config: number;
-  mutant_name: string;
-  hint_number: number;
-  hint_text: string;
-  hint_rating: number | null;
-  user_comment: string;
+export class UnratedMutantHintData {
+  unrated_hints: UnlockedHintData[] = [];
 }
 
 @Component({
@@ -127,6 +124,7 @@ interface UnlockedHintData {
   }
 })
 export default class SubmissionList extends Vue implements SubmissionObserver,
+                                                           MutantHintObserver,
                                                            Created, BeforeDestroy {
   @Inject({from: 'globals'})
   globals!: GlobalData;
@@ -152,7 +150,10 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
 
   d_collapsed = false;
 
+  // IMPORTANT: UPDATE THESE VARIABLES TOGETHER
   d_all_unlocked_mutant_hints: UnlockedHintData[] = [];
+  @Provide('unrated_mutant_hint_data')
+  unrated_mutant_hint_data: UnratedMutantHintData = new UnratedMutantHintData();
 
   @Watch('group')
   on_group_changed(new_value: Group, old_value: Group) {
@@ -161,11 +162,13 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
 
   created() {
     Submission.subscribe(this);
+    MutantHintService.subscribe(this);
     return this.initialize(this.group);
   }
 
   beforeDestroy() {
     Submission.unsubscribe(this);
+    MutantHintService.unsubscribe(this);
     if (this.plain_submissions_poller !== null) {
       this.plain_submissions_poller.stop();
     }
@@ -212,10 +215,11 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
 
     this.d_loading = false;
 
-    let all_hints_response = await HttpClient.get_instance().get<UnlockedHintData[]>(
-      `/groups/${this.group.pk}/all_unlocked_mutant_hints/`
+    this.d_all_unlocked_mutant_hints = await MutantHintService.get_all_unlocked_hints(
+      this.group.pk
     );
-    this.d_all_unlocked_mutant_hints = all_hints_response.data;
+    this.d_all_unlocked_mutant_hints.sort((a, b) => a.pk - b.pk);
+    this.unrated_mutant_hint_data.unrated_hints = this.unrated_hints;
   }
 
   private async refresh_submissions() {
@@ -314,11 +318,24 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
     }
   }
 
-  on_hint_updated(data: {pk: number, hint_rating: number, user_comment: string}) {
-    this.d_all_unlocked_mutant_hints.splice(
-      this.d_all_unlocked_mutant_hints.findIndex(item => item.pk === data.pk),
-      1
-    );
+  update_hint_unlocked(hint: UnlockedHintData): void {
+    this.d_all_unlocked_mutant_hints.push(hint);
+    this.unrated_mutant_hint_data.unrated_hints = this.unrated_hints;
+  }
+
+  update_hint_rated(hint_pk: number, data: HintRatingData): void {
+    let index = this.d_all_unlocked_mutant_hints.findIndex(item => item.pk === hint_pk);
+    if (index !== -1) {
+      // Since the top-level list of hints only shows unrated hints, we don't
+      // need to explicitly remove it from the list.
+      this.d_all_unlocked_mutant_hints[index].hint_rating = data.hint_rating;
+      this.d_all_unlocked_mutant_hints[index].user_comment = data.user_comment;
+      this.unrated_mutant_hint_data.unrated_hints = this.unrated_hints;
+    }
+  }
+
+  get unrated_hints() {
+    return this.d_all_unlocked_mutant_hints.filter(hint => hint.hint_rating === null);
   }
 }
 </script>
