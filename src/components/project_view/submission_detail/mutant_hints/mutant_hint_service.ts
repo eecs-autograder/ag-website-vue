@@ -5,6 +5,7 @@ export interface UnlockedHintData {
     mutation_test_suite_result: number;
     mutation_test_suite_hint_config: number;
     mutant_name: string;
+    true_mutant_name?: string;
     hint_number: number;
     hint_text: string;
     hint_rating: number | null;
@@ -70,4 +71,17 @@ export class MutantHintService {
             subscriber.update_hint_rated(hint_pk, data);
         }
     }
+}
+
+export interface HasMutantName {
+    mutant_name: string;
+    true_mutant_name?: string;
+}
+
+export function display_mutant_name(name_data: HasMutantName) {
+    if (name_data.true_mutant_name === undefined) {
+        return `"${name_data.mutant_name}"`;
+    }
+
+    return `"${name_data.mutant_name}" (a.k.a. "${name_data.true_mutant_name}")`;
 }

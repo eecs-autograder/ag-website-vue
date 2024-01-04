@@ -3,10 +3,6 @@
     <fieldset class="fieldset">
       <legend class="legend">Hints</legend>
 
-      <!-- <div>{{ d_hint_limits }}</div> -->
-      <!-- <div>{{ d_hints_remaining }}</div> -->
-      <!-- <div>{{ d_unlocked_hints }}</div> -->
-
       <div
         class="unlocked-hint-wrapper"
         v-for="hint of d_unlocked_hints"
@@ -41,8 +37,8 @@
       >
         Not sure what else to test?<br>
         <span class="num-hints-remaining">{{ d_hints_remaining.num_hints_remaining }}</span>
-        more hint(s) remain for bug
-        "{{ d_hints_remaining.mutant_name }}"
+        more hint(s) remain for
+        {{ display_mutant_name(d_hints_remaining) }}
         <div class="request-hint-button-wrapper">
           <button @click="request_hint" class="blue-button request-hint-button" :disabled="d_requesting_new_hint">
             Request a hint
@@ -53,7 +49,7 @@
         v-if="d_hints_remaining !== null && d_hints_remaining.num_hints_remaining === 0"
         class="request-hint-wrapper all-hints-unlocked-msg"
       >
-        All hints unlocked for bug "{{ d_hints_remaining.mutant_name }}".
+        All hints unlocked for {{ display_mutant_name(d_hints_remaining) }}.
       </div>
     </fieldset>
 
@@ -120,7 +116,8 @@ import {
   HintRatingData,
   MutantHintObserver,
   MutantHintService,
-  UnlockedHintData
+  UnlockedHintData,
+  display_mutant_name
 } from './mutant_hint_service';
 import { toggle } from '@/utils';
 import { BeforeDestroy, Created } from '@/lifecycle';
@@ -141,6 +138,7 @@ interface HintLimits {
 interface HintsRemaining {
   num_hints_remaining: number;
   mutant_name: string;
+  true_mutant_name?: string;
 }
 
 @Component({
@@ -176,6 +174,8 @@ export default class MutantHints extends Vue implements MutantHintObserver,
 
   @Inject({from: 'unrated_mutant_hint_data'})
   unrated_mutant_hint_data!: UnratedMutantHintData;
+
+  readonly display_mutant_name = display_mutant_name;
 
   get unrated_hints() {
     return this.unrated_mutant_hint_data.unrated_hints

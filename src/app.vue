@@ -14,7 +14,7 @@
       <div id="banner">
         <div id="breadcrumbs">
           <router-link to="/" id="home-logo">
-            Autograder
+            Autograder.io
           </router-link>
           <template v-if="globals.current_course !== null">
             <router-link :to="`/web/course/${globals.current_course.pk}`"

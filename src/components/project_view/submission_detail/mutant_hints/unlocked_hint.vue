@@ -2,7 +2,7 @@
   <div class="unlocked-hint">
     <div class="hint-wrapper">
       <div class="hint-title">
-        Hint {{ hint.hint_number + 1 }} for "{{ hint.mutant_name }}"
+        Hint {{ hint.hint_number + 1 }} for {{ display_mutant_name(hint) }}
       </div>
       <div class="hint-text">{{ hint.hint_text }}</div>
     </div>
@@ -75,30 +75,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
-
-import {
-    HttpClient,
-    HttpError,
-} from 'ag-client-typescript';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import APIErrors from '@/components/api_errors.vue';
-import { handle_global_errors_async } from '@/error_handling';
 import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { assert_not_null, toggle } from '@/utils';
-import { MutantHintService } from './mutant_hint_service';
-
-// FIXME: De-duplicate (also in submission_list.vue)
-interface UnlockedHintData {
-  pk: number;
-  mutation_test_suite_result: number;
-  mutation_test_suite_hint_config: number;
-  mutant_name: string;
-  hint_number: number;
-  hint_text: string;
-  hint_rating: number | null;
-  user_comment: string;
-}
+import { display_mutant_name, MutantHintService, UnlockedHintData } from './mutant_hint_service';
 
 @Component({
   components: {
@@ -114,6 +96,8 @@ export default class UnlockedHint extends Vue {
   d_saving = false;
 
   d_radio_button_random_num = Math.floor(Math.random() * 1000000);
+
+  readonly display_mutant_name = display_mutant_name;
 
   @Watch('hint', {deep: true})
   on_hint_change(new_value: UnlockedHintData, old_value: UnlockedHintData) {
