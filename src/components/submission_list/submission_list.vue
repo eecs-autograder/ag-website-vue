@@ -50,14 +50,12 @@
           We appreciate your feedback. Were these hints useful?
         </div>
 
-        <!-- FIXME: Sort hints -->
         <div
           class="unlocked-hint-wrapper"
           v-for="hint of unrated_hints"
           :key="hint.pk"
         >
           <unlocked-hint :hint="hint"></unlocked-hint>
-            <!-- FIXME: Update list here when hints are rated in submission detail and vice versa -->
         </div>
       </div>
 

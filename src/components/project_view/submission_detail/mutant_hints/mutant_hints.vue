@@ -40,7 +40,10 @@
         more hint(s) remain for
         {{ display_mutant_name(d_hints_remaining) }}
         <div class="request-hint-button-wrapper">
-          <button @click="request_hint" class="blue-button request-hint-button" :disabled="d_requesting_new_hint">
+          <button
+            @click="request_hint" class="blue-button request-hint-button"
+            :disabled="d_requesting_new_hint"
+          >
             Request a hint
           </button>
         </div>
@@ -252,7 +255,8 @@ export default class MutantHints extends Vue implements MutantHintObserver,
     }
 
     Vue.nextTick(() => {
-      (<Vue[]> this.$refs.unlocked_hint)[this.d_unlocked_hints.length - 1].$el.focus();
+      let component = (<Vue[]> this.$refs.unlocked_hint)[this.d_unlocked_hints.length - 1];
+      (<HTMLElement> component.$el).focus();
     });
 
     this.load_hint_limits();
