@@ -222,6 +222,7 @@ export default class MutantHints extends Vue implements MutantHintObserver,
 
   @handle_global_errors_async
   async load_hint_limits() {
+    try {
       let limits_response = await HttpClient.get_instance().get<HintLimits>(
         `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/mutant_hint_limits/`
       );
@@ -231,6 +232,16 @@ export default class MutantHints extends Vue implements MutantHintObserver,
         `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/num_hints_remaining/`
       );
       this.d_hints_remaining = hints_available_response.data;
+    }
+    catch (e) {
+      if ((e instanceof HttpError) && e.status === 404) {
+        this.d_has_hints = false;
+      }
+      else {
+        // istanbul ignore next
+        throw e;
+      }
+    }
   }
 
   get has_unrated_hints() {
