@@ -112,7 +112,7 @@ export default class MutationCommands extends Vue {
 
   d_mutation_test_suite: MutationTestSuite | null = null;
 
-  @Watch('value')
+  @Watch('value', {deep: true})
   on_value_changed(new_val: MutationTestSuite, old_val: MutationTestSuite) {
     this.d_mutation_test_suite = deep_copy(new_val, MutationTestSuite);
   }
