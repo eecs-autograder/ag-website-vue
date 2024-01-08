@@ -231,7 +231,12 @@ export default class MutantHints extends Vue implements MutantHintObserver,
       let hints_available_response = await HttpClient.get_instance().get<HintsRemaining>(
         `/mutation_test_suite_results/${this.mutation_test_suite_result.pk}/num_hints_remaining/`
       );
-      this.d_hints_remaining = hints_available_response.data;
+      if (hints_available_response.status === 204) {
+        this.d_hints_remaining = null;
+      }
+      else {
+        this.d_hints_remaining = hints_available_response.data;
+      }
     }
     catch (e) {
       if ((e instanceof HttpError) && e.status === 404) {
