@@ -8,6 +8,15 @@
       </a>
     </div>
 
+    <div class="queue-size-wrapper">
+      <span class="num-queued-submissions">
+        <template v-if="d_num_queued_submissions === null">...</template>
+        <template v-else>{{ d_num_queued_submissions }}</template>
+      </span>
+      submission(s) currently in the queue
+      <i class="refresh-icon fas fa-sync-alt" @click="load_num_queued_submissions"></i>
+    </div>
+
     <div class="checkbox-input-container">
       <label class="checkbox-label">
         <input
@@ -56,6 +65,64 @@
             v-if="submission_results !== null"
             :ultimate_submission_entries="submission_results"
           />
+
+          <table
+            class="ultimate-submission-table"
+            v-if="submission_results !== null
+                  && submission_results.length !== 0
+                  && first_non_null_submission_results !== undefined"
+          >
+            <thead>
+              <tr>
+                <td>Username</td>
+                <td>Group</td>
+                <td>Score</td>
+                <template v-for="suite_result of get_ag_test_suite_results(first_non_null_submission_results)">
+                  <td :key="`suite-${suite_result.ag_test_suite_pk}`">
+                    {{ suite_result.ag_test_suite_name }} ({{ suite_result.total_points_possible }})
+                  </td>
+                  <template v-for="test_result of suite_result.ag_test_case_results">
+                    <td :key="`test-${test_result.ag_test_case_pk}`">
+                      {{ test_result.ag_test_case_name }} ({{ test_result.total_points_possible }})
+                    </td>
+                  </template>
+                </template>
+                <template v-for="mutation_result of get_mutation_test_suite_results(first_non_null_submission_results)">
+                  <td :key="`mutation-result-${mutation_result.pk}`">
+                    {{ mutation_result.mutation_test_suite_name }} ({{ mutation_result.total_points_possible }})
+                  </td>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="submission_result of submission_results"
+                  :key="`result-${submission_result.username}`">
+                <td>{{ submission_result.username }}</td>
+                <td>{{ submission_result.group.member_names.join(',') }}</td>
+                <template v-if="submission_result.ultimate_submission !== null">
+                  <td>{{ submission_result.ultimate_submission.results.total_points }}/{{
+                         submission_result.ultimate_submission.results.total_points_possible}}</td>
+
+                  <template v-for="suite_result of submission_result.ultimate_submission.results.ag_test_suite_results">
+                    <td :key="`suite-${suite_result.ag_test_suite_pk}`">
+                      {{ suite_result.total_points }}
+                    </td>
+                    <template v-for="test_result of suite_result.ag_test_case_results">
+                      <td :key="`test-${test_result.ag_test_case_pk}`">
+                        {{ test_result.total_points }}
+                      </td>
+                    </template>
+                  </template>
+
+                  <template v-for="suite_result of submission_result.ultimate_submission.results.mutation_test_suite_results">
+                    <td :key="`mutation-suite-${suite_result.mutation_test_suite_pk}`">
+                      {{ suite_result.total_points }}
+                    </td>
+                  </template>
+                </template>
+              </tr>
+            </tbody>
+          </table>
         </template>
       </collapsible>
     </div>
@@ -190,9 +257,9 @@ import * as ag_cli from 'ag-client-typescript';
 
 import Collapsible from '@/components/collapsible.vue';
 import ProgressBar from '@/components/progress_bar.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
-import { toggle } from '@/utils';
+import { assert_not_null, toggle } from '@/utils';
 
 import FirstSubmissionTimeVsFinalScore from './first_submission_time_vs_final_score.vue';
 import PassFailCounts from './pass_fail_counts.vue';
@@ -224,6 +291,8 @@ export default class ProjectStats extends Vue {
   d_include_staff = true;
   d_staff_usernames = new Set<string>();
 
+  d_num_queued_submissions: number | null = null;
+
   d_loading_submission_results = false;
   d_submission_results_progress = 0;
   d_submission_results: ag_cli.FullUltimateSubmissionResult[] | null = null;
@@ -239,6 +308,14 @@ export default class ProjectStats extends Vue {
   async created() {
     let [staff, admins] = await Promise.all([this.course.get_staff(), this.course.get_admins()]);
     this.d_staff_usernames = new Set([...staff, ...admins].map(user => user.username));
+    await this.load_num_queued_submissions();
+  }
+
+  @handle_global_errors_async
+  async load_num_queued_submissions() {
+    let response = await ag_cli.HttpClient.get_instance().get<number>(
+      `/projects/${this.project.pk}/num_queued_submissions/`);
+    this.d_num_queued_submissions = response.data;
   }
 
   get submission_results() {
@@ -274,7 +351,10 @@ export default class ProjectStats extends Vue {
                 page_num: page_num,
                 page_size: page_size,
                 // Staff will be filtered out after we load the data
-                include_staff: true
+                include_staff: true,
+                // The less-surprising behavior for this is to include students with extensions.
+                // @ts-ignore
+                include_pending_extensions: true,
             }
         );
         results.push(...page.results);
@@ -343,6 +423,26 @@ export default class ProjectStats extends Vue {
       await this.reload_all_submissions();
     });
   }
+
+  get first_non_null_submission_results() {
+    assert_not_null(this.submission_results);
+    let first_non_null = this.submission_results.find(res => res.ultimate_submission !== null);
+    return first_non_null;
+  }
+
+  get_ag_test_suite_results(submission_result: ag_cli.FullUltimateSubmissionResult) {
+    if (submission_result.ultimate_submission === null) {
+      return [];
+    }
+    return submission_result.ultimate_submission.results.ag_test_suite_results;
+  }
+
+  get_mutation_test_suite_results(submission_result: ag_cli.FullUltimateSubmissionResult) {
+    if (submission_result.ultimate_submission === null) {
+      return [];
+    }
+    return submission_result.ultimate_submission.results.mutation_test_suite_results;
+  }
 }
 </script>
 
@@ -372,4 +472,22 @@ export default class ProjectStats extends Vue {
   @include section-header($with-left-divider: false);
   font-size: 1.25rem;
 }
+
+.refresh-icon {
+  cursor: pointer;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid $pebble-medium;
+  padding: .25rem;
+}
+
+tr:nth-child(even) {
+  background-color: $pebble-medium;
+}
+
 </style>
