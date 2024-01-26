@@ -42,7 +42,7 @@
         <div class="request-hint-button-wrapper">
           <button
             @click="request_hint" class="blue-button request-hint-button"
-            :disabled="d_requesting_new_hint"
+            :disabled="d_requesting_new_hint || reached_daily_hint_limit"
           >
             Request a hint
           </button>
@@ -253,16 +253,42 @@ export default class MutantHints extends Vue implements MutantHintObserver,
     return this.unrated_hints.length !== 0;
   }
 
+  @handle_global_errors_async
   async request_hint() {
     return toggle(this, 'd_requesting_new_hint', async () => {
       if (this.has_unrated_hints && !this.d_show_unrated_hints_modal) {
         this.d_show_unrated_hints_modal = true;
       }
       else {
-        await MutantHintService.request_new_hint(this.mutation_test_suite_result.pk);
-        this.d_show_unrated_hints_modal = false;
+        try {
+          await MutantHintService.request_new_hint(this.mutation_test_suite_result.pk);
+        }
+        finally {
+          this.d_show_unrated_hints_modal = false;
+        }
       }
     });
+  }
+
+  get reached_daily_hint_limit() {
+    if (this.d_hint_limits?.num_hints_allowed.submission === null
+          && this.d_hint_limits.num_hints_allowed.today === null) {
+      return false;
+    }
+
+    if (this.d_hint_limits?.num_hints_allowed.submission !== null
+          && this.d_hint_limits?.num_hints_allowed.submission
+                === this.d_hint_limits?.num_hints_unlocked.submission) {
+      return true;
+    }
+
+    if (this.d_hint_limits?.num_hints_allowed.today !== null
+          && this.d_hint_limits?.num_hints_allowed.today
+                === this.d_hint_limits?.num_hints_unlocked.today) {
+      return true;
+    }
+
+    return false;
   }
 
   update_hint_unlocked(hint: UnlockedHintData): void {
