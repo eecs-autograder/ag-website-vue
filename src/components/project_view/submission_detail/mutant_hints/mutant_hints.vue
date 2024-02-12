@@ -53,6 +53,7 @@
         class="request-hint-wrapper all-hints-unlocked-msg"
       >
         All hints unlocked for {{ display_mutant_name(d_hints_remaining) }}.
+        Once you catch this bug, you can request hints for other remaining bugs.
       </div>
     </fieldset>
 
