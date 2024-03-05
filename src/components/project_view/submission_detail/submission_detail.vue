@@ -118,7 +118,8 @@
       <view-file :filename="current_filename"
                   :file_contents="current_file_contents"
                   :progress="load_contents_progress"
-                  view_file_max_height="50vh"></view-file>
+                  view_file_max_height="50vh"
+                  :is_code_file="true"></view-file>
     </div>
 
     <div class="discarded-files" v-if="submission.discarded_files.length !== 0">

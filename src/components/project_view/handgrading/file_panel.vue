@@ -11,7 +11,8 @@
                  :progress="d_progress"
                  :handgrading_result="handgrading_result"
                  :enable_custom_comments="enable_custom_comments"
-                 :readonly_handgrading_results="readonly_handgrading_results"></view-file>
+                 :readonly_handgrading_results="readonly_handgrading_results"
+                 :is_code_file="true"></view-file>
     </div>
   </div>
 </template>

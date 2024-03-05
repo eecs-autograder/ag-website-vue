@@ -1,6 +1,7 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
+import hljs, { AutoHighlightResult } from 'highlight.js';
 import * as sinon from 'sinon';
 
 import ViewFile from '@/components/view_file.vue';
@@ -112,6 +113,98 @@ describe('ViewFile.vue', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({name: 'ProgressBar'}).exists()).toBe(true);
         expect(wrapper.find('viewing-container').exists()).toBe(false);
+    });
+
+    describe('Code file tests', () => {
+        test('Code file has appropriate styling when displayed', async () => {
+            await wrapper.setProps({is_code_file: true});
+
+            expect(wrapper.find('.viewing-container').exists()).toBe(true);
+            expect(wrapper.find('.viewing-container').classes()).toContain('hljs');
+
+            const line_numbers = wrapper.findAll('.line-number');
+            for (const line_number of line_numbers.wrappers) {
+                expect(line_number.classes()).toContain('line-number-code');
+            }
+        });
+
+        test('Code content processed correctly with no mid-span newline', async () => {
+            const hljs_stub = sinon.stub(hljs, 'highlightAuto');
+            hljs_stub.returns({
+                relevance: 1,
+                value: 'Hello <span class="hljs-keyword">world</span>',
+                illegal: false,
+            });
+
+            await wrapper.setProps({
+                is_code_file: true,
+                file_contents: Promise.resolve("Hello world")
+            });
+            expect(await wait_for_load(wrapper)).toBe(true);
+
+            const content_lines = wrapper.findAll('.line-of-file-content');
+            expect(content_lines.length).toEqual(1);
+            expect(content_lines.at(0).html()).toContain(
+                'Hello <span class="hljs-keyword">world</span>'
+            );
+        });
+
+        test('Code content processed correctly with exactly one mid-span newline', async () => {
+            const hljs_stub = sinon.stub(hljs, 'highlightAuto');
+            hljs_stub.returns({
+                relevance: 1,
+                value: 'omg <span class="hljs-keyword">HELLO\nworld</span>',
+                illegal: false,
+            });
+
+            await wrapper.setProps({
+                is_code_file: true,
+                file_contents: Promise.resolve("omg HELLO\nworld")
+            });
+            expect(await wait_for_load(wrapper)).toBe(true);
+
+            const content_lines = wrapper.findAll('.line-of-file-content');
+            expect(content_lines.length).toEqual(2);
+            expect(content_lines.at(0).html()).toContain(
+                'omg <span class="hljs-keyword">HELLO</span>'
+            );
+            expect(content_lines.at(1).html()).toContain(
+                '<span class="hljs-keyword">world</span>'
+            );
+        });
+
+        test('Code content processed correctly with multiple mid-span newlines', async () => {
+            const hljs_stub = sinon.stub(hljs, 'highlightAuto');
+            hljs_stub.returns({
+                relevance: 1,
+                value: 'You were the <span class="hljs-string">chosen one.\n' +
+                'It was said you would destroy the Sith,\n' +
+                'not join them.</span> Bring balance to the force...',
+                illegal: false,
+            });
+
+            await wrapper.setProps({ is_code_file: true });
+            await wrapper.setProps({
+                file_contents: Promise.resolve(
+                    'You were the chosen one.\n' +
+                    'It was said you would destroy the Sith,\n' +
+                    'not join them. Bring balance to the force...',
+                )
+            });
+            expect(await wait_for_load(wrapper)).toBe(true);
+
+            const content_lines = wrapper.findAll('.line-of-file-content');
+            expect(content_lines.length).toEqual(3);
+            expect(content_lines.at(0).html()).toContain(
+                'You were the <span class="hljs-string">chosen one.</span>'
+            );
+            expect(content_lines.at(1).html()).toContain(
+                '<span class="hljs-string">It was said you would destroy the Sith,</span>'
+            );
+            expect(content_lines.at(2).html()).toContain(
+                '<span class="hljs-string">not join them.</span> Bring balance to the force...'
+            );
+        });
     });
 });
 
