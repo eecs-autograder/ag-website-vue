@@ -115,6 +115,67 @@ describe('ViewFile.vue', () => {
         expect(wrapper.find('viewing-container').exists()).toBe(false);
     });
 
+    test('File copies to clipboard', async () => {
+        // Set mocks
+        const write_text_mock = sinon.stub();
+        Object.assign(navigator, {
+            clipboard: {
+                writeText: write_text_mock,
+            },
+        });
+
+        const clock = sinon.useFakeTimers();
+
+        // Init
+        const file_text = 'Just keep <span class="dori">swimming,\nswimming,\nswimming!</span>';
+        await wrapper.setProps({file_contents: Promise.resolve(file_text)});
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // Test
+        expect(wrapper.find('.copy-button-clickable').exists()).toBe(true);
+        wrapper.find('.copy-button-clickable').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(write_text_mock.calledOnce).toBe(true);
+        expect(write_text_mock.getCall(0).args[0]).toBe(file_text);
+
+        expect(wrapper.vm.d_is_file_copying).toBe(true);
+        clock.tick(3000);
+        expect(wrapper.vm.d_is_file_copying).toBe(false);
+    });
+
+    test('Code file copies unhighlighted code to clipboard', async () => {
+        // Set mocks
+        const write_text_mock = sinon.stub();
+        Object.assign(navigator, {
+            clipboard: {
+                writeText: write_text_mock,
+            },
+        });
+
+        const clock = sinon.useFakeTimers();
+
+        // Init
+        const file_text = 'Just keep <span class="dori">swimming,\nswimming,\nswimming!</span>';
+        await wrapper.setProps({
+            is_code_file: true,
+            file_contents: Promise.resolve(file_text)
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // Test
+        expect(wrapper.find('.copy-button-clickable').exists()).toBe(true);
+        wrapper.find('.copy-button-clickable').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        expect(write_text_mock.calledOnce).toBe(true);
+        expect(write_text_mock.getCall(0).args[0]).toBe(file_text);
+
+        expect(wrapper.vm.d_is_file_copying).toBe(true);
+        clock.tick(3000);
+        expect(wrapper.vm.d_is_file_copying).toBe(false);
+    });
+
     describe('Code file tests', () => {
         test('Code file has appropriate styling when displayed', async () => {
             await wrapper.setProps({is_code_file: true});
