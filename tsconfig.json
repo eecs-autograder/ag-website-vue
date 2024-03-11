@@ -26,6 +26,9 @@
             ],
             "@/tests/*": [
                 "tests/*"
+            ],
+            "highlight.js": [
+                "src/redefined_types/highlightjs.d.ts"
             ]
         },
         "lib": [

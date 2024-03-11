@@ -6,7 +6,7 @@ import * as sinon from "sinon";
 import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
-import ViewFile from '@/components/view_file.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { wait_until } from '@/tests/utils';

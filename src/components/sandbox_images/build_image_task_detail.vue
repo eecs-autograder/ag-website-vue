@@ -101,7 +101,7 @@ import FileSaver from 'file-saver';
 
 import { GlobalData } from '@/app.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
-import ViewFile from '@/components/view_file.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
 import { handle_global_errors_async } from '@/error_handling';
 import { blob_to_string, format_datetime, toggle } from '@/utils';
