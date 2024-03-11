@@ -13,14 +13,15 @@
     </div>
     <template v-else>
       <div class="viewing-container"
-            :class="{'hljs': is_code_file}"
+            :class="{'hljs': is_code_file,
+                      'code-dark': is_code_file && is_code_theme_dark}"
             @mouseenter="d_is_file_hovered = true"
             @mouseleave="d_is_file_hovered = false"
       >
         <div class="copy-file-button" :class="{'opacity-1': d_is_file_hovered}">
           <button type="button"
                   class="copy-button-clickable"
-                  :class="{'code-dark': is_code_file}"
+                  :class="{'code-copy-button': is_code_file}"
                   @click="copy_file_to_clipboard"
                   aria-label="Copy file contents"
           >
@@ -148,8 +149,8 @@ import {
   UserRoles,
 } from "ag-client-typescript";
 import hljs from 'highlight.js'; // "hljs" class in HTML element styles it with imported theme
-import 'highlight.js/styles/github.min.css';
 
+import { CODE_THEME_STORE } from '@/code_theme_store';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from '@/components/modal.vue';
@@ -263,6 +264,10 @@ export default class ViewFile extends Vue implements Created {
   @Watch('filename')
   on_filename_change(new_file_name: string, old_file_name: string) {
     this.d_filename = new_file_name;
+  }
+
+  private get is_code_theme_dark() {
+    return CODE_THEME_STORE.current_code_theme === 'dark';
   }
 
   get file_is_large() {
@@ -628,6 +633,15 @@ $light-green: hsl(97, 42%, 79%);
   }
 }
 
+.code-dark {
+  // Invert highlighted lines' text when dark theme
+  // to avoid color clashes
+  .commented-line td,
+  .highlighted-region-line td {
+    filter: invert(1);
+  }
+}
+
 .copy-file-button {
   right: 0;
   top: 0;
@@ -650,11 +664,7 @@ $light-green: hsl(97, 42%, 79%);
     margin: 0.5rem;
     cursor: pointer;
 
-    &.code-light {
-        background-color: $pebble-light;
-    }
-
-    &.code-dark {
+    &.code-copy-button {
       background-color: $white-gray;
     }
   }

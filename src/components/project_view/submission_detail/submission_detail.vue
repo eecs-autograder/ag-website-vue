@@ -114,8 +114,10 @@
 
     <progress-overlay v-if="d_downloading_file" :progress="d_download_progress"></progress-overlay>
 
-    <div id="view-file-container" v-if="current_filename !== null">
-      <view-file :filename="current_filename"
+    <div id="view-file-region" v-if="current_filename !== null">
+      <code-theme-toggle class="code-theme-toggle-container"></code-theme-toggle>
+      <view-file id="view-file-container"
+                  :filename="current_filename"
                   :file_contents="current_file_contents"
                   :progress="load_contents_progress"
                   view_file_max_height="50vh"
@@ -238,6 +240,7 @@ import * as FileSaver from 'file-saver';
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
+import CodeThemeToggle from '@/components/code_theme_toggle.vue';
 import Modal from '@/components/modal.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
 import AGTestSuiteResultDetail from '@/components/project_view/submission_detail/ag_test_suite_result_detail.vue';
@@ -254,6 +257,7 @@ import { format_datetime, toggle } from '@/utils';
   components: {
     APIErrors,
     AGTestSuiteResultDetail,
+    CodeThemeToggle,
     Modal,
     MutationSuiteResults,
     ProgressOverlay,
@@ -499,9 +503,20 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
   }
 }
 
-#view-file-container {
-  margin-bottom: .625rem;
-  border: 1px solid $pebble-medium;
+#view-file-region {
+  position: relative;
+
+  .code-theme-toggle-container {
+    position: absolute;
+    top: 0;
+    right: 1px;
+    margin-top: -1.875rem;
+  }
+
+  #view-file-container {
+    margin-bottom: .625rem;
+    border: 1px solid $pebble-medium;
+  }
 }
 
 .discarded-files {
