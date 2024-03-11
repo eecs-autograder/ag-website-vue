@@ -22,7 +22,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import { HandgradingResult } from 'ag-client-typescript';
 
-import ViewFile from '@/components/view_file.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 import { toggle } from '@/utils';
 
 @Component({

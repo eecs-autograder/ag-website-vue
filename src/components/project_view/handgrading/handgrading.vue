@@ -289,9 +289,9 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
-import CodeThemeToggle from '@/components/code_theme_toggle.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import CodeThemeToggle from '@/components/view_file/code_theme_toggle.vue';
 import {
   handle_api_errors_async,
   handle_global_errors_async,

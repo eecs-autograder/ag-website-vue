@@ -2,8 +2,8 @@ import { mount, Wrapper } from '@vue/test-utils';
 
 import * as sinon from 'sinon';
 
-import * as code_theme_store from '@/code_theme_store';
-import CodeThemeToggle from '@/components/code_theme_toggle.vue';
+import * as code_theme_store from '@/components/view_file/code_theme_store';
+import CodeThemeToggle from '@/components/view_file/code_theme_toggle.vue';
 
 const HLJS_LINK_SELECTOR = '#hljs-code-theme';
 const CHECKBOX_SELECTOR = 'input[type="checkbox"]';

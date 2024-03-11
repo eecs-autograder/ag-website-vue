@@ -39,7 +39,7 @@
 <script lang="ts">
   import { Component, Vue } from 'vue-property-decorator';
 
-  import ViewFile from '@/components/view_file.vue';
+  import ViewFile from '@/components/view_file/view_file.vue';
 
   @Component({
     components: {ViewFile}

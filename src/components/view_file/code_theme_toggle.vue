@@ -13,9 +13,10 @@
 <script lang="ts">
 import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import { CODE_THEME_STORE, set_code_theme } from '@/code_theme_store';
 import { handle_global_errors_async } from '@/error_handling';
 import { Created } from '@/lifecycle';
+
+import { CODE_THEME_STORE, set_code_theme } from './code_theme_store';
 
 const CODE_LIGHT_THEME_NAME = 'github';
 const CODE_DARK_THEME_NAME = 'tokyo-night-dark';
@@ -160,3 +161,4 @@ input:checked + .slider:before {
 }
 
 </style>
+@/components/view_file/code_theme_store

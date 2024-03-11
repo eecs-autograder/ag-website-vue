@@ -1,4 +1,4 @@
-import { CODE_THEME_STORE, set_code_theme } from '@/code_theme_store';
+import { CODE_THEME_STORE, set_code_theme } from '@/components/view_file/code_theme_store';
 
 describe('CodeThemeStore Tests', () => {
     beforeEach(() => {

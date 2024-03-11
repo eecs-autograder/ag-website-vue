@@ -4,7 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import hljs, { AutoHighlightResult } from 'highlight.js';
 import * as sinon from 'sinon';
 
-import ViewFile from '@/components/view_file.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';

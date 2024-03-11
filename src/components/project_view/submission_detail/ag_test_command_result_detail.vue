@@ -170,7 +170,7 @@ import {
 } from "ag-client-typescript";
 
 import Diff from '@/components/diff.vue';
-import ViewFile from "@/components/view_file.vue";
+import ViewFile from "@/components/view_file/view_file.vue";
 import { handle_global_errors_async } from '@/error_handling';
 
 @Component({

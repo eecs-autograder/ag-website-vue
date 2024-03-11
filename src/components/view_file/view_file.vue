@@ -150,7 +150,6 @@ import {
 } from "ag-client-typescript";
 import hljs from 'highlight.js'; // "hljs" class in HTML element styles it with imported theme
 
-import { CODE_THEME_STORE } from '@/code_theme_store';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from '@/components/modal.vue';
@@ -163,7 +162,9 @@ import { chain, toggle } from '@/utils';
 import {
   handgrading_comment_factory,
   HandgradingComment,
-} from './project_view/handgrading/handgrading_comment';
+} from '../project_view/handgrading/handgrading_comment';
+
+import { CODE_THEME_STORE } from './code_theme_store';
 
 @Component({
   components: {
@@ -672,3 +673,4 @@ $light-green: hsl(97, 42%, 79%);
 }
 
 </style>
+../project_view/handgrading/handgrading_comment@/components/view_file/code_theme_store

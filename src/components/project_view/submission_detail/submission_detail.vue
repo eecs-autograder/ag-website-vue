@@ -240,14 +240,14 @@ import * as FileSaver from 'file-saver';
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
-import CodeThemeToggle from '@/components/code_theme_toggle.vue';
 import Modal from '@/components/modal.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
 import AGTestSuiteResultDetail from '@/components/project_view/submission_detail/ag_test_suite_result_detail.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
-import ViewFile from '@/components/view_file.vue';
+import CodeThemeToggle from '@/components/view_file/code_theme_toggle.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { OpenFilesMixin } from '@/open_files_mixin';

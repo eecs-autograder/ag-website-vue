@@ -383,7 +383,7 @@ import {
 
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from "@/components/project_view/submission_detail/correctness_icon.vue";
-import ViewFile from "@/components/view_file.vue";
+import ViewFile from "@/components/view_file/view_file.vue";
 import { handle_global_errors_async } from '@/error_handling';
 
 @Component({
