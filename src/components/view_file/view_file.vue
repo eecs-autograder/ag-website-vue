@@ -1,6 +1,6 @@
 <template>
   <div class="view-file-component"
-        :style="{height: view_file_height, max_height: view_file_max_height}">
+       :style="{height: view_file_height, max_height: view_file_max_height}">
     <div v-if="d_loading" class="loading-container">
       <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
       <i v-else class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"></i>
@@ -499,13 +499,13 @@ table {
 
 .view-file-component {
   overflow-y: auto;
-  position: relative;
 }
 
 .viewing-container {
   font-family: monospace;
   padding: .25rem 0;
   width: 100%;
+  position: relative;
 }
 
 .large-file-message {
@@ -673,4 +673,3 @@ $light-green: hsl(97, 42%, 79%);
 }
 
 </style>
-../project_view/handgrading/handgrading_comment@/components/view_file/code_theme_store

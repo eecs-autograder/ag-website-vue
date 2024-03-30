@@ -1,5 +1,4 @@
 <template>
-  <!-- <div class="code-theme-toggle"> -->
     <label class="switch">
       <input type="checkbox" :checked="is_code_theme_dark" @change="switch_code_theme" />
       <span class="slider round">
@@ -7,7 +6,6 @@
         <i class="fas fa-sun"></i>
       </span>
     </label>
-  <!-- </div> -->
 </template>
 
 <script lang="ts">
@@ -161,4 +159,3 @@ input:checked + .slider:before {
 }
 
 </style>
-@/components/view_file/code_theme_store
