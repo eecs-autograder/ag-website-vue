@@ -16,6 +16,7 @@
         </template>
       </div>
 
+      <code-theme-toggle class="code-theme-toggle-container"></code-theme-toggle>
       <file-panel v-for="filename of d_handgrading_result.submitted_filenames"
                   :key="filename"
                   :handgrading_result="d_handgrading_result"
@@ -290,6 +291,7 @@ import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import CodeThemeToggle from '@/components/view_file/code_theme_toggle.vue';
 import {
   handle_api_errors_async,
   handle_global_errors_async,
@@ -327,6 +329,7 @@ class ProcessingSemaphore {
 @Component({
   components: {
     APIErrors,
+    CodeThemeToggle,
     FilePanel,
     Modal,
     ValidatedInput,
@@ -568,6 +571,13 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
 .handgrading {
   display: flex;
+
+  .code-theme-toggle-container {
+    display: block;
+    margin-left: auto;
+    margin-top: 0.375rem;
+    margin-right: 0.375rem;
+  }
 }
 
 .files {

@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 
 import Diff from '@/components/diff.vue';
 import AGTestCommandResultDetail from '@/components/project_view/submission_detail/ag_test_command_result_detail.vue';
-import ViewFile from '@/components/view_file.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';

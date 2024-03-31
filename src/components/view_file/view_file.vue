@@ -12,56 +12,81 @@
       </button>
     </div>
     <template v-else>
-      <table class="viewing-container" :class="{'saving': d_saving}">
-        <template v-for="(line_num, index) of num_lines_to_show">
-          <tr :class="{'commented-line': line_in_comment(index),
-                        'hovered-comment-line': d_hovered_comment !== null
-                                                && index >= d_hovered_comment.location.first_line
-                                                && index <= d_hovered_comment.location.last_line,
-                        'highlighted-region-line': d_first_highlighted_line !== null
-                                                  && index >= d_first_highlighted_line
-                                                  && index <= d_last_highlighted_line}"
-              @mousedown="start_highlighting(index)"
-              @mouseenter="grow_highlighted_region(index)"
-              @mouseup="stop_highlighting($event, index)"
-              ref="code_line">
-            <td class="line-number">{{line_num}}</td>
-            <td class="line-of-file-content"
-                :style="{'user-select': (handgrading_enabled
-                                          && !readonly_handgrading_results) ? 'none' : 'auto'}"
-            >{{split_content[index] === "" ? "\n" : split_content[index]}}</td>
-          </tr>
-          <tr v-for="comment of handgrading_comments.get(index, [])">
-            <td></td>
-            <td>
-              <div class="comment"
-                    @mouseenter="d_hovered_comment = comment"
-                    @mouseleave="d_hovered_comment = null">
-                <div class="comment-header">
-                  <div class="comment-line-range">
-                    {{comment.location.first_line !== comment.location.last_line
-                      ? `Lines ${comment.location.first_line + 1} `
-                        + `- ${comment.location.last_line + 1}`
-                      :`Line ${comment.location.first_line + 1}`}}
+      <div class="viewing-container"
+            :class="{'hljs': is_code_file,
+                      'code-dark': is_code_file && is_code_theme_dark}"
+            @mouseenter="d_is_file_hovered = true"
+            @mouseleave="d_is_file_hovered = false"
+      >
+        <div class="copy-file-button" :class="{'opacity-1': d_is_file_hovered}">
+          <button type="button"
+                  class="copy-button-clickable"
+                  :class="{'code-copy-button': is_code_file}"
+                  @click="copy_file_to_clipboard"
+                  aria-label="Copy file contents"
+          >
+            <i :class="{'far fa-copy': !d_is_file_copying,
+                        'fas fa-check': d_is_file_copying}"
+            ></i>
+          </button>
+        </div>
+        <table :class="{'saving': d_saving}">
+          <template v-for="(line_num, index) of num_lines_to_show">
+            <tr :class="{'commented-line': line_in_comment(index),
+                          'hovered-comment-line': d_hovered_comment !== null
+                                                  && index >= d_hovered_comment.location.first_line
+                                                  && index <= d_hovered_comment.location.last_line,
+                          'highlighted-region-line': d_first_highlighted_line !== null
+                                                    && index >= d_first_highlighted_line
+                                                    && index <= d_last_highlighted_line}"
+                @mousedown="start_highlighting(index)"
+                @mouseenter="grow_highlighted_region(index)"
+                @mouseup="stop_highlighting($event, index)"
+                ref="code_line">
+              <td class="line-number" :class="{'line-number-code': is_code_file}">{{line_num}}</td>
+              <td class="line-of-file-content"
+                  :class="{'line-of-file-content-code': is_code_file}"
+                  :style="{'user-select': (handgrading_enabled
+                                            && !readonly_handgrading_results) ? 'none' : 'auto'}"
+              >
+                <span v-if="is_code_file"
+                      v-html="split_code_content[index]"
+                ></span>
+                <span v-else>{{ split_content[index] === "" ? "\n" : split_content[index] }}</span>
+              </td>
+            </tr>
+            <tr v-for="comment of handgrading_comments.get(index, [])">
+              <td></td>
+              <td>
+                <div class="comment"
+                      @mouseenter="d_hovered_comment = comment"
+                      @mouseleave="d_hovered_comment = null">
+                  <div class="comment-header">
+                    <div class="comment-line-range">
+                      {{comment.location.first_line !== comment.location.last_line
+                        ? `Lines ${comment.location.first_line + 1} `
+                          + `- ${comment.location.last_line + 1}`
+                        :`Line ${comment.location.first_line + 1}`}}
+                    </div>
+                    <i v-if="!readonly_handgrading_results
+                              && (enable_custom_comments || !comment.is_custom)"
+                        @click="delete_handgrading_comment(comment)"
+                        class="delete fas fa-times"></i>
                   </div>
-                  <i v-if="!readonly_handgrading_results
-                            && (enable_custom_comments || !comment.is_custom)"
-                      @click="delete_handgrading_comment(comment)"
-                      class="delete fas fa-times"></i>
+                  <div class="comment-message">
+                    {{comment.short_description}}
+                    <template
+                      v-if="comment.deduction !== 0"
+                    >({{comment.deduction}}<template v-if="comment.max_deduction !== null"
+                    >/{{comment.max_deduction}} max</template>)
+                    </template>
+                  </div>
                 </div>
-                <div class="comment-message">
-                  {{comment.short_description}}
-                  <template
-                    v-if="comment.deduction !== 0"
-                  >({{comment.deduction}}<template v-if="comment.max_deduction !== null"
-                  >/{{comment.max_deduction}} max</template>)
-                  </template>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </template>
-      </table>
+              </td>
+            </tr>
+          </template>
+        </table>
+      </div>
 
       <div class="show-more-button-container" v-if="d_num_lines_rendered < split_content.length">
         <button type="button"
@@ -123,6 +148,7 @@ import {
   Location,
   UserRoles,
 } from "ag-client-typescript";
+import hljs from 'highlight.js'; // "hljs" class in HTML element styles it with imported theme
 
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
@@ -136,7 +162,9 @@ import { chain, toggle } from '@/utils';
 import {
   handgrading_comment_factory,
   HandgradingComment,
-} from './project_view/handgrading/handgrading_comment';
+} from '../project_view/handgrading/handgrading_comment';
+
+import { CODE_THEME_STORE } from './code_theme_store';
 
 @Component({
   components: {
@@ -193,6 +221,14 @@ export default class ViewFile extends Vue implements Created {
   @Prop({default: true, type: Boolean})
   readonly_handgrading_results!: boolean;
 
+  // When true, file contents have syntax-highlighting
+  @Prop({default: false, type: Boolean})
+  is_code_file!: boolean;
+
+  // Tracking file copying
+  d_is_file_hovered = false;
+  d_is_file_copying = false;
+
   d_hovered_comment: HandgradingComment | null = null;
 
   d_context_menu_is_open = false;
@@ -231,6 +267,10 @@ export default class ViewFile extends Vue implements Created {
     this.d_filename = new_file_name;
   }
 
+  private get is_code_theme_dark() {
+    return CODE_THEME_STORE.current_code_theme === 'dark';
+  }
+
   get file_is_large() {
     return this.d_file_contents.length > this.display_size_threshold;
   }
@@ -240,6 +280,52 @@ export default class ViewFile extends Vue implements Created {
   // render times.
   private get split_content() {
     return this.d_file_contents.split('\n');
+  }
+
+  // Makes each line of code have independent styling by padding newlines in
+  // the midle of spans.
+  private separate_span_tags_with_newlines(code_html_str: string): string {
+    // Adapted from: https://stackoverflow.com/questions/64280814
+    //  /how-can-i-correctly-highlight-a-line-by-line-code-using-highlight-js-react
+    const open_spans: string[] = [];
+
+    const padded_code = code_html_str.replace(/(<span [^>]+>)|(<\/span>)|(\n)/g, match => {
+      if (match === "\n") {
+        return "</span>".repeat(open_spans.length) + "\n" + open_spans.join("");
+      }
+
+      if (match === "</span>") {
+        open_spans.pop();
+      }
+      else {
+        open_spans.push(match);
+      }
+
+      return match;
+    });
+
+    return padded_code;
+  }
+
+  // Returns HTML for highlighted contents of code file, split by newlines.
+  private get split_code_content() {
+    const highlighted_code = hljs.highlightAuto(this.d_file_contents).value;
+    const padded_highlighted_code = this.separate_span_tags_with_newlines(highlighted_code);
+    return padded_highlighted_code.split('\n');
+  }
+
+  @handle_global_errors_async
+  private async copy_file_to_clipboard() {
+    await navigator.clipboard.writeText(this.d_file_contents);
+    this.d_is_file_copying = true;
+
+    // Wait to set icon back
+    setTimeout(
+      () => {
+        this.d_is_file_copying = false;
+      },
+      3000
+    );
   }
 
   private get num_lines_to_show() {
@@ -419,6 +505,7 @@ table {
   font-family: monospace;
   padding: .25rem 0;
   width: 100%;
+  position: relative;
 }
 
 .large-file-message {
@@ -452,6 +539,10 @@ table {
   width: 1%;
 }
 
+.line-number.line-number-code {
+  color: inherit;
+}
+
 .line-of-file-content {
   color: black;
   font-size: .875rem;
@@ -460,6 +551,10 @@ table {
   white-space: pre-wrap;
   word-break: break-word;
   word-wrap: break-word;
+}
+
+.line-of-file-content.line-of-file-content-code {
+  color: inherit;
 }
 
 .show-more-button-container {
@@ -537,6 +632,44 @@ $light-green: hsl(97, 42%, 79%);
   .input {
     width: 100%;
   }
+}
+
+.code-dark {
+  // Invert highlighted lines' text when dark theme
+  // to avoid color clashes
+  .commented-line td,
+  .highlighted-region-line td {
+    filter: invert(1);
+  }
+}
+
+.copy-file-button {
+  right: 0;
+  top: 0;
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.2s;
+
+  &.opacity-1 {
+    opacity: 1;
+  }
+
+  .copy-button-clickable {
+    background-color: $pebble-dark;
+    border: 0.0625rem solid black;
+    border-radius: 0.375rem;
+    position: relative;
+    line-height: 1;
+    vertical-align: middle;
+    padding: 0.5rem;
+    margin: 0.5rem;
+    cursor: pointer;
+
+    &.code-copy-button {
+      background-color: $white-gray;
+    }
+  }
+  
 }
 
 </style>

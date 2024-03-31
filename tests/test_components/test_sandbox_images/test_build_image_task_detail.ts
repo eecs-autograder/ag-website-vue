@@ -4,7 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import BuildImageTaskDetail from '@/components/sandbox_images/build_image_task_detail.vue';
-import ViewFile from '@/components/view_file.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 import { assert_not_null, deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';

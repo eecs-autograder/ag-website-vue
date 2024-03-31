@@ -105,7 +105,7 @@ import APIErrors from "@/components/api_errors.vue";
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
-import ViewFile from '@/components/view_file.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 import {
   handle_api_errors_async,
   handle_global_errors_async,

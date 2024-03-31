@@ -4,7 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import FilePanel from '@/components/project_view/handgrading/file_panel.vue';
-import ViewFile from '@/components/view_file.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';

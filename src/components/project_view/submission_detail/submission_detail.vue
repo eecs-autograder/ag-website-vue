@@ -114,11 +114,14 @@
 
     <progress-overlay v-if="d_downloading_file" :progress="d_download_progress"></progress-overlay>
 
-    <div id="view-file-container" v-if="current_filename !== null">
-      <view-file :filename="current_filename"
+    <div id="view-file-region" v-if="current_filename !== null">
+      <code-theme-toggle class="code-theme-toggle-container"></code-theme-toggle>
+      <view-file id="view-file-container"
+                  :filename="current_filename"
                   :file_contents="current_file_contents"
                   :progress="load_contents_progress"
-                  view_file_max_height="50vh"></view-file>
+                  view_file_max_height="50vh"
+                  :is_code_file="true"></view-file>
     </div>
 
     <div class="discarded-files" v-if="submission.discarded_files.length !== 0">
@@ -243,7 +246,8 @@ import AGTestSuiteResultDetail from '@/components/project_view/submission_detail
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 import ResultPanel from '@/components/project_view/submission_detail/result_panel.vue';
-import ViewFile from '@/components/view_file.vue';
+import CodeThemeToggle from '@/components/view_file/code_theme_toggle.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { OpenFilesMixin } from '@/open_files_mixin';
@@ -253,6 +257,7 @@ import { format_datetime, toggle } from '@/utils';
   components: {
     APIErrors,
     AGTestSuiteResultDetail,
+    CodeThemeToggle,
     Modal,
     MutationSuiteResults,
     ProgressOverlay,
@@ -498,9 +503,20 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
   }
 }
 
-#view-file-container {
-  margin-bottom: .625rem;
-  border: 1px solid $pebble-medium;
+#view-file-region {
+  position: relative;
+
+  .code-theme-toggle-container {
+    position: absolute;
+    top: 0;
+    right: 1px;
+    margin-top: -1.875rem;
+  }
+
+  #view-file-container {
+    margin-bottom: .625rem;
+    border: 1px solid $pebble-medium;
+  }
 }
 
 .discarded-files {
