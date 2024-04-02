@@ -42,7 +42,7 @@
                 @mousedown="start_highlighting(index)"
                 @mouseenter="grow_highlighted_region(index)"
                 @mouseup="stop_highlighting($event, index)"
-                ref="code_line">
+                data-testid="code_line">
               <td class="line-number" :class="{'line-number-code': is_code_file}">{{line_num}}</td>
               <td class="line-of-file-content"
                   :class="{'line-of-file-content-code': is_code_file}"
@@ -669,7 +669,7 @@ $light-green: hsl(97, 42%, 79%);
       background-color: $white-gray;
     }
   }
-  
+
 }
 
 </style>

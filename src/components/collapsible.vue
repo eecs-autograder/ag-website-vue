@@ -56,7 +56,11 @@ export default class Collapsible extends Vue {
   // Valid values are null and the numbers 0, 1, 2, and 3.
   // Note that indentation level 0 adds a small amount of visual left padding,
   // while null adds no left padding.
-  @Prop({default: 0, type: Number, validator: val => val === null || (val >= 0 && val <= 3)})
+  @Prop({
+    default: 0,
+    type: Number,
+    validator: val => val === null || (<number> val >= 0 && <number> val <= 3)
+  })
   indentation_level!: number;
 
   // When true, the header_icons_slot will always be visible.

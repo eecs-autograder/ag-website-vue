@@ -43,8 +43,22 @@
       </div>
     </div>
 
-
     <div :class="['body', {'body-closed': d_collapsed}]">
+      <div v-if="unrated_hints.length !== 0" style="margin: .875rem;">
+        <h3>Hints</h3>
+        <div style="margin-bottom: .25rem;">
+          We appreciate your feedback. Were these hints useful?
+        </div>
+
+        <div
+          class="unlocked-hint-wrapper"
+          v-for="hint of unrated_hints"
+          :key="hint.pk"
+        >
+          <unlocked-hint :hint="hint"></unlocked-hint>
+        </div>
+      </div>
+
       <div class="screen-too-small-msg">
         <i class="fas fa-exclamation-triangle"></i>
         Your screen may be too small to display this content properly.
@@ -63,13 +77,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Provide, Vue, Watch } from 'vue-property-decorator';
 
 import {
     Course,
     FeedbackCategory,
     GradingStatus,
     Group,
+    HttpClient,
     HttpError,
     Project,
     Submission,
@@ -87,13 +102,27 @@ import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { safe_assign, zip } from '@/utils';
 
+import UnlockedHint from '../project_view/submission_detail/mutant_hints/unlocked_hint.vue';
+import {
+HintRatingData,
+  MutantHintObserver,
+  MutantHintService,
+  UnlockedHintData
+} from '../project_view/submission_detail/mutant_hints/mutant_hint_service';
+
+export class UnratedMutantHintData {
+  unrated_hints: UnlockedHintData[] = [];
+}
+
 @Component({
   components: {
     SubmissionDetail,
-    SubmissionPanel
+    SubmissionPanel,
+    UnlockedHint,
   }
 })
 export default class SubmissionList extends Vue implements SubmissionObserver,
+                                                           MutantHintObserver,
                                                            Created, BeforeDestroy {
   @Inject({from: 'globals'})
   globals!: GlobalData;
@@ -119,6 +148,11 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
 
   d_collapsed = false;
 
+  // IMPORTANT: UPDATE THESE VARIABLES TOGETHER
+  d_all_unlocked_mutant_hints: UnlockedHintData[] = [];
+  @Provide('unrated_mutant_hint_data')
+  unrated_mutant_hint_data: UnratedMutantHintData = new UnratedMutantHintData();
+
   @Watch('group')
   on_group_changed(new_value: Group, old_value: Group) {
     return this.initialize(new_value);
@@ -126,11 +160,13 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
 
   created() {
     Submission.subscribe(this);
+    MutantHintService.subscribe(this);
     return this.initialize(this.group);
   }
 
   beforeDestroy() {
     Submission.unsubscribe(this);
+    MutantHintService.unsubscribe(this);
     if (this.plain_submissions_poller !== null) {
       this.plain_submissions_poller.stop();
     }
@@ -176,6 +212,12 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
     this.plain_submissions_poller.start_after_delay();
 
     this.d_loading = false;
+
+    this.d_all_unlocked_mutant_hints = await MutantHintService.get_all_unlocked_hints(
+      this.group.pk
+    );
+    this.d_all_unlocked_mutant_hints.sort((a, b) => a.pk - b.pk);
+    this.unrated_mutant_hint_data.unrated_hints = this.unrated_hints;
   }
 
   private async refresh_submissions() {
@@ -272,6 +314,26 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
     if (index !== -1) {
       safe_assign(this.d_submissions[index], new SubmissionData(submission));
     }
+  }
+
+  update_hint_unlocked(hint: UnlockedHintData): void {
+    this.d_all_unlocked_mutant_hints.push(hint);
+    this.unrated_mutant_hint_data.unrated_hints = this.unrated_hints;
+  }
+
+  update_hint_rated(hint_pk: number, data: HintRatingData): void {
+    let index = this.d_all_unlocked_mutant_hints.findIndex(item => item.pk === hint_pk);
+    if (index !== -1) {
+      // Since the top-level list of hints only shows unrated hints, we don't
+      // need to explicitly remove it from the list.
+      this.d_all_unlocked_mutant_hints[index].hint_rating = data.hint_rating;
+      this.d_all_unlocked_mutant_hints[index].user_comment = data.user_comment;
+      this.unrated_mutant_hint_data.unrated_hints = this.unrated_hints;
+    }
+  }
+
+  get unrated_hints() {
+    return this.d_all_unlocked_mutant_hints.filter(hint => hint.hint_rating === null);
   }
 }
 </script>
@@ -371,6 +433,10 @@ $border-color: $pebble-medium;
   @media only screen and (min-width: 500px) {
     display: none;
   }
+}
+
+.unlocked-hint-wrapper {
+  margin-bottom: .5rem;
 }
 
 </style>

@@ -1,5 +1,11 @@
 <template>
   <div class="mutation-suite-result">
+    <mutant-hints
+      :mutation_test_suite_result="mutation_test_suite_result"
+      :fdbk_category="fdbk_category"
+      :submission="submission"
+    ></mutant-hints>
+
     <fieldset v-if="show_setup_fieldset" class="fieldset">
       <legend class="legend" data-testid="setup_command_name">
         {{mutation_test_suite_result.setup_command_name !== null
@@ -386,9 +392,12 @@ import CorrectnessIcon from "@/components/project_view/submission_detail/correct
 import ViewFile from "@/components/view_file/view_file.vue";
 import { handle_global_errors_async } from '@/error_handling';
 
+import MutantHints from "./mutant_hints/mutant_hints.vue";
+
 @Component({
   components: {
     CorrectnessIcon,
+    MutantHints,
     ViewFile
   }
 })

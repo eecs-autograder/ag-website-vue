@@ -143,6 +143,8 @@ describe('ExpectedStudentFiles tests', () => {
         wrapper.find('.modal-delete-button').trigger('click');
         await component.$nextTick();
 
+        await wait_until(
+            wrapper, w => !w.findComponent({ref: 'delete_expected_student_file_modal'}).exists());
         expect(delete_stub.callCount).toEqual(1);
         expect(component.d_delete_pending).toBe(false);
         expect(wrapper.vm.d_show_delete_expected_student_file_modal).toBe(false);

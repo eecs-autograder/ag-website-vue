@@ -1,10 +1,11 @@
-import { config, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
 
 import {
     Course,
     Group,
     HandgradingResult,
     HandgradingRubric,
+    HttpClient,
     HttpError,
     Project,
     Submission,
@@ -44,6 +45,10 @@ beforeEach(async () => {
 
     course = data_ut.make_course();
     project = data_ut.make_project(course.pk);
+
+    sinon.stub(HttpClient.get_instance(), 'get').withArgs(
+        `/projects/${project.pk}/all_unlocked_mutant_hints/`
+    ).resolves({status: 200, headers: {}, data: []});
 
     user = data_ut.make_user();
     data_ut.set_global_current_user(user);
@@ -363,7 +368,7 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'SubmissionList'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'SubmissionList'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'SubmissionList'}).isVisible()).toBe(true);
         expect(wrapper.vm.d_current_tab).toEqual('my_submissions');
         expect(router_replace.calledOnce).toBe(true);
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'my_submissions'}}));
@@ -380,8 +385,8 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'SubmissionList'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'SubmissionList'}).element).toBeVisible();
-        expect(wrapper.findComponent({name: 'Submit'}).element).not.toBeVisible();
+        expect(wrapper.findComponent({name: 'SubmissionList'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'Submit'}).isVisible()).toBe(false);
         expect(wrapper.vm.d_current_tab).toEqual('my_submissions');
         expect(router_replace.calledOnce).toBe(true);
 
@@ -389,7 +394,7 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(wrapper.vm.d_current_tab).toEqual('submit');
         expect(router_replace.calledTwice).toBe(true);
         expect(router_replace.secondCall.calledWith({query: {current_tab: 'submit'}}));
-        expect(wrapper.findComponent({name: 'SubmissionList'}).element).not.toBeVisible();
+        expect(wrapper.findComponent({name: 'SubmissionList'}).isVisible()).toBe(false);
     });
 
     test('Clicking on my_submissions tab', async () => {
@@ -403,13 +408,13 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'my_submissions'}}));
 
         expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(true);
-        expect(wrapper.findComponent({name: 'SubmissionList'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'SubmissionList'}).isVisible()).toBe(true);
 
         tabs.at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findComponent({name: 'SubmissionList'}).exists()).toBe(true);
-        expect(wrapper.findComponent({name: 'SubmissionList'}).element).not.toBeVisible();
+        expect(wrapper.findComponent({name: 'SubmissionList'}).isVisible()).toBe(false);
     });
 
     test('Clicking on student_lookup tab', async () => {
@@ -422,7 +427,7 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'student_lookup'}}));
 
         expect(wrapper.findComponent({name: 'StudentLookup'}).exists()).toBe(true);
-        expect(wrapper.findComponent({name: 'StudentLookup'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'StudentLookup'}).isVisible()).toBe(true);
     });
 
     test('Clicking on handgrading tab', async () => {
@@ -436,13 +441,13 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'handgrading'}}));
 
         expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(true);
-        expect(wrapper.findComponent({name: 'HandgradingContainer'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).isVisible()).toBe(true);
 
         tabs.at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findComponent({name: 'HandgradingContainer'}).exists()).toBe(true);
-        expect(wrapper.findComponent({name: 'HandgradingContainer'}).element).not.toBeVisible();
+        expect(wrapper.findComponent({name: 'HandgradingContainer'}).isVisible()).toBe(false);
     });
 
     test('Clicking on handgrading results tab', async () => {
@@ -456,12 +461,12 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(router_replace.firstCall.calledWith({query: {current_tab: 'handgrading_result'}}));
 
         expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(true);
-        expect(wrapper.findComponent({name: 'Handgrading'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'Handgrading'}).isVisible()).toBe(true);
 
         tabs.at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(true);
-        expect(wrapper.findComponent({name: 'Handgrading'}).element).not.toBeVisible();
+        expect(wrapper.findComponent({name: 'Handgrading'}).isVisible()).toBe(false);
     });
 });

@@ -14,7 +14,7 @@ import InvitationReceived from '@/components/project_view/group_registration/inv
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { wait_for_load, wait_until } from '@/tests/utils';
+import { wait_fixed, wait_for_load, wait_until } from '@/tests/utils';
 
 describe('GroupRegistration tests', () => {
     let wrapper: Wrapper<GroupRegistration>;
@@ -656,6 +656,7 @@ describe('GroupRegistration tests', () => {
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
         await invitation_to_reject.get('[data-testid=confirm_reject_button]').trigger('click');
+        await wait_until(wrapper, w => w.vm.invitations_received.length === 3);
 
         expect(wrapper.vm.invitations_received.length).toEqual(3);
         expect(wrapper.vm.invitations_received[0]).toEqual(invitation_received_2);
@@ -668,6 +669,7 @@ describe('GroupRegistration tests', () => {
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
         await invitation_to_reject.find('[data-testid=confirm_reject_button]').trigger('click');
+        await wait_until(wrapper, w => w.vm.invitations_received.length === 2);
 
         expect(wrapper.vm.invitations_received.length).toEqual(2);
         expect(wrapper.vm.invitations_received[0]).toEqual(invitation_received_2);
@@ -679,6 +681,7 @@ describe('GroupRegistration tests', () => {
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
         await invitation_to_reject.find('[data-testid=confirm_reject_button]').trigger('click');
+        await wait_until(wrapper, w => w.vm.invitations_received.length === 1);
 
         expect(wrapper.vm.invitations_received.length).toEqual(1);
         expect(wrapper.vm.invitations_received[0]).toEqual(invitation_received_2);
@@ -689,6 +692,7 @@ describe('GroupRegistration tests', () => {
 
         sinon.stub(invitation_received_component.d_invitation! , 'reject');
         await invitation_to_reject.find('[data-testid=confirm_reject_button]').trigger('click');
+        await wait_until(wrapper, w => w.vm.invitations_received.length === 0);
 
         expect(wrapper.vm.invitations_received.length).toEqual(0);
     });

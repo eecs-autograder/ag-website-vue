@@ -52,7 +52,7 @@ test('File loaded on open', async () => {
     wrapper.find('.panel').trigger('click');
     expect(await wait_until(wrapper, w => w.vm.d_content !== null));
 
-    expect(wrapper.find('.body').element).toBeVisible();
+    expect(wrapper.find('.body').isVisible()).toBe(true);
     expect(await wrapper.vm.d_content).toEqual(content);
 
     let view_file = find_by_name<ViewFile>(wrapper, 'ViewFile');

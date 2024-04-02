@@ -8,6 +8,15 @@
       </a>
     </div>
 
+    <div class="queue-size-wrapper">
+      <span class="num-queued-submissions">
+        <template v-if="d_num_queued_submissions === null">...</template>
+        <template v-else>{{ d_num_queued_submissions }}</template>
+      </span>
+      submission(s) currently in the queue
+      <i class="refresh-icon fas fa-sync-alt" @click="load_num_queued_submissions"></i>
+    </div>
+
     <div class="checkbox-input-container">
       <label class="checkbox-label">
         <input
@@ -56,6 +65,8 @@
             v-if="submission_results !== null"
             :ultimate_submission_entries="submission_results"
           />
+
+          <score-table :submission_results="submission_results"/>
         </template>
       </collapsible>
     </div>
@@ -190,12 +201,13 @@ import * as ag_cli from 'ag-client-typescript';
 
 import Collapsible from '@/components/collapsible.vue';
 import ProgressBar from '@/components/progress_bar.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
-import { toggle } from '@/utils';
+import { assert_not_null, toggle } from '@/utils';
 
 import FirstSubmissionTimeVsFinalScore from './first_submission_time_vs_final_score.vue';
 import PassFailCounts from './pass_fail_counts.vue';
+import ScoreTable from './score_table.vue';
 import SubmissionScoreHistogram from './submission_score_histogram/submission_score_histogram.vue';
 import SubmissionsOverTimeGraph from './submissions_over_time_graph.vue';
 
@@ -209,6 +221,7 @@ export interface FirstSubmissionData {
     Collapsible,
     PassFailCounts,
     ProgressBar,
+    ScoreTable,
     SubmissionScoreHistogram,
     SubmissionsOverTimeGraph,
     FirstSubmissionTimeVsFinalScore
@@ -223,6 +236,8 @@ export default class ProjectStats extends Vue {
 
   d_include_staff = true;
   d_staff_usernames = new Set<string>();
+
+  d_num_queued_submissions: number | null = null;
 
   d_loading_submission_results = false;
   d_submission_results_progress = 0;
@@ -239,6 +254,14 @@ export default class ProjectStats extends Vue {
   async created() {
     let [staff, admins] = await Promise.all([this.course.get_staff(), this.course.get_admins()]);
     this.d_staff_usernames = new Set([...staff, ...admins].map(user => user.username));
+    await this.load_num_queued_submissions();
+  }
+
+  @handle_global_errors_async
+  async load_num_queued_submissions() {
+    let response = await ag_cli.HttpClient.get_instance().get<number>(
+      `/projects/${this.project.pk}/num_queued_submissions/`);
+    this.d_num_queued_submissions = response.data;
   }
 
   get submission_results() {
@@ -274,7 +297,10 @@ export default class ProjectStats extends Vue {
                 page_num: page_num,
                 page_size: page_size,
                 // Staff will be filtered out after we load the data
-                include_staff: true
+                include_staff: true,
+                // The less-surprising behavior for this is to include students with extensions.
+                // @ts-ignore
+                include_pending_extensions: true,
             }
         );
         results.push(...page.results);
@@ -372,4 +398,9 @@ export default class ProjectStats extends Vue {
   @include section-header($with-left-divider: false);
   font-size: 1.25rem;
 }
+
+.refresh-icon {
+  cursor: pointer;
+}
+
 </style>

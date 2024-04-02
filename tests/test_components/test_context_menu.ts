@@ -123,7 +123,7 @@ describe('ContextMenu tests', () => {
         context_menu_area.trigger('click');
         await context_menu.vm.$nextTick();
 
-        expect(context_menu.element).toBeVisible();
+        expect(context_menu.isVisible()).toBe(true);
 
         let outside_input = wrapper.find('#outside');
         outside_input.trigger('click');
@@ -131,7 +131,7 @@ describe('ContextMenu tests', () => {
         await context_menu.vm.$nextTick();
 
         expect(emitted(context_menu, 'close').length).not.toEqual(0);
-        expect(context_menu.element).not.toBeVisible();
+        expect(context_menu.isVisible()).toBe(false);
 
         wrapper.destroy();
     });
@@ -218,12 +218,12 @@ describe('ContextMenu tests', () => {
 
         context_menu_area.trigger('click');
         await wrapper.vm.$nextTick();
-        expect(context_menu_wrapper.element).toBeVisible();
+        expect(context_menu_wrapper.isVisible()).toBe(true);
 
         context_menu_wrapper.trigger('keyup.esc');
         await wrapper.vm.$nextTick();
 
-        expect(context_menu_wrapper.element).not.toBeVisible();
+        expect(context_menu_wrapper.isVisible()).toBe(false);
 
         wrapper.destroy();
     });

@@ -37,7 +37,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Submission } from 'ag-client-typescript';
 import { BarController, BarElement, Chart, Legend, LinearScale, TimeScale, Tooltip } from 'chart.js';
 import 'chartjs-adapter-moment';
-// @ts-ignore
 import * as zoom_plugin from 'chartjs-plugin-zoom';
 import moment from "moment-timezone";
 
@@ -140,17 +139,20 @@ export default class SubmissionsOverTimeGraph extends Vue {
                 title: ctx => ''
               }
             },
-            // @ts-ignore
             zoom: {
               pan: {
                 enabled: true,
                 mode: 'x',
               },
               zoom: {
-                enabled: true,
                 mode: 'x',
-                // @ts-ignore
-                wheelModifierKey: 'shift',
+                wheel: {
+                  enabled: true,
+                  modifierKey: 'shift',
+                },
+                pinch: {
+                  enabled: true
+                }
               }
             },
           }

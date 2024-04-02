@@ -38,7 +38,7 @@ test('Member names and submissions displayed', async () => {
     expect(wrapper.findAll('.member-name').at(1).text()).toEqual(group.member_names[1]);
 
     expect(
-        wrapper.findAllComponents({ref: 'submission_checkbox'}).length
+        wrapper.findAll('[data-testid=submission_checkbox]').length
     ).toEqual(submissions.length);
 });
 

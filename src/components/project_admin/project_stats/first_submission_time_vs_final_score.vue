@@ -37,7 +37,6 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { FullUltimateSubmissionResult } from 'ag-client-typescript';
 import { Chart, Legend, LinearScale, LineElement, PointElement, ScatterController, TimeScale, Tooltip } from 'chart.js';
 import 'chartjs-adapter-moment';
-// @ts-ignore
 import * as zoom_plugin from 'chartjs-plugin-zoom';
 import moment from "moment-timezone";
 
@@ -142,17 +141,20 @@ export default class FirstSubmissionTimeVsFinalScore extends Vue {
                 title: ctx => ''
               }
             },
-            // @ts-ignore
             zoom: {
               pan: {
                 enabled: true,
                 mode: 'x',
               },
               zoom: {
-                enabled: true,
                 mode: 'x',
-                // @ts-ignore
-                wheelModifierKey: 'shift',
+                wheel: {
+                  enabled: true,
+                  modifierKey: 'shift',
+                },
+                pinch: {
+                  enabled: true
+                }
               }
             },
           }

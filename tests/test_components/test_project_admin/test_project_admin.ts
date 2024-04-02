@@ -94,7 +94,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'HandgradingSettings'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'HandgradingSettings'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'HandgradingSettings'}).isVisible()).toBe(true);
         expect(wrapper.vm.current_tab).toEqual('handgrading');
         expect(wrapper.findComponent(HandgradingSettings).vm.$props.project).toEqual(project);
     });
@@ -112,17 +112,17 @@ describe('Changing tabs in project admin', () => {
             await wait_until(wrapper, w => w.findComponent({name: 'InstructorFiles'}).exists())
         ).toBe(true);
         expect(wrapper.vm.current_tab).toEqual('instructor_files');
-        expect(wrapper.findComponent({name: 'InstructorFiles'}).element).toBeVisible();
-        expect(wrapper.findComponent({name: 'ProjectSettings'}).element).not.toBeVisible();
+        expect(wrapper.findComponent({name: 'InstructorFiles'}).isVisible()).toBe(true);
+        expect(wrapper.findComponent({name: 'ProjectSettings'}).isVisible()).toBe(false);
         expect(router_replace.calledOnce).toBe(true);
 
         await tabs.at(0).trigger('click');
-        expect(wrapper.findComponent(ProjectSettings).element).toBeVisible();
+        expect(wrapper.findComponent(ProjectSettings).isVisible()).toBe(true);
         expect(wrapper.vm.current_tab).toEqual('settings');
         expect(router_replace.secondCall.calledWith(
             {query: {current_tab: 'settings'}})
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'InstructorFiles'}).element).not.toBeVisible();
+        expect(wrapper.findComponent({name: 'InstructorFiles'}).isVisible()).toBe(false);
     });
 
     test('Clicking on Instructor Files tab', async () => {
@@ -131,7 +131,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'InstructorFiles'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'InstructorFiles'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'InstructorFiles'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.current_tab).toEqual('instructor_files');
         expect(router_replace.firstCall.calledWith(
@@ -146,7 +146,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'ExpectedStudentFiles'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'ExpectedStudentFiles'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'ExpectedStudentFiles'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.current_tab).toEqual('expected_student_files');
         expect(router_replace.firstCall.calledWith(
@@ -161,7 +161,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'AGTestSuites'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'AGTestSuites'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'AGTestSuites'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.current_tab).toEqual('test_cases');
         expect(router_replace.firstCall.calledWith(
@@ -176,7 +176,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'MutationSuites'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'MutationSuites'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'MutationSuites'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.current_tab).toEqual('mutation_testing');
         expect(router_replace.firstCall.calledWith(
@@ -191,7 +191,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'EditGroups'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'EditGroups'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'EditGroups'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.current_tab).toEqual('edit_groups');
         expect(router_replace.firstCall.calledWith(
@@ -228,7 +228,7 @@ describe('Changing tabs in project admin', () => {
         expect(
             await wait_until(wrapper, w => w.findComponent({name: 'HandgradingSettings'}).exists())
         ).toBe(true);
-        expect(wrapper.findComponent({name: 'HandgradingSettings'}).element).toBeVisible();
+        expect(wrapper.findComponent({name: 'HandgradingSettings'}).isVisible()).toBe(true);
 
         expect(wrapper.vm.current_tab).toEqual('handgrading');
         expect(router_replace.firstCall.calledWith(

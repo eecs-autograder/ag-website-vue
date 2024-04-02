@@ -37,7 +37,7 @@
                     && d_active_mutation_test_suite.pk === mutation_test_suite.pk
                 }"
                 :key="mutation_test_suite.pk"
-                @click="d_active_mutation_test_suite = mutation_test_suite">
+                @click="set_active_mutation_test_suite(mutation_test_suite)">
               <div class="text">{{mutation_test_suite.name}}</div>
               <div class="icons">
                 <i class="icon handle fas fa-arrows-alt"></i>
@@ -350,6 +350,10 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     this.d_loading = false;
   }
 
+  set_active_mutation_test_suite(active_mutation_test_suite: MutationTestSuite) {
+    this.d_active_mutation_test_suite = active_mutation_test_suite;
+  }
+
   beforeDestroy() {
     MutationTestSuite.unsubscribe(this);
     InstructorFile.unsubscribe(this);
@@ -420,7 +424,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   update_mutation_test_suite_created(mutation_test_suite: MutationTestSuite): void {
     if (mutation_test_suite.project === this.project.pk) {
       this.d_mutation_test_suites.push(mutation_test_suite);
-      this.d_active_mutation_test_suite = mutation_test_suite;
+      this.set_active_mutation_test_suite(mutation_test_suite);
     }
   }
 
@@ -439,7 +443,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
             deep_copy(mutation_test_suite, MutationTestSuite)
     );
     if (changed_suite_is_active) {
-      this.d_active_mutation_test_suite = this.d_mutation_test_suites[index];
+      this.set_active_mutation_test_suite(this.d_mutation_test_suites[index]);
     }
   }
 

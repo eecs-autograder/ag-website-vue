@@ -116,7 +116,8 @@ describe('Deadline info tests', () => {
     });
 
     test('More than one month until soft closing time', async () => {
-        project.soft_closing_time = moment().add(1, 'months').add(1, 'minutes').format();
+        project.soft_closing_time = moment()
+            .add(1, 'months').add(1, 'days').add(1, 'minutes').format();
         const wrapper = managed_mount(Submit, {
             propsData: {
                 course: course,
@@ -288,7 +289,8 @@ describe('Deadline info tests', () => {
 
     test('More than one month until extension', async () => {
         project.soft_closing_time = moment().subtract(7, 'hours').format();
-        group.extended_due_date = moment().add(1, 'months').add(1, 'minutes').format();
+        group.extended_due_date = moment()
+            .add(1, 'months').add(1, 'days').add(1, 'minutes').format();
 
         const wrapper = managed_mount(Submit, {
             propsData: {

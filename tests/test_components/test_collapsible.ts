@@ -10,13 +10,13 @@ test('start_open true', () => {
         }
     });
 
-    expect(wrapper.find('[data-testid=collapsible_body]').element).toBeVisible();
+    expect(wrapper.find('[data-testid=collapsible_body]').isVisible()).toBe(true);
 });
 
 test('start_open default false', () => {
     let wrapper = managed_mount(Collapsible);
 
-    expect(wrapper.find('[data-testid=collapsible_body]').element).not.toBeVisible();
+    expect(wrapper.find('[data-testid=collapsible_body]').isVisible()).toBe(false);
 });
 
 test('include_caret default true', () => {
@@ -40,19 +40,19 @@ test('stay_open prevents closing when true', async () => {
         }
     });
 
-    expect(wrapper.find('[data-testid=collapsible_body]').element).not.toBeVisible();
+    expect(wrapper.find('[data-testid=collapsible_body]').isVisible()).toBe(false);
 
     wrapper.vm.toggle_is_open();
     await wrapper.vm.$nextTick();
-    expect(wrapper.find('[data-testid=collapsible_body]').element).toBeVisible();
+    expect(wrapper.find('[data-testid=collapsible_body]').isVisible()).toBe(true);
 
     wrapper.vm.toggle_is_open();
     await wrapper.vm.$nextTick();
-    expect(wrapper.find('[data-testid=collapsible_body]').element).toBeVisible();
+    expect(wrapper.find('[data-testid=collapsible_body]').isVisible()).toBe(true);
 
     await set_props(wrapper, {stay_open: false});
 
     wrapper.vm.toggle_is_open();
     await wrapper.vm.$nextTick();
-    expect(wrapper.find('[data-testid=collapsible_body]').element).not.toBeVisible();
+    expect(wrapper.find('[data-testid=collapsible_body]').isVisible()).toBe(false);
 });

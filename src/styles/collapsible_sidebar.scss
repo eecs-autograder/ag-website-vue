@@ -1,3 +1,6 @@
+@import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
+
 @mixin collapsible-sidebar(
     // The width of the sidebar.
     $sidebar-width,
@@ -98,8 +101,6 @@
                     font-weight: bold;
                 }
 
-                @import '@/styles/button_styles.scss';
-
                 .sidebar-new-button {
                     @extend .white-button;
                     box-shadow: none;
@@ -109,8 +110,6 @@
                     // proportional to the header text.
                     font-size: .875em;
                     padding: .25em .625em;
-
-                    @import '@/styles/colors.scss';
 
                     color: darken($green, 20%);
 

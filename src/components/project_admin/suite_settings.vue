@@ -172,6 +172,7 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { is_not_empty } from '@/validators';
+import { deep_copy } from '@/utils';
 
 class Suite {
   name: string;
@@ -223,7 +224,7 @@ export default class SuiteSettings extends Vue {
 
   @Watch('suite', {deep: true})
   on_suite_changed(new_value: Suite, old_value: Suite) {
-    this.d_suite = new Suite(new_value);
+    this.d_suite = deep_copy(new_value, Suite);
   }
 
   add_instructor_file(instructor_file: InstructorFile) {

@@ -207,13 +207,13 @@ describe('FeedbackConfigPanel tests', () => {
         });
 
         expect(wrapper.vm.d_configuration).toEqual(ag_test_suite_normal_feedback_config);
-        expect(wrapper.find('[data-testid=preset_selection]').element).toBeVisible();
+        expect(wrapper.find('[data-testid=preset_selection]').isVisible()).toBe(true);
 
         wrapper.setProps({value: null});
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_configuration).toEqual(null);
-        expect(wrapper.find('[data-testid=preset_selection]').element).not.toBeVisible();
+        expect(wrapper.find('[data-testid=preset_selection]').isVisible()).toBe(false);
     });
 
     test('Presets not provided, no preset dropdown', async () => {
@@ -223,6 +223,6 @@ describe('FeedbackConfigPanel tests', () => {
             }
         });
 
-        expect(wrapper.find('[data-testid=preset_selection]').element).not.toBeVisible();
+        expect(wrapper.find('[data-testid=preset_selection]').isVisible()).toBe(false);
     });
 });

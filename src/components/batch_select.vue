@@ -111,8 +111,8 @@ export default class BatchSelect extends Vue {
 
   // Call when user clicks the "confirm" button.
   confirm_selection() {
-    this.d_show_batch_select_modal = false;
     this.$emit("input", this.d_selected_items);
+    this.d_show_batch_select_modal = false;
   }
 }
 </script>

@@ -300,6 +300,7 @@ export default class AGTestSuiteSettings extends Vue {
 
   @handle_global_errors_async
   async created() {
+    // FIXME: Add tests for suite deep copy behavior
     this.d_ag_test_suite = deep_copy(this.ag_test_suite, AGTestSuite);
     let global_images = await SandboxDockerImage.get_images(null);
     let course_images = await SandboxDockerImage.get_images(this.project.course);

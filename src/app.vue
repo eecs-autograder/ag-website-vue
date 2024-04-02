@@ -14,7 +14,7 @@
       <div id="banner">
         <div id="breadcrumbs">
           <router-link to="/" id="home-logo">
-            Autograder
+            Autograder.io
           </router-link>
           <template v-if="globals.current_course !== null">
             <router-link :to="`/web/course/${globals.current_course.pk}`"
@@ -249,7 +249,7 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
       }
       else {
         let oauth_url = e.headers['www-authenticate'].split('Redirect_to: ')[1];
-        window.location.assign(oauth_url);
+        window_location.assign(oauth_url);
       }
     }
   }
@@ -263,6 +263,10 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
     (<APIErrors> this.$refs.global_errors).show_errors_from_response(error);
   }
 }
+
+export let window_location = {
+  assign: (url: string) => window.location.assign(url)
+};
 
 </script>
 
