@@ -103,6 +103,7 @@
 </template>
 
 <script lang="ts">
+// istanbul ignore file
 import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {

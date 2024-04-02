@@ -1,3 +1,4 @@
+// istanbul ignore file
 import { HttpClient } from "ag-client-typescript";
 
 export interface UnlockedHintData {

@@ -351,8 +351,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   }
 
   set_active_mutation_test_suite(active_mutation_test_suite: MutationTestSuite) {
-    // FIXME: Add tests for suite deep copy behavior
-    this.d_active_mutation_test_suite = deep_copy(active_mutation_test_suite, MutationTestSuite);
+    this.d_active_mutation_test_suite = active_mutation_test_suite;
   }
 
   beforeDestroy() {

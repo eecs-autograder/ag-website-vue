@@ -5,6 +5,7 @@ import {
     Group,
     HandgradingResult,
     HandgradingRubric,
+    HttpClient,
     HttpError,
     Project,
     Submission,
@@ -44,6 +45,10 @@ beforeEach(async () => {
 
     course = data_ut.make_course();
     project = data_ut.make_project(course.pk);
+
+    sinon.stub(HttpClient.get_instance(), 'get').withArgs(
+        `/projects/${project.pk}/all_unlocked_mutant_hints/`
+    ).resolves({status: 200, headers: {}, data: []});
 
     user = data_ut.make_user();
     data_ut.set_global_current_user(user);

@@ -10,6 +10,7 @@ import * as utils from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { wait_fixed, wait_for_load } from '@/tests/utils';
+import { MutantHintService } from '@/components/project_view/submission_detail/mutant_hints/mutant_hint_service';
 
 let user: ag_cli.User;
 let course: ag_cli.Course;
@@ -20,6 +21,7 @@ let get_submissions_with_results_stub: sinon.SinonStub;
 let get_submissions_stub: sinon.SinonStub;
 let get_ultimate_submission_stub: sinon.SinonStub;
 let get_submission_result_stub: sinon.SinonStub;
+let get_all_unlocked_hints_stub: sinon.SinonStub;
 
 beforeEach(() => {
     user = data_ut.make_user();
@@ -38,6 +40,10 @@ beforeEach(() => {
     ).rejects(new ag_cli.HttpError(403, ''));
     get_submission_result_stub = sinon.stub(
         ag_cli.SubmissionResults, 'get_submission_result').rejects();
+
+        get_all_unlocked_hints_stub = sinon.stub(
+            MutantHintService, 'get_all_unlocked_hints'
+        ).resolves([]);
 });
 
 describe('Submission list tests', () => {

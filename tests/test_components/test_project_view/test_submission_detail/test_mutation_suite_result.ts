@@ -1835,7 +1835,8 @@ async function make_wrapper() {
             mutation_test_suite_result: mutation_test_suite_result,
             submission: submission,
             fdbk_category: ag_cli.FeedbackCategory.max
-        }
+        },
+        stubs: {MutantHints: true}
     });
 
 

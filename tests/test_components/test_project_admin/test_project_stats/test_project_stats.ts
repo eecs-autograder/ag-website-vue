@@ -12,6 +12,8 @@ let project: ag_cli.Project;
 
 let get_staff_stub: sinon.SinonStub;
 let get_admins_stub: sinon.SinonStub;
+let get_admins_stub: sinon.SinonStub;
+let num_queued_submissions_stub: sinon.SinonStub;
 
 beforeEach(() => {
     course = data_ut.make_course();
@@ -19,6 +21,10 @@ beforeEach(() => {
 
     get_staff_stub = sinon.stub(course, 'get_staff').resolves([]);
     get_admins_stub = sinon.stub(course, 'get_admins').resolves([]);
+
+    num_queued_submissions_stub = sinon.stub(ag_cli.HttpClient.get_instance(), 'get').withArgs(
+        `/projects/${project.pk}/num_queued_submissions/`
+    ).resolves(new ag_cli.HttpResponse({status: 200, data: 0, headers: {}}));;
 });
 
 test('Staff and admins loaded initially', async () => {
