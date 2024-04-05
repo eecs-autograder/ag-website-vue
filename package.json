@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "./static_analysis.bash && vue-cli-service build",
+    "lint": "./static_analysis.bash",
+    "build": "vue-cli-service build",
     "test": "python3 run_tests.py"
   },
   "dependencies": {
