@@ -68,12 +68,12 @@
                   </div>
                   <div class="radio-container">
                     <input type="radio" name="status"
-                            id="no-submission"
+                            id="no-valid-submission"
                             class="radio"
                             v-model="d_status_filter"
-                            :value="HandgradingStatus.no_submission">
+                            :value="HandgradingStatus.no_valid_submission">
                     <label class="label"
-                            for="no-submission">{{HandgradingStatus.no_submission}}</label>
+                            for="no-valid-submission">{{HandgradingStatus.no_valid_submission}}</label>
                   </div>
                 </div>
               </div>
@@ -234,7 +234,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 
   get total_num_to_grade() {
     return this.staff_filtered_groups.filter(
-      group => get_handgrading_status(group) !== HandgradingStatus.no_submission
+      group => get_handgrading_status(group) !== HandgradingStatus.no_valid_submission
     ).length;
   }
 

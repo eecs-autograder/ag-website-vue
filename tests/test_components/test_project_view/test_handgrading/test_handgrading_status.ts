@@ -28,8 +28,9 @@ test('get_handgrading_status', () => {
     );
     expect(get_handgrading_status(ungraded)).toEqual(HandgradingStatus.ungraded);
 
-    let no_submission = data_ut.make_group_summary(
+    let no_valid_submission = data_ut.make_group_summary(
         project.pk, 1, {num_submits_towards_limit: 0},
     );
-    expect(get_handgrading_status(no_submission)).toEqual(HandgradingStatus.no_submission);
+    expect(get_handgrading_status(no_valid_submission))
+        .toEqual(HandgradingStatus.no_valid_submission);
 });

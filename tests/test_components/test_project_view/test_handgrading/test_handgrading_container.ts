@@ -17,6 +17,7 @@ let project: ag_cli.Project;
 let rubric: ag_cli.HandgradingRubric;
 
 let no_submissions_group: ag_cli.GroupWithHandgradingResultSummary;
+let no_valid_submission_group: ag_cli.GroupWithHandgradingResultSummary;
 let ungraded_group: ag_cli.GroupWithHandgradingResultSummary;
 let in_progress_group: ag_cli.GroupWithHandgradingResultSummary;
 let graded_group: ag_cli.GroupWithHandgradingResultSummary;
@@ -44,6 +45,9 @@ beforeEach(() => {
 
     no_submissions_group = data_ut.make_group_summary(
         project.pk, 1, {member_names: ['none@me.com']});
+    no_valid_submission_group = data_ut.make_group_summary(
+        project.pk, 1, {member_names: ['no-valid@me.com'], num_submissions: 1,
+        num_submits_towards_limit: 0});
     ungraded_group = data_ut.make_group_summary(
         project.pk, 1, {member_names: ['not_yet@me.com'], num_submissions: 1});
     in_progress_group = data_ut.make_group_summary(
@@ -147,7 +151,7 @@ describe('Filter group summaries tests', () => {
         expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([ungraded_group.pk]);
 
-        wrapper.find('#no-submission').setChecked();
+        wrapper.find('#no-valid-submission').setChecked();
         await wrapper.vm.$nextTick();
         expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([no_submissions_group.pk]);
