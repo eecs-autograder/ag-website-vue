@@ -1,7 +1,7 @@
 import { GroupWithHandgradingResultSummary } from 'ag-client-typescript';
 
 export enum HandgradingStatus {
-    no_submission = "No Submission",
+    no_valid_submission = "No Valid Submissions",
     ungraded = "Ungraded",
     in_progress = "In Progress",
     graded = "Graded",
@@ -9,7 +9,7 @@ export enum HandgradingStatus {
 
 export function get_handgrading_status(group_summary: GroupWithHandgradingResultSummary) {
     if (group_summary.num_submits_towards_limit === 0) {
-      return HandgradingStatus.no_submission;
+      return HandgradingStatus.no_valid_submission;
     }
 
     let result = group_summary.handgrading_result;

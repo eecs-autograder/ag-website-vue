@@ -4,7 +4,7 @@
          'graded': status === HandgradingStatus.graded,
          'ungraded': status === HandgradingStatus.ungraded,
          'in-progress': status === HandgradingStatus.in_progress,
-         'no-submission': status === HandgradingStatus.no_submission,
+         'no-valid-submission': status === HandgradingStatus.no_valid_submission,
        }"
        v-on="$listeners">
     <div class="member-names">
@@ -78,8 +78,10 @@ export default class GroupSummaryPanel extends Vue {
   color: $ocean-blue;
 }
 
-.no-submission {
+no-valid-submission {
   color: $stormy-gray-dark;
+  background-color: aqua;
+  pointer-events: none; // Make the panel unclickable
 }
 
 </style>
