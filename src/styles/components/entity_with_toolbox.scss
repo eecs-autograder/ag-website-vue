@@ -21,6 +21,20 @@ $border-radius: 3px;
         border-bottom-right-radius: $border-radius;
     }
 
+    .project-name-container {
+        display: flex;
+        justify-content: space-between;
+        //padding: 0 .25rem;
+    }
+
+    .left-text {
+        text-align: left;
+    }
+
+    .right-text {
+        text-align: right;
+    }
+
     .name {
         color: black;
         font-size: 1.25rem;
