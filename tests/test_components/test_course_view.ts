@@ -107,4 +107,21 @@ describe('CourseView tests', () => {
         expect(wrapper.findAll('.project').length).toEqual(0);
         expect(wrapper.find('#no-projects-message').exists()).toBe(true);
     });
+
+    test('correct visibility icon is shown for each project', async () => {
+        project1.visible_to_students = true;
+        project2.visible_to_students = false;
+
+        wrapper = mount(CourseView, {
+            stubs: ['router-link', 'router-view'],
+            mocks: {
+                $route
+            }
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(wrapper.findAll('.project').length).toEqual(2);
+        expect(wrapper.findAll('.fa-eye').length).toEqual(1);
+        expect(wrapper.findAll('.fa-eye-slash').length).toEqual(1);
+    });
 });
