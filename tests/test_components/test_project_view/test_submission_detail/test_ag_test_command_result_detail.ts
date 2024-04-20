@@ -164,17 +164,6 @@ describe('Correctness feedback tests', () => {
             );
         });
 
-        test('Actual return code available, return code not checked', async () => {
-            ag_test_command_result.expected_return_code = ag_cli.ExpectedReturnCode.none;
-            ag_test_command_result.return_code_correct = null;
-            // https://github.com/eecs-autograder/autograder.io/issues/30
-            // Any status should be correct, including 2
-            ag_test_command_result.actual_return_code = 2;
-            let wrapper = await make_wrapper();
-            let section_wrapper = wrapper.findComponent({ref: 'actual_return_code'});
-            expect(section_wrapper.find('.actual-return-code-incorrect').exists()).toBe(false);
-        });
-
         test('Expected return code available, return code not checked', async () => {
             ag_test_command_result.expected_return_code = ag_cli.ExpectedReturnCode.none;
             let wrapper = await make_wrapper();

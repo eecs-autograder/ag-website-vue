@@ -33,7 +33,7 @@
                         {'actual-return-code-correct': ag_test_command_result !== null
                           && ag_test_command_result.return_code_correct,
                           'actual-return-code-incorrect': ag_test_command_result !== null
-                          && ag_test_command_result.return_code_correct === false}]"
+                          && !ag_test_command_result.return_code_correct}]"
           >{{ag_test_command_result.actual_return_code}}</div>
         </div>
       </div>
