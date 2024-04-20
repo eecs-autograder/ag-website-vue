@@ -124,4 +124,22 @@ describe('CourseView tests', () => {
         expect(wrapper.findAll('.fa-eye').length).toEqual(1);
         expect(wrapper.findAll('.fa-eye-slash').length).toEqual(1);
     });
+
+    test('student cannot see the eye icon', async () => {
+        user_roles_stub.returns(
+            Promise.resolve(data_ut.make_user_roles({is_student: true}))
+        );
+
+        wrapper = mount(CourseView, {
+            stubs: ['router-link', 'router-view'],
+            mocks: {
+                $route
+            }
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(wrapper.findAll('.project').length).toEqual(2);
+        expect(wrapper.findAll('.fa-eye').length).toEqual(0);
+        expect(wrapper.findAll('.fa-eye-slash').length).toEqual(0);
+    });
 });
