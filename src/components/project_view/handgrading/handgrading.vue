@@ -278,6 +278,7 @@
 import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
+  Annotation,
   AppliedAnnotation,
   AppliedAnnotationObserver,
   Comment,
@@ -495,16 +496,53 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     });
   }
 
+  unchecked_total_deduction_by_annotation_pk(annotation: Annotation) {
+    return this.d_handgrading_result!.applied_annotations
+      .filter(result_annotation => result_annotation.annotation.pk === annotation.pk)
+      .map(applied_annotation => applied_annotation.annotation.deduction)
+      .reduce((a, b) => a + b, 0);
+  }
+
+  limited_deduction_by_annotation_pk(unchecked_total_deduction: number, annotation: Annotation) {
+    if (annotation.max_deduction !== null && unchecked_total_deduction < annotation.max_deduction) {
+      return annotation.max_deduction;
+    }
+    return unchecked_total_deduction;
+  }
+
+  // Must call before applying change to this.d_handgrading_result.applied_annotations
+  deduction_change(annotation: Annotation, unchecked_score_change: number) {
+    const unchecked_deduction_before = this.unchecked_total_deduction_by_annotation_pk(annotation);
+    const actual_deduction_before = this.limited_deduction_by_annotation_pk(
+      unchecked_deduction_before,
+      annotation
+    );
+    const unchecked_deduction_after = unchecked_deduction_before + unchecked_score_change;
+    const actual_deduction_after = this.limited_deduction_by_annotation_pk(
+      unchecked_deduction_after,
+      annotation
+    );
+    return actual_deduction_after - actual_deduction_before;
+  }
+
   update_applied_annotation_created(applied_annotation: AppliedAnnotation): void {
     if (applied_annotation.handgrading_result === this.d_handgrading_result!.pk) {
+      const score_change = this.deduction_change(
+        applied_annotation.annotation,
+        applied_annotation.annotation.deduction
+      );
       this.d_handgrading_result!.applied_annotations.push(applied_annotation);
       // tslint:disable-next-line no-floating-promises
-      this.update_score(applied_annotation.annotation.deduction);
+      this.update_score(score_change);
     }
   }
 
   update_applied_annotation_deleted(applied_annotation: AppliedAnnotation): void {
     if (applied_annotation.handgrading_result === this.d_handgrading_result!.pk) {
+      const score_change = this.deduction_change(
+        applied_annotation.annotation,
+        -applied_annotation.annotation.deduction
+      );
       this.d_handgrading_result!.applied_annotations.splice(
         this.d_handgrading_result!.applied_annotations.findIndex(
           item => item.pk === applied_annotation.pk
@@ -512,7 +550,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
         1
       );
       // tslint:disable-next-line no-floating-promises
-      this.update_score(-applied_annotation.annotation.deduction);
+      this.update_score(score_change);
     }
   }
 
