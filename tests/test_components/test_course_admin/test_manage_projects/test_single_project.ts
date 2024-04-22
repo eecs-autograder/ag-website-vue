@@ -157,4 +157,19 @@ describe('SingleProject.vue', () => {
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
+
+    test('Visibility icons toggle based on project visibility to students', async () => {
+        // Test when the project is visible to students
+        wrapper.setProps({ project: make_project(course_1.pk, {visible_to_students: true})});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('.fa-eye').exists()).toBe(true);
+        expect(wrapper.find('.fa-eye-slash').exists()).toBe(false);
+
+        // Update the project to not visible and check for correct icons
+        wrapper.setProps({ project: make_project(course_1.pk, {visible_to_students: false} )});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('.fa-eye').exists()).toBe(false);
+        expect(wrapper.find('.fa-eye-slash').exists()).toBe(true);
+
+    });
 });

@@ -2,7 +2,13 @@
   <div id="single-project-component">
     <div class="project-wrapper entity">
       <router-link :to="`/web/project/${project.pk}`" class="project-name name info">
-        {{project.name}}
+        <div class="project-name-container">
+          <span class="left-text">{{project.name}}</span>
+          <span class="right-text tool-icon">
+              <i class="fa fa-eye" aria-hidden="true" v-if="project.visible_to_students"></i>
+              <i class="fa fa-eye-slash" aria-hidden="true" v-else></i>
+            </span>
+        </div>
       </router-link>
 
       <div class="toolbox">

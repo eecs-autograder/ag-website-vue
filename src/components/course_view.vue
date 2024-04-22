@@ -14,7 +14,13 @@
         <router-link class="project-name info name"
                       :class="{'round-bottom-corners': !d_globals.user_roles.is_admin}"
                       :to="`/web/project/${project.pk}`">
-          {{project.name}}
+          <div class="project-name-container">
+            <span class="left-text">{{project.name}}</span>
+            <span class="right-text tool-icon" v-if="!d_globals.user_roles.is_student">
+              <i class="fa fa-eye" aria-hidden="true" v-if="project.visible_to_students"></i>
+              <i class="fa fa-eye-slash" aria-hidden="true" v-else></i>
+            </span>
+          </div>
         </router-link>
         <div class="toolbox" v-if="d_globals.user_roles.is_admin">
           <router-link :to="`/web/project_admin/${project.pk}`"
