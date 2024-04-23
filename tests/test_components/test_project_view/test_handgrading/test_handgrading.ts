@@ -660,7 +660,7 @@ describe('Comment tests', () => {
             );
             ag_cli.AppliedAnnotation.notify_applied_annotation_created(applied_annotation);
         }
-        wrapper.vm.$forceUpdate();
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('5/10');
     });
@@ -674,7 +674,7 @@ describe('Comment tests', () => {
             );
             ag_cli.AppliedAnnotation.notify_applied_annotation_created(applied_annotation);
         }
-        wrapper.vm.$forceUpdate();
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(6);
         expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('5/10');
@@ -711,13 +711,13 @@ describe('Comment tests', () => {
         };
 
         add_annotation(1);
-        wrapper.vm.$forceUpdate();
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(3);
         expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/10');
 
         add_annotation(2);
-        wrapper.vm.$forceUpdate();
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(4);
         expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('2/10');
@@ -735,7 +735,7 @@ describe('Comment tests', () => {
 
         add_annotation(1);
         add_annotation(2);
-        wrapper.vm.$forceUpdate();
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(4);
         expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('2/10');
