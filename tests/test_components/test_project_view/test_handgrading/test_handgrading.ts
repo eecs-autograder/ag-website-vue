@@ -531,7 +531,7 @@ describe('Comment tests', () => {
     test('Handgraders allowed to leave custom comments', async () => {
         wrapper.vm.d_handgrading_result!.handgrading_rubric.handgraders_can_leave_comments = true;
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
-        wrapper.vm.$forceUpdate();
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#new-comment').exists()).toBe(true);
 
