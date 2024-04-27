@@ -432,6 +432,7 @@ describe('Comment tests', () => {
 
     let annotation_with_long_description: ag_cli.Annotation;
     let annotation_empty_long_description: ag_cli.Annotation;
+    let annotation_unaligned_max_deduction: ag_cli.Annotation;
 
     // The number at the end of these names describes the ordering
     // of these elements in the displayed comment/applied annotation
@@ -460,6 +461,16 @@ describe('Comment tests', () => {
             }
         );
 
+        annotation_unaligned_max_deduction = data_ut.make_annotation(
+            result.handgrading_rubric.pk,
+            {
+                short_description: "I have unaligned max deduction",
+                deduction: -3,
+                // Not a multiple of -3
+                max_deduction: -5
+            }
+        );
+
         result.handgrading_rubric.annotations = [
             annotation_with_long_description, annotation_empty_long_description
         ];
@@ -475,6 +486,8 @@ describe('Comment tests', () => {
             result, annotation_with_long_description,
             {filename: 'file2.cpp', first_line: 10, last_line: 10}
         );
+        result.total_points_possible = 10;
+        result.total_points = 7;
 
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_staff: true}));
         wrapper = managed_mount(Handgrading, {
@@ -518,7 +531,7 @@ describe('Comment tests', () => {
     test('Handgraders allowed to leave custom comments', async () => {
         wrapper.vm.d_handgrading_result!.handgrading_rubric.handgraders_can_leave_comments = true;
         data_ut.set_global_user_roles(data_ut.make_user_roles({is_handgrader: true}));
-        wrapper.vm.$forceUpdate();
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#new-comment').exists()).toBe(true);
 
@@ -636,6 +649,109 @@ describe('Comment tests', () => {
         expect(wrapper.vm.d_handgrading_result!.applied_annotations).toEqual(
             [applied_long_description_annotation_1]);
         expect(delete_stub.calledOnce).toBe(true);
+    });
+
+    test('Add applied annotations beyond max deduction', async () => {
+        for (let i = 1; i <= 3; ++i) {
+            let applied_annotation = data_ut.make_applied_annotation(
+                result,
+                annotation_empty_long_description,
+                {filename: 'file1.txt', first_line: i, last_line: i}
+            );
+            ag_cli.AppliedAnnotation.notify_applied_annotation_created(applied_annotation);
+        }
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('5/10');
+    });
+
+    test('Delete all applied annotations after exceeding max deduction', async () => {
+        for (let i = 1; i <= 4; ++i) {
+            let applied_annotation = data_ut.make_applied_annotation(
+                result,
+                annotation_empty_long_description,
+                {filename: 'file1.txt', first_line: i, last_line: i}
+            );
+            ag_cli.AppliedAnnotation.notify_applied_annotation_created(applied_annotation);
+        }
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(6);
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('5/10');
+
+        const delete_stubs =
+            wrapper.vm.d_handgrading_result!.applied_annotations.map(annotation => {
+                return sinon.stub(
+                    annotation, 'delete'
+                ).callsFake(() => {
+                    ag_cli.AppliedAnnotation.notify_applied_annotation_deleted(annotation);
+                    return Promise.resolve();
+                });
+            });
+        for (let i = 0; i < 6; ++i) {
+            wrapper.findAll('.comment').at(1).find('.delete').trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+        }
+        expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(0);
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('10/10');
+
+        for (const stub of delete_stubs) {
+            expect(stub.calledOnce).toBe(true);
+        }
+    });
+
+    test('Add applied annotation across unaligned max deduction', async () => {
+        const add_annotation = (i: number) => {
+            let applied_annotation = data_ut.make_applied_annotation(
+                result,
+                annotation_unaligned_max_deduction,
+                {filename: 'file3.py', first_line: i, last_line: i}
+            );
+            ag_cli.AppliedAnnotation.notify_applied_annotation_created(applied_annotation);
+        };
+
+        add_annotation(1);
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(3);
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/10');
+
+        add_annotation(2);
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(4);
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('2/10');
+    });
+
+    test('Delete applied annotation across unaligned max deduction', async () => {
+        const add_annotation = (i: number) => {
+            let applied_annotation = data_ut.make_applied_annotation(
+                result,
+                annotation_unaligned_max_deduction,
+                {filename: 'file3.py', first_line: i, last_line: i}
+            );
+            ag_cli.AppliedAnnotation.notify_applied_annotation_created(applied_annotation);
+        };
+
+        add_annotation(1);
+        add_annotation(2);
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(4);
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('2/10');
+        
+        let to_delete = wrapper.vm.d_handgrading_result!.applied_annotations[3];
+        let delete_stub = sinon.stub(
+            to_delete, 'delete'
+        ).callsFake(() => {
+            ag_cli.AppliedAnnotation.notify_applied_annotation_deleted(to_delete);
+            return Promise.resolve();
+        });
+        wrapper.findAll('.comment').at(3).find('.delete').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
+
+        expect(delete_stub.calledOnce).toBe(true);
+        expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/10');
     });
 });
 
