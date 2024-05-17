@@ -8,7 +8,7 @@ export enum HandgradingStatus {
 }
 
 export function get_handgrading_status(group_summary: GroupWithHandgradingResultSummary) {
-    if (group_summary.num_submits_towards_limit === 0) {
+    if (!group_summary.has_handgradeable_submission) {
       return HandgradingStatus.no_valid_submission;
     }
 
