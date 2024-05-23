@@ -50,7 +50,7 @@
       <div class="form-field-wrapper">
         <label class="label">
           Command
-          <tooltip width="large" placement="top">
+          <tooltip width="large" placement="right">
             Can be any valid bash command. <br>
             Note that if it includes sequencing or piping,
             you will have to increase the process limit.
