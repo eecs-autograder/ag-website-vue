@@ -103,4 +103,9 @@ export default class SubmissionPanel extends Vue {
     color: $navy-blue;
   }
 }
+
+.submission-list-item:hover {
+  background-color: $pebble-light;
+}
+
 </style>
