@@ -51,9 +51,7 @@
         <label class="label">
           Command
           <tooltip width="large" placement="right">
-            Can be any valid bash command. <br>
-            Note that if it includes sequencing or piping,
-            you will have to increase the process limit.
+            Can be any valid bash command.
           </tooltip>
         </label>
         <validated-input ref="cmd"
