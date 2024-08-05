@@ -697,7 +697,7 @@ export function make_group_summary(
     project_pk: number,
     num_members: number = 1,
     group_args: Partial<Group> = {},
-    has_handgradable_submission: boolean = false,
+    has_handgradeable_submission: boolean = false,
     handgrading_result: {
         finished_grading: boolean;
         total_points: number;
@@ -707,7 +707,7 @@ export function make_group_summary(
     let group = make_group(project_pk, num_members, group_args);
     return {
         handgrading_result: handgrading_result,
-        has_handgradable_submission: has_handgradable_submission,
+        has_handgradeable_submission: has_handgradeable_submission,
         ...group
     };
 }
