@@ -12,25 +12,25 @@ beforeEach(() => {
 
 test('get_handgrading_status', () => {
     let graded = data_ut.make_group_summary(
-        project.pk, 1, {num_submissions: 1},
+        project.pk, 1, {num_submissions: 1}, true,
         {finished_grading: true, total_points: 4, total_points_possible: 5}
     );
     expect(get_handgrading_status(graded)).toEqual(HandgradingStatus.graded);
 
     let in_progress = data_ut.make_group_summary(
-        project.pk, 1, {num_submissions: 1},
+        project.pk, 1, {num_submissions: 1}, true,
         {finished_grading: false, total_points: 3, total_points_possible: 5}
     );
     expect(get_handgrading_status(in_progress)).toEqual(HandgradingStatus.in_progress);
 
     let ungraded = data_ut.make_group_summary(
-        project.pk, 1, {num_submissions: 1},
+        project.pk, 1, {num_submissions: 1}, true,
     );
     expect(get_handgrading_status(ungraded)).toEqual(HandgradingStatus.ungraded);
 
-    let no_valid_submission = data_ut.make_group_summary(
-        project.pk, 1, {num_submits_towards_limit: 0},
+    let no_handgradeable_submission = data_ut.make_group_summary(
+        project.pk, 1, {num_submissions: 1}, false
     );
-    expect(get_handgrading_status(no_valid_submission))
-        .toEqual(HandgradingStatus.no_valid_submission);
+    expect(get_handgrading_status(no_handgradeable_submission))
+        .toEqual(HandgradingStatus.no_handgradeable_submission);
 });

@@ -219,3 +219,17 @@ type SetDataInputPartial<T> = {
 export function api_error_count(wrapper: Wrapper<Vue>, selector: RefSelector) {
     return (<APIErrors> wrapper.findComponent(selector).vm).d_api_errors.length;
 }
+
+export function expect_has_class(wrapper: Wrapper<Vue>, class_: string) {
+    let class_list = Array.from(wrapper.element.classList);
+    if (!class_list.includes(class_)) {
+        fail(`CSS class "${class_}" not found in [${class_list.join(', ')}]`);
+    }
+}
+
+export function expect_not_has_class(wrapper: Wrapper<Vue>, class_: string) {
+    let class_list = Array.from(wrapper.element.classList);
+    if (class_list.includes(class_)) {
+        fail(`CSS class "${class_}" unexpectedly found in [${class_list.join(', ')}]`);
+    }
+}
