@@ -10,13 +10,14 @@ import { HandgradingStatus } from '@/components/project_view/handgrading/handgra
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, compress_whitespace, find_by_name, wait_until } from '@/tests/utils';
+import { checkbox_is_checked, compress_whitespace, expect_has_class, expect_not_has_class, find_by_name, wait_until } from '@/tests/utils';
 
 let course: ag_cli.Course;
 let project: ag_cli.Project;
 let rubric: ag_cli.HandgradingRubric;
 
 let no_submissions_group: ag_cli.GroupWithHandgradingResultSummary;
+let no_handgradeable_submissions_group: ag_cli.GroupWithHandgradingResultSummary;
 let ungraded_group: ag_cli.GroupWithHandgradingResultSummary;
 let in_progress_group: ag_cli.GroupWithHandgradingResultSummary;
 let graded_group: ag_cli.GroupWithHandgradingResultSummary;
@@ -43,11 +44,14 @@ beforeEach(() => {
     ).rejects(new ag_cli.HttpError(500, 'Mock me please'));
 
     no_submissions_group = data_ut.make_group_summary(
-        project.pk, 1, {member_names: ['none@me.com']});
+        project.pk, 1, {member_names: ['none@me.com'], num_submissions: 0}, false);
+    no_handgradeable_submissions_group = data_ut.make_group_summary(
+        project.pk, 1, {member_names: ['none@me.com'], num_submissions: 1}, false);
     ungraded_group = data_ut.make_group_summary(
-        project.pk, 1, {member_names: ['not_yet@me.com'], num_submissions: 1});
+        project.pk, 1, {member_names: ['not_yet@me.com'], num_submissions: 1}, true);
     in_progress_group = data_ut.make_group_summary(
         project.pk, 1, {member_names: ['progress@me.com'], num_submissions: 1},
+        true,
         {
             finished_grading: false,
             total_points: 4,
@@ -56,6 +60,7 @@ beforeEach(() => {
     );
     graded_group = data_ut.make_group_summary(
         project.pk, 1, {member_names: ['graded@me.com'], num_submissions: 1},
+        true,
         {
             finished_grading: true,
             total_points: 5,
@@ -70,6 +75,7 @@ beforeEach(() => {
     staff_group = data_ut.make_group_summary(
         project.pk, 1,
         {member_names: staff.map(user => user.username), num_submissions: 1},
+        true,
         {
             finished_grading: true,
             total_points: 6,
@@ -82,6 +88,7 @@ beforeEach(() => {
     admin_group = data_ut.make_group_summary(
         project.pk, 1,
         {member_names: [admin.username], num_submissions: 1},
+        true,
         {
             finished_grading: true,
             total_points: 5,
@@ -99,6 +106,7 @@ describe('Filter group summaries tests', () => {
     beforeEach(async () => {
         set_summaries([
             no_submissions_group,
+            no_handgradeable_submissions_group,
             ungraded_group,
             in_progress_group,
             graded_group,
@@ -112,21 +120,22 @@ describe('Filter group summaries tests', () => {
     test('Include/exclude staff', async () => {
         expect(checkbox_is_checked(wrapper.find('#include-staff'))).toBe(false);
         expect(wrapper.vm.d_include_staff).toBe(false);
-        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(4);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(5);
         expect(summary_pks(wrapper).includes(staff_group.pk)).toBe(false);
 
         wrapper.find('#include-staff').setChecked();
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_include_staff).toBe(true);
-        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(6);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(7);
         expect(summary_pks(wrapper).includes(staff_group.pk)).toBe(true);
     });
 
     test('Filter by status', async () => {
         expect(checkbox_is_checked(wrapper.find('#all'))).toBe(true);
-        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(4);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(5);
         expect(summary_pks(wrapper)).toEqual([
             no_submissions_group.pk,
+            no_handgradeable_submissions_group.pk,
             ungraded_group.pk,
             in_progress_group.pk,
             graded_group.pk,
@@ -147,10 +156,12 @@ describe('Filter group summaries tests', () => {
         expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
         expect(summary_pks(wrapper)).toEqual([ungraded_group.pk]);
 
-        wrapper.find('#no-submission').setChecked();
+        wrapper.find('#no-handgradeable-submission').setChecked();
         await wrapper.vm.$nextTick();
-        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(1);
-        expect(summary_pks(wrapper)).toEqual([no_submissions_group.pk]);
+        expect(wrapper.findAllComponents({name: 'GroupSummaryPanel'}).length).toBe(2);
+        expect(
+            summary_pks(wrapper)
+        ).toEqual([no_submissions_group.pk, no_handgradeable_submissions_group.pk]);
     });
 
     test('Filter by username', async () => {
@@ -170,21 +181,21 @@ describe('Filter group summaries tests', () => {
         expect(wrapper.vm.d_include_staff).toBe(false);
         expect(
             compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
-        ).toEqual('1/3 (4 total)');
+        ).toEqual('1/3 (5 total)');
 
         wrapper.vm.d_include_staff = true;
         await wrapper.vm.$nextTick();
 
         expect(
             compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
-        ).toEqual('3/5 (6 total)');
+        ).toEqual('3/5 (7 total)');
 
         // Filtering by status does NOT change the "total graded" display
         wrapper.vm.d_status_filter = HandgradingStatus.graded;
         await wrapper.vm.$nextTick();
         expect(
             compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
-        ).toEqual('3/5 (6 total)');
+        ).toEqual('3/5 (7 total)');
 
 
         // Entering search text does NOT change the "total graded" display
@@ -192,7 +203,7 @@ describe('Filter group summaries tests', () => {
         await wrapper.vm.$nextTick();
         expect(
             compress_whitespace(wrapper.findComponent({ref: 'progress_text'}).text())
-        ).toEqual('3/5 (6 total)');
+        ).toEqual('3/5 (7 total)');
     });
 });
 
@@ -257,7 +268,12 @@ describe('Select group tests', () => {
     let wrapper: Wrapper<HandgradingContainer>;
 
     beforeEach(async () => {
-        set_summaries([no_submissions_group, ungraded_group, graded_group]);
+        set_summaries([
+            no_submissions_group,
+            no_handgradeable_submissions_group,
+            ungraded_group,
+            graded_group
+        ]);
         wrapper = await make_wrapper();
     });
 
@@ -266,8 +282,12 @@ describe('Select group tests', () => {
         get_or_create_stub.withArgs(ungraded_group.pk).resolves(result);
         expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
 
-        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(1).trigger('click');
+        let to_click = wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(2);
+        await to_click.trigger('click');
         await expect_result_is_selected(wrapper, result);
+
+        expect_not_has_class(to_click, 'disabled');
+        expect_has_class(to_click, 'active');
     });
 
     test('Select graded group for grading', async () => {
@@ -275,17 +295,45 @@ describe('Select group tests', () => {
         get_or_create_stub.withArgs(graded_group.pk).resolves(result);
         expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
 
-        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(2).trigger('click');
+        let to_click = wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(3);
+        await to_click.trigger('click');
         await expect_result_is_selected(wrapper, result);
+
+        expect_not_has_class(to_click, 'disabled');
+        expect_has_class(to_click, 'active');
     });
 
     test('Group selected for grading has no submissions', async () => {
+        let result = data_ut.make_handgrading_result(rubric, no_submissions_group.pk, 42);
+        get_or_create_stub.withArgs(no_submissions_group.pk).resolves(result);
+
         expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
-        wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(0).trigger('click');
-        await wrapper.vm.$nextTick();
+        let to_click = wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(0);
+        await to_click.trigger('click');
 
         expect(wrapper.vm.d_currently_grading).toBe(null);
         expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
+        expect(get_or_create_stub.called).toBe(false);
+
+        expect_has_class(to_click, 'disabled');
+        expect_not_has_class(to_click, 'active');
+    });
+
+    test('Group selected for grading has no handgradeable submissions', async () => {
+        let result = data_ut.make_handgrading_result(
+            rubric, no_handgradeable_submissions_group.pk, 42);
+        get_or_create_stub.withArgs(no_handgradeable_submissions_group.pk).resolves(result);
+
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
+        let to_click = wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(1);
+        await to_click.trigger('click');
+
+        expect(wrapper.vm.d_currently_grading).toBe(null);
+        expect(wrapper.findComponent({name: 'Handgrading'}).exists()).toBe(false);
+        expect(get_or_create_stub.called).toBe(false);
+
+        expect_has_class(to_click, 'disabled');
+        expect_not_has_class(to_click, 'active');
     });
 });
 
@@ -318,7 +366,12 @@ describe('Select next/prev for grading', () => {
     });
 
     test('Select next and prev skips no_submission', async () => {
-        set_summaries([ungraded_group, no_submissions_group, graded_group]);
+        set_summaries([
+            ungraded_group,
+            no_submissions_group,
+            no_handgradeable_submissions_group,
+            graded_group
+        ]);
         let wrapper = await make_wrapper();
 
         await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(0).trigger('click');
@@ -360,8 +413,30 @@ describe('Select next/prev for grading', () => {
         expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_last).toBe(false);
     });
 
+    test('Current group is first with handgradeable submission', async () => {
+        set_summaries([no_handgradeable_submissions_group, ungraded_group, graded_group]);
+
+        let wrapper = await make_wrapper();
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(1).trigger('click');
+        await expect_result_is_selected(wrapper, ungraded_result);
+
+        expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_first).toBe(true);
+        expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_last).toBe(false);
+    });
+
     test('Current group is last with submission', async () => {
         set_summaries([ungraded_group, graded_group, no_submissions_group]);
+
+        let wrapper = await make_wrapper();
+        await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(1).trigger('click');
+        await expect_result_is_selected(wrapper, graded_result);
+
+        expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_first).toBe(false);
+        expect(find_by_name<Handgrading>(wrapper, 'Handgrading').vm.is_last).toBe(true);
+    });
+
+    test('Current group is last with handgradeable submission', async () => {
+        set_summaries([ungraded_group, graded_group, no_handgradeable_submissions_group]);
 
         let wrapper = await make_wrapper();
         await wrapper.findAllComponents({name: 'GroupSummaryPanel'}).at(1).trigger('click');

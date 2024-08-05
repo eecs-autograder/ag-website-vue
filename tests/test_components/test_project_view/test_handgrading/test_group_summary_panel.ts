@@ -29,7 +29,7 @@ test('Group member names displayed', () => {
 
 test('Score displayed when status is graded', () => {
     let summary = data_ut.make_group_summary(
-        project.pk, 1, {num_submissions: 1},
+        project.pk, 1, {num_submissions: 1}, true,
         {finished_grading: true, total_points: 4, total_points_possible: 5}
     );
     let wrapper = managed_mount(GroupSummaryPanel, {
@@ -43,7 +43,7 @@ test('Score displayed when status is graded', () => {
 
 test('Non-graded statuses show status text', async () => {
     let in_progress_summary = data_ut.make_group_summary(
-        project.pk, 1, {num_submissions: 1},
+        project.pk, 1, {num_submissions: 1}, true,
         {finished_grading: false, total_points: 3, total_points_possible: 5}
     );
     let wrapper = managed_mount(GroupSummaryPanel, {
@@ -54,14 +54,20 @@ test('Non-graded statuses show status text', async () => {
     expect(wrapper.find('.status').text()).toEqual('In Progress');
 
     let ungraded_summary = data_ut.make_group_summary(
-        project.pk, 1, {num_submissions: 1},
+        project.pk, 1, {num_submissions: 1}, true,
     );
     await set_props(wrapper, {group_summary: ungraded_summary});
     expect(wrapper.find('.status').text()).toEqual('Ungraded');
 
     let no_submission_summary = data_ut.make_group_summary(
-        project.pk, 1, {num_submissions: 0},
+        project.pk, 1, {num_submissions: 0}, false,
     );
     await set_props(wrapper, {group_summary: no_submission_summary});
+    expect(wrapper.find('.status').text()).toEqual('No Submission');
+
+    let no_handgradeable_submission_summary = data_ut.make_group_summary(
+        project.pk, 1, {num_submissions: 1}, false,
+    );
+    await set_props(wrapper, {group_summary: no_handgradeable_submission_summary});
     expect(wrapper.find('.status').text()).toEqual('No Submission');
 });

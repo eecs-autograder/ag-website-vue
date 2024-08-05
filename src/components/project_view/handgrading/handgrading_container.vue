@@ -68,12 +68,14 @@
                   </div>
                   <div class="radio-container">
                     <input type="radio" name="status"
-                            id="no-submission"
+                            id="no-handgradeable-submission"
                             class="radio"
                             v-model="d_status_filter"
-                            :value="HandgradingStatus.no_submission">
-                    <label class="label"
-                            for="no-submission">{{HandgradingStatus.no_submission}}</label>
+                            :value="HandgradingStatus.no_handgradeable_submission">
+                    <label
+                      class="label"
+                      for="no-handgradeable-submission"
+                    >{{HandgradingStatus.no_handgradeable_submission}}</label>
                   </div>
                 </div>
               </div>
@@ -90,7 +92,7 @@
                                  :class="{
                                    'active': d_currently_grading !== null
                                              && d_currently_grading.group === group_summary.pk,
-                                   'disabled': group_summary.num_submissions === 0
+                                   'disabled': !group_summary.has_handgradeable_submission
                                  }">
             </group-summary-panel>
           </template>
@@ -234,13 +236,13 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 
   get total_num_to_grade() {
     return this.staff_filtered_groups.filter(
-      group => get_handgrading_status(group) !== HandgradingStatus.no_submission
+      group => get_handgrading_status(group) !== HandgradingStatus.no_handgradeable_submission
     ).length;
   }
 
   @handle_global_errors_async
   async select_for_grading(group: ag_cli.GroupWithHandgradingResultSummary) {
-    if (group.num_submissions !== 0) {
+    if (group.has_handgradeable_submission) {
       await toggle(this, 'd_loading_result', async () => {
         this.d_currently_grading = await ag_cli.HandgradingResult.get_or_create(group.pk);
       });
@@ -250,7 +252,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   get previous() {
     let index = this.index_of_currently_grading - 1;
     while (index >= 0) {
-      if (this.staff_filtered_groups[index].num_submissions !== 0) {
+      if (this.staff_filtered_groups[index].has_handgradeable_submission) {
         return this.staff_filtered_groups[index];
       }
       index -= 1;
@@ -261,7 +263,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
   get next() {
     let index = this.index_of_currently_grading + 1;
     while (index < this.staff_filtered_groups.length) {
-      if (this.staff_filtered_groups[index].num_submissions !== 0) {
+      if (this.staff_filtered_groups[index].has_handgradeable_submission) {
         return this.staff_filtered_groups[index];
       }
       index += 1;
