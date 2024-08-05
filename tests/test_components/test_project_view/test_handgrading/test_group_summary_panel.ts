@@ -60,8 +60,14 @@ test('Non-graded statuses show status text', async () => {
     expect(wrapper.find('.status').text()).toEqual('Ungraded');
 
     let no_submission_summary = data_ut.make_group_summary(
-        project.pk, 1, {num_submissions: 0}, true,
+        project.pk, 1, {num_submissions: 0}, false,
     );
     await set_props(wrapper, {group_summary: no_submission_summary});
+    expect(wrapper.find('.status').text()).toEqual('No Submission');
+
+    let no_handgradeable_submission_summary = data_ut.make_group_summary(
+        project.pk, 1, {num_submissions: 1}, false,
+    );
+    await set_props(wrapper, {group_summary: no_handgradeable_submission_summary});
     expect(wrapper.find('.status').text()).toEqual('No Submission');
 });
