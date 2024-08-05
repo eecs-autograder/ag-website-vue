@@ -28,9 +28,9 @@ test('get_handgrading_status', () => {
     );
     expect(get_handgrading_status(ungraded)).toEqual(HandgradingStatus.ungraded);
 
-    let no_handgradeable_submission = data_ut.make_group_summary(
+    let no_handgradable_submission = data_ut.make_group_summary(
         project.pk, 1, {num_submissions: 1}, false
     );
-    expect(get_handgrading_status(no_handgradeable_submission))
-        .toEqual(HandgradingStatus.no_handgradeable_submission);
+    expect(get_handgrading_status(no_handgradable_submission))
+        .toEqual(HandgradingStatus.no_handgradable_submission);
 });
