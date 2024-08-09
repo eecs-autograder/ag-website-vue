@@ -948,3 +948,21 @@ describe('First failed test case result panel open initially tests', () => {
         expect(second.open_initially).toBe(false);
     });
 });
+
+describe('Suite Descriptions', () => {
+    test('Staff description shown to staff', () => {
+        fail();
+    });
+
+    test('Staff description not shown to student', () => {
+        fail();
+    });
+
+    test('Student description visible', () => {
+        fail();
+    });
+
+    test('Student description hidden', () => {
+        fail();
+    });
+});

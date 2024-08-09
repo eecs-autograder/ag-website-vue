@@ -470,3 +470,29 @@ test('Output reloaded on fdbk category change', async () => {
     expect(stdout_diff_stub.calledTwice).toBe(true);
     expect(stderr_diff_stub.calledTwice).toBe(true);
 });
+
+describe('Command Descriptions', () => {
+    test('Staff description shown to staff', () => {
+        fail();
+    });
+
+    test('Staff description not shown to student', () => {
+        fail();
+    });
+
+    test('Student description visible', () => {
+        fail();
+    });
+
+    test('Student description hidden', () => {
+        fail();
+    });
+
+    test('Student on-fail description visible', () => {
+        fail();
+    });
+
+    test('Student on-fail description hidden', () => {
+        fail();
+    });
+});

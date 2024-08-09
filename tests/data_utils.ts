@@ -377,7 +377,8 @@ export function make_ag_test_suite_fdbk_config(
         show_setup_stderr: false,
         show_setup_stdout: false,
         show_setup_timed_out: false,
-        visible: false
+        visible: false,
+        show_student_description: false,
     };
     safe_assign(defaults, args);
     return defaults;

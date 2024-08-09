@@ -94,6 +94,28 @@ describe('AGTestSuiteSettings tests', () => {
         expect(wrapper.vm.d_ag_test_suite!.name).toEqual(new_name);
     });
 
+    test('Suite description bindings', () => {
+        let staff_description_input = wrapper.findComponent({ref: 'staff_description'});
+        await set_validated_input_text(staff_description_input, 'a tall stick for magic');
+
+        expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd_name).toEqual("sunflower");
+        expect(validated_input_is_valid(staff_description_input)).toEqual(true);
+
+        await set_validated_input_text(staff_description_input, '');
+        expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd_name).toEqual("");
+        expect(validated_input_is_valid(staff_description_input)).toEqual(true);
+
+        let student_description_input = wrapper.findComponent({ref: 'student_description'});
+        await set_validated_input_text(student_description_input, 'a tall stick for magic');
+
+        expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd_name).toEqual("sunflower");
+        expect(validated_input_is_valid(student_description_input)).toEqual(true);
+
+        await set_validated_input_text(student_description_input, '');
+        expect(wrapper.vm.d_ag_test_suite!.setup_suite_cmd_name).toEqual("");
+        expect(validated_input_is_valid(student_description_input)).toEqual(true);
+    });
+
     test('setup_suite_cmd_name binding', async () => {
         let setup_suite_cmd_name_input = wrapper.findComponent({ref: 'setup_suite_cmd_name'});
         await set_validated_input_text(setup_suite_cmd_name_input, 'sunflower');

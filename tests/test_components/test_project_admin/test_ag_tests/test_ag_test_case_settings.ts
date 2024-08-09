@@ -109,6 +109,30 @@ describe('AG test case settings form tests', () => {
         expect(api_errors.d_api_errors.length).toBe(1);
     });
 
+    test('Description fields binding', async () => {
+        let staff_description_input = wrapper.findComponent({ref: 'staff_description'});
+
+        set_validated_input_text(staff_description_input, "Test case level description");
+        await wrapper.vm.$nextTick();
+        expect(validated_input_is_valid(staff_description_input)).toBe(true);
+        expect(component.d_ag_test_case!.staff_description).toEqual("Test case level description");
+
+        component.d_ag_test_case!.staff_description = "Another description";
+        await wrapper.vm.$nextTick();
+        expect(get_validated_input_text(staff_description_input)).toEqual("Another description");
+
+        let student_description_input = wrapper.findComponent({ref: 'student_description'});
+
+        set_validated_input_text(student_description_input, "Student test descriptionnn");
+        await wrapper.vm.$nextTick();
+        expect(validated_input_is_valid(student_description_input)).toBe(true);
+        expect(component.d_ag_test_case!.student_description).toEqual("Student test descriptionnn");
+
+        component.d_ag_test_case!.student_description = "Weeee description";
+        await wrapper.vm.$nextTick();
+        expect(get_validated_input_text(student_description_input)).toEqual("Weeee description");
+    });
+
     test('Feedback config panels always visible', async () => {
         expect(component.d_ag_test_case!.ag_test_commands.length).toEqual(0);
         expect(wrapper.findComponent({ref: 'fdbk_panels'}).exists()).toBe(true);

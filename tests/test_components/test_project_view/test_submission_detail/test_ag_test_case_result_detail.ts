@@ -822,3 +822,21 @@ describe('AGTestCaseResult tests concerning props', () => {
         )).toEqual(CorrectnessLevel.some_correct);
     });
 });
+
+describe('Test Case Descriptions', () => {
+    test('Staff description shown to staff', () => {
+        fail();
+    });
+
+    test('Staff description not shown to student', () => {
+        fail();
+    });
+
+    test('Student description visible', () => {
+        fail();
+    });
+
+    test('Student description hidden', () => {
+        fail();
+    });
+});

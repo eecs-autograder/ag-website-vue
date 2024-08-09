@@ -63,6 +63,27 @@ describe('AGTestCaseFdbkConfigPanel tests', () => {
         expect(checkbox_is_checked(visible_input)).toEqual(true);
     });
 
+    test('show_student_description binding', async () => {
+        let show_student_description_input = wrapper.find('[data-testid=show_student_description]');
+
+        await show_student_description_input.setChecked(true);
+        expect(component.d_feedback_config!.show_student_description).toEqual(true);
+
+        await show_student_description_input.setChecked(false);
+        expect(component.d_feedback_config!.show_student_description).toEqual(false);
+
+        await show_student_description_input.setChecked(true);
+        expect(component.d_feedback_config!.show_student_description).toEqual(true);
+
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
+
+        await set_data(wrapper, {d_feedback_config: {show_student_description: false}});
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(false);
+
+        await set_data(wrapper, {d_feedback_config: {show_student_description: true}});
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
+    });
+
     test('show_individual_commands binding', async () => {
         let show_individual_commands_input = wrapper.find('[data-testid=show_individual_commands]');
 

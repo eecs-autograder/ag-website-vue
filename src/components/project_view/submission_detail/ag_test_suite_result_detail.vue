@@ -2,6 +2,18 @@
   <div class="suite-result">
 
     <div id="ag-test-suite-name">{{ag_test_suite_result.ag_test_suite_name}}</div>
+
+    <description-renderer
+      v-if="d_globals.user_roles.is_staff
+            && d_staff_description !== null && d_staff_description !== ''"
+      :text="d_staff_description"
+    ></description-renderer>
+
+    <description-renderer
+      v-if="ag_test_suite_result.student_description !== null"
+      :text="ag_test_suite_result.student_description"
+    ></description-renderer>
+
     <div class="ag-test-case-results-header">
       <div class="column-1"> Test Case </div>
       <div class="column-2"> Passed </div>
@@ -44,15 +56,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue } from 'vue-property-decorator';
 
 import {
     AGTestCaseResultFeedback,
+    AGTestSuite,
     AGTestSuiteResultFeedback,
     FeedbackCategory,
     Submission
 } from "ag-client-typescript";
 
+import { GlobalData } from '@/app.vue';
 import AGTestCaseResultDetail from '@/components/project_view/submission_detail/ag_test_case_result_detail.vue';
 import AGTestSuiteSetupResultDetail from '@/components/project_view/submission_detail/ag_test_suite_setup_result_detail.vue';
 import {
@@ -62,17 +76,23 @@ import {
   CorrectnessLevel,
   setup_return_code_correctness
 } from "@/components/project_view/submission_detail/correctness";
+import DescriptionRenderer from "@/components/project_view/submission_detail/description_renderer.vue"
 import ResultPanel from "@/components/project_view/submission_detail/result_panel.vue";
+import { Created } from '@/lifecycle';
 
 
 @Component({
   components: {
     AGTestCaseResultDetail,
     AGTestSuiteSetupResultDetail,
+    DescriptionRenderer,
     ResultPanel
   }
 })
-export default class AGTestSuiteResultDetail extends Vue {
+export default class AGTestSuiteResultDetail extends Vue implements Created {
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
 
   @Prop({required: true, type: Submission})
   submission!: Submission;
@@ -86,7 +106,16 @@ export default class AGTestSuiteResultDetail extends Vue {
   @Prop({default: false, type: Boolean})
   is_first_suite!: boolean;
 
+  d_staff_description: string | null = null;
+
   readonly CorrectnessLevel = CorrectnessLevel;
+
+  async created() {
+    if (this.d_globals.user_roles.is_staff) {
+      let ag_test_suite = await AGTestSuite.get_by_pk(this.ag_test_suite_result.ag_test_suite_pk);
+      this.d_staff_description = ag_test_suite.staff_description;
+    }
+  }
 
   private get setup_correctness_level(): CorrectnessLevel {
     if (this.ag_test_suite_result.setup_name === null) {

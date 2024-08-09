@@ -79,6 +79,27 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(0);
     });
 
+    test('show_student_description binding', async () => {
+        let show_student_description_input = wrapper.find('[data-testid=show_student_description]');
+
+        await show_student_description_input.setChecked(true);
+        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
+
+        await show_student_description_input.setChecked(false);
+        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(false);
+
+        await show_student_description_input.setChecked(true);
+        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
+
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
+
+        await set_data(wrapper, {d_feedback_config: {show_student_description: false}});
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(false);
+
+        await set_data(wrapper, {d_feedback_config: {show_student_description: true}});
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
+    });
+
     test('return_code_fdbk_level binding', async () => {
         await set_data(wrapper, {d_is_open: true});
 

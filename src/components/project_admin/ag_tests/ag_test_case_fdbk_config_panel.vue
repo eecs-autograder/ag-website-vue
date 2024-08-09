@@ -18,6 +18,17 @@
 
       <div class="checkbox-input-container">
         <label class="label">
+          <input data-testid="show_student_description"
+                 type="checkbox"
+                 @change="$emit('input', d_feedback_config)"
+                 class="checkbox"
+                 v-model="d_feedback_config.show_student_description">
+          Show Student-Facing Description
+        </label>
+      </div>
+
+      <div class="checkbox-input-container">
+        <label class="label">
           <input data-testid="show_individual_commands"
                  type="checkbox"
                  @change="$emit('input', d_feedback_config)"
