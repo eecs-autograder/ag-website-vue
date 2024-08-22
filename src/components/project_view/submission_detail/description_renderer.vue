@@ -1,5 +1,5 @@
 <template>
-  <div v-html="markdown_rendered"></div>
+  <div v-html="markdown_rendered" class="description-markdown"></div>
 </template>
 
 <script lang="ts">
@@ -7,10 +7,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import DOMPurify from 'dompurify';
-// import { marked } from 'marked';
 import showdown from 'showdown';
-// const { marked } = require('marked');
-// import * as marked from 'marked';
 
 const converter = new showdown.Converter();
 
@@ -20,15 +17,30 @@ export default class DescriptionRenderer extends Vue {
   text!: string;
 
   get markdown_rendered() : string {
-    // marked.parse only returns a promise
-    // if the async option is true:
-    // https://github.com/markedjs/marked/discussions/3219
     return DOMPurify.sanitize(<string> converter.makeHtml(this.text));
   }
 
 }
 </script>
 
-<style>
+<style scoped lang="scss">
+@import '@/styles/colors.scss';
 
+.description-markdown {
+  margin: .25rem 0;
+  padding: .625rem .75rem;
+  border: 1px solid $sky-blue;
+
+  :first-child {
+    // Override any margin/padding in the first and last elements in the markdown.
+    margin-top: 0!important;
+    padding-top: 0!important;
+  }
+
+  :last-child {
+    // Override any margin/padding in the first and last elements in the markdown.
+    margin-bottom: 0!important;
+    padding-bottom: 0!important;
+  }
+}
 </style>
