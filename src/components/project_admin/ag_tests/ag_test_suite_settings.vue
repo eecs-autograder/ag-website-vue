@@ -13,6 +13,30 @@
                         :docker_images="d_docker_images"
                         @field_change="Object.assign(d_ag_test_suite, $event)"></suite-settings>
 
+        <div class="form-field-wrapper">
+          <label class="label">Internal Admin Notes</label>
+          <validated-input ref="internal_admin_notes"
+                           v-model="d_ag_test_suite.internal_admin_notes"
+                           :num_rows="3"
+                           :validators="[]"></validated-input>
+        </div>
+
+        <div class="form-field-wrapper">
+          <label class="label">Staff-only Description</label>
+          <validated-input ref="staff_description"
+                           v-model="d_ag_test_suite.staff_description"
+                           :num_rows="3"
+                           :validators="[]"></validated-input>
+        </div>
+
+        <div class="form-field-wrapper">
+          <label class="label">Student-Facing Description</label>
+          <validated-input ref="student_description"
+                           v-model="d_ag_test_suite.student_description"
+                           :num_rows="3"
+                           :validators="[]"></validated-input>
+        </div>
+
         <fieldset class="fieldset">
           <legend class="legend"> Setup </legend>
 

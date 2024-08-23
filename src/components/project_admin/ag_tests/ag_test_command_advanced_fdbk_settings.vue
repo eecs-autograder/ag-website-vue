@@ -13,6 +13,17 @@
         </label>
       </div>
 
+      <div class="checkbox-input-container">
+        <label class="checkbox-label">
+          <input data-testid="show_student_description"
+                  type="checkbox"
+                  class="checkbox"
+                  @change="$emit('input', d_feedback_config)"
+                  v-model="d_feedback_config.show_student_description">
+          Show Student-Facing Descriptions
+        </label>
+      </div>
+
       <div class="advanced-settings-label" @click="toggle_is_open">
         <i v-if="d_is_open" class="fas fa-caret-down caret-down"></i>
         <i v-else class="fas fa-caret-right caret-right"></i>

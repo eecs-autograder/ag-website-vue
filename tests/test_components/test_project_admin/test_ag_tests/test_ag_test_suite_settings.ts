@@ -94,6 +94,38 @@ describe('AGTestSuiteSettings tests', () => {
         expect(wrapper.vm.d_ag_test_suite!.name).toEqual(new_name);
     });
 
+    test('Suite description bindings', async () => {
+        let internal_admin_notes_input = wrapper.findComponent({ref: 'internal_admin_notes'});
+        await set_validated_input_text(internal_admin_notes_input, 'a tall stick for magic');
+
+        expect(wrapper.vm.d_ag_test_suite!.internal_admin_notes).toEqual("a tall stick for magic");
+        expect(validated_input_is_valid(internal_admin_notes_input)).toEqual(true);
+
+        await set_validated_input_text(internal_admin_notes_input, '');
+        expect(wrapper.vm.d_ag_test_suite!.internal_admin_notes).toEqual("");
+        expect(validated_input_is_valid(internal_admin_notes_input)).toEqual(true);
+
+        let staff_description_input = wrapper.findComponent({ref: 'staff_description'});
+        await set_validated_input_text(staff_description_input, 'a tall stick for magic');
+
+        expect(wrapper.vm.d_ag_test_suite!.staff_description).toEqual("a tall stick for magic");
+        expect(validated_input_is_valid(staff_description_input)).toEqual(true);
+
+        await set_validated_input_text(staff_description_input, '');
+        expect(wrapper.vm.d_ag_test_suite!.staff_description).toEqual("");
+        expect(validated_input_is_valid(staff_description_input)).toEqual(true);
+
+        let student_description_input = wrapper.findComponent({ref: 'student_description'});
+        await set_validated_input_text(student_description_input, 'some student description');
+
+        expect(wrapper.vm.d_ag_test_suite!.student_description).toEqual("some student description");
+        expect(validated_input_is_valid(student_description_input)).toEqual(true);
+
+        await set_validated_input_text(student_description_input, '');
+        expect(wrapper.vm.d_ag_test_suite!.student_description).toEqual("");
+        expect(validated_input_is_valid(student_description_input)).toEqual(true);
+    });
+
     test('setup_suite_cmd_name binding', async () => {
         let setup_suite_cmd_name_input = wrapper.findComponent({ref: 'setup_suite_cmd_name'});
         await set_validated_input_text(setup_suite_cmd_name_input, 'sunflower');

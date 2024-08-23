@@ -62,6 +62,54 @@
         </validated-input>
       </div>
 
+      <div class="form-field-wrapper">
+        <label class="label">
+          Staff-Only Description
+        </label>
+        <validated-input ref="internal_admin_notes"
+                         id="input-internal-admin-notes"
+                         v-model="d_ag_test_command.internal_admin_notes"
+                         :num_rows="2"
+                         :validators="[]">
+        </validated-input>
+      </div>
+
+      <div class="form-field-wrapper">
+        <label class="label">
+          Staff-Only Description
+        </label>
+        <validated-input ref="staff_description"
+                         id="input-staff-description"
+                         v-model="d_ag_test_command.staff_description"
+                         :num_rows="2"
+                         :validators="[]">
+        </validated-input>
+      </div>
+
+      <div class="form-field-wrapper">
+        <label class="label">
+          Student-Facing Description
+        </label>
+        <validated-input ref="student_description"
+                         id="input-student-description"
+                         v-model="d_ag_test_command.student_description"
+                         :num_rows="2"
+                         :validators="[]">
+        </validated-input>
+      </div>
+
+      <div class="form-field-wrapper">
+        <label class="label">
+          Student-Facing Description (On Failure Only)
+        </label>
+        <validated-input ref="student_on_fail_description"
+                         id="input-student-on-faildescription"
+                         v-model="d_ag_test_command.student_on_fail_description"
+                         :num_rows="2"
+                         :validators="[]">
+        </validated-input>
+      </div>
+
       <fieldset class="fieldset">
         <legend class="legend"> Stdin </legend>
         <div class="form-field-wrapper">
@@ -716,7 +764,8 @@ export default class AGTestCommandSettings extends Vue {
         show_actual_return_code: true,
         show_actual_stdout: true,
         show_actual_stderr: true,
-        show_whether_timed_out: true
+        show_whether_timed_out: true,
+        show_student_description: true,
       };
     }
     else {

@@ -377,7 +377,8 @@ export function make_ag_test_suite_fdbk_config(
         show_setup_stderr: false,
         show_setup_stdout: false,
         show_setup_timed_out: false,
-        visible: false
+        visible: false,
+        show_student_description: false,
     };
     safe_assign(defaults, args);
     return defaults;
@@ -557,6 +558,8 @@ export function make_ag_test_command_result_feedback(
         pk: AG_TEST_COMMAND_RESULT_FEEDBACK_PKS.next().value,
         ag_test_command_pk: ag_test_command_pk,
         ag_test_command_name: `AG Test Command ${ag_test_command_pk}`,
+        student_description: null,
+        student_on_fail_description: null,
         fdbk_settings: make_ag_test_command_fdbk_config(),
         timed_out: null,
         return_code_correct: null,
@@ -587,6 +590,7 @@ export function make_ag_test_case_result_feedback(
         ag_test_case_pk: ag_test_case_pk,
         ag_test_case_name: `AG Test Case ${ag_test_case_pk}`,
         fdbk_settings: make_ag_test_case_feedback_config(),
+        student_description: null,
         total_points: 0,
         total_points_possible: 0,
         ag_test_command_results: []
@@ -604,6 +608,7 @@ export function make_ag_test_suite_result_feedback(
         pk: AG_TEST_SUITE_RESULT_FEEDBACK_PKS.next().value,
         ag_test_suite_pk: ag_test_suite_pk,
         ag_test_suite_name: `AG Test Suite ${ag_test_suite_pk}`,
+        student_description: null,
         fdbk_settings: make_ag_test_suite_fdbk_config(),
         total_points: 0,
         total_points_possible: 0,

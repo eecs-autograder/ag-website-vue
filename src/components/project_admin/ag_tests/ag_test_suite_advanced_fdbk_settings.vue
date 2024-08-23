@@ -13,6 +13,17 @@
             Suite is Visible
           </label>
         </div>
+
+        <div class="checkbox-input-container">
+          <label class="label">
+            <input data-testid="show_student_description"
+                   type="checkbox"
+                   @change="$emit('input', d_feedback_config)"
+                   class="checkbox"
+                   v-model="d_feedback_config.show_student_description">
+            Show Student-Facing Description
+          </label>
+        </div>
       </div>
 
       <div class="advanced-settings-label" @click="toggle_is_open">

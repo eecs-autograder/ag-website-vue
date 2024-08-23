@@ -21,6 +21,8 @@ let stderr_stub: sinon.SinonStub;
 let stdout_diff_stub: sinon.SinonStub;
 let stderr_diff_stub: sinon.SinonStub;
 
+let get_ag_test_cmd_stub: sinon.SinonStub;
+
 beforeEach(() => {
     let project = data_ut.make_project(data_ut.make_course().pk);
     group = data_ut.make_group(project.pk);
@@ -64,15 +66,22 @@ beforeEach(() => {
         ag_cli.ResultOutput,
         'get_ag_test_cmd_result_stderr_diff'
     ).rejects(new ag_cli.HttpError(500, 'Stub me'));
+
+    get_ag_test_cmd_stub = sinon.stub(ag_cli.AGTestCommand, 'get_by_pk');
 });
 
-async function make_wrapper() {
+async function make_wrapper(user_roles: Partial<ag_cli.UserRoles> = {}) {
     let wrapper = managed_mount(AGTestCommandResultDetail, {
         propsData: {
             submission: submission,
             ag_test_command_result: ag_test_command_result,
             fdbk_category: ag_cli.FeedbackCategory.max
-        }
+        },
+        provide: {
+            globals: {
+                user_roles: data_ut.make_user_roles(user_roles),
+            },
+        },
     });
     expect(await wait_until(wrapper, w => w.vm.d_output_size !== null));
     return wrapper;
@@ -469,4 +478,108 @@ test('Output reloaded on fdbk category change', async () => {
     expect(stderr_stub.calledTwice).toBe(true);
     expect(stdout_diff_stub.calledTwice).toBe(true);
     expect(stderr_diff_stub.calledTwice).toBe(true);
+});
+
+describe('Command Descriptions', () => {
+     beforeEach(() => {
+        let test_command = data_ut.make_ag_test_command(
+            ag_test_command_result.ag_test_command_pk,
+            {staff_description: 'some staff command description'});
+        get_ag_test_cmd_stub.withArgs(
+            ag_test_command_result.ag_test_command_pk
+        ).resolves(test_command);
+    });
+
+    test('Staff description shown to staff', async () => {
+        let wrapper = await make_wrapper({is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('some staff command description');
+    });
+
+    test('Staff description not shown when null', async () => {
+        let wrapper = await make_wrapper({is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('some staff command description');
+
+        wrapper.vm!.d_staff_description = null;
+        await wait_fixed(wrapper, 10);
+
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
+    });
+
+    test('Staff description not shown when empty', async () => {
+        let wrapper = await make_wrapper({is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('some staff command description');
+
+        wrapper.vm!.d_staff_description = '';
+        await wait_fixed(wrapper, 10);
+
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
+    });
+
+    test('Staff description not shown to student', async () => {
+        let wrapper = await make_wrapper({is_staff: false, is_student: true});
+
+        await wait_fixed(wrapper, 10);
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
+    });
+
+    test('Student description visible', async () => {
+        ag_test_command_result.student_description = 'hellooo student';
+
+        let wrapper = await make_wrapper();
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.vm!.text).toEqual('hellooo student');
+    });
+
+    test('Student description hidden', async () => {
+        ag_test_command_result.student_description = null;
+
+        let wrapper = await make_wrapper();
+        await wait_fixed(wrapper, 10);
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.exists()).toBe(false);
+    });
+
+    test('Student description empty', async () => {
+        ag_test_command_result.student_description = '';
+
+        let wrapper = await make_wrapper();
+        await wait_fixed(wrapper, 10);
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.exists()).toBe(false);
+    });
+
+    test('Student on-fail description visible', async () => {
+        ag_test_command_result.student_on_fail_description = 'faaail';
+
+        let wrapper = await make_wrapper();
+        let student_description = wrapper.findComponent({ref: 'student_on_fail_description'});
+        expect(student_description.vm!.text).toEqual('faaail');
+    });
+
+    test('Student on-fail description hidden', async () => {
+        ag_test_command_result.student_on_fail_description = null;
+
+        let wrapper = await make_wrapper();
+        await wait_fixed(wrapper, 10);
+        let student_description = wrapper.findComponent({ref: 'student_on_fail_description'});
+        expect(student_description.exists()).toBe(false);
+    });
+
+    test('Student on-fail description empty', async () => {
+        ag_test_command_result.student_on_fail_description = '';
+
+        let wrapper = await make_wrapper();
+        await wait_fixed(wrapper, 10);
+        let student_description = wrapper.findComponent({ref: 'student_on_fail_description'});
+        expect(student_description.exists()).toBe(false);
+    });
 });

@@ -5,67 +5,94 @@
                   @submit="save_ag_test_case_settings"
                   @form_validity_changed="d_settings_form_is_valid = $event">
 
+    <div class="form-field-wrapper">
+      <label class="label"> Test name </label>
+      <validated-input ref="name"
+                       v-model="d_ag_test_case.name"
+                       :validators="[is_not_empty]">
+      </validated-input>
+    </div>
+
+    <div class="form-field-wrapper">
+      <label class="label"> Internal Admin Notes </label>
+      <validated-input ref="internal_admin_notes"
+                       v-model="d_ag_test_case.internal_admin_notes"
+                       :num_rows=3
+                       :validators="[]">
+      </validated-input>
+    </div>
+
+    <div class="form-field-wrapper">
+      <label class="label"> Staff-only description </label>
+      <validated-input ref="staff_description"
+                       v-model="d_ag_test_case.staff_description"
+                       :num_rows=3
+                       :validators="[]">
+      </validated-input>
+    </div>
+
       <div class="form-field-wrapper">
-        <label class="label"> Test name </label>
-        <validated-input ref="name"
-                         v-model="d_ag_test_case.name"
-                         :validators="[is_not_empty]">
-        </validated-input>
-      </div>
+      <label class="label"> Student-Facing Description </label>
+      <validated-input ref="student_description"
+                       v-model="d_ag_test_case.student_description"
+                       :num_rows=3
+                       :validators="[]">
+      </validated-input>
+    </div>
 
-      <div ref="fdbk_panels">
-        <AGTestCaseFdbkConfigPanel ref="normal"
-                                   v-model="d_ag_test_case.normal_fdbk_config"
-                                   :config_name="FeedbackConfigLabel.normal">
-          <template slot="header">
-            <div class="config-name">
-              {{FeedbackConfigLabel.normal}}
-              <tooltip width="large" placement="top">
-                {{FeedbackDescriptions.normal}}
-              </tooltip>
-            </div>
-          </template>
-        </AGTestCaseFdbkConfigPanel>
+    <div ref="fdbk_panels">
+      <AGTestCaseFdbkConfigPanel ref="normal"
+                                 v-model="d_ag_test_case.normal_fdbk_config"
+                                 :config_name="FeedbackConfigLabel.normal">
+        <template slot="header">
+          <div class="config-name">
+            {{FeedbackConfigLabel.normal}}
+            <tooltip width="large" placement="top">
+              {{FeedbackDescriptions.normal}}
+            </tooltip>
+          </div>
+        </template>
+      </AGTestCaseFdbkConfigPanel>
 
-        <AGTestCaseFdbkConfigPanel ref="final_graded"
-                                    v-model="d_ag_test_case.ultimate_submission_fdbk_config"
-                                    :config_name="FeedbackConfigLabel.ultimate_submission">
-          <template slot="header">
-            <div class="config-name">
-              {{FeedbackConfigLabel.ultimate_submission}}
-              <tooltip width="large" placement="top">
-                {{FeedbackDescriptions.ultimate_submission}}
-              </tooltip>
-            </div>
-          </template>
-        </AGTestCaseFdbkConfigPanel>
+      <AGTestCaseFdbkConfigPanel ref="final_graded"
+                                 v-model="d_ag_test_case.ultimate_submission_fdbk_config"
+                                 :config_name="FeedbackConfigLabel.ultimate_submission">
+        <template slot="header">
+          <div class="config-name">
+            {{FeedbackConfigLabel.ultimate_submission}}
+            <tooltip width="large" placement="top">
+              {{FeedbackDescriptions.ultimate_submission}}
+            </tooltip>
+          </div>
+        </template>
+      </AGTestCaseFdbkConfigPanel>
 
-        <AGTestCaseFdbkConfigPanel ref="past_limit"
-                                    v-model="d_ag_test_case.past_limit_submission_fdbk_config"
-                                    :config_name="FeedbackConfigLabel.past_limit">
-          <template slot="header">
-            <div class="config-name">
-              {{FeedbackConfigLabel.past_limit}}
-              <tooltip width="large" placement="top">
-                {{FeedbackDescriptions.past_limit}}
-              </tooltip>
-            </div>
-          </template>
-        </AGTestCaseFdbkConfigPanel>
+      <AGTestCaseFdbkConfigPanel ref="past_limit"
+                                 v-model="d_ag_test_case.past_limit_submission_fdbk_config"
+                                 :config_name="FeedbackConfigLabel.past_limit">
+        <template slot="header">
+          <div class="config-name">
+            {{FeedbackConfigLabel.past_limit}}
+            <tooltip width="large" placement="top">
+              {{FeedbackDescriptions.past_limit}}
+            </tooltip>
+          </div>
+        </template>
+      </AGTestCaseFdbkConfigPanel>
 
-        <AGTestCaseFdbkConfigPanel ref="student_lookup"
-                                    v-model="d_ag_test_case.staff_viewer_fdbk_config"
-                                    :config_name="FeedbackConfigLabel.staff_viewer">
-          <template slot="header">
-            <div class="config-name">
-              {{FeedbackConfigLabel.staff_viewer}}
-              <tooltip width="large" placement="top">
-                {{FeedbackDescriptions.staff_viewer}}
-              </tooltip>
-            </div>
-          </template>
-        </AGTestCaseFdbkConfigPanel>
-      </div>
+      <AGTestCaseFdbkConfigPanel ref="student_lookup"
+                                 v-model="d_ag_test_case.staff_viewer_fdbk_config"
+                                 :config_name="FeedbackConfigLabel.staff_viewer">
+        <template slot="header">
+          <div class="config-name">
+            {{FeedbackConfigLabel.staff_viewer}}
+            <tooltip width="large" placement="top">
+              {{FeedbackDescriptions.staff_viewer}}
+            </tooltip>
+          </div>
+        </template>
+      </AGTestCaseFdbkConfigPanel>
+    </div>
 
     <APIErrors ref="api_errors"></APIErrors>
 

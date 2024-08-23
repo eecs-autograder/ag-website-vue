@@ -31,7 +31,8 @@ describe('FeedbackConfigPanel tests', () => {
                     show_setup_return_code: true,
                     show_setup_timed_out: true,
                     show_setup_stdout: true,
-                    show_setup_stderr: true
+                    show_setup_stderr: true,
+                    show_student_description: true,
                 }
             ],
             [
@@ -41,7 +42,8 @@ describe('FeedbackConfigPanel tests', () => {
                     show_setup_return_code: true,
                     show_setup_timed_out: true,
                     show_setup_stdout: false,
-                    show_setup_stderr: false
+                    show_setup_stderr: false,
+                    show_student_description: true,
                 }
             ],
             [
@@ -51,7 +53,8 @@ describe('FeedbackConfigPanel tests', () => {
                     show_setup_return_code: false,
                     show_setup_timed_out: false,
                     show_setup_stdout: false,
-                    show_setup_stderr: false
+                    show_setup_stderr: false,
+                    show_student_description: false,
                 }
             ]
         ]);

@@ -1,5 +1,26 @@
 <template>
   <div>
+    <description-renderer
+      v-if="d_globals.user_roles.is_staff
+            && d_staff_description !== null && d_staff_description !== ''"
+      :text="d_staff_description"
+      ref="staff_description"
+    ></description-renderer>
+
+    <description-renderer
+      v-if="ag_test_command_result.student_description !== null
+            && ag_test_command_result.student_description !== ''"
+      :text="ag_test_command_result.student_description"
+      ref="student_description"
+    ></description-renderer>
+
+    <description-renderer
+      v-if="ag_test_command_result.student_on_fail_description !== null
+            && ag_test_command_result.student_on_fail_description !== ''"
+      :text="ag_test_command_result.student_on_fail_description"
+      ref="student_on_fail_description"
+    ></description-renderer>
+
     <fieldset ref="correctness" v-if="show_correctness_fieldset" class="fieldset">
       <legend class="legend"> Correctness </legend>
 
@@ -160,28 +181,38 @@
 
 <script lang="ts">
 
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
-    AGTestCommandResultFeedback,
-    ExpectedReturnCode,
-    FeedbackCategory,
-    ResultOutput,
-    Submission,
-    ValueFeedbackLevel
+  AGTestCommand,
+  AGTestCommandResultFeedback,
+  ExpectedReturnCode,
+  FeedbackCategory,
+  ResultOutput,
+  Submission,
+  ValueFeedbackLevel
 } from "ag-client-typescript";
 
+import { GlobalData } from '@/app.vue';
 import Diff from '@/components/diff.vue';
+import DescriptionRenderer from "@/components/project_view/submission_detail/description_renderer.vue"
 import ViewFile from "@/components/view_file/view_file.vue";
 import { handle_global_errors_async } from '@/error_handling';
+import { Created } from '@/lifecycle';
+
 
 @Component({
   components: {
+    DescriptionRenderer,
     Diff,
     ViewFile
   }
 })
-export default class AGTestCommandResultDetail extends Vue {
+export default class AGTestCommandResultDetail extends Vue implements Created{
+  @Inject({from: 'globals'})
+  globals!: GlobalData;
+  d_globals = this.globals;
+
   @Prop({required: true, type: Submission})
   submission!: Submission;
 
@@ -190,6 +221,8 @@ export default class AGTestCommandResultDetail extends Vue {
 
   @Prop({required: true, type: String})
   fdbk_category!: FeedbackCategory;
+
+  d_staff_description: string | null = null;
 
   d_output_size: ResultOutput.AGTestCommandResultOutputSize | null = null;
 
@@ -211,7 +244,12 @@ export default class AGTestCommandResultDetail extends Vue {
   readonly ExpectedReturnCode = ExpectedReturnCode;
   readonly ValueFeedbackLevel = ValueFeedbackLevel;
 
-  created() {
+  async created() {
+    if (this.d_globals.user_roles.is_staff) {
+      let ag_test_command = await AGTestCommand.get_by_pk(
+        this.ag_test_command_result.ag_test_command_pk);
+      this.d_staff_description = ag_test_command.staff_description;
+    }
     return this.get_output();
   }
 

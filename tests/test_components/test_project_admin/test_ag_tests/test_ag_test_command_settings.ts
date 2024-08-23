@@ -204,6 +204,71 @@ describe('AGTestCommandSettings tests', () => {
         return do_invalid_text_input_test(wrapper, {ref: "cmd"}, ' ', '.save-button');
     });
 
+    test('internal_admin_notes binding', async () => {
+        let internal_admin_notes_input = wrapper.findComponent({ref: 'internal_admin_notes'});
+        await set_validated_input_text(internal_admin_notes_input, 'vjhbre');
+
+        expect(wrapper.vm.d_ag_test_command!.internal_admin_notes).toEqual('vjhbre');
+        expect(validated_input_is_valid(internal_admin_notes_input)).toEqual(true);
+
+        await set_validated_input_text(internal_admin_notes_input, '');
+
+        expect(wrapper.vm.d_ag_test_command!.internal_admin_notes).toEqual('');
+        expect(validated_input_is_valid(internal_admin_notes_input)).toEqual(true);
+
+        await set_data(wrapper, {d_ag_test_command: {internal_admin_notes: 'hjdr'}});
+        expect(get_validated_input_text(internal_admin_notes_input)).toEqual('hjdr');
+    });
+
+    test('staff_description binding', async () => {
+        let staff_description_input = wrapper.findComponent({ref: 'staff_description'});
+        await set_validated_input_text(staff_description_input, 'qoieuy');
+
+        expect(wrapper.vm.d_ag_test_command!.staff_description).toEqual('qoieuy');
+        expect(validated_input_is_valid(staff_description_input)).toEqual(true);
+
+        await set_validated_input_text(staff_description_input, '');
+
+        expect(wrapper.vm.d_ag_test_command!.staff_description).toEqual('');
+        expect(validated_input_is_valid(staff_description_input)).toEqual(true);
+
+        await set_data(wrapper, {d_ag_test_command: {staff_description: 'djkfgh'}});
+        expect(get_validated_input_text(staff_description_input)).toEqual('djkfgh');
+    });
+
+    test('student_description binding', async () => {
+        let student_description_input = wrapper.findComponent({ref: 'student_description'});
+        await set_validated_input_text(student_description_input, 'vjhbre');
+
+        expect(wrapper.vm.d_ag_test_command!.student_description).toEqual('vjhbre');
+        expect(validated_input_is_valid(student_description_input)).toEqual(true);
+
+        await set_validated_input_text(student_description_input, '');
+
+        expect(wrapper.vm.d_ag_test_command!.student_description).toEqual('');
+        expect(validated_input_is_valid(student_description_input)).toEqual(true);
+
+        await set_data(wrapper, {d_ag_test_command: {student_description: 'hjdr'}});
+        expect(get_validated_input_text(student_description_input)).toEqual('hjdr');
+    });
+
+    test('student_on_fail_description binding', async () => {
+        let student_on_fail_description_input = wrapper.findComponent(
+            {ref: 'student_on_fail_description'});
+        await set_validated_input_text(student_on_fail_description_input, 'dsuhva');
+
+        expect(wrapper.vm.d_ag_test_command!.student_on_fail_description).toEqual('dsuhva');
+        expect(validated_input_is_valid(student_on_fail_description_input)).toEqual(true);
+
+        await set_validated_input_text(student_on_fail_description_input, '');
+
+        expect(wrapper.vm.d_ag_test_command!.student_on_fail_description).toEqual('');
+        expect(validated_input_is_valid(student_on_fail_description_input)).toEqual(true);
+
+        await set_data(wrapper, {d_ag_test_command: {student_on_fail_description: 'xcnmb'}});
+        expect(get_validated_input_text(student_on_fail_description_input)).toEqual('xcnmb');
+    });
+
     test('stdin_source binding', async () => {
         let stdin_source_input = wrapper.find('#stdin-source');
 
@@ -1200,7 +1265,8 @@ describe('AG test command feedback tests', () => {
             show_actual_return_code: true,
             show_actual_stdout: true,
             show_actual_stderr: true,
-            show_whether_timed_out: true
+            show_whether_timed_out: true,
+            show_student_description: true,
         });
 
         await checkbox.setChecked(false);

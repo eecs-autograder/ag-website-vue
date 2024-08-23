@@ -1,6 +1,7 @@
 import { Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
+import * as sinon from 'sinon';
 
 import AGTestSuiteResultDetail from '@/components/project_view/submission_detail/ag_test_suite_result_detail.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
@@ -8,6 +9,7 @@ import ResultPanel from '@/components/project_view/submission_detail/result_pane
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_shallow_mount } from '@/tests/setup';
+import { wait_fixed, wait_until } from '@/tests/utils';
 
 let group: ag_cli.Group;
 let submission: ag_cli.Submission;
@@ -17,6 +19,8 @@ let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
 let ag_test_command_1_result: ag_cli.AGTestCommandResultFeedback;
 let ag_test_command_2_result: ag_cli.AGTestCommandResultFeedback;
 let ag_test_command_3_result: ag_cli.AGTestCommandResultFeedback;
+
+let get_ag_test_suite_stub: sinon.SinonStub;
 
 beforeEach(() => {
     user = data_ut.make_user();
@@ -55,6 +59,10 @@ beforeEach(() => {
     ag_test_suite_result.ag_test_case_results = [
         ag_test_case_result
     ];
+
+    get_ag_test_suite_stub = sinon.stub(
+        ag_cli.AGTestSuite, 'get_by_pk'
+    ).resolves(data_ut.make_ag_test_suite(group.project));
 });
 
 function set_command_result_correctness(command: ag_cli.AGTestCommandResultFeedback,
@@ -78,14 +86,19 @@ function check_all_case_correctness_levels(wrapper: Wrapper<AGTestSuiteResultDet
     expect(wrapper.vm.case_result_correctness(case_result)).toEqual(overall_correctness);
 }
 
-function make_wrapper(is_first_suite: boolean) {
+function make_wrapper(is_first_suite: boolean, user_roles: Partial<ag_cli.UserRoles> = {}) {
     let wrapper = managed_shallow_mount(AGTestSuiteResultDetail, {
         propsData: {
             submission: submission,
             ag_test_suite_result: ag_test_suite_result,
             fdbk_category: ag_cli.FeedbackCategory.max,
             is_first_suite: is_first_suite
-        }
+        },
+        provide: {
+            globals: {
+                user_roles: data_ut.make_user_roles(user_roles),
+            },
+        },
     });
 
     return wrapper;
@@ -946,5 +959,82 @@ describe('First failed test case result panel open initially tests', () => {
 
         let second = get_test_result_panel(wrapper, 1);
         expect(second.open_initially).toBe(false);
+    });
+});
+
+describe('Suite Descriptions', () => {
+    beforeEach(() => {
+        let suite = data_ut.make_ag_test_suite(
+            group.project, {staff_description: 'hello this is an description for the staff'});
+        get_ag_test_suite_stub.withArgs(
+            ag_test_suite_result.ag_test_suite_pk
+        ).resolves(suite);
+    });
+
+    test('Staff description shown to staff', async () => {
+        let wrapper = make_wrapper(true, {is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('hello this is an description for the staff');
+    });
+
+    test('Staff description not shown when null', async () => {
+        let wrapper = make_wrapper(true, {is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('hello this is an description for the staff');
+
+        wrapper.vm!.d_staff_description = null;
+        await wait_fixed(wrapper, 10);
+
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
+    });
+
+    test('Staff description not shown when empty', async () => {
+        let wrapper = make_wrapper(true, {is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('hello this is an description for the staff');
+
+        wrapper.vm!.d_staff_description = '';
+        await wait_fixed(wrapper, 10);
+
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
+    });
+
+    test('Staff description not shown to student', async () => {
+        let wrapper = make_wrapper(true, {is_staff: false, is_student: true});
+
+        await wait_fixed(wrapper, 10);
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
+    });
+
+    test('Student description visible', () => {
+        ag_test_suite_result.student_description = 'hello student';
+
+        let wrapper = make_wrapper(true);
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.vm!.text).toEqual('hello student');
+    });
+
+    test('Student description hidden', async () => {
+        ag_test_suite_result.student_description = null;
+
+        let wrapper = make_wrapper(true);
+        await wait_fixed(wrapper, 10);
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.exists()).toBe(false);
+    });
+
+    test('Student description empty', async () => {
+        ag_test_suite_result.student_description = '';
+
+        let wrapper = make_wrapper(true);
+        await wait_fixed(wrapper, 10);
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.exists()).toBe(false);
     });
 });
