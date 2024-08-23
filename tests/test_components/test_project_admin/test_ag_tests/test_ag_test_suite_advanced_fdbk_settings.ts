@@ -6,7 +6,7 @@ import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_tests
 
 import { make_ag_test_suite_fdbk_config } from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked } from '@/tests/utils';
+import { checkbox_is_checked, set_data } from '@/tests/utils';
 
 
 describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
@@ -47,6 +47,32 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         wrapper.vm.d_feedback_config!.visible = true;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(visible_input)).toEqual(true);
+    });
+
+    test('Toggle show_student_description', async () => {
+        wrapper.setData({d_is_open: true});
+        await wrapper.vm.$nextTick();
+
+        let show_student_description_input = wrapper.find('[data-testid=show_student_description]');
+
+        show_student_description_input.setChecked(true);
+        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
+
+        show_student_description_input.setChecked(false);
+        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(false);
+
+        show_student_description_input.setChecked(true);
+        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
+
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
+
+        await set_data(wrapper, {d_feedback_config: {show_student_description: false}});
+        await wrapper.vm.$nextTick();
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(false);
+
+        await set_data(wrapper, {d_feedback_config: {show_student_description: true}});
+        await wrapper.vm.$nextTick();
+        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
     });
 
     test('show_individual_tests binding', async () => {
@@ -177,32 +203,6 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         wrapper.vm.d_feedback_config!.show_setup_stderr = true;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(show_setup_stderr_input)).toEqual(true);
-    });
-
-    test('Toggle show_student_description', async () => {
-        wrapper.setData({d_is_open: true});
-        await wrapper.vm.$nextTick();
-
-        let show_student_description_input = wrapper.find('[data-testid=show_student_description]');
-
-        show_student_description_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
-
-        show_student_description_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(false);
-
-        show_student_description_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
-
-        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
-
-        wrapper.vm.d_feedback_config!.show_student_description = false;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_student_description_input)).toEqual(false);
-
-        wrapper.vm.d_feedback_config!.show_student_description = true;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
     });
 
     test('value Watcher', async () => {
