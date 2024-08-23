@@ -4,16 +4,21 @@
       v-if="d_globals.user_roles.is_staff
             && d_staff_description !== null && d_staff_description !== ''"
       :text="d_staff_description"
+      ref="staff_description"
     ></description-renderer>
 
     <description-renderer
-      v-if="ag_test_command_result.student_description !== null"
+      v-if="ag_test_command_result.student_description !== null
+            && ag_test_command_result.student_description !== ''"
       :text="ag_test_command_result.student_description"
+      ref="student_description"
     ></description-renderer>
 
     <description-renderer
-      v-if="ag_test_command_result.student_on_fail_description !== null"
+      v-if="ag_test_command_result.student_on_fail_description !== null
+            && ag_test_command_result.student_on_fail_description !== ''"
       :text="ag_test_command_result.student_on_fail_description"
+      ref="student_on_fail_description"
     ></description-renderer>
 
     <fieldset ref="correctness" v-if="show_correctness_fieldset" class="fieldset">

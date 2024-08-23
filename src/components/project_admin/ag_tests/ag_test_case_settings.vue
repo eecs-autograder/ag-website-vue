@@ -14,6 +14,15 @@
     </div>
 
     <div class="form-field-wrapper">
+      <label class="label"> Internal Admin Notes </label>
+      <validated-input ref="internal_admin_notes"
+                       v-model="d_ag_test_case.internal_admin_notes"
+                       :num_rows=3
+                       :validators="[]">
+      </validated-input>
+    </div>
+
+    <div class="form-field-wrapper">
       <label class="label"> Staff-only description </label>
       <validated-input ref="staff_description"
                        v-model="d_ag_test_case.staff_description"

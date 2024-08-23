@@ -5,11 +5,14 @@
       v-if="d_globals.user_roles.is_staff
             && d_staff_description !== null && d_staff_description !== ''"
       :text="d_staff_description"
+      ref="staff_description"
     ></description-renderer>
 
     <description-renderer
-      v-if="ag_test_case_result.student_description !== null"
+      v-if="ag_test_case_result.student_description !== null
+            && ag_test_case_result.student_description !== ''"
       :text="ag_test_case_result.student_description"
+      ref="student_description"
     ></description-renderer>
 
     <template v-if="ag_test_case_result.ag_test_command_results.length > 1">

@@ -66,6 +66,18 @@
         <label class="label">
           Staff-Only Description
         </label>
+        <validated-input ref="internal_admin_notes"
+                         id="input-internal-admin-notes"
+                         v-model="d_ag_test_command.internal_admin_notes"
+                         :num_rows="2"
+                         :validators="[]">
+        </validated-input>
+      </div>
+
+      <div class="form-field-wrapper">
+        <label class="label">
+          Staff-Only Description
+        </label>
         <validated-input ref="staff_description"
                          id="input-staff-description"
                          v-model="d_ag_test_command.staff_description"

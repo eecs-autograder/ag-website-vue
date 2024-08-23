@@ -1,11 +1,14 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
+import * as sinon from 'sinon';
 
 import AGTestCaseResultDetail from '@/components/project_view/submission_detail/ag_test_case_result_detail.vue';
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 
 import * as data_ut from '@/tests/data_utils';
+import { managed_shallow_mount } from '@/tests/setup';
+import { wait_fixed, wait_until } from '@/tests/utils';
 
 let group: ag_cli.Group;
 let project: ag_cli.Project;
@@ -13,25 +16,40 @@ let submission: ag_cli.Submission;
 let user: ag_cli.User;
 let ag_test_case_result: ag_cli.AGTestCaseResultFeedback;
 
+let get_ag_test_case_stub: sinon.SinonStub;
+
 beforeEach(() => {
     user = data_ut.make_user();
     project = data_ut.make_project(1);
     group = data_ut.make_group(project.pk, 1, {member_names: [user.username]});
     submission = data_ut.make_submission(group);
     ag_test_case_result = data_ut.make_ag_test_case_result_feedback(1);
+
+    get_ag_test_case_stub = sinon.stub(ag_cli.AGTestCase, 'get_by_pk');
 });
+
+function make_wrapper(user_roles: Partial<ag_cli.UserRoles> = {}) {
+    let wrapper = managed_shallow_mount(AGTestCaseResultDetail, {
+        propsData: {
+            submission: submission,
+            ag_test_case_result: ag_test_case_result,
+            fdbk_category: ag_cli.FeedbackCategory.max,
+        },
+        provide: {
+            globals: {
+                user_roles: data_ut.make_user_roles(user_roles),
+            },
+        },
+    });
+
+    return wrapper;
+}
 
 describe('command_result_correctness tests', () => {
     let wrapper: Wrapper<AGTestCaseResultDetail>;
 
     beforeEach(() => {
-        wrapper = mount(AGTestCaseResultDetail, {
-            propsData: {
-                ag_test_case_result: ag_test_case_result,
-                fdbk_category: ag_cli.FeedbackCategory.max,
-                submission: submission,
-            }
-        });
+        wrapper = make_wrapper();
     });
 
     test('command_result_correctness - return_code_correctness === not_available AND' +
@@ -622,13 +640,7 @@ describe('command_result_return_code_correctness tests', () => {
     let wrapper: Wrapper<AGTestCaseResultDetail>;
 
     beforeEach(() => {
-        wrapper = mount(AGTestCaseResultDetail, {
-            propsData: {
-                ag_test_case_result: ag_test_case_result,
-                fdbk_category: ag_cli.FeedbackCategory.max,
-                submission: submission
-            }
-        });
+        wrapper = make_wrapper();
     });
 
     test('command_result_return_code_correctness - return_code_correct === null', async () => {
@@ -691,13 +703,7 @@ describe('command_result_output_correctness tests', () => {
     let wrapper: Wrapper<AGTestCaseResultDetail>;
 
     beforeEach(() => {
-        wrapper = mount(AGTestCaseResultDetail, {
-            propsData: {
-                ag_test_case_result: ag_test_case_result,
-                fdbk_category: ag_cli.FeedbackCategory.max,
-                submission: submission
-            }
-        });
+        wrapper = make_wrapper();
     });
 
     test('command_result_output_correctness - output is not available', async () => {
@@ -751,13 +757,7 @@ describe('AGTestCaseResult tests concerning props', () => {
     let wrapper: Wrapper<AGTestCaseResultDetail>;
 
     beforeEach(() => {
-        wrapper = mount(AGTestCaseResultDetail, {
-            propsData: {
-                ag_test_case_result: ag_test_case_result,
-                fdbk_category: ag_cli.FeedbackCategory.max,
-                submission: submission,
-            }
-        });
+        wrapper = make_wrapper();
     });
 
     test('ag_test_case_result prop changes reflected in html', async () => {
@@ -824,19 +824,83 @@ describe('AGTestCaseResult tests concerning props', () => {
 });
 
 describe('Test Case Descriptions', () => {
-    test('Staff description shown to staff', () => {
-        fail();
+    beforeEach(() => {
+        let test_case = data_ut.make_ag_test_case(
+            ag_test_case_result.ag_test_case_pk,
+            {staff_description: 'some staff test description'});
+        get_ag_test_case_stub.withArgs(
+            ag_test_case_result.ag_test_case_pk
+        ).resolves(test_case);
+
+        ag_test_case_result.ag_test_command_results = [
+            data_ut.make_ag_test_command_result_feedback(1, {})
+        ];
     });
 
-    test('Staff description not shown to student', () => {
-        fail();
+    test('Staff description shown to staff', async () => {
+        let wrapper = make_wrapper({is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('some staff test description');
     });
 
-    test('Student description visible', () => {
-        fail();
+    test('Staff description not shown when null', async () => {
+        let wrapper = make_wrapper({is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('some staff test description');
+
+        wrapper.vm!.d_staff_description = null;
+        await wait_fixed(wrapper, 10);
+
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
     });
 
-    test('Student description hidden', () => {
-        fail();
+    test('Staff description not shown when empty', async () => {
+        let wrapper = make_wrapper({is_staff: true});
+
+        expect(await wait_until(wrapper, w => w.vm!.d_staff_description !== null)).toBe(true);
+        let staff_description = wrapper.findComponent({ref: 'staff_description'});
+        expect(staff_description.vm!.text).toEqual('some staff test description');
+
+        wrapper.vm!.d_staff_description = '';
+        await wait_fixed(wrapper, 10);
+
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
+    });
+
+    test('Staff description not shown to student', async () => {
+        let wrapper = make_wrapper({is_staff: false, is_student: true});
+
+        await wait_fixed(wrapper, 10);
+        expect(wrapper.findComponent({ref: 'staff_description'}).exists()).toBe(false);
+    });
+
+    test('Student description visible', async () => {
+        ag_test_case_result.student_description = 'hellooo student';
+
+        let wrapper = make_wrapper();
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.vm!.text).toEqual('hellooo student');
+    });
+
+    test('Student description hidden', async () => {
+        ag_test_case_result.student_description = null;
+
+        let wrapper = make_wrapper();
+        await wait_fixed(wrapper, 10);
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.exists()).toBe(false);
+    });
+
+    test('Student description empty', async () => {
+        ag_test_case_result.student_description = '';
+
+        let wrapper = make_wrapper();
+        await wait_fixed(wrapper, 10);
+        let student_description = wrapper.findComponent({ref: 'student_description'});
+        expect(student_description.exists()).toBe(false);
     });
 });
