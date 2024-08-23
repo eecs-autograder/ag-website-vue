@@ -50,27 +50,24 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_student_description', async () => {
-        wrapper.setData({d_is_open: true});
-        await wrapper.vm.$nextTick();
-
         let show_student_description_input = wrapper.find('[data-testid=show_student_description]');
 
-        show_student_description_input.setChecked(true);
+        await show_student_description_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
 
-        show_student_description_input.setChecked(false);
+        await show_student_description_input.setChecked(false);
         expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(false);
 
-        show_student_description_input.setChecked(true);
+        await show_student_description_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
 
         expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
 
-        await set_data(wrapper, {d_feedback_config: {show_student_description: false}});
+        wrapper.vm.d_feedback_config!.show_student_description = false;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(show_student_description_input)).toEqual(false);
 
-        await set_data(wrapper, {d_feedback_config: {show_student_description: true}});
+        wrapper.vm.d_feedback_config!.show_student_description = true;
         await wrapper.vm.$nextTick();
         expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
     });
@@ -80,10 +77,10 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
 
         let show_individual_tests_input = wrapper.find('[data-testid=show_individual_tests]');
 
-        show_individual_tests_input.setChecked(true);
+        await show_individual_tests_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_individual_tests).toEqual(true);
 
-        show_individual_tests_input.setChecked(false);
+        await show_individual_tests_input.setChecked(false);
         expect(wrapper.vm.d_feedback_config!.show_individual_tests).toEqual(false);
 
         await show_individual_tests_input.setChecked(true);
@@ -132,13 +129,13 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
 
         let show_setup_timed_out_input = wrapper.find('[data-testid=show_setup_timed_out]');
 
-        show_setup_timed_out_input.setChecked(true);
+        await show_setup_timed_out_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_setup_timed_out).toEqual(true);
 
-        show_setup_timed_out_input.setChecked(false);
+        await show_setup_timed_out_input.setChecked(false);
         expect(wrapper.vm.d_feedback_config!.show_setup_timed_out).toEqual(false);
 
-        show_setup_timed_out_input.setChecked(true);
+        await show_setup_timed_out_input.setChecked(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_feedback_config!.show_setup_timed_out).toEqual(true);
 
@@ -159,13 +156,13 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
 
         let show_setup_stdout_input = wrapper.find('[data-testid=show_setup_stdout]');
 
-        show_setup_stdout_input.setChecked(true);
+        await show_setup_stdout_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_setup_stdout).toEqual(true);
 
-        show_setup_stdout_input.setChecked(false);
+        await show_setup_stdout_input.setChecked(false);
         expect(wrapper.vm.d_feedback_config!.show_setup_stdout).toEqual(false);
 
-        show_setup_stdout_input.setChecked(true);
+        await show_setup_stdout_input.setChecked(true);
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_feedback_config!.show_setup_stdout).toEqual(true);
         expect(checkbox_is_checked(show_setup_stdout_input)).toEqual(true);
@@ -185,13 +182,13 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
 
         let show_setup_stderr_input = wrapper.find('[data-testid=show_setup_stderr]');
 
-        show_setup_stderr_input.setChecked(true);
+        await show_setup_stderr_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_setup_stderr).toEqual(true);
 
-        show_setup_stderr_input.setChecked(false);
+        await show_setup_stderr_input.setChecked(false);
         expect(wrapper.vm.d_feedback_config!.show_setup_stderr).toEqual(false);
 
-        show_setup_stderr_input.setChecked(true);
+        await show_setup_stderr_input.setChecked(true);
         expect(wrapper.vm.d_feedback_config!.show_setup_stderr).toEqual(true);
 
         expect(checkbox_is_checked(show_setup_stderr_input)).toEqual(true);
@@ -212,7 +209,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
             show_setup_stdout: !feedback_config.show_setup_stdout,
             show_setup_stderr: !feedback_config.show_setup_stderr,
         });
-        wrapper.setProps({'value': new_val});
+        await wrapper.setProps({'value': new_val});
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_feedback_config!).toEqual(new_val);
@@ -227,10 +224,10 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         wrapper.vm.toggle_is_open();
         expect(wrapper.vm.d_is_open).toBe(false);
 
-        wrapper.find('.advanced-settings-label').trigger('click');
+        await wrapper.find('.advanced-settings-label').trigger('click');
         expect(wrapper.vm.d_is_open).toBe(true);
 
-        wrapper.find('.advanced-settings-label').trigger('click');
+        await wrapper.find('.advanced-settings-label').trigger('click');
         expect(wrapper.vm.d_is_open).toBe(false);
     });
 });
