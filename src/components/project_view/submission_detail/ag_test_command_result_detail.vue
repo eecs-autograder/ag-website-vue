@@ -246,7 +246,8 @@ export default class AGTestCommandResultDetail extends Vue implements Created{
 
   async created() {
     if (this.d_globals.user_roles.is_staff) {
-      let ag_test_command = await AGTestCommand.get_by_pk(this.ag_test_command_result.ag_test_command_pk);
+      let ag_test_command = await AGTestCommand.get_by_pk(
+        this.ag_test_command_result.ag_test_command_pk);
       this.d_staff_description = ag_test_command.staff_description;
     }
     return this.get_output();

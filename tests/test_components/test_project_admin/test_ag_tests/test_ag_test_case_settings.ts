@@ -115,7 +115,9 @@ describe('AG test case settings form tests', () => {
         set_validated_input_text(internal_admin_notes_input, "Test case level description");
         await wrapper.vm.$nextTick();
         expect(validated_input_is_valid(internal_admin_notes_input)).toBe(true);
-        expect(component.d_ag_test_case!.internal_admin_notes).toEqual("Test case level description");
+        expect(
+            component.d_ag_test_case!.internal_admin_notes
+        ).toEqual("Test case level description");
 
         component.d_ag_test_case!.internal_admin_notes = "Another description";
         await wrapper.vm.$nextTick();
