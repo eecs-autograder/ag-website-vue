@@ -96,8 +96,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { defineProps, ref, watch, toRaw } from 'vue';
 
 import { Course, Group, Project } from 'ag-client-typescript';
 
@@ -110,84 +110,55 @@ import Toggle from '@/components/toggle.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
-import { assert_not_null, deep_copy, format_datetime, toggle } from '@/utils';
+import { assert_not_null, deep_copy, format_datetime, toggle_ref } from '@/utils';
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
-@Component({
-  components: {
-    APIErrors,
-    DatetimePicker,
-    GroupMembersForm,
-    LastSaved,
-    Modal,
-    Toggle,
-    ValidatedForm,
-    ValidatedInput,
-  }
+const props = defineProps({
+  course: Course,
+  group: Group,
+  project: Project,
 })
-export default class EditSingleGroup extends Vue {
 
-  readonly is_not_empty = is_not_empty;
-  readonly is_non_negative = is_non_negative;
-  readonly is_integer = is_integer;
-  readonly string_to_num = string_to_num;
+const d_group = ref(structuredClone(toRaw(props.group)))
+const d_saving = ref(false);
+const d_edit_group_form_is_valid = ref(true);
 
-  @Prop({required: true, type: Course})
-  course!: Course;
+const d_show_delete_group_modal = ref(false);
+const d_deleting = ref(false);
 
-  @Prop({required: true, type: Group})
-  group!: Group;
-
-  @Prop({required: true, type: Project})
-  project!: Project;
-
-  d_group: Group | null = null;
-
-  d_saving = false;
-  d_edit_group_form_is_valid = true;
-
-  d_show_delete_group_modal = false;
-  d_deleting = false;
-
-  @Watch('group')
-  on_group_selected_changed(new_group: Group, old_group: Group) {
-    this.d_group = deep_copy(new_group, Group);
+watch(
+  () => props.group,
+  (group: Group) => {
+    d_group.value = ref(structuredClone(toRaw(group)))
   }
+)
 
-  created() {
-    this.d_group = deep_copy(this.group, Group);
-  }
+// @handle_api_errors_async(handle_save_group_error)
+// const update_group = async () => {
+//   assert_not_null(d_group.val);
+//   try {
+//     d_saving.val = true;
+//     (<APIErrors> $refs.api_errors).clear();
+//     await d_group.value.save();
+//   }
+//   finally {
+//     d_saving.value = false;
+//   }
+// }
 
-  @handle_api_errors_async(handle_save_group_error)
-  async update_group() {
-    assert_not_null(this.d_group);
-    try {
-      this.d_saving = true;
-      (<APIErrors> this.$refs.api_errors).clear();
-      await this.d_group.save();
-    }
-    finally {
-      this.d_saving = false;
-    }
-  }
+// @handle_api_errors_async(make_error_handler_func('delete_group_api_errors'))
+// const delete_group = async () => {
+//   return toggle_ref(d_deleting, async () => {
+//       assert_not_null(d_group.value);
+//       await d_group.value.pseudo_delete();
+//       d_show_delete_group_modal.value = false;
+//   });
+// }
 
-  @handle_api_errors_async(make_error_handler_func('delete_group_api_errors'))
-  async delete_group() {
-    return toggle(this, 'd_deleting', async () => {
-        assert_not_null(this.d_group);
-        await this.d_group.pseudo_delete();
-        this.d_show_delete_group_modal = false;
-    });
-  }
-
-  get format_datetime() {
-    return format_datetime;
-  }
+const format_datetime = () => {
+  return format_datetime;
 }
 
-function handle_save_group_error(component: EditSingleGroup, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
-}
 </script>
 
 <style scoped lang="scss">
