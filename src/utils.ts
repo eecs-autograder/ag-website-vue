@@ -1,4 +1,5 @@
 import { Dictionary } from 'vue-router/types/router';
+import type { Ref } from 'vue'
 
 import { Course } from 'ag-client-typescript';
 // @ts-ignore
@@ -54,6 +55,20 @@ export async function toggle<T, Key extends keyof T, ReturnType>(
     }
     finally {
         (<boolean> <unknown> obj[key]) = original;
+    }
+}
+
+export async function toggle_ref<ReturnType>(ref: Ref<boolean>, body: () => Promise<ReturnType>) {
+    if (typeof ref.value !== 'boolean') {
+        throw new TypeError(`Expected a ref of boolean type, but got "${typeof ref.value}"`)
+    }
+    let original = ref.value
+    try {
+        ref.value = !original
+        return await body();
+    }
+    finally {
+        ref.value = original
     }
 }
 

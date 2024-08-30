@@ -119,7 +119,7 @@ const props = defineProps({
   project: Project,
 })
 
-const d_group = ref(structuredClone(toRaw(props.group)))
+const d_group = ref(deep_copy(toRaw(props.group), Group))
 const d_saving = ref(false);
 const d_edit_group_form_is_valid = ref(true);
 
@@ -129,31 +129,31 @@ const d_deleting = ref(false);
 watch(
   () => props.group,
   (group: Group) => {
-    d_group.value = ref(structuredClone(toRaw(group)))
+    d_group.value = ref(deep_copy(toRaw(group), Group))
   }
 )
 
-// @handle_api_errors_async(handle_save_group_error)
-// const update_group = async () => {
-//   assert_not_null(d_group.val);
-//   try {
-//     d_saving.val = true;
-//     (<APIErrors> $refs.api_errors).clear();
-//     await d_group.value.save();
-//   }
-//   finally {
-//     d_saving.value = false;
-//   }
-// }
+@handle_api_errors_async(handle_save_group_error)
+const update_group = async () => {
+  assert_not_null(d_group.val);
+  try {
+    d_saving.val = true;
+    (<APIErrors> $refs.api_errors).clear();
+    await d_group.value.save();
+  }
+  finally {
+    d_saving.value = false;
+  }
+}
 
-// @handle_api_errors_async(make_error_handler_func('delete_group_api_errors'))
-// const delete_group = async () => {
-//   return toggle_ref(d_deleting, async () => {
-//       assert_not_null(d_group.value);
-//       await d_group.value.pseudo_delete();
-//       d_show_delete_group_modal.value = false;
-//   });
-// }
+@handle_api_errors_async(make_error_handler_func('delete_group_api_errors'))
+const delete_group = async () => {
+  return toggle_ref(d_deleting, async () => {
+      assert_not_null(d_group.value);
+      await d_group.value.pseudo_delete();
+      d_show_delete_group_modal.value = false;
+  });
+}
 
 const format_datetime = () => {
   return format_datetime;
