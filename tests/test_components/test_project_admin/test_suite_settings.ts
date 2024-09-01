@@ -206,8 +206,8 @@ describe('Field binding tests', () => {
 
         expect(wrapper.vm.d_suite!.allow_network_access).toEqual(false);
 
-        allow_network_access_toggle.find('.on-border').trigger('click');
-        await wrapper.vm.$nextTick();
+        await allow_network_access_toggle.find('.on-border').trigger('click');
+        await wrapper.find('[data-testid=allow_network_access_button]').trigger('click');
 
         expect(wrapper.vm.d_suite!.allow_network_access).toEqual(true);
 
