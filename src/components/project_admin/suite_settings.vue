@@ -38,8 +38,6 @@
 
       <div class="form-field-wrapper">
         <label class="label"> Sandbox environment </label>
-
-
         <select-object :items="docker_images"
                         id_field="pk"
                         v-model="d_suite.sandbox_docker_image"
@@ -51,6 +49,12 @@
         </select-object>
       </div>
       <div class="toggle-container form-field-wrapper">
+        <div>
+          <i class="fas fa-exclamation-triangle warning-tip"></i>
+          <tooltip width="large" placement="right">
+            Allowing network access may expose your files to students' code.
+          </tooltip>
+        </div>
         <toggle :value="d_suite.allow_network_access"
                 @input="on_toogle_allow_network"
                 ref="allow_network_access"
@@ -326,6 +330,7 @@ export default class SuiteSettings extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
+@import '@/styles/global.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/modal.scss';
@@ -336,6 +341,9 @@ export default class SuiteSettings extends Vue {
 }
 
 .toggle-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
   font-size: .875rem;
   margin: 1rem 0;
 }
@@ -385,6 +393,11 @@ export default class SuiteSettings extends Vue {
   .dropdown-typeahead-container {
     flex: 1;
   }
+}
+
+.warning-tip{
+  color: $warning-red;
+  font-size: 1.25rem;
 }
 
 </style>
