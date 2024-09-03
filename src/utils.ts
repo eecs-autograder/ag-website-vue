@@ -1,4 +1,5 @@
 import { Dictionary } from 'vue-router/types/router';
+import type { Ref } from 'vue'
 
 import { Course } from 'ag-client-typescript';
 // @ts-ignore
