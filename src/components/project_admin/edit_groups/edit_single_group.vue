@@ -106,58 +106,57 @@ import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import GroupMembersForm from '@/components/group_members_form.vue';
 import LastSaved from '@/components/last_saved.vue';
 import Modal from '@/components/modal.vue';
-import Toggle from '@/components/toggle.vue';
-import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
-import { assert_not_null, deep_copy, format_datetime, toggle_ref } from '@/utils';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling_composition';
+import { assert_not_null, deep_copy, format_datetime } from '@/utils';
+import { toggle } from '@/utils_composition';
 import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
 
 const props = defineProps({
-  course: Course,
-  group: Group,
-  project: Project,
+  course: { type: Course, required: true },
+  group: { type: Group, required: true },
+  project: { type: Project, required: true }
 })
 
-const d_group = ref(deep_copy(toRaw(props.group), Group))
-const d_saving = ref(false);
-const d_edit_group_form_is_valid = ref(true);
+const d_group = ref<Group>(deep_copy(toRaw(props.group), Group))
+const d_saving = ref<boolean>(false);
+const d_edit_group_form_is_valid = ref<boolean>(true);
 
-const d_show_delete_group_modal = ref(false);
-const d_deleting = ref(false);
+const d_show_delete_group_modal = ref<boolean>(false);
+const d_deleting = ref<boolean>(false);
+
+const api_errors = ref<APIErrors>();
+const delete_group_api_errors = ref<APIErrors>();
 
 watch(
   () => props.group,
   (group: Group) => {
-    d_group.value = ref(deep_copy(toRaw(group), Group))
+    d_group.value = deep_copy(toRaw(group), Group)
   }
 )
 
-@handle_api_errors_async(handle_save_group_error)
-const update_group = async () => {
-  assert_not_null(d_group.val);
-  try {
-    d_saving.val = true;
-    (<APIErrors> $refs.api_errors).clear();
-    await d_group.value.save();
-  }
-  finally {
-    d_saving.value = false;
-  }
-}
+const update_group = handle_api_errors_async(
+  async () => {
+    assert_not_null(d_group.value);
+    try {
+      d_saving.value = true;
+      (<APIErrors> api_errors.value).clear();
+      await d_group.value.save();
+    }
+    finally {
+      d_saving.value = false;
+    }
+  }, make_error_handler_func(api_errors))
 
-@handle_api_errors_async(make_error_handler_func('delete_group_api_errors'))
-const delete_group = async () => {
-  return toggle_ref(d_deleting, async () => {
+const delete_group = handle_api_errors_async(
+  async () => {
+    return toggle(d_deleting, async() => {
       assert_not_null(d_group.value);
       await d_group.value.pseudo_delete();
       d_show_delete_group_modal.value = false;
-  });
-}
-
-const format_datetime = () => {
-  return format_datetime;
-}
+    });
+  }, make_error_handler_func(delete_group_api_errors)
+)
 
 </script>
 

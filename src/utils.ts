@@ -58,20 +58,6 @@ export async function toggle<T, Key extends keyof T, ReturnType>(
     }
 }
 
-export async function toggle_ref<ReturnType>(ref: Ref<boolean>, body: () => Promise<ReturnType>) {
-    if (typeof ref.value !== 'boolean') {
-        throw new TypeError(`Expected a ref of boolean type, but got "${typeof ref.value}"`)
-    }
-    let original = ref.value
-    try {
-        ref.value = !original
-        return await body();
-    }
-    finally {
-        ref.value = original
-    }
-}
-
 type IterableType<T> = Iterable<T> | IterableIterator<T>;
 
 // Given two iterables, returns an iterable iterator that produces
