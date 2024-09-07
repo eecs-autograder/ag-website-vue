@@ -1,4 +1,5 @@
-import { Wrapper } from '@vue/test-utils';
+import Vue from 'vue';
+import { Wrapper, mount } from '@vue/test-utils';
 
 import {
     Course,
@@ -46,7 +47,8 @@ describe('EditSingleGroup tests', () => {
         });
 
 
-        wrapper = managed_mount(EditSingleGroup, {
+        wrapper = managed_mount(Vue.extend(EditSingleGroup), {
+        // wrapper = managed_mount(EditSingleGroup, {
             propsData: {
                 course: course,
                 project: project,
@@ -72,7 +74,7 @@ describe('EditSingleGroup tests', () => {
         await set_validated_input_text(
             wrapper.findComponent({ref: 'bonus_submissions_remaining_input'}), "-4");
 
-        expect(wrapper.vm.d_edit_group_form_is_valid).toBe(false);
+        expect(wrapper.findComponent('.update-group-button').element.disabled).toBe(true);
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 
@@ -82,13 +84,13 @@ describe('EditSingleGroup tests', () => {
         let bonus_submissions_validator = <ValidatedInput> wrapper.findComponent({
             ref: 'bonus_submissions_remaining_input'
         }).vm;
-        set_validated_input_text(bonus_submissions_input, "");
+        await set_validated_input_text(bonus_submissions_input, "");
 
         expect(bonus_submissions_validator.is_valid).toBe(false);
 
         set_validated_input_text(bonus_submissions_input, "spam");
 
-        expect(wrapper.vm.d_edit_group_form_is_valid).toBe(false);
+        expect(wrapper.findComponent('.update-group-button').element.disabled).toBe(true);
         expect(bonus_submissions_validator.is_valid).toBe(false);
     });
 
@@ -104,11 +106,12 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('Revoking and granting extension', async () => {
-        expect(wrapper.vm.d_group?.extended_due_date).not.toBeNull();
+        const null_date_string = '--- --, ----, --:-- -- ---'
+        expect(wrapper.findComponent('.datetime-input').element).not.toContainHTML(null_date_string);
 
         let revoke_button = wrapper.find('[data-testid=revoke_extension]');
         await revoke_button.trigger('click');
-        expect(wrapper.vm.d_group?.extended_due_date).toBeNull();
+        expect(wrapper.findComponent('.datetime-input').element).toContainHTML(null_date_string);
 
         let picker
             = <Wrapper<DatetimePicker>> wrapper.findComponent({ref: 'extension_datetime_picker'});
@@ -118,7 +121,9 @@ describe('EditSingleGroup tests', () => {
         let now = moment();
         picker.vm.set_date_and_time(now.format());
         picker.vm.update_time_selected();
+        await wrapper.vm.$nextTick();
         expect(moment(wrapper.vm.d_group?.extended_due_date).format()).toEqual(now.format());
+        expect(wrapper.findComponent('.datetime-input').element).not.toContainHTML(null_date_string);
     });
 
     test('API errors displayed on submit', async () => {

@@ -81,6 +81,7 @@ describe('EditGroups tests', () => {
                 course: course,
             }
         });
+        console.log(wrapper.html())
         component = wrapper.vm;
     });
 

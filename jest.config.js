@@ -7,8 +7,9 @@ module.exports = {
         'ts',
         'tsx'
     ],
+    testEnvironment: 'jsdom',
     transform: {
-        '^.+\\.vue$': 'vue-jest',
+        '^.+\\.vue$': '@vue/vue2-jest',
         '.+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
         '^.+\\.tsx?$': 'ts-jest'
     },

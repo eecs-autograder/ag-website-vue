@@ -1,5 +1,5 @@
 <template>
-  <div class="edit-single-group-component">
+  <div v-if="d_group" class="edit-single-group-component">
     <div class="created-at">
       <span class="timestamp-label">Created: </span>
       <span class="timestamp">{{format_datetime(d_group.created_at)}}</span>
@@ -48,7 +48,7 @@
         <div class="button-footer">
           <button class="update-group-button"
                   type="submit"
-                  :disabled="d_saving"> Update Group </button>
+                  :disabled="d_saving || !d_edit_group_form_is_valid"> Update Group </button>
 
           <last-saved :saving="d_saving" :last_modified="group.last_modified"></last-saved>
         </div>
@@ -118,7 +118,8 @@ const props = defineProps({
   project: { type: Project, required: true }
 })
 
-const d_group = ref<Group>(deep_copy(toRaw(props.group), Group))
+// const d_group = ref<Group>(deep_copy(toRaw(props.group), Group))
+const d_group = ref<Group>()
 const d_saving = ref<boolean>(false);
 const d_edit_group_form_is_valid = ref<boolean>(true);
 
@@ -132,7 +133,8 @@ watch(
   () => props.group,
   (group: Group) => {
     d_group.value = deep_copy(toRaw(group), Group)
-  }
+  },
+  { immediate: true }
 )
 
 const update_group = handle_api_errors_async(
@@ -146,7 +148,8 @@ const update_group = handle_api_errors_async(
     finally {
       d_saving.value = false;
     }
-  }, make_error_handler_func(api_errors))
+  }, make_error_handler_func(api_errors)
+)
 
 const delete_group = handle_api_errors_async(
   async () => {
