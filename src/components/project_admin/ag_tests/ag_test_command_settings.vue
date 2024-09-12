@@ -64,7 +64,7 @@
 
       <div class="form-field-wrapper">
         <label class="label">
-          Staff-Only Description
+          Internal Admin Notes
         </label>
         <validated-input ref="internal_admin_notes"
                          id="input-internal-admin-notes"
