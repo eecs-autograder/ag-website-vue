@@ -3,6 +3,7 @@
     <div class="validated-input-wrapper">
       <slot name="prefix"> </slot>
       <input class="input"
+             data-testid="input"
              v-if="num_rows === 1"
              :style="input_style"
              :class="{
@@ -18,6 +19,7 @@
                 :rows="num_rows"
                 :style="input_style"
                 class="input"
+                data-testid="input"
                 :class="{
                  'error-input' : input_style === '' && show_errors
                 }"
