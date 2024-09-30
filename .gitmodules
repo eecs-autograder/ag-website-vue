@@ -1,0 +1,3 @@
+[submodule "cypress/e2e/test_stack/autograder-server"]
+	path = cypress/e2e/test_stack/autograder-server
+	url = git@github.com:eecs-autograder/autograder-server.git

@@ -3,10 +3,14 @@
   "version": "2024.08.0",
   "private": true,
   "scripts": {
+    "serve:e2e": "docker compose -f cypress/e2e/test_stack/docker-compose.yml up",
+    "migrate:e2e": "docker exec -it ag-vue-e2e-django python3 manage.py migrate",
+    "cy:e2e": "npm run migrate:e2e && cypress run",
+    "e2e": "start-server-and-test serve:e2e http://localhost:8080 cy:e2e",
     "serve": "vue-cli-service serve",
     "lint": "./static_analysis.bash",
     "build": "vue-cli-service build",
-    "test": "python3 run_tests.py"
+    "test": "python3 run_tests.py && cypress run --component"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
@@ -44,6 +48,7 @@
     "@vue/cli-service": "^4.5.11",
     "@vue/test-utils": "^1.1.3",
     "cache-loader": "^4.1.0",
+    "child_process": "^1.0.2",
     "cypress": "^13.14.2",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^7.20.0",
@@ -52,6 +57,7 @@
     "sass": "^1.66.1",
     "sass-loader": "^10.1.1",
     "sinon": "^7.5.0",
+    "start-server-and-test": "^2.0.8",
     "timezone-mock": "^1.1.3",
     "ts-jest": "^25.0.0",
     "tslint": "5.15.0",
