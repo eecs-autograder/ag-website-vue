@@ -5,7 +5,6 @@
     </div>
   </div>
   <div v-else id="project-admin">
-    <h1>HI!</h1>
     <div class="navbar default-navbar">
       <div class="nav-link"
             data-testid="settings-tab"

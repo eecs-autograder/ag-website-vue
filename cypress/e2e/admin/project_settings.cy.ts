@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 const username = Cypress.env('admin')
 const course_name = 'Nerdy Algos'
 const project_name = 'TSP'
@@ -97,7 +99,10 @@ describe('project settings page as admin', () => {
     cy.get_by_testid('soft-deadline-picker').should('be.visible').find('.available-day')
       .contains(new_date).should('be.visible').click();
 
-    cy.get_by_testid('period-input').should('be.visible').should('have.value', 'PM').click();
+    // FIXME?: It feels weird that the period automatically switches to AM when typing a new value
+    // even without clicking here the period would switch after typing the new hours below
+    cy.get_by_testid('period-input').should('be.visible').should('have.value', 'PM')
+      .click().should('have.value', 'AM');
 
     cy.get_by_testid('hour-input').should('be.visible').should('have.value', '12')
       .type(new_hours);
@@ -108,15 +113,72 @@ describe('project settings page as admin', () => {
     // TZ environment variable is set within the npm script
     cy.get_by_testid('timezone-select').should('have.value', 'America/Los_Angeles');
 
-    // FIXME?: It feels weird that the period automatically switches to AM when typing a new value
-    cy.get_by_testid('period-input').should('be.visible').should('have.value', 'AM').click();
+    cy.get_by_testid('period-input').should('be.visible').should('have.value', 'AM')
+      .click().should('have.value', 'PM');
 
     // check date has been updated on page
     cy.get_by_testid('soft-deadline-input').should('contain.text', new_datetime_str)
 
+    // save and check that new data is loaded on refresh
+    cy.get_by_testid('save-button').should('be.visible').click()
+      .reload().get_by_testid('soft-deadline-input').should('contain.text', new_datetime_str)
+
+    // check that soft deadline can be deleted
+    cy.get_by_testid('clear-soft-deadline').should('be.visible').click()
+    cy.get_by_testid('soft-deadline-input').should('not.contain.text', new_datetime_str)
+
+    cy.get_by_testid('save-button').should('be.visible').click()
+      .reload().get_by_testid('soft-deadline-input').should('not.contain.text', new_datetime_str)
+  })
+
+  it('allows user to set and delete hard deadline', function() {
+    // April 3, 2024 12:01 PM
+    const now = new Date(2024, 3, 14, 12, 1)
+    cy.clock(now)
+
+    const new_date = '15'
+    const new_hours = '2'
+    const new_minutes = '30'
+
+    // See FIXME below...
+    const new_datetime_str = 'April 15, 2024, 02:30 PM PDT'
+
+    cy.visit(this.page_uri)
+      .get_by_testid('hard-deadline-input').should('be.visible').click();
+
+    cy.get_by_testid('hard-deadline-picker').should('be.visible').find('.available-day')
+      .contains(new_date).should('be.visible').click();
+
+    // FIXME?: It feels weird that the period automatically switches to AM when typing a new value
+    // even without clicking here the period would switch after typing the new hours below
+    cy.get_by_testid('period-input').should('be.visible').should('have.value', 'PM')
+      .click().should('have.value', 'AM');
+
+    cy.get_by_testid('hour-input').should('be.visible').should('have.value', '12')
+      .type(new_hours);
+
+    cy.get_by_testid('minute-input').should('be.visible').should('have.value', '01')
+      .type(new_minutes);
+
+    // TZ environment variable is set within the npm script
+    cy.get_by_testid('timezone-select').should('have.value', 'America/Los_Angeles');
+
+    cy.get_by_testid('period-input').should('be.visible').should('have.value', 'AM')
+      .click().should('have.value', 'PM');
+
+    // check date has been updated on page
+    cy.get_by_testid('hard-deadline-input').should('contain.text', new_datetime_str)
+
     // save amd check that new data is loaded on refresh
     cy.get_by_testid('save-button').should('be.visible').click()
 
-    cy.reload().get_by_testid('soft-deadline-input').should('contain.text', new_datetime_str)
+    cy.reload().get_by_testid('hard-deadline-input').should('contain.text', new_datetime_str)
+
+    // check that hard deadline can be deleted
+    cy.get_by_testid('clear-hard-deadline').should('be.visible').click()
+    cy.get_by_testid('hard-deadline-input').should('not.contain.text', new_datetime_str)
+
+    cy.get_by_testid('save-button').should('be.visible').click()
+      .reload().get_by_testid('hard-deadline-input').should('not.contain.text', new_datetime_str)
   })
 })

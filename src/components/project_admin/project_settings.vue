@@ -30,7 +30,7 @@
             {{format_datetime(d_project.soft_closing_time)}}
             <i class="far fa-calendar-alt"></i>
           </div>
-          <button type="button" class="clear-button" data-testid="clear_soft_closing_time"
+          <button type="button" class="clear-button" data-testid="clear-soft-deadline"
                   @click.stop="d_project.soft_closing_time = null"
                   :disabled="d_project.soft_closing_time === null">
             <i class="fas fa-times"></i>
@@ -42,7 +42,8 @@
                            ref="soft_closing_time"></datetime-picker>
         </div>
 
-        <div class="clearable-datetime-picker hard-deadline">
+        <div class="clearable-datetime-picker hard-deadline"
+             data-testid="hard-deadline-picker">
           <div class="label">
             Hard Deadline
             <tooltip width="large" placement="top">
@@ -51,11 +52,12 @@
             </tooltip>
           </div>
           <div class="datetime-input"
-                @click="$refs.closing_time.toggle_visibility()">
+               data-testid="hard-deadline-input"
+               @click="$refs.closing_time.toggle_visibility()">
             {{format_datetime(d_project.closing_time)}}
             <i class="far fa-calendar-alt"></i>
           </div>
-          <button type="button" class="clear-button" data-testid="clear_closing_time"
+          <button type="button" class="clear-button" data-testid="clear-hard-deadline"
                   @click.stop="d_project.closing_time = null"
                   :disabled="d_project.closing_time === null">
             <i class="fas fa-times"></i>
