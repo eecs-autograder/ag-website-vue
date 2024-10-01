@@ -167,18 +167,90 @@ describe('project settings page as admin', () => {
       .click().should('have.value', 'PM');
 
     // check date has been updated on page
-    cy.get_by_testid('hard-deadline-input').should('contain.text', new_datetime_str)
+    cy.get_by_testid('hard-deadline-input').should('contain.text', new_datetime_str);
 
     // save amd check that new data is loaded on refresh
-    cy.get_by_testid('save-button').should('be.visible').click()
+    cy.get_by_testid('save-button').should('be.visible').click();
 
-    cy.reload().get_by_testid('hard-deadline-input').should('contain.text', new_datetime_str)
+    cy.reload().get_by_testid('hard-deadline-input').should('contain.text', new_datetime_str);
 
     // check that hard deadline can be deleted
     cy.get_by_testid('clear-hard-deadline').should('be.visible').click()
-    cy.get_by_testid('hard-deadline-input').should('not.contain.text', new_datetime_str)
+    cy.get_by_testid('hard-deadline-input').should('not.contain.text', new_datetime_str);
 
     cy.get_by_testid('save-button').should('be.visible').click()
-      .reload().get_by_testid('hard-deadline-input').should('not.contain.text', new_datetime_str)
+      .reload().get_by_testid('hard-deadline-input').should('not.contain.text', new_datetime_str);
+  })
+
+  it('allows user to update project access', function() {
+    enum CheckboxId {
+      visible_to_students = 'visible-to-students',
+      guests_can_submit = 'guests-can-submit',
+      disallow_student_submissions = 'disallow-student-submissions',
+      publish_final_grades = 'publish-final-grades'
+    }
+
+    const assert_checkbox_values = (...args: CheckboxId[]) => {
+      const all_boxes = [
+        CheckboxId.visible_to_students, CheckboxId.guests_can_submit,
+        CheckboxId.disallow_student_submissions, CheckboxId.publish_final_grades
+      ];
+      all_boxes.map(box_id => {
+        if (args.includes(box_id)) {
+          cy.get_by_testid(box_id).should('be.checked');
+        }
+        else {
+          cy.get_by_testid(box_id).should('not.be.checked');
+        }
+      });
+    }
+
+    cy.visit(this.page_uri);
+    assert_checkbox_values();
+
+    cy.get_by_testid(CheckboxId.visible_to_students).check();
+    assert_checkbox_values(CheckboxId.visible_to_students);
+    cy.get_by_testid('save-button').click().reload();
+    assert_checkbox_values(CheckboxId.visible_to_students);
+
+    cy.get_by_testid(CheckboxId.guests_can_submit).check()
+    assert_checkbox_values(CheckboxId.visible_to_students, CheckboxId.guests_can_submit);
+    cy.get_by_testid('save-button').click().reload();
+    assert_checkbox_values(CheckboxId.visible_to_students, CheckboxId.guests_can_submit);
+
+
+    cy.get_by_testid(CheckboxId.visible_to_students).uncheck();
+    assert_checkbox_values(CheckboxId.guests_can_submit);
+    cy.get_by_testid('save-button').click().reload();
+    assert_checkbox_values(CheckboxId.guests_can_submit);
+
+    cy.get_by_testid(CheckboxId.disallow_student_submissions).check()
+    assert_checkbox_values(CheckboxId.disallow_student_submissions, CheckboxId.guests_can_submit);
+    cy.get_by_testid('save-button').click().reload();
+    assert_checkbox_values(CheckboxId.disallow_student_submissions, CheckboxId.guests_can_submit);
+
+    cy.get_by_testid(CheckboxId.guests_can_submit).uncheck();
+    assert_checkbox_values(CheckboxId.disallow_student_submissions);
+    cy.get_by_testid('save-button').click().reload();
+    assert_checkbox_values(CheckboxId.disallow_student_submissions);
+
+    cy.get_by_testid(CheckboxId.publish_final_grades).check()
+    assert_checkbox_values(CheckboxId.disallow_student_submissions, CheckboxId.publish_final_grades);
+    cy.get_by_testid('save-button').click().reload();
+    assert_checkbox_values(CheckboxId.disallow_student_submissions, CheckboxId.publish_final_grades);
+
+    cy.get_by_testid(CheckboxId.disallow_student_submissions).uncheck();
+    assert_checkbox_values(CheckboxId.publish_final_grades);
+    cy.get_by_testid('save-button').click().reload();
+    assert_checkbox_values(CheckboxId.publish_final_grades);
+
+    cy.get_by_testid(CheckboxId.publish_final_grades).uncheck();
+    assert_checkbox_values();
+    cy.get_by_testid('save-button').click().reload();
+    assert_checkbox_values();
+  })
+
+  it('allows user to update grading policy', function() {
+
   })
 })

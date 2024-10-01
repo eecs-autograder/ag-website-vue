@@ -75,7 +75,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="visible_to_students"
+              <input data-testid="visible-to-students"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.visible_to_students"/>
@@ -85,7 +85,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="guests_can_submit"
+              <input data-testid="guests-can-submit"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.guests_can_submit"/>
@@ -99,7 +99,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="disallow_student_submissions"
+              <input data-testid="disallow-student-submissions"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.disallow_student_submissions"/>
@@ -113,7 +113,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="publish_final_grades"
+              <input data-testid="publish-final-grades"
                      type="checkbox"
                      class="checkbox"
                      :checked="!d_project.hide_ultimate_submission_fdbk"
