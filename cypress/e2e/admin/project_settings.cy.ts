@@ -179,6 +179,29 @@ describe('project settings page as admin', () => {
       .should('not.contain.text', new_datetime_str);
   })
 
+  it('shows deadline related API errors', function() {
+    const now = new Date(2024, 3, 14, 12, 1)
+    cy.clock(now)
+    const invalid_soft_deadline = '17';
+    const valid_soft_deadline = '15';
+    const hard_deadline = '16';
+
+    cy.visit(this.page_uri)
+      .get_by_testid('soft-deadline-input').should('be.visible').click()
+      .get_by_testid('soft-deadline-picker').should('be.visible').find('.available-day')
+      .contains(invalid_soft_deadline).should('be.visible').click()
+      .get_by_testid('hard-deadline-input').should('be.visible').click()
+      .get_by_testid('hard-deadline-picker').should('be.visible').find('.available-day')
+      .contains(hard_deadline).should('be.visible').click();
+
+    cy.save().get_api_errors().should('have.length', 1).first().should('contain.text', 'closing time');
+
+    // make sure error goes away after valid request
+    cy.get_by_testid('soft-deadline-picker').should('be.visible').find('.available-day')
+      .contains(valid_soft_deadline).should('be.visible').click()
+      .save_and_reload();
+  })
+
   it('allows user to update project access', function() {
     enum CheckboxId {
       visible_to_students = 'visible-to-students',
@@ -298,6 +321,14 @@ describe('project settings page as admin', () => {
     assert_correct_values(3, 9, false);
     cy.save_and_reload()
     assert_correct_values(3, 9, false);
+  })
+
+  it('shows group settings related API errors', function() {
+    cy.visit(this.page_uri).get_by_testid('min-group-size').type('{backspace}22')
+      .save().get_api_errors().should('have.length', 1).should('contain.text', 'group size');
+
+    // make sure error goes away after valid request
+    cy.get_by_testid('max-group-size').type('{backspace}33').save_and_reload();
   })
 
   it('does not allow the user to update group settings with invalid values', function() {

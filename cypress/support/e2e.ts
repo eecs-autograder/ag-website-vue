@@ -20,11 +20,41 @@ const { superuser, admin, staff, student } = Cypress.env()
 declare global {
   namespace Cypress {
     interface Chainable {
+      /**
+       * Create a course by making a POST to the API
+       * @param {string} course_name The name of the course to be made
+       */
       create_course(course_name: string): Chainable
+      /**
+       * Create a project by making a POST request to the API
+       * @param {number} course_pk The primary key of the course to make the project under
+       * @param {string} project_name The name of the project to be made
+       */
       create_project(course_pk: number, project_name: string): Chainable
+      /**
+       * Log a user in by setting the necessary session cookies.
+       * This command assumes the backend is running with "fake" auth
+       * @param {string} username the username of the user to be logged in
+       */
       fake_login(username: string): Chainable
+      /**
+       * Log the current user out by clearing session cookies.
+       */
       logout(): Chainable
+      /**
+       * Save the current page.
+       */
+      save(): Chainable
+      /**
+       * Save the current page and refresh. Fails if there are any API errors
+       * on the page (data-testid=api-error)
+       */
       save_and_reload(): Chainable
+
+      /**
+       * Get an array of API errors that are rendered on the page (data-testid=api-error).
+       */
+      get_api_errors(): Chainable
     }
   }
 }
@@ -33,9 +63,16 @@ beforeEach(() => {
   cy.task('setup_db');
 })
 
-Cypress.Commands.add('save_and_reload', () => {
+Cypress.Commands.add('get_api_errors', () => {
+  cy.get_by_testid('api-error')
+})
+
+Cypress.Commands.add('save', () => {
   cy.get_by_testid('save-button').click()
-    .get_by_testid('api-error').should('have.length', 0).reload();
+})
+
+Cypress.Commands.add('save_and_reload', () => {
+  cy.save().get_api_errors().should('have.length', 0).reload();
 })
 
 Cypress.Commands.add('fake_login', username => {
