@@ -319,7 +319,7 @@ describe('ProjectSettings tests', () => {
 
     test('allow_submissions_past_limit checkbox disabled when submission_limit_per_day is null',
          async () => {
-        let allow_past_limit_checkbox = wrapper.find('[data-testid=allow_submissions_past_limit]');
+        let allow_past_limit_checkbox = wrapper.find('[data-testid=allow-submissions-past-limit]');
         expect(wrapper.vm.d_project?.submission_limit_per_day).toBeNull();
         expect(allow_past_limit_checkbox.element).toBeDisabled();
 
@@ -396,7 +396,7 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_project.max_group_size = 2;
         await wrapper.vm.$nextTick();
 
-        let checkbox = wrapper.find('[data-testid=groups_combine_daily_submissions]');
+        let checkbox = wrapper.find('[data-testid=groups-combine-daily-submissions]');
         expect(checkbox.element).not.toBeDisabled();
 
         await checkbox.setChecked(true);
@@ -422,12 +422,12 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_project.max_group_size = 1;
         await wrapper.vm.$nextTick();
 
-        let checkbox = wrapper.find('[data-testid=groups_combine_daily_submissions]');
+        let checkbox = wrapper.find('[data-testid=groups-combine-daily-submissions]');
         expect(checkbox.element).toBeDisabled();
     });
 
     test('Allow late days binding', async () => {
-        let checkbox = wrapper.find('[data-testid=allow_late_days]');
+        let checkbox = wrapper.find('[data-testid=allow-late-days]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project?.allow_late_days).toEqual(true);
@@ -510,7 +510,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('use_honor_pledge binding', async () => {
-        let checkbox = wrapper.find('[data-testid=use_honor_pledge]');
+        let checkbox = wrapper.find('[data-testid=use-honor-pledge]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project?.use_honor_pledge).toEqual(true);
@@ -532,11 +532,11 @@ describe('ProjectSettings tests', () => {
     });
 
     test('honor_pledge_text binding', async () => {
-        expect(wrapper.find('[data-testid=honor_pledge_text]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid=honor-pledge-text]').exists()).toBe(false);
 
-        let checkbox = wrapper.find('[data-testid=use_honor_pledge]');
+        let checkbox = wrapper.find('[data-testid=use-honor-pledge]');
         await checkbox.setChecked(true);
-        let pledge_text = wrapper.find('[data-testid=honor_pledge_text]');
+        let pledge_text = wrapper.find('[data-testid=honor-pledge-text]');
         expect(pledge_text.exists()).toBe(true);
 
         let text = 'noerastoineratonieratsienrastoinearsoitrs';
@@ -549,7 +549,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('send_email_on_submission_received binding', async () => {
-        let checkbox = wrapper.find('[data-testid=send_email_on_submission_received]');
+        let checkbox = wrapper.find('[data-testid=send-email-on-submission-received]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project?.send_email_on_submission_received).toEqual(true);
@@ -571,7 +571,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('send_email_on_non_deferred_tests_finished binding', async () => {
-        let checkbox = wrapper.find('[data-testid=send_email_on_non_deferred_tests_finished]');
+        let checkbox = wrapper.find('[data-testid=send-email-on-non-deferred-tests-finished]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project?.send_email_on_non_deferred_tests_finished).toEqual(true);
@@ -596,8 +596,8 @@ describe('ProjectSettings tests', () => {
 describe('Delete project tests', () => {
     test('Delete project', async () => {
         let delete_stub = sinon.stub(project, 'delete');
-        await wrapper.find('[data-testid=show_delete_project_modal_button]').trigger('click');
-        await wrapper.find('[data-testid=delete_project_button]').trigger('click');
+        await wrapper.find('[data-testid=show-delete-project-modal-button]').trigger('click');
+        await wrapper.find('[data-testid=delete-project-button]').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
 
         expect(delete_stub.calledOnce).toBe(true);
@@ -609,8 +609,8 @@ describe('Delete project tests', () => {
 
     test('Delete project API errors handled', async () => {
         sinon.stub(project, 'delete').rejects(new HttpError(400, 'Noope'));
-        await wrapper.find('[data-testid=show_delete_project_modal_button]').trigger('click');
-        await wrapper.find('[data-testid=delete_project_button]').trigger('click');
+        await wrapper.find('[data-testid=show-delete-project-modal-button]').trigger('click');
+        await wrapper.find('[data-testid=delete-project-button]').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
 
         expect(router_push_stub.callCount).toEqual(0);

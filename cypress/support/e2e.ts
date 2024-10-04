@@ -21,30 +21,37 @@ declare global {
   namespace Cypress {
     interface Chainable {
       /**
-       * Create a course by making a POST to the API
+       * Create a course by making a POST request to the API. Yields the primary
+       * key of the new course.
        * @param {string} course_name The name of the course to be made
        */
       create_course(course_name: string): Chainable
+
       /**
-       * Create a project by making a POST request to the API
+       * Create a project by making a POST request to the API. Yields the primary
+       * key of the new project.
        * @param {number} course_pk The primary key of the course to make the project under
        * @param {string} project_name The name of the project to be made
        */
       create_project(course_pk: number, project_name: string): Chainable
+
       /**
        * Log a user in by setting the necessary session cookies.
        * This command assumes the backend is running with "fake" auth
        * @param {string} username the username of the user to be logged in
        */
       fake_login(username: string): Chainable
+
       /**
        * Log the current user out by clearing session cookies.
        */
       logout(): Chainable
+
       /**
        * Save the current page.
        */
       save(): Chainable
+
       /**
        * Save the current page and refresh. Fails if there are any API errors
        * on the page (data-testid=api-error)
@@ -52,7 +59,7 @@ declare global {
       save_and_reload(): Chainable
 
       /**
-       * Get an array of API errors that are rendered on the page (data-testid=api-error).
+       * Yield all API errors that are rendered on the page (data-testid=api-error).
        */
       get_api_errors(): Chainable
     }
@@ -83,9 +90,6 @@ Cypress.Commands.add('logout', () => {
   cy.clearAllCookies()
 })
 
-/*
-  * Create a course by making a POST request to the API and yield the pk
-  */
 Cypress.Commands.add('create_course', course_name => {
   cy.fake_login(superuser)
 
@@ -119,9 +123,6 @@ Cypress.Commands.add('create_course', course_name => {
   })
 })
 
-/*
-  * Create a project by making a POST request to the API and yield the pk
-  */
 Cypress.Commands.add('create_project', (course_pk, project_name) => {
   cy.request('POST', `/api/courses/${course_pk}/projects/`, {
     'name': project_name

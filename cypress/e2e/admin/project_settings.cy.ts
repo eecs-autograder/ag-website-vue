@@ -22,6 +22,34 @@ describe('project settings page as admin', () => {
     });
   })
 
+  it('allows user to navigate to navigate to project submission page', function() {
+    const submission_uri = `/web/project/${this.project_pk}`
+    cy.visit(this.page_uri).get(`a[href="${submission_uri}"]`)
+      .should('be.visible').click()
+      .url().should('eq', build_full_url(submission_uri));
+  })
+
+  it('allows user to navigate to course page', function() {
+    const course_uri = `/web/course/${this.course_pk}`
+    cy.visit(this.page_uri).get(`a[href="${course_uri}"]`)
+      .should('be.visible').click()
+      .url().should('eq', build_full_url(course_uri));
+  })
+
+  it('allows user to navigate to course admin page', function() {
+    const course_admin_uri = `/web/course_admin/${this.course_pk}`
+    cy.visit(this.page_uri).get(`a[href="${course_admin_uri}"]`)
+      .should('be.visible').click()
+      .url().should('eq', build_full_url(course_admin_uri));
+  })
+
+  it ('allows user to navigate to home page', function() {
+    const home_page_uri = '/'
+    cy.visit(this.page_uri).get(`a[href="${home_page_uri}"]`)
+      .should('be.visible').click()
+      .url().should('eq', build_full_url(home_page_uri));
+  })
+
   it('has functioning navbar tabs', function() {
     cy.visit(this.page_uri)
       .get_by_testid('settings-tab')
@@ -79,14 +107,22 @@ describe('project settings page as admin', () => {
       .url().should('eq', build_full_url(`${this.page_uri}?current_tab=stats`))
   });
 
+  it('does not show elements that should be hidden on first load', function() {
+    cy.visit(this.page_uri).get_by_testid('hour-input').should('not.exist')
+      .get_by_testid('minute-input').should('not.exist')
+      .get('.calendar').should('not.exist');
+  })
+
   it('allows user to set and delete soft deadline', function() {
     // April 3, 2024 12:01 PM
     const now = new Date(2024, 3, 14, 12, 1)
     cy.clock(now)
 
     const new_date = '15'
-    const new_hours = '2'
-    const new_minutes = '30'
+
+    // input should ignore non-numeric characters
+    const new_hours = '2abc'
+    const new_minutes = '30abc'
 
     // See FIXME below...
     const new_datetime_str = 'April 15, 2024, 02:30 PM PDT'
@@ -135,8 +171,10 @@ describe('project settings page as admin', () => {
     cy.clock(now)
 
     const new_date = '15'
-    const new_hours = '2'
-    const new_minutes = '30'
+
+    // input should ignore non-numeric characters
+    const new_hours = '2abc'
+    const new_minutes = '30abc'
 
     // See FIXME below...
     const new_datetime_str = 'April 15, 2024, 02:30 PM PDT'
@@ -373,7 +411,7 @@ describe('project settings page as admin', () => {
       .get_by_testid(ElementId.max).should('have.value', 1);
   })
 
-  it('allows the user to update the grading policy', function() {
+  it('allows user to update the grading policy', function() {
     cy.visit(this.page_uri).get_by_testid('ultimate-submission-policy')
       .should('be.visible').select('best').save_and_reload()
       .get_by_testid('ultimate-submission-policy').should('have.value', 'best');
@@ -383,7 +421,102 @@ describe('project settings page as admin', () => {
       .get_by_testid('ultimate-submission-policy').should('have.value', 'most_recent');
   })
 
-  it('allows the user to update submission limits', function() {
-    cy.visit(this.page_uri)
+  it('allows user to update submission limits', function() {
+    cy.visit(this.page_uri).get_by_testid('submission-limit-per-day')
+      .should('be.visible').type('3').should('have.value', '3')
+      .save_and_reload()
+      .get_by_testid('submission-limit-per-day').should('have.value', '3')
+
+    cy.get_by_testid('allow-submissions-past-limit').should('be.visible')
+      .should('be.checked').uncheck().should('not.be.checked')
+      .get_by_testid('submission-limit-per-day').type('{backspace}1')
+      .save_and_reload()
+      .get_by_testid('allow-submissions-past-limit').should('not.be.checked')
+      .get_by_testid('submission-limit-per-day').should('have.value', '1')
+
+    cy.get_by_testid('reset-time-input').should('contain.text', '12:00 AM').click()
+      .get_by_testid('hour-input').should('have.value', '12')
+      .type('11').should('have.value', '11')
+      .get_by_testid('minute-input').should('have.value', '00')
+      .type('11').should('have.value', '11')
+      .get_by_testid('period-input').should('have.value', 'AM')
+      .click().should('have.value', 'PM')
+      .get_by_testid('reset-time-input').should('contain.text', '11:11 PM')
+      .get_by_testid('allow-submissions-past-limit').should('not.be.checked')
+      .check().should('be.checked')
+      .save_and_reload()
+      .get_by_testid('reset-time-input').should('contain.text', '11:11 PM')
+
+    cy.get_by_testid('groups-combine-daily-submissions')
+      .should('be.disabled').should('not.be.checked')
+      .get_by_testid('max-group-size').type('{backspace}2') // needed to enable the checkbox
+      .get_by_testid('groups-combine-daily-submissions').check().should('be.checked')
+      .get_by_testid('submission-limit-reset-timezone')
+      .select('America/Chicago').should('have.value', 'America/Chicago')
+      .save_and_reload()
+      .get_by_testid('groups-combine-daily-submissions').check().should('be.checked')
+      .get_by_testid('submission-limit-reset-timezone').should('have.value', 'America/Chicago')
+
+    cy.get_by_testid('bonus-submissions-input').should('have.value', 0)
+      .type('{backspace}2').should('have.value', 2)
+      .get_by_testid('groups-combine-daily-submissions').uncheck().should('not.be.checked')
+      .save_and_reload()
+      .get_by_testid('bonus-submissions-input').should('have.value', 2)
+      .get_by_testid('groups-combine-daily-submissions').should('not.be.checked')
+
+    cy.get_by_testid('allow-late-days').should('not.be.checked').check().should('be.checked')
+      .get_by_testid('bonus-submissions-input').type('{backspace}12').should('have.value', 12)
+      .save_and_reload()
+      .get_by_testid('allow-late-days').should('be.checked')
+      .get_by_testid('bonus-submissions-input').should('have.value', 12)
+
+    cy.get_by_testid('total-submission-limit').should('have.value', '')
+      .type('20').should('have.value', 20)
+      .get_by_testid('bonus-submissions-input').type('{backspace}{backspace}21')
+      .should('have.value', 21)
+      .save_and_reload()
+      .get_by_testid('total-submission-limit').should('have.value', 20)
+      .get_by_testid('bonus-submissions-input').should('have.value', 21)
+
+    cy.get_by_testid('max-group-size').type('{backspace}1') // should disable the checkbox
+      .get_by_testid('groups-combine-daily-submissions')
+      .should('not.be.checked').should('be.disabled')
+      .save_and_reload()
+      .get_by_testid('groups-combine-daily-submissions')
+      .should('not.be.checked').should('be.disabled')
+  })
+
+  it('allows user to update email settings', function() {
+    cy.visit(this.page_uri).get_by_testid('send-email-on-submission-received')
+      .should('not.be.checked').check().should('be.checked')
+      .get_by_testid('send-email-on-non-deferred-tests-finished')
+      .should('not.be.checked').check().should('be.checked')
+      .save_and_reload()
+      .get_by_testid('send-email-on-submission-received').should('be.checked')
+      .get_by_testid('send-email-on-non-deferred-tests-finished').should('be.checked');
+  })
+
+  it('allows user to update honor pedge settings', function() {
+    cy.visit(this.page_uri).get_by_testid('use-honor-pledge')
+      .should('not.be.checked').check().should('be.checked')
+      .save_and_reload()
+      .get_by_testid('use-honor-pledge').should('be.checked');
+  })
+
+  it('allows user to delete the project', function() {
+    const projects_tab_url = build_full_url(
+      `/web/course_admin/${this.course_pk}?current_tab=projects`
+    );
+    cy.visit(this.page_uri).get_by_testid('show-delete-project-modal-button').click()
+      .get_by_testid('delete-project-button').click()
+      .url().should('eq', projects_tab_url)
+  })
+
+  it.skip('shows project deletion related API errors', function() {
+    // TODO: create test suite
+    // TODO: create test case
+    cy.visit(this.page_uri).get_by_testid('show-delete-project-modal-button').click()
+      .get_by_testid('delete-project-button').click()
+      .get_api_errors().first().should('contain.text', 'test case')
   })
 })
