@@ -14,7 +14,11 @@
 // ***********************************************************
 
 import {
+  AGTestCase,
+  AGTestSuite,
   Course,
+  NewAGTestCaseData,
+  NewAGTestSuiteData,
   NewCourseData,
   NewProjectData,
   Semester,
@@ -44,6 +48,22 @@ declare global {
       create_project(course_pk: number, project_name: string): Chainable
 
       /**
+       * Create a test suite by making a POST request to the API. Yields the primary
+       * key of the new test suite.
+       * @param {number} course_pk The primary key of the course to make the project under
+       * @param {string} test_suite_name The name of the project to be made
+       */
+      create_test_suite(course_pk: number, test_suite_name: string): Chainable
+
+      /**
+       * Create a test case by making a POST request to the API. Yields the primary
+       * key of the new test suite.
+       * @param {number} test_suite_pk The primary key of the course to make the project under
+       * @param {string} test_case_name The name of the project to be made
+       */
+      create_test_case(test_suite_pk: number, test_case_name: string): Chainable
+
+      /**
        * Log a user in by setting the necessary session cookies.
        * This command assumes the backend is running with "fake" auth
        * @param {string} username the username of the user to be logged in
@@ -62,7 +82,7 @@ declare global {
 
       /**
        * Save the current page and refresh. Fails if there are any API errors
-       * on the page (data-testid=api-error)
+       * on the page (data-testid=api-error) after saving or after reloading.
        */
       save_and_reload(): Chainable
 
@@ -87,7 +107,8 @@ Cypress.Commands.add('save', () => {
 })
 
 Cypress.Commands.add('save_and_reload', () => {
-  cy.save().get_api_errors().should('have.length', 0).reload();
+  cy.save().get_api_errors().should('have.length', 0)
+    .reload().get_api_errors().should('have.length', 0);
 })
 
 Cypress.Commands.add('fake_login', username => {
@@ -145,11 +166,41 @@ Cypress.Commands.add('create_project', (course_pk, project_name) => {
       return new Cypress.Promise<Project>(async (resolve, _) => {
         const project = await Project.create(course_pk, new NewProjectData({
             name: project_name
-        }))
+        }));
         resolve(project);
       })
     })
     .then(project => {
       return cy.wrap(project.pk);
+    })
+})
+
+Cypress.Commands.add('create_test_suite', (project_pk, test_suite_name) => {
+  cy.fake_login(admin)
+    .then(() => {
+      return new Cypress.Promise<AGTestSuite>(async (resolve, _) => {
+        const suite = await AGTestSuite.create(project_pk, new NewAGTestSuiteData({
+          name: test_suite_name
+        }));
+        resolve(suite);
+      })
+    })
+    .then(suite => {
+      return cy.wrap(suite.pk);
+    })
+})
+
+Cypress.Commands.add('create_test_case', (test_suite_pk, test_case_name) => {
+  cy.fake_login(admin)
+    .then(() => {
+      return new Cypress.Promise<AGTestCase>(async (resolve, _) => {
+        const test_case = await AGTestCase.create(test_suite_pk, new NewAGTestCaseData({
+          name: test_case_name
+        }));
+        resolve(test_case);
+      })
+    })
+    .then(test_case => {
+      return cy.wrap(test_case.pk);
     })
 })

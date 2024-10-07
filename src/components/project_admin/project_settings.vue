@@ -444,6 +444,7 @@
                     @click="delete_project"> Delete </button>
 
             <button class="modal-cancel-button white-button"
+                    data-testid="cancel-delete-project-button"
                     @click="d_show_delete_project_modal = false">
               Cancel
             </button>

@@ -512,11 +512,12 @@ describe('project settings page as admin', () => {
       .url().should('eq', projects_tab_url)
   })
 
-  it.skip('shows project deletion related API errors', function() {
-    // TODO: create test suite
-    // TODO: create test case
-    cy.visit(this.page_uri).get_by_testid('show-delete-project-modal-button').click()
+  it('shows project deletion related API errors', function() {
+    cy.create_test_suite(this.project_pk, "Sweet suite")
+      .visit(this.page_uri).get_by_testid('show-delete-project-modal-button').click()
       .get_by_testid('delete-project-button').click()
       .get_api_errors().first().should('contain.text', 'test case')
+      .get_by_testid('cancel-delete-project-button').click()
+      .save_and_reload()
   })
 })
