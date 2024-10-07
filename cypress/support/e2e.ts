@@ -13,9 +13,17 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-import './commands'
+import {
+  Course,
+  NewCourseData,
+  NewProjectData,
+  Semester,
+  Project,
+} from 'ag-client-typescript';
 
-const { superuser, admin, staff, student } = Cypress.env()
+import './commands';
+
+const { superuser, admin, staff, student } = Cypress.env();
 
 declare global {
   namespace Cypress {
@@ -71,11 +79,11 @@ beforeEach(() => {
 })
 
 Cypress.Commands.add('get_api_errors', () => {
-  cy.get_by_testid('api-error')
+  cy.get_by_testid('api-error');
 })
 
 Cypress.Commands.add('save', () => {
-  cy.get_by_testid('save-button').click()
+  cy.get_by_testid('save-button').click();
 })
 
 Cypress.Commands.add('save_and_reload', () => {
@@ -83,48 +91,65 @@ Cypress.Commands.add('save_and_reload', () => {
 })
 
 Cypress.Commands.add('fake_login', username => {
-  cy.setCookie('token', 'foo').setCookie('username', username)
+  cy.setCookie('token', 'foo').setCookie('username', username);
 })
 
 Cypress.Commands.add('logout', () => {
-  cy.clearAllCookies()
+  cy.clearAllCookies();
 })
 
 Cypress.Commands.add('create_course', course_name => {
+  // We need to use Cypress promises to be sure this works with the command queue.
+  // See https://docs.cypress.io/api/utilities/promise#Waiting-for-Promises
   cy.fake_login(superuser)
-
-  cy.request('POST', '/api/courses/', {
-    'name': course_name,
-    'semester': 'Fall',
-    'year': 2024,
-    'subtitle': 'This is a subtitle',
-    'num_late_days': 0,
-    'allowed_guest_domain': 'autograder.io'
-  })
-  .then((res) => cy.wrap(res.body.pk))
-  .then((pk) => {
-    cy.request('POST', `/api/courses/${pk}/admins/`, {
-      'new_admins': [ admin ]
-    });
-    return cy.wrap(pk);
-  })
-  .then((pk) => {
-    cy.request('POST', `/api/courses/${pk}/staff/`, {
-      'new_staff': [ staff ]
-    });
-    return cy.wrap(pk);
-  })
-  .then((pk) => {
-    cy.request('POST', `/api/courses/${pk}/students/`, {
-      'new_students': [ student ]
-    });
-    cy.logout();
-    return cy.wrap(pk);
-  })
+    .then(() => {
+      return new Cypress.Promise<Course>(async (resolve, _) => {
+        const course = Course.create(new NewCourseData({
+          name: course_name,
+          semester: Semester.winter,
+          year: 2024,
+          subtitle: 'This is a course',
+          num_late_days: 1,
+        }));
+        resolve(course);
+      })
+    })
+    .then(course => {
+      return new Cypress.Promise<Course>(async (resolve, _) => {
+        await course.add_admins([admin]);
+        resolve(course);
+      })
+    })
+    .then(course => {
+      return new Cypress.Promise<Course>(async (resolve, _) => {
+        await course.add_staff([staff]);
+        resolve(course);
+      })
+    })
+    .then(course => {
+      return new Cypress.Promise<Course>(async (resolve, _) => {
+        await course.add_students([student]);
+        resolve(course);
+      })
+    })
+    .then(course => {
+      return cy.wrap(course.pk);
+    })
 })
 
 Cypress.Commands.add('create_project', (course_pk, project_name) => {
-  cy.request('POST', `/api/courses/${course_pk}/projects/`, {
-    'name': project_name
-  }).then((res) => cy.wrap(res.body.pk))
+  // We need to use Cypress promises to be sure this works with the command queue.
+  // See https://docs.cypress.io/api/utilities/promise#Waiting-for-Promises
+  cy.fake_login(admin)
+    .then(() => {
+      return new Cypress.Promise<Project>(async (resolve, _) => {
+        const project = await Project.create(course_pk, new NewProjectData({
+            name: project_name
+        }))
+        resolve(project);
+      })
+    })
+    .then(project => {
+      return cy.wrap(project.pk);
+    })
 })
