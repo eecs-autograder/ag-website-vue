@@ -11,9 +11,12 @@ RUN tar -xf node-v16.9.1-linux-x64.tar.gz -C /usr/local --strip-components=1 --n
 
 COPY package.json .
 COPY package-lock.json .
+RUN npm ci
+
 COPY .browserslistrc .
 COPY .postcssrc.js .
 COPY vue.config.js .
-COPY tsconfig.json .
-
-RUN npm ci
+COPY tsconfig* .
+COPY env.d.ts .
+COPY vite.config.ts .
+COPY index.html .

@@ -1,52 +1,64 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "downlevelIteration": true,
-        "module": "esnext",
-        "strict": true,
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitReturns": true,
-        "importHelpers": true,
-        "moduleResolution": "node",
-        "experimentalDecorators": true,
-        "esModuleInterop": true,
-        "sourceMap": true,
-        "baseUrl": ".",
-        "types": [
-            "node",
-            "jest"
-        ],
-        "typeRoots": [
-            "./types",
-            "node_modules/@types"
-        ],
-        "paths": {
-            "@/*": [
-                "src/*"
-            ],
-            "@/tests/*": [
-                "tests/*"
-            ],
-            "highlight.js": [
-                "src/redefined_types/highlightjs.d.ts"
-            ]
-        },
-        "lib": [
-            "es2017",
-            "dom",
-            "dom.iterable",
-            "scripthost"
-        ]
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.config.json"
     },
-    "include": [
-        "./types/**/*.ts",
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "src/**/*.vue",
-        "tests/**/*.ts",
-        "tests/**/*.tsx"
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.cypress-ct.json"
+    }
+  ],
+  "target": "es6",
+  "compilerOptions": {
+    "downlevelIteration": true,
+    "module": "esnext",
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "types": [
+      "node",
+      "jest"
     ],
-    "exclude": [
-        "node_modules"
+    "typeRoots": [
+      "./types",
+      "node_modules/@types"
+    ],
+    "paths": {
+      "@/*": [
+          "src/*"
+      ],
+      "@/tests/*": [
+          "tests/*"
+      ],
+      "highlight.js": [
+          "src/redefined_types/highlightjs.d.ts"
+      ]
+    },
+    "lib": [
+      "es2017",
+      "dom",
+      "dom.iterable",
+      "scripthost"
     ]
+  },
+  "include": [
+    "./types/**/*.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

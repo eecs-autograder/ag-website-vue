@@ -12,7 +12,6 @@ let project: ag_cli.Project;
 
 let get_staff_stub: sinon.SinonStub;
 let get_admins_stub: sinon.SinonStub;
-let get_admins_stub: sinon.SinonStub;
 let num_queued_submissions_stub: sinon.SinonStub;
 
 beforeEach(() => {

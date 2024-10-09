@@ -9,7 +9,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import * as FileSaver from 'file-saver';
+import FileSaver from 'file-saver';
 
 import { SYSADMIN_CONTACT } from '@/constants';
 import { get_cookie } from '@/cookie';
