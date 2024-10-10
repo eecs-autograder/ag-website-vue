@@ -26,7 +26,7 @@ import { mount } from 'cypress/vue2'
 // Alternatively, can be defined in cypress/support/component.d.ts
 // with a <reference path="./component" /> at the top of your spec.
 declare global {
-  namespace Cypress {
+  namespace Cypress { //eslint-disable-line @typescript-eslint/no-namespace
     interface Chainable {
       mount: typeof mount
     }
