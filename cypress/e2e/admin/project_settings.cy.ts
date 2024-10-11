@@ -10,9 +10,7 @@ const build_full_url = (uri: string): string => {
 
 describe('project settings page as admin', () => {
   beforeEach(() => {
-    cy.task('setup_db')
-      .create_course(course_name)
-      .as('course_pk', { type: 'static' });
+    cy.create_course(course_name).as('course_pk', { type: 'static' });
 
     cy.fake_login(username)
       .get('@course_pk').then((course_pk) => {
@@ -120,15 +118,15 @@ describe('project settings page as admin', () => {
     cy.get_by_testid('soft-deadline-input').should('contain.text', new_datetime_str)
 
     // save and check that new data is loaded on refresh
-    cy.get_by_testid('save-button').should('be.visible').click()
-      .reload().get_by_testid('soft-deadline-input').should('contain.text', new_datetime_str)
+    cy.save_and_reload().get_by_testid('soft-deadline-input')
+      .should('contain.text', new_datetime_str)
 
     // check that soft deadline can be deleted
     cy.get_by_testid('clear-soft-deadline').should('be.visible').click()
     cy.get_by_testid('soft-deadline-input').should('not.contain.text', new_datetime_str)
 
-    cy.get_by_testid('save-button').should('be.visible').click()
-      .reload().get_by_testid('soft-deadline-input').should('not.contain.text', new_datetime_str)
+    cy.save_and_reload().get_by_testid('soft-deadline-input')
+      .should('not.contain.text', new_datetime_str)
   })
 
   it('allows user to set and delete hard deadline', function() {
@@ -170,16 +168,15 @@ describe('project settings page as admin', () => {
     cy.get_by_testid('hard-deadline-input').should('contain.text', new_datetime_str);
 
     // save amd check that new data is loaded on refresh
-    cy.get_by_testid('save-button').should('be.visible').click();
-
-    cy.reload().get_by_testid('hard-deadline-input').should('contain.text', new_datetime_str);
+    cy.save_and_reload().get_by_testid('hard-deadline-input')
+      .should('contain.text', new_datetime_str);
 
     // check that hard deadline can be deleted
     cy.get_by_testid('clear-hard-deadline').should('be.visible').click()
     cy.get_by_testid('hard-deadline-input').should('not.contain.text', new_datetime_str);
 
-    cy.get_by_testid('save-button').should('be.visible').click()
-      .reload().get_by_testid('hard-deadline-input').should('not.contain.text', new_datetime_str);
+    cy.save_and_reload().get_by_testid('hard-deadline-input')
+      .should('not.contain.text', new_datetime_str);
   })
 
   it('allows user to update project access', function() {
@@ -210,43 +207,43 @@ describe('project settings page as admin', () => {
 
     cy.get_by_testid(CheckboxId.visible_to_students).check();
     assert_checkbox_values(CheckboxId.visible_to_students);
-    cy.get_by_testid('save-button').click().reload();
+    cy.save_and_reload();
     assert_checkbox_values(CheckboxId.visible_to_students);
 
     cy.get_by_testid(CheckboxId.guests_can_submit).check()
     assert_checkbox_values(CheckboxId.visible_to_students, CheckboxId.guests_can_submit);
-    cy.get_by_testid('save-button').click().reload();
+    cy.save_and_reload();
     assert_checkbox_values(CheckboxId.visible_to_students, CheckboxId.guests_can_submit);
 
 
     cy.get_by_testid(CheckboxId.visible_to_students).uncheck();
     assert_checkbox_values(CheckboxId.guests_can_submit);
-    cy.get_by_testid('save-button').click().reload();
+    cy.save_and_reload();
     assert_checkbox_values(CheckboxId.guests_can_submit);
 
     cy.get_by_testid(CheckboxId.disallow_student_submissions).check()
     assert_checkbox_values(CheckboxId.disallow_student_submissions, CheckboxId.guests_can_submit);
-    cy.get_by_testid('save-button').click().reload();
+    cy.save_and_reload();
     assert_checkbox_values(CheckboxId.disallow_student_submissions, CheckboxId.guests_can_submit);
 
     cy.get_by_testid(CheckboxId.guests_can_submit).uncheck();
     assert_checkbox_values(CheckboxId.disallow_student_submissions);
-    cy.get_by_testid('save-button').click().reload();
+    cy.save_and_reload();
     assert_checkbox_values(CheckboxId.disallow_student_submissions);
 
     cy.get_by_testid(CheckboxId.publish_final_grades).check()
     assert_checkbox_values(CheckboxId.disallow_student_submissions, CheckboxId.publish_final_grades);
-    cy.get_by_testid('save-button').click().reload();
+    cy.save_and_reload();
     assert_checkbox_values(CheckboxId.disallow_student_submissions, CheckboxId.publish_final_grades);
 
     cy.get_by_testid(CheckboxId.disallow_student_submissions).uncheck();
     assert_checkbox_values(CheckboxId.publish_final_grades);
-    cy.get_by_testid('save-button').click().reload();
+    cy.save_and_reload();
     assert_checkbox_values(CheckboxId.publish_final_grades);
 
     cy.get_by_testid(CheckboxId.publish_final_grades).uncheck();
     assert_checkbox_values();
-    cy.get_by_testid('save-button').click().reload();
+    cy.save_and_reload();
     assert_checkbox_values();
   })
 
@@ -274,32 +271,88 @@ describe('project settings page as admin', () => {
 
     cy.get_by_testid(ElementId.max).should('be.visible').type('{moveToEnd}{backspace}12');
     assert_correct_values(1, 12, false);
-    cy.get_by_testid('save-button').click().reload()
+    cy.save_and_reload()
     assert_correct_values(1, 12, false);
 
     cy.get_by_testid(ElementId.min).should('be.visible').type('{moveToEnd}{backspace}2');
     assert_correct_values(2, 12, false);
-    cy.get_by_testid('save-button').click().reload()
+    cy.save_and_reload()
     assert_correct_values(2, 12, false);
 
     cy.get_by_testid(ElementId.disallow).should('be.visible').check();
     assert_correct_values(2, 12, true);
-    cy.get_by_testid('save-button').click().reload()
+    cy.save_and_reload()
     assert_correct_values(2, 12, true);
 
     cy.get_by_testid(ElementId.max).should('be.visible').type('{moveToEnd}{backspace}{backspace}9');
     assert_correct_values(2, 9, true);
-    cy.get_by_testid('save-button').click().reload()
+    cy.save_and_reload()
     assert_correct_values(2, 9, true);
 
     cy.get_by_testid(ElementId.min).should('be.visible').type('{moveToEnd}{backspace}3');
     assert_correct_values(3, 9, true);
-    cy.get_by_testid('save-button').click().reload()
+    cy.save_and_reload()
     assert_correct_values(3, 9, true);
 
     cy.get_by_testid(ElementId.disallow).should('be.visible').uncheck();
     assert_correct_values(3, 9, false);
-    cy.get_by_testid('save-button').click().reload()
+    cy.save_and_reload()
     assert_correct_values(3, 9, false);
+  })
+
+  it('does not allow the user to update group settings with invalid values', function() {
+    enum ElementId {
+      min = 'min-group-size',
+      min_err = 'min-group-size-error',
+      max = 'max-group-size',
+      max_err = 'max-group-size-error',
+      disallow = 'disallow-group-registration',
+      save = 'save-button'
+    }
+    cy.visit(this.page_uri);
+
+    cy.get_by_testid(ElementId.min).should('be.visible').type('10a')
+      .get_by_testid(ElementId.min_err).should('contain.text', 'integer')
+      .get_by_testid(ElementId.save).should('be.disabled').click({force: true})
+      .get_by_testid(ElementId.max).should('be.visible').type('b0')
+      .get_by_testid(ElementId.max_err).should('contain.text', 'integer')
+      .get_by_testid(ElementId.save).should('be.disabled').click({force: true})
+      .reload()
+      .get_by_testid(ElementId.min).should('have.value', 1)
+      .get_by_testid(ElementId.max).should('have.value', 1);
+
+    cy.get_by_testid(ElementId.min).should('be.visible').type('.1')
+      .get_by_testid(ElementId.min_err).should('contain.text', 'integer')
+      .get_by_testid(ElementId.save).should('be.disabled').click({force: true})
+      .get_by_testid(ElementId.max).should('be.visible').type('.2')
+      .get_by_testid(ElementId.max_err).should('contain.text', 'integer')
+      .get_by_testid(ElementId.save).should('be.disabled').click({force: true})
+      .reload()
+      .get_by_testid(ElementId.min).should('have.value', 1)
+      .get_by_testid(ElementId.max).should('have.value', 1);
+
+    cy.get_by_testid(ElementId.min).should('be.visible').type('{backspace}-1')
+      .get_by_testid(ElementId.min_err).should('contain.text', '>= 1')
+      .get_by_testid(ElementId.save).should('be.disabled').click({force: true})
+      .get_by_testid(ElementId.max).should('be.visible').type('{backspace}0')
+      .get_by_testid(ElementId.max_err).should('contain.text', '>= 1')
+      .get_by_testid(ElementId.save).should('be.disabled').click({force: true})
+      .reload()
+      .get_by_testid(ElementId.min).should('have.value', 1)
+      .get_by_testid(ElementId.max).should('have.value', 1);
+  })
+
+  it('allows the user to update the grading policy', function() {
+    cy.visit(this.page_uri).get_by_testid('ultimate-submission-policy')
+      .should('be.visible').select('best').save_and_reload()
+      .get_by_testid('ultimate-submission-policy').should('have.value', 'best');
+
+    cy.get_by_testid('ultimate-submission-policy')
+      .should('be.visible').select('most_recent').save_and_reload()
+      .get_by_testid('ultimate-submission-policy').should('have.value', 'most_recent');
+  })
+
+  it('allows the user to update submission limits', function() {
+    cy.visit(this.page_uri)
   })
 })

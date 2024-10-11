@@ -24,9 +24,19 @@ declare global {
       create_project(course_pk: number, project_name: string): Chainable
       fake_login(username: string): Chainable
       logout(): Chainable
+      save_and_reload(): Chainable
     }
   }
 }
+
+beforeEach(() => {
+  cy.task('setup_db');
+})
+
+Cypress.Commands.add('save_and_reload', () => {
+  cy.get_by_testid('save-button').click()
+    .get_by_testid('api-error').should('have.length', 0).reload();
+})
 
 Cypress.Commands.add('fake_login', username => {
   cy.setCookie('token', 'foo').setCookie('username', username)

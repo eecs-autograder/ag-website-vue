@@ -3,7 +3,7 @@
     <div class="validated-input-wrapper">
       <slot name="prefix"> </slot>
       <input class="input"
-             :data-testid="data_testid"
+             :data-testid="testid"
              v-if="num_rows === 1"
              :style="input_style"
              :class="{
@@ -19,7 +19,7 @@
                 :rows="num_rows"
                 :style="input_style"
                 class="input"
-                data-testid="input"
+                :data-testid="testid"
                 :class="{
                  'error-input' : input_style === '' && show_errors
                 }"
@@ -32,7 +32,10 @@
     <transition name="fade">
       <slot :d_error_msg="d_error_msg" v-if="show_errors">
         <ul class="error-ul">
-            <li class="error-text error-li">{{d_error_msg}}</li>
+            <li class="error-text error-li"
+                :data-testid="error_testid">
+              {{d_error_msg}}
+            </li>
         </ul>
       </slot>
     </transition>
@@ -98,12 +101,14 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   show_warnings_on_blur!: boolean;
 
   @Prop({required: false, default: "validated-input"})
-  data_testid!: string;
+  testid!: string;
 
   d_input_value: string = "";
   private d_is_valid: boolean = false;
   d_error_msg: string = "";
   d_show_warnings: boolean = false;
+
+  private error_testid: string = "";
 
   private debounced_enable_warnings!: (...args: unknown[]) => unknown;
 
@@ -118,6 +123,8 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   // Note: This assumes "value" provided will not throw exception when running this.to_string_fn
   created() {
     this.input_uid = ValidatedInput._NEXT_UID++;
+
+    this.error_testid = `${this.testid}-error`;
 
     // Add ValidatedInput to list of inputs stored in parent ValidatedForm component
     this.register(this);

@@ -1,8 +1,11 @@
 <template>
-  <div>
+  <div :data-testid="data_testid">
     <div v-for="(error, index) of d_api_errors"
          class="error-msg-container">
-      <div class="error-msg">{{error}}</div>
+      <div class="error-msg"
+           data-testid="api-error">
+        {{error}}
+      </div>
       <button class="dismiss-error-button"
               type="button"
               @click="d_api_errors.splice(index, 1);
@@ -14,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 
 import { HttpError } from 'ag-client-typescript';
 
@@ -22,6 +25,9 @@ import { SYSADMIN_CONTACT } from '@/constants';
 
 @Component
 export default class APIErrors extends Vue {
+  @Prop({required: false, default: 'api-errors'})
+  data_testid!: string
+
   d_api_errors: string[] = [];
 
   show_errors_from_response(error_response: unknown, clear_current_errors = true) {

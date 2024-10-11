@@ -136,7 +136,7 @@
             <div class="group-size-container">
               <label class="label"> Min group size </label>
               <validated-input id="min-group-size"
-                               data_testid="min-group-size"
+                               testid="min-group-size"
                                v-model="d_project.min_group_size"
                                :validators="[is_integer, is_not_empty, is_positive]"
                                :from_string_fn="string_to_num"
@@ -152,7 +152,7 @@
                 members the first time they visit the project page.
               </tooltip>
               <validated-input id="max-group-size"
-                               data_testid="max-group-size"
+                               testid="max-group-size"
                                v-model="d_project.max_group_size"
                                :validators="[is_integer, is_not_empty, is_positive]"
                                :from_string_fn="string_to_num"
@@ -191,6 +191,7 @@
             </tooltip>
             <div>
               <select id="ultimate-submission-policy"
+                      data-testid="ultimate-submission-policy"
                       v-model="d_project.ultimate_submission_policy"
                       class="select">
                 <option :value="UltimateSubmissionPolicy.most_recent">
