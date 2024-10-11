@@ -100,7 +100,7 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   @Prop({default: false})
   show_warnings_on_blur!: boolean;
 
-  @Prop({required: false, default: "validated-input"})
+  @Prop({required: false, default: "input"})
   testid!: string;
 
   d_input_value: string = "";
