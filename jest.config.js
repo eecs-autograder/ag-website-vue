@@ -38,5 +38,5 @@ module.exports = {
   setupFilesAfterEnv: ["./tests/setup.ts"],
 
   // https://kulshekhar.github.io/ts-jest/user/config/isolatedModules
-  globals: {"ts-jest": {isolatedModules: true}},
+  globals: { "ts-jest": { isolatedModules: true } },
 };

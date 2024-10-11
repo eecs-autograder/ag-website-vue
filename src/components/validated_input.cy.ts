@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-import ValidatedInput, {ValidatorResponse} from "./validated_input.vue";
+import ValidatedInput, { ValidatorResponse } from "./validated_input.vue";
 
 const IS_NUMBER = (value: string): ValidatorResponse => {
   return {
