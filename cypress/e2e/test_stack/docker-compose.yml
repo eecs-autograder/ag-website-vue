@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   nginx:
@@ -45,7 +45,7 @@ services:
       # Then, using a browser plugin such as EditThisCookie, set the
       # cookie "username=<email>" to set which user you want to
       # authenticate as.
-      USE_REAL_AUTH: 'false'
+      USE_REAL_AUTH: "false"
 
   postgres:
     restart: no
@@ -54,7 +54,7 @@ services:
     expose:
       - "5432"
     environment:
-      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_PASSWORD: "postgres"
 
   redis:
     restart: no
