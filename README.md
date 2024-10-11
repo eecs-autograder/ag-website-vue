@@ -21,6 +21,7 @@ npm test
 
 To run linters (eslint, Prettier, type checking, etc.):
 ```
+npm run lint
 npm run build
 ```
 
