@@ -1,8 +1,12 @@
 import { defineConfig } from "cypress";
 import * as child_process from 'child_process';
 
-// reset db
-// make super user
+const SUPERUSER_NAME = 'superuser@autograder.io'
+const ADMIN_NAME = 'admin@autograder.io'
+const STAFF_NAME = 'staff@autograder.io'
+const STUDENT_NAME = 'student@autograder.io'
+
+const CONTAINER_NAME = 'ag-vue-e2e-django'
 
 export default defineConfig({
   component: {
@@ -18,12 +22,15 @@ export default defineConfig({
         setup_db
       })
     },
-    baseUrl: 'http://localhost:8080'
+    baseUrl: 'http://localhost:8080',
+    env: {
+      superuser: SUPERUSER_NAME,
+      admin: ADMIN_NAME,
+      staff: STAFF_NAME,
+      student: STUDENT_NAME,
+    },
   },
 });
-
-const SUPERUSER_NAME = 'superuser@autograder.io'
-const CONTAINER_NAME = 'ag-vue-e2e-django'
 
 const setup_db = () => {
     let django_code = `import shutil
@@ -38,9 +45,18 @@ BuildSandboxDockerImageTask.objects.all().delete()
 shutil.rmtree('/usr/src/app/media_root_dev/', ignore_errors=True)
 cache.clear()
 
-user = User.objects.get_or_create(username='${SUPERUSER_NAME}')[0]
-user.is_superuser = True
-user.save()
+superuser = User.objects.get_or_create(username='${SUPERUSER_NAME}')[0]
+superuser.is_superuser = True
+superuser.save()
+
+admin = User.objects.get_or_create(username='${ADMIN_NAME}')[0]
+admin.save()
+
+staff = User.objects.get_or_create(username='${STAFF_NAME}')[0]
+staff.save()
+
+student = User.objects.get_or_create(username='${STUDENT_NAME}')[0]
+student.save()
 `;
     return run_in_django_shell(django_code);
 }

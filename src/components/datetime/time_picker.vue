@@ -10,7 +10,7 @@
       </button>
       <div>
         <input type="text"
-                data-testid="hour_input"
+                data-testid="hour-input"
                 class="hour-input"
                 :value="hours_str"
                 @keydown="update_hours">
@@ -34,6 +34,7 @@
       </button>
       <div>
         <input type="text"
+                data-testid="minute-input"
                 class="minute-input"
                 :value="minutes_str"
                 @keydown="update_minutes"/>
@@ -51,6 +52,7 @@
     <div class="time-unit-col">
       <div>
         <input class="period-input"
+                data-testid="period-input"
                 type="button"
                 v-model="am_pm_str"
                 @click="toggle_period_value"/>

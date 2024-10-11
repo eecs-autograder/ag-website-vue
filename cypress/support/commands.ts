@@ -35,3 +35,14 @@
 //     }
 //   }
 // }
+//
+
+declare namespace Cypress {
+  interface Chainable {
+    get_by_testid(selector: string, ...args): Chainable
+  }
+}
+
+Cypress.Commands.add('get_by_testid', (selector, ...args) => {
+  return cy.get(`[data-testid=${selector}]`, ...args)
+})

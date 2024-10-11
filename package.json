@@ -3,14 +3,17 @@
   "version": "2024.08.0",
   "private": true,
   "scripts": {
-    "serve:e2e": "docker compose -f cypress/e2e/test_stack/docker-compose.yml up",
-    "migrate:e2e": "docker exec -it ag-vue-e2e-django python3 manage.py migrate",
-    "cy:e2e": "npm run migrate:e2e && cypress run",
-    "e2e": "start-server-and-test serve:e2e http://localhost:8080 cy:e2e",
+    "e2e:serve": "docker compose -f cypress/e2e/test_stack/docker-compose.yml up",
+    "e2e:migrate": "docker exec ag-vue-e2e-django python3 manage.py migrate",
+    "e2e:cy:run": "npm run e2e:migrate && TZ=America/Los_Angeles cypress run",
+    "e2e:cy:open": "npm run e2e:migrate && TZ=America/Los_Angeles cypress open",
+    "e2e": "start-server-and-test e2e:serve http://localhost:8080 e2e:cy:run",
+    "e2e:browser": "start-server-and-test e2e:serve http://localhost:8080 e2e:cy:open",
     "serve": "vue-cli-service serve",
     "lint": "./static_analysis.bash",
     "build": "vue-cli-service build",
-    "test": "python3 run_tests.py && cypress run --component"
+    "component": "python3 run_tests.py && cypress run --component",
+    "test": "npm run component && npm run e2e"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",

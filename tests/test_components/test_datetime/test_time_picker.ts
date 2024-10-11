@@ -304,7 +304,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find('[data-testid=hour_input]');
+        let hour_input = wrapper.find('[data-testid=hour-input]');
         await hour_input.trigger("keydown", {code: "Digit3", key: "3"});
 
         expect(wrapper.vm.hours_str).toEqual("03");
@@ -324,7 +324,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find('[data-testid=hour_input]');
+        let hour_input = wrapper.find('[data-testid=hour-input]');
         await hour_input.trigger("keydown", {code: "Digit1", key: "1"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
@@ -339,7 +339,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find('[data-testid=hour_input]');
+        let hour_input = wrapper.find('[data-testid=hour-input]');
         await hour_input.trigger("keydown", {code: "Digit0", key: "0"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
@@ -354,7 +354,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find('[data-testid=hour_input]');
+        let hour_input = wrapper.find('[data-testid=hour-input]');
         await hour_input.trigger("keydown", {code: "Digit1", key: "1"});
 
         expect(wrapper.vm.hours_str).toEqual("01");
@@ -374,7 +374,7 @@ describe('TimePicker HourInputState tests', () => {
         expect(wrapper.vm.hours_str).toEqual("01");
         expect(wrapper.vm.hour_input_state).toEqual(HourInputState.awaiting_first_digit);
 
-        let hour_input = wrapper.find('[data-testid=hour_input]');
+        let hour_input = wrapper.find('[data-testid=hour-input]');
         await hour_input.trigger("keydown", {code: "Digit1", key: "1"});
 
         expect(wrapper.vm.hours_str).toEqual("01");

@@ -16,14 +16,17 @@
 
       <fieldset class="fieldset">
         <legend class="legend"> Project Deadline </legend>
-        <div class="clearable-datetime-picker soft-deadline">
+        <div class="clearable-datetime-picker soft-deadline"
+             data-testid="soft-deadline-picker">
           <div class="label">
             Soft Deadline
             <tooltip width="medium" placement="top">
               The deadline shown to students.
             </tooltip>
           </div>
-          <div class="datetime-input" @click="$refs.soft_closing_time.toggle_visibility()">
+          <div class="datetime-input"
+               data-testid="soft-deadline-input"
+               @click="$refs.soft_closing_time.toggle_visibility()">
             {{format_datetime(d_project.soft_closing_time)}}
             <i class="far fa-calendar-alt"></i>
           </div>
@@ -35,7 +38,8 @@
           </button>
 
           <datetime-picker v-model="d_project.soft_closing_time"
-                            ref="soft_closing_time"></datetime-picker>
+                           data-testid="soft-deadline-datetime-picker"
+                           ref="soft_closing_time"></datetime-picker>
         </div>
 
         <div class="clearable-datetime-picker hard-deadline">
@@ -383,6 +387,7 @@
 
       <div class="button-footer">
         <button id="save-button"
+                data-testid="save-button"
                 class="save-button"
                 type="submit"
                 :disabled="!settings_form_is_valid || d_saving">Save</button>
