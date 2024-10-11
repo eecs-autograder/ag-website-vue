@@ -19,11 +19,21 @@ To run the unit tests (with coverage):
 npm test
 ```
 
+To run linters (eslint, Prettier, type checking, etc.):
+```
+npm run build
+```
+
 ## Coding Standards
 In addition to the items listed here, all source code must follow our
 [Typescript/Vue coding standards](https://github.com/eecs-autograder/autograder.io/blob/master/coding_standards_typescript_vue.md).
 
-Run `npm run build` to check for some style issues using TSLint. All code must be free of TSLint errors. This command should also be treated as the single source of truth for type checking, as different editor plugins have various shortcomings.
+We are in the process of formatting the codebase using Prettier.
+At this time, only apply Prettier to the following:
+- New test cases wrritten with Cypress
+- New components written using the composition API
+- Components being converted to use the composition API
+Add the names of such files to the Prettier and eslint commands in static_analysis.bash.
 
 - HTML/CSS
     - Prefer classes to id's unless you can guarantee that only one element

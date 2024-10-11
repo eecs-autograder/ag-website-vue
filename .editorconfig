@@ -7,11 +7,14 @@ trim_trailing_whitespace = true
 charset = utf-8
 indent_style = space
 
-[*.{html,yml,yaml,vue}]
-indent_size = 2
-
-[*.{ts,scss,json,js}]
+# As we move tests over to Cypress, components to the Vue 3
+# composition API, and remove deprecated SCSS features,
+# we will gradually move from 4-space to 2-space indentation
+# on these file types.
+[src/**.{ts,scss}]
+indent_size = 4
+[test/**.{ts}]
 indent_size = 4
 
-[package.json]
+[*.{html,yml,yaml,vue,json,js,cy.ts}]
 indent_size = 2
