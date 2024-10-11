@@ -250,7 +250,56 @@ describe('project settings page as admin', () => {
     assert_checkbox_values();
   })
 
-  it('allows user to update grading policy', function() {
+  it('allows user to update group settings with valid values', function() {
+    enum ElementId {
+      min = 'min-group-size',
+      max = 'max-group-size',
+      disallow = 'disallow-group-registration'
+    }
 
+    const assert_correct_values = (min: number, max: number, disallow: boolean) => {
+      cy.get_by_testid(ElementId.min).should('have.value', min)
+        .get_by_testid(ElementId.max).should('have.value', max);
+
+      if (disallow) {
+        cy.get_by_testid(ElementId.disallow).should('be.checked');
+      }
+      else {
+        cy.get_by_testid(ElementId.disallow).should('not.be.checked');
+      }
+    }
+
+    cy.visit(this.page_uri);
+    assert_correct_values(1, 1, false);
+
+    cy.get_by_testid(ElementId.max).should('be.visible').type('{moveToEnd}{backspace}12');
+    assert_correct_values(1, 12, false);
+    cy.get_by_testid('save-button').click().reload()
+    assert_correct_values(1, 12, false);
+
+    cy.get_by_testid(ElementId.min).should('be.visible').type('{moveToEnd}{backspace}2');
+    assert_correct_values(2, 12, false);
+    cy.get_by_testid('save-button').click().reload()
+    assert_correct_values(2, 12, false);
+
+    cy.get_by_testid(ElementId.disallow).should('be.visible').check();
+    assert_correct_values(2, 12, true);
+    cy.get_by_testid('save-button').click().reload()
+    assert_correct_values(2, 12, true);
+
+    cy.get_by_testid(ElementId.max).should('be.visible').type('{moveToEnd}{backspace}{backspace}9');
+    assert_correct_values(2, 9, true);
+    cy.get_by_testid('save-button').click().reload()
+    assert_correct_values(2, 9, true);
+
+    cy.get_by_testid(ElementId.min).should('be.visible').type('{moveToEnd}{backspace}3');
+    assert_correct_values(3, 9, true);
+    cy.get_by_testid('save-button').click().reload()
+    assert_correct_values(3, 9, true);
+
+    cy.get_by_testid(ElementId.disallow).should('be.visible').uncheck();
+    assert_correct_values(3, 9, false);
+    cy.get_by_testid('save-button').click().reload()
+    assert_correct_values(3, 9, false);
   })
 })

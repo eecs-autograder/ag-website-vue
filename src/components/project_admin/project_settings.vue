@@ -136,6 +136,7 @@
             <div class="group-size-container">
               <label class="label"> Min group size </label>
               <validated-input id="min-group-size"
+                               data_testid="min-group-size"
                                v-model="d_project.min_group_size"
                                :validators="[is_integer, is_not_empty, is_positive]"
                                :from_string_fn="string_to_num"
@@ -151,6 +152,7 @@
                 members the first time they visit the project page.
               </tooltip>
               <validated-input id="max-group-size"
+                               data_testid="max-group-size"
                                v-model="d_project.max_group_size"
                                :validators="[is_integer, is_not_empty, is_positive]"
                                :from_string_fn="string_to_num"
@@ -162,7 +164,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="disallow_group_registration"
+              <input data-testid="disallow-group-registration"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.disallow_group_registration"/>

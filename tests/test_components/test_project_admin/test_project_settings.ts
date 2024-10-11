@@ -50,7 +50,7 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_project.soft_closing_time = (new Date()).toISOString();
         await wrapper.vm.$nextTick();
 
-        let button = wrapper.find('[data-testid=clear_soft_closing_time]');
+        let button = wrapper.find('[data-testid=clear-soft-deadline]');
         expect(button.element).not.toBeDisabled();
 
         button.trigger('click');
@@ -81,7 +81,7 @@ describe('ProjectSettings tests', () => {
         wrapper.vm.d_project.closing_time = (new Date()).toISOString();
         await wrapper.vm.$nextTick();
 
-        let button = wrapper.find('[data-testid=clear_closing_time]');
+        let button = wrapper.find('[data-testid=clear-hard-deadline]');
         expect(button.element).not.toBeDisabled();
 
         button.trigger('click');
@@ -107,7 +107,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('visible_to_students binding', async () => {
-        let checkbox = wrapper.find('[data-testid=visible_to_students]');
+        let checkbox = wrapper.find('[data-testid=visible-to-students]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project?.visible_to_students).toEqual(true);
@@ -129,7 +129,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('guests_can_submit binding', async () => {
-        let checkbox = wrapper.find('[data-testid=guests_can_submit]');
+        let checkbox = wrapper.find('[data-testid=guests-can-submit]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project?.guests_can_submit).toEqual(true);
@@ -151,7 +151,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('disallow_student_submissions binding', async () => {
-        let checkbox = wrapper.find('[data-testid=disallow_student_submissions]');
+        let checkbox = wrapper.find('[data-testid=disallow-student-submissions]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project?.disallow_student_submissions).toEqual(true);
@@ -173,7 +173,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('disallow_group_registration binding', async () => {
-        let checkbox = wrapper.find('[data-testid=disallow_group_registration]');
+        let checkbox = wrapper.find('[data-testid=disallow-group-registration]');
 
         await checkbox.setChecked(true);
         expect(wrapper.vm.d_project?.disallow_group_registration).toEqual(true);
@@ -218,7 +218,7 @@ describe('ProjectSettings tests', () => {
     });
 
     test('Publish final grades binding', async () => {
-        let publish_grades = wrapper.find('[data-testid=publish_final_grades]');
+        let publish_grades = wrapper.find('[data-testid=publish-final-grades]');
 
         await publish_grades.setChecked(true);
         expect(wrapper.vm.d_project?.hide_ultimate_submission_fdbk).toEqual(false);

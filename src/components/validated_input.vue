@@ -3,7 +3,7 @@
     <div class="validated-input-wrapper">
       <slot name="prefix"> </slot>
       <input class="input"
-             data-testid="input"
+             :data-testid="data_testid"
              v-if="num_rows === 1"
              :style="input_style"
              :class="{
@@ -96,6 +96,9 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
   @Prop({default: false})
   show_warnings_on_blur!: boolean;
+
+  @Prop({required: false, default: "validated-input"})
+  data_testid!: string;
 
   d_input_value: string = "";
   private d_is_valid: boolean = false;

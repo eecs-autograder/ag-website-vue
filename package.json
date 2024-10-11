@@ -13,7 +13,7 @@
     "lint": "./static_analysis.bash",
     "build": "vue-cli-service build",
     "component": "python3 run_tests.py && cypress run --component",
-    "test": "npm run component && npm run e2e"
+    "test": "npm run lint && npm run component && npm run e2e"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
