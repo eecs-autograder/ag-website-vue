@@ -32,7 +32,13 @@ const { superuser, admin, staff, student } = Cypress.env();
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
+    interface Cypress {
+      env(key: "superuser" | "admin" | "staff" | "student"): string
+    }
+
     interface Chainable {
+      validate_checkbox_bindings(...testids: string[]): Chainable;
+
       /**
        * Create a course by making a POST request to the API. Yields the primary
        * key of the new course.
@@ -102,6 +108,10 @@ beforeEach(() => {
   cy.task("setup_db");
 });
 
+Cypress.Commands.add("validate_checkbox_bindings", (...testids) => {
+
+})
+
 Cypress.Commands.add("get_api_errors", () => {
   cy.get_by_testid("api-error");
 });
@@ -133,7 +143,7 @@ Cypress.Commands.add("create_course", (course_name) => {
   cy.fake_login(superuser)
     .then(() => {
       return new Cypress.Promise<Course>(async (resolve, _) => {
-        const course = Course.create(
+        const course = await Course.create(
           new NewCourseData({
             name: course_name,
             semester: Semester.winter,
@@ -223,3 +233,5 @@ Cypress.Commands.add("create_test_case", (test_suite_pk, test_case_name) => {
       return cy.wrap(test_case.pk);
     });
 });
+
+
