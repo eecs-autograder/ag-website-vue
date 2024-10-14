@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import { Course, Project, Semester } from "ag-client-typescript";
+
 const username = Cypress.env("admin");
 const course_name = "Nerdy Algos";
 const project_name = "TSP";
@@ -9,20 +11,32 @@ const build_full_url = (uri: string): string => {
 };
 
 describe("project settings page as admin", () => {
-  beforeEach(() => {
-    cy.create_course(course_name).as("course_pk", { type: "static" });
+  let course: Course;
+  let project: Project;
+  let page_uri: string;
+
+  beforeEach(async () => {
+    course = await Course.create({
+      name: course_name,
+      semester: Semester.winter,
+      year: 2024,
+      subtitle: "This is a course",
+      num_late_days: 1,
+    })
+    // cy.create_course(course_name).as("course_pk", { type: "static" });
 
     cy.fake_login(username)
-      .get("@course_pk")
-      .then((course_pk) => {
-        cy.create_project(Number(course_pk), project_name).as("project_pk", {
-          type: "static",
-        });
+      .then(async () => {
+        project = await Project.create(course.pk, {name: project_name});
+        page_uri = `/web/project_admin/${project.pk}`;
+        // cy.create_project(Number(course.pk), project_name).as("project_pk", {
+        //   type: "static",
+        // });
       });
 
-    cy.get("@project_pk").then((pk) => {
-      cy.wrap(`/web/project_admin/${pk}`).as("page_uri");
-    });
+    // cy.get("@project_pk").then((pk) => {
+    //   cy.wrap(`/web/project_admin/${pk}`).as("page_uri");
+    // });
   });
 
   it("allows user to navigate to navigate to project submission page", function () {

@@ -34,6 +34,7 @@ declare global {
   namespace Cypress {
     interface Cypress {
       env(key: "superuser" | "admin" | "staff" | "student"): string
+      env(): { superuser: string, admin: string, staff: string, student: string };
     }
 
     interface Chainable {
@@ -174,7 +175,7 @@ Cypress.Commands.add("create_course", (course_name) => {
       });
     })
     .then((course) => {
-      return cy.wrap(course.pk);
+      return cy.wrap(course);
     });
 });
 
