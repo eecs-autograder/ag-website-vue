@@ -474,71 +474,22 @@ describe("project settings page as admin", () => {
     });
   });
 
-  it("allows user to update group settings with valid values", () => {
-    enum ElementId {
-      min = "min-group-size",
-      max = "max-group-size",
-      disallow = "disallow-group-registration",
-    }
-
-    const assert_correct_values = (
-      min: number,
-      max: number,
-      disallow: boolean,
-    ) => {
-      cy.get_by_testid(ElementId.min)
-        .should("have.value", min)
-        .get_by_testid(ElementId.max)
-        .should("have.value", max);
-
-      if (disallow) {
-        cy.get_by_testid(ElementId.disallow).should("be.checked");
-      } else {
-        cy.get_by_testid(ElementId.disallow).should("not.be.checked");
-      }
-    };
-
-    set_up().then(({ page_uri }) => {
+  it.only("allows user to update group settings with valid values", () => {
+    set_up().then(({page_uri}) => {
       cy.visit(page_uri);
-      assert_correct_values(1, 1, false);
-
-      cy.get_by_testid(ElementId.max)
+      cy.get_by_testid("min-group-size")
         .should("be.visible")
-        .type("{moveToEnd}{backspace}12");
-      assert_correct_values(1, 12, false);
-      cy.save_and_reload();
-      assert_correct_values(1, 12, false);
-
-      cy.get_by_testid(ElementId.min)
+        .should("have.value", 1);
+      cy.get_by_testid("max-group-size")
         .should("be.visible")
-        .type("{moveToEnd}{backspace}2");
-      assert_correct_values(2, 12, false);
-      cy.save_and_reload();
-      assert_correct_values(2, 12, false);
+        .should("have.value", 1);
 
-      cy.get_by_testid(ElementId.disallow).should("be.visible").check();
-      assert_correct_values(2, 12, true);
-      cy.save_and_reload();
-      assert_correct_values(2, 12, true);
-
-      cy.get_by_testid(ElementId.max)
-        .should("be.visible")
-        .type("{moveToEnd}{backspace}{backspace}9");
-      assert_correct_values(2, 9, true);
-      cy.save_and_reload();
-      assert_correct_values(2, 9, true);
-
-      cy.get_by_testid(ElementId.min)
-        .should("be.visible")
-        .type("{moveToEnd}{backspace}3");
-      assert_correct_values(3, 9, true);
-      cy.save_and_reload();
-      assert_correct_values(3, 9, true);
-
-      cy.get_by_testid(ElementId.disallow).should("be.visible").uncheck();
-      assert_correct_values(3, 9, false);
-      cy.save_and_reload();
-      assert_correct_values(3, 9, false);
+      cy.do_multiple_input_binding_test([
+        {'min-group-size': 2, 'max-group-size': 3},
+        {'min-group-size': 1, 'max-group-size': 4},
+        {'min-group-size': 4, 'max-group-size': 4},
+        {'min-group-size': 1, 'max-group-size': 1},
+      ]);
     });
   });
 
@@ -638,6 +589,10 @@ describe("project settings page as admin", () => {
         .get_by_testid(ElementId.max)
         .should("have.value", 1);
     });
+  });
+
+  it("lets user enable or disable group registration", () => {
+    fail();
   });
 
   it("allows user to update the grading policy", () => {

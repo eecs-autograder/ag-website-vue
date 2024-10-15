@@ -26,6 +26,7 @@ import {
 } from "ag-client-typescript";
 
 import "./commands";
+import { zip } from "@/utils";
 
 const { superuser, admin, staff, student } = Cypress.env();
 
@@ -112,6 +113,24 @@ declare global {
        * Yield all API errors that are rendered on the page (data-testid=api-error).
        */
       get_api_errors(): Chainable;
+
+      // For each given value, sets the input identified data-testid=testid
+      // to that value, saves & refreshes the page, and checks that the value
+      // is still set.
+      // Only works for inputs where the user can type in a value.
+      do_input_binding_test(
+        testid: string,
+        ...values: {toString(): string}[]
+      ): Chainable<void>;
+
+      // Similar to do_input_binding_test, but instead supports
+      // setting multiple inputs at once.
+      // Only works for inputs where the user can type in a value.
+      do_multiple_input_binding_test(
+        value_dicts: {
+          [testid: string]: {toString(): string};
+        }[],
+      ): Chainable<void>;
     }
   }
 }
@@ -262,4 +281,24 @@ Cypress.Commands.add("create_test_case", (test_suite_pk, test_case_name) => {
       });
     })
     .then((test_case) => cy.wrap(test_case));
+});
+
+Cypress.Commands.add("do_input_binding_test", (testid, ...values) => {
+  for (let value of values) {
+    cy.get_by_testid(testid).should("be.visible").clear().type(value.toString());
+    cy.save_and_reload();
+    cy.get_by_testid(testid).should("be.visible").should("have.value", value);
+  }
+});
+
+Cypress.Commands.add("do_multiple_input_binding_test", (value_dicts) => {
+  for (let value_dict of value_dicts) {
+    for (let [testid, value] of Object.entries(value_dict)) {
+      cy.get_by_testid(testid).should("be.visible").clear().type(value.toString());
+    }
+    cy.save_and_reload();
+    for (let [testid, value] of Object.entries(value_dict)) {
+      cy.get_by_testid(testid).should("be.visible").should("have.value", value);
+    }
+  }
 });
