@@ -33,8 +33,13 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Cypress {
-      env(key: "superuser" | "admin" | "staff" | "student"): string
-      env(): { superuser: string, admin: string, staff: string, student: string };
+      env(key: "superuser" | "admin" | "staff" | "student"): string;
+      env(): {
+        superuser: string;
+        admin: string;
+        staff: string;
+        student: string;
+      };
     }
 
     interface Chainable {
@@ -53,7 +58,10 @@ declare global {
        * @param {number} course_pk The primary key of the course to make the project under
        * @param {string} project_name The name of the project to be made
        */
-      create_project(course_pk: number, project_name: string): Chainable<Project>;
+      create_project(
+        course_pk: number,
+        project_name: string,
+      ): Chainable<Project>;
 
       /**
        * Create a test suite by making a POST request to the API. Yields the primary
@@ -61,7 +69,10 @@ declare global {
        * @param {number} course_pk The primary key of the course to make the project under
        * @param {string} test_suite_name The name of the project to be made
        */
-      create_test_suite(course_pk: number, test_suite_name: string): Chainable<AGTestSuite>;
+      create_test_suite(
+        course_pk: number,
+        test_suite_name: string,
+      ): Chainable<AGTestSuite>;
 
       /**
        * Create a test case by making a POST request to the API. Yields the primary
@@ -109,9 +120,7 @@ beforeEach(() => {
   cy.task("setup_db");
 });
 
-Cypress.Commands.add("validate_checkbox_bindings", (...testids) => {
-
-})
+Cypress.Commands.add("validate_checkbox_bindings", (...testids) => {});
 
 Cypress.Commands.add("get_api_errors", () => {
   cy.get_by_testid("api-error");
@@ -152,30 +161,41 @@ Cypress.Commands.add("create_course", (course_name) => {
             subtitle: "This is a course",
             num_late_days: 1,
           }),
-        ).then((course) => {
+        )
+          .then((course) => {
             resolve(course);
-        }).catch(reject);
+          })
+          .catch(reject);
       });
     })
     .then((course) => {
       return new Cypress.Promise<Course>((resolve, reject) => {
-        course.add_admins([admin]).then(() => {
+        course
+          .add_admins([admin])
+          .then(() => {
             resolve(course);
-        }).catch(reject);
+          })
+          .catch(reject);
       });
     })
     .then((course) => {
       return new Cypress.Promise<Course>((resolve, reject) => {
-        course.add_staff([staff]).then(() => {
+        course
+          .add_staff([staff])
+          .then(() => {
             resolve(course);
-        }).catch(reject);
+          })
+          .catch(reject);
       });
     })
     .then((course) => {
       return new Cypress.Promise<Course>((resolve, reject) => {
-        course.add_students([student]).then(() => {
+        course
+          .add_students([student])
+          .then(() => {
             resolve(course);
-        }).catch(reject);
+          })
+          .catch(reject);
       });
     })
     .then((course) => {
@@ -194,9 +214,11 @@ Cypress.Commands.add("create_project", (course_pk, project_name) => {
           new NewProjectData({
             name: project_name,
           }),
-        ).then(project => {
-          resolve(project);
-        }).catch(reject)
+        )
+          .then((project) => {
+            resolve(project);
+          })
+          .catch(reject);
       });
     })
     .then((project) => {
@@ -213,11 +235,14 @@ Cypress.Commands.add("create_test_suite", (project_pk, test_suite_name) => {
           new NewAGTestSuiteData({
             name: test_suite_name,
           }),
-        ).then((suite) => {
+        )
+          .then((suite) => {
             resolve(suite);
-        }).catch(reject);
+          })
+          .catch(reject);
       });
-    }).then(suite => cy.wrap(suite));
+    })
+    .then((suite) => cy.wrap(suite));
 });
 
 Cypress.Commands.add("create_test_case", (test_suite_pk, test_case_name) => {
@@ -229,9 +254,12 @@ Cypress.Commands.add("create_test_case", (test_suite_pk, test_case_name) => {
           new NewAGTestCaseData({
             name: test_case_name,
           }),
-        ).then((test_case) => {
+        )
+          .then((test_case) => {
             resolve(test_case);
-        }).catch(reject);
+          })
+          .catch(reject);
       });
-    }).then(test_case => cy.wrap(test_case));
+    })
+    .then((test_case) => cy.wrap(test_case));
 });
