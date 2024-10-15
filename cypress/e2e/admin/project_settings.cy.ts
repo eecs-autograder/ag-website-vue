@@ -11,42 +11,31 @@ const build_full_url = (uri: string): string => {
 };
 
 describe("project settings page as admin", () => {
-  let course: Course;
-  let project: Project;
-  let page_uri: string;
-
-  beforeEach(async () => {
-    course = await Course.create({
-      name: course_name,
-      semester: Semester.winter,
-      year: 2024,
-      subtitle: "This is a course",
-      num_late_days: 1,
-    })
-    // cy.create_course(course_name).as("course_pk", { type: "static" });
-
-    cy.fake_login(username)
-      .then(async () => {
-        project = await Project.create(course.pk, {name: project_name});
-        page_uri = `/web/project_admin/${project.pk}`;
-        // cy.create_project(Number(course.pk), project_name).as("project_pk", {
-        //   type: "static",
-        // });
+  function set_up() {
+    return cy
+      .fake_login(username)
+      .create_course(course_name)
+      .then((course) => {
+        return cy.create_project(course.pk, project_name).then((project) => {
+          return {
+            course: course,
+            project: project,
+            page_uri: `/web/project_admin/${project.pk}`,
+          };
+        });
       });
-
-    // cy.get("@project_pk").then((pk) => {
-    //   cy.wrap(`/web/project_admin/${pk}`).as("page_uri");
-    // });
-  });
+  }
 
   it("allows user to navigate to navigate to project submission page", function () {
-    const submission_uri = `/web/project/${this.project_pk}`;
-    cy.visit(this.page_uri)
-      .get(`a[href="${submission_uri}"]`)
-      .should("be.visible")
-      .click()
-      .url()
-      .should("eq", build_full_url(submission_uri));
+    set_up().then(({project, page_uri}) => {
+      const submission_uri = `/web/project/${project.pk}`
+      cy.visit(page_uri)
+        .get(`a[href="${submission_uri}"]`)
+        .should("be.visible")
+        .click()
+        .url()
+        .should("eq", build_full_url(submission_uri));
+    });
   });
 
   it("allows user to navigate to course page", function () {

@@ -45,7 +45,7 @@ declare global {
        * key of the new course.
        * @param {string} course_name The name of the course to be made
        */
-      create_course(course_name: string): Chainable;
+      create_course(course_name: string): Chainable<Course>;
 
       /**
        * Create a project by making a POST request to the API. Yields the primary
@@ -53,7 +53,7 @@ declare global {
        * @param {number} course_pk The primary key of the course to make the project under
        * @param {string} project_name The name of the project to be made
        */
-      create_project(course_pk: number, project_name: string): Chainable;
+      create_project(course_pk: number, project_name: string): Chainable<Project>;
 
       /**
        * Create a test suite by making a POST request to the API. Yields the primary
@@ -61,7 +61,7 @@ declare global {
        * @param {number} course_pk The primary key of the course to make the project under
        * @param {string} test_suite_name The name of the project to be made
        */
-      create_test_suite(course_pk: number, test_suite_name: string): Chainable;
+      create_test_suite(course_pk: number, test_suite_name: string): Chainable<AGTestSuite>;
 
       /**
        * Create a test case by making a POST request to the API. Yields the primary
@@ -72,30 +72,30 @@ declare global {
       create_test_case(
         test_suite_pk: number,
         test_case_name: string,
-      ): Chainable;
+      ): Chainable<AGTestSuite>;
 
       /**
        * Log a user in by setting the necessary session cookies.
        * This command assumes the backend is running with "fake" auth
        * @param {string} username the username of the user to be logged in
        */
-      fake_login(username: string): Chainable;
+      fake_login(username: string): Chainable<void>;
 
       /**
        * Log the current user out by clearing session cookies.
        */
-      logout(): Chainable;
+      logout(): Chainable<void>;
 
       /**
        * Save the current page.
        */
-      save(): Chainable;
+      save(): Chainable<void>;
 
       /**
        * Save the current page and refresh. Fails if there are any API errors
        * on the page (data-testid=api-error) after saving or after reloading.
        */
-      save_and_reload(): Chainable;
+      save_and_reload(): Chainable<void>;
 
       /**
        * Yield all API errors that are rendered on the page (data-testid=api-error).
@@ -143,8 +143,8 @@ Cypress.Commands.add("create_course", (course_name) => {
   // See https://docs.cypress.io/api/utilities/promise#Waiting-for-Promises
   cy.fake_login(superuser)
     .then(() => {
-      return new Cypress.Promise<Course>(async (resolve, _) => {
-        const course = await Course.create(
+      return new Cypress.Promise<Course>((resolve, reject) => {
+        Course.create(
           new NewCourseData({
             name: course_name,
             semester: Semester.winter,
@@ -152,26 +152,30 @@ Cypress.Commands.add("create_course", (course_name) => {
             subtitle: "This is a course",
             num_late_days: 1,
           }),
-        );
-        resolve(course);
+        ).then((course) => {
+            resolve(course);
+        }).catch(reject);
       });
     })
     .then((course) => {
-      return new Cypress.Promise<Course>(async (resolve, _) => {
-        await course.add_admins([admin]);
-        resolve(course);
+      return new Cypress.Promise<Course>((resolve, reject) => {
+        course.add_admins([admin]).then(() => {
+            resolve(course);
+        }).catch(reject);
       });
     })
     .then((course) => {
-      return new Cypress.Promise<Course>(async (resolve, _) => {
-        await course.add_staff([staff]);
-        resolve(course);
+      return new Cypress.Promise<Course>((resolve, reject) => {
+        course.add_staff([staff]).then(() => {
+            resolve(course);
+        }).catch(reject);
       });
     })
     .then((course) => {
-      return new Cypress.Promise<Course>(async (resolve, _) => {
-        await course.add_students([student]);
-        resolve(course);
+      return new Cypress.Promise<Course>((resolve, reject) => {
+        course.add_students([student]).then(() => {
+            resolve(course);
+        }).catch(reject);
       });
     })
     .then((course) => {
@@ -184,55 +188,50 @@ Cypress.Commands.add("create_project", (course_pk, project_name) => {
   // See https://docs.cypress.io/api/utilities/promise#Waiting-for-Promises
   cy.fake_login(admin)
     .then(() => {
-      return new Cypress.Promise<Project>(async (resolve, _) => {
-        const project = await Project.create(
+      return new Cypress.Promise<Project>((resolve, reject) => {
+        Project.create(
           course_pk,
           new NewProjectData({
             name: project_name,
           }),
-        );
-        resolve(project);
+        ).then(project => {
+          resolve(project);
+        }).catch(reject)
       });
     })
     .then((project) => {
-      return cy.wrap(project.pk);
+      return cy.wrap(project);
     });
 });
 
 Cypress.Commands.add("create_test_suite", (project_pk, test_suite_name) => {
   cy.fake_login(admin)
     .then(() => {
-      return new Cypress.Promise<AGTestSuite>(async (resolve, _) => {
-        const suite = await AGTestSuite.create(
+      return new Cypress.Promise<AGTestSuite>((resolve, reject) => {
+        AGTestSuite.create(
           project_pk,
           new NewAGTestSuiteData({
             name: test_suite_name,
           }),
-        );
-        resolve(suite);
+        ).then((suite) => {
+            resolve(suite);
+        }).catch(reject);
       });
-    })
-    .then((suite) => {
-      return cy.wrap(suite.pk);
-    });
+    }).then(suite => cy.wrap(suite));
 });
 
 Cypress.Commands.add("create_test_case", (test_suite_pk, test_case_name) => {
   cy.fake_login(admin)
     .then(() => {
-      return new Cypress.Promise<AGTestCase>(async (resolve, _) => {
-        const test_case = await AGTestCase.create(
+      return new Cypress.Promise<AGTestCase>((resolve, reject) => {
+        AGTestCase.create(
           test_suite_pk,
           new NewAGTestCaseData({
             name: test_case_name,
           }),
-        );
-        resolve(test_case);
+        ).then((test_case) => {
+            resolve(test_case);
+        }).catch(reject);
       });
-    })
-    .then((test_case) => {
-      return cy.wrap(test_case.pk);
-    });
+    }).then(test_case => cy.wrap(test_case));
 });
-
-
