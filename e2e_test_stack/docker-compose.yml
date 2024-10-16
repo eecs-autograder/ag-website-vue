@@ -1,28 +1,21 @@
 version: "3"
 
 services:
-  nginx:
-    image: nginx:latest
-    restart: no
-    container_name: ag-vue-e2e-nginx
-    ports:
-      - "8080:80"
-    volumes:
-      - ./nginx/conf.d/:/etc/nginx/conf.d
-
   website:
     restart: no
     build:
       context: ../
       dockerfile: Dockerfile-website-dev
     container_name: ag-vue-e2e-website
-    expose:
-      - "8080"
+    ports:
+      - 8080:8080
+    # expose:
+    #   - "8080"
     volumes:
       - ../src:/usr/src/app/src
       - ../tests:/usr/src/app/tests
       - ../public:/usr/src/app/public
-    command: npm run serve -- --host website
+    command: npm run serve
 
   django:
     restart: no
