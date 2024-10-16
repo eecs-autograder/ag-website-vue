@@ -472,7 +472,7 @@ describe("project settings page as admin", () => {
     });
   });
 
-  it.only("allows user to update group settings with valid values", () => {
+  it("allows user to update group settings with valid values", () => {
     set_up().then(({ page_uri }) => {
       cy.visit(page_uri);
       cy.get_by_testid("min-group-size")
@@ -589,7 +589,7 @@ describe("project settings page as admin", () => {
     });
   });
 
-  it("lets user enable or disable group registration", () => {
+  it.skip("lets user enable or disable group registration", () => {
     fail();
   });
 
