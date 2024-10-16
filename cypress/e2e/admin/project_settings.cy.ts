@@ -1,7 +1,5 @@
 /// <reference types="cypress" />
 
-import { Course, Project, Semester } from "ag-client-typescript";
-
 const username = Cypress.env("admin");
 const course_name = "Nerdy Algos";
 const project_name = "TSP";
@@ -475,7 +473,7 @@ describe("project settings page as admin", () => {
   });
 
   it.only("allows user to update group settings with valid values", () => {
-    set_up().then(({page_uri}) => {
+    set_up().then(({ page_uri }) => {
       cy.visit(page_uri);
       cy.get_by_testid("min-group-size")
         .should("be.visible")
@@ -485,10 +483,10 @@ describe("project settings page as admin", () => {
         .should("have.value", 1);
 
       cy.do_multiple_input_binding_test([
-        {'min-group-size': 2, 'max-group-size': 3},
-        {'min-group-size': 1, 'max-group-size': 4},
-        {'min-group-size': 4, 'max-group-size': 4},
-        {'min-group-size': 1, 'max-group-size': 1},
+        { "min-group-size": 2, "max-group-size": 3 },
+        { "min-group-size": 1, "max-group-size": 4 },
+        { "min-group-size": 4, "max-group-size": 4 },
+        { "min-group-size": 1, "max-group-size": 1 },
       ]);
     });
   });

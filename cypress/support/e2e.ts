@@ -120,7 +120,7 @@ declare global {
       // Only works for inputs where the user can type in a value.
       do_input_binding_test(
         testid: string,
-        ...values: {toString(): string}[]
+        ...values: { toString(): string }[]
       ): Chainable<void>;
 
       // Similar to do_input_binding_test, but instead supports
@@ -128,7 +128,7 @@ declare global {
       // Only works for inputs where the user can type in a value.
       do_multiple_input_binding_test(
         value_dicts: {
-          [testid: string]: {toString(): string};
+          [testid: string]: { toString(): string };
         }[],
       ): Chainable<void>;
     }
@@ -284,20 +284,26 @@ Cypress.Commands.add("create_test_case", (test_suite_pk, test_case_name) => {
 });
 
 Cypress.Commands.add("do_input_binding_test", (testid, ...values) => {
-  for (let value of values) {
-    cy.get_by_testid(testid).should("be.visible").clear().type(value.toString());
+  for (const value of values) {
+    cy.get_by_testid(testid)
+      .should("be.visible")
+      .clear()
+      .type(value.toString());
     cy.save_and_reload();
     cy.get_by_testid(testid).should("be.visible").should("have.value", value);
   }
 });
 
 Cypress.Commands.add("do_multiple_input_binding_test", (value_dicts) => {
-  for (let value_dict of value_dicts) {
-    for (let [testid, value] of Object.entries(value_dict)) {
-      cy.get_by_testid(testid).should("be.visible").clear().type(value.toString());
+  for (const value_dict of value_dicts) {
+    for (const [testid, value] of Object.entries(value_dict)) {
+      cy.get_by_testid(testid)
+        .should("be.visible")
+        .clear()
+        .type(value.toString());
     }
     cy.save_and_reload();
-    for (let [testid, value] of Object.entries(value_dict)) {
+    for (const [testid, value] of Object.entries(value_dict)) {
       cy.get_by_testid(testid).should("be.visible").should("have.value", value);
     }
   }
