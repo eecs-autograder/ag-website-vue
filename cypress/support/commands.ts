@@ -35,3 +35,18 @@
 //     }
 //   }
 // }
+//
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare namespace Cypress {
+  interface Chainable {
+    get_by_testid(
+      selector: string,
+      options?: Partial<Loggable & Timeoutable & Withinable & Shadow>,
+    ): Chainable;
+  }
+}
+
+Cypress.Commands.add("get_by_testid", (selector, options) => {
+  return cy.get(`[data-testid=${selector}]`, options);
+});

@@ -16,18 +16,21 @@
 
       <fieldset class="fieldset">
         <legend class="legend"> Project Deadline </legend>
-        <div class="clearable-datetime-picker soft-deadline">
+        <div class="clearable-datetime-picker soft-deadline"
+             data-testid="soft-deadline-picker">
           <div class="label">
             Soft Deadline
             <tooltip width="medium" placement="top">
               The deadline shown to students.
             </tooltip>
           </div>
-          <div class="datetime-input" @click="$refs.soft_closing_time.toggle_visibility()">
+          <div class="datetime-input"
+               data-testid="soft-deadline-input"
+               @click="$refs.soft_closing_time.toggle_visibility()">
             {{format_datetime(d_project.soft_closing_time)}}
             <i class="far fa-calendar-alt"></i>
           </div>
-          <button type="button" class="clear-button" data-testid="clear_soft_closing_time"
+          <button type="button" class="clear-button" data-testid="clear-soft-deadline"
                   @click.stop="d_project.soft_closing_time = null"
                   :disabled="d_project.soft_closing_time === null">
             <i class="fas fa-times"></i>
@@ -35,10 +38,12 @@
           </button>
 
           <datetime-picker v-model="d_project.soft_closing_time"
-                            ref="soft_closing_time"></datetime-picker>
+                           data-testid="soft-deadline-datetime-picker"
+                           ref="soft_closing_time"></datetime-picker>
         </div>
 
-        <div class="clearable-datetime-picker hard-deadline">
+        <div class="clearable-datetime-picker hard-deadline"
+             data-testid="hard-deadline-picker">
           <div class="label">
             Hard Deadline
             <tooltip width="large" placement="top">
@@ -47,11 +52,12 @@
             </tooltip>
           </div>
           <div class="datetime-input"
-                @click="$refs.closing_time.toggle_visibility()">
+               data-testid="hard-deadline-input"
+               @click="$refs.closing_time.toggle_visibility()">
             {{format_datetime(d_project.closing_time)}}
             <i class="far fa-calendar-alt"></i>
           </div>
-          <button type="button" class="clear-button" data-testid="clear_closing_time"
+          <button type="button" class="clear-button" data-testid="clear-hard-deadline"
                   @click.stop="d_project.closing_time = null"
                   :disabled="d_project.closing_time === null">
             <i class="fas fa-times"></i>
@@ -69,7 +75,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="visible_to_students"
+              <input data-testid="visible-to-students"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.visible_to_students"/>
@@ -79,7 +85,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="guests_can_submit"
+              <input data-testid="guests-can-submit"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.guests_can_submit"/>
@@ -93,7 +99,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="disallow_student_submissions"
+              <input data-testid="disallow-student-submissions"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.disallow_student_submissions"/>
@@ -107,7 +113,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="publish_final_grades"
+              <input data-testid="publish-final-grades"
                      type="checkbox"
                      class="checkbox"
                      :checked="!d_project.hide_ultimate_submission_fdbk"
@@ -130,6 +136,7 @@
             <div class="group-size-container">
               <label class="label"> Min group size </label>
               <validated-input id="min-group-size"
+                               testid="min-group-size"
                                v-model="d_project.min_group_size"
                                :validators="[is_integer, is_not_empty, is_positive]"
                                :from_string_fn="string_to_num"
@@ -145,6 +152,7 @@
                 members the first time they visit the project page.
               </tooltip>
               <validated-input id="max-group-size"
+                               testid="max-group-size"
                                v-model="d_project.max_group_size"
                                :validators="[is_integer, is_not_empty, is_positive]"
                                :from_string_fn="string_to_num"
@@ -156,7 +164,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="disallow_group_registration"
+              <input data-testid="disallow-group-registration"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.disallow_group_registration"/>
@@ -183,6 +191,7 @@
             </tooltip>
             <div>
               <select id="ultimate-submission-policy"
+                      data-testid="ultimate-submission-policy"
                       v-model="d_project.ultimate_submission_policy"
                       class="select">
                 <option :value="UltimateSubmissionPolicy.most_recent">
@@ -209,6 +218,7 @@
           <div class="form-field-wrapper">
               <label class="label"> Submissions per day </label>
               <validated-input id="submission-limit-per-day"
+                               testid="submission-limit-per-day"
 
                                v-model="d_project.submission_limit_per_day"
 
@@ -222,7 +232,7 @@
           </div>
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="allow_submissions_past_limit"
+              <input data-testid="allow-submissions-past-limit"
                      type="checkbox"
                      class="checkbox"
                      :disabled="d_project.submission_limit_per_day === null"
@@ -238,6 +248,7 @@
             <div id="reset-time-picker-container">
               <div class="clearable-datetime-picker">
                 <div class="datetime-input" ref="submission_limit_reset_time"
+                     data-testid="reset-time-input"
                      @click="d_show_reset_time_picker = !d_show_reset_time_picker">
                   {{format_time(d_project.submission_limit_reset_time)}}
                   <i class="far fa-clock"></i>
@@ -245,6 +256,7 @@
 
                 <div class="timezone">
                   <select id="submission-limit-reset-timezone"
+                          data-testid="submission-limit-reset-timezone"
                           class="select"
                           v-model="d_project.submission_limit_reset_timezone">
                     <option v-for="timezone of timezones" :value="timezone">{{timezone}}</option>
@@ -260,7 +272,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="groups_combine_daily_submissions"
+              <input data-testid="groups-combine-daily-submissions"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.groups_combine_daily_submissions"
@@ -279,6 +291,7 @@
           <div class="form-field-wrapper extra-space">
             <label class="label"> Bonus submissions per group </label>
             <validated-input ref="bonus_submissions_input"
+                             testid="bonus-submissions-input"
                              v-model="d_project.num_bonus_submissions"
                              :validators="[is_integer, is_not_empty, is_non_negative]"
                              input_style="width: 80px;">
@@ -287,7 +300,7 @@
 
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="allow_late_days"
+              <input data-testid="allow-late-days"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.allow_late_days"/>
@@ -306,6 +319,7 @@
             </tooltip>
             <validated-input ref="total_submissions_input"
                              id="total-submission-limit"
+                             testid="total-submission-limit"
 
                              v-model="d_project.total_submission_limit"
 
@@ -324,7 +338,7 @@
           <legend class="legend">Email Receipts</legend>
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="send_email_on_submission_received"
+              <input data-testid="send-email-on-submission-received"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.send_email_on_submission_received"/>
@@ -337,7 +351,7 @@
           </div>
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="send_email_on_non_deferred_tests_finished"
+              <input data-testid="send-email-on-non-deferred-tests-finished"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.send_email_on_non_deferred_tests_finished"/>
@@ -356,7 +370,7 @@
           <legend class="legend">Honor Pledge</legend>
           <div class="checkbox-input-container">
             <label class="checkbox-label">
-              <input data-testid="use_honor_pledge"
+              <input data-testid="use-honor-pledge"
                      type="checkbox"
                      class="checkbox"
                      v-model="d_project.use_honor_pledge"/>
@@ -369,7 +383,7 @@
           <div class="form-field-wrapper" v-if="d_project.use_honor_pledge">
             <label class="label">Honor pledge text</label>
             <validated-input
-              data-testid="honor_pledge_text"
+              data-testid="honor-pledge-text"
               v-model="d_project.honor_pledge_text"
               :validators="[]"
               :num_rows="4"
@@ -383,6 +397,7 @@
 
       <div class="button-footer">
         <button id="save-button"
+                data-testid="save-button"
                 class="save-button"
                 type="submit"
                 :disabled="!settings_form_is_valid || d_saving">Save</button>
@@ -401,7 +416,7 @@
       <div class="danger-text">
         Delete Project: {{project.name}}
       </div>
-      <button data-testid="show_delete_project_modal_button" class="delete-button"
+      <button data-testid="show-delete-project-modal-button" class="delete-button"
               type="button"
               @click="d_show_delete_project_modal = true">
         Delete
@@ -423,12 +438,13 @@
           <b>THIS ACTION CANNOT BE UNDONE.</b>
           <APIErrors ref="delete_errors"></APIErrors>
           <div class="modal-button-footer">
-            <button data-testid="delete_project_button"
+            <button data-testid="delete-project-button"
                     class="red-button"
                     :disabled="d_deleting"
                     @click="delete_project"> Delete </button>
 
             <button class="modal-cancel-button white-button"
+                    data-testid="cancel-delete-project-button"
                     @click="d_show_delete_project_modal = false">
               Cancel
             </button>

@@ -7,51 +7,61 @@
   <div v-else id="project-admin">
     <div class="navbar default-navbar">
       <div class="nav-link"
+            data-testid="settings-tab"
             :class="{'active': d_current_tab === 'settings'}"
             @click="set_current_tab('settings')">
         Settings
       </div>
       <div class="nav-link"
+            data-testid="instructor-files-tab"
             :class="{'active': d_current_tab === 'instructor_files'}"
             @click="set_current_tab('instructor_files')">
         Instructor Files
       </div>
       <div class="nav-link"
+            data-testid="student-files-tab"
             :class="{'active': d_current_tab === 'expected_student_files'}"
             @click="set_current_tab('expected_student_files')">
         Student Files
       </div>
       <div class="nav-link"
+            data-testid="test-cases-tab"
             :class="{'active': d_current_tab === 'test_cases'}"
             @click="set_current_tab('test_cases')">
         Test Cases
       </div>
       <div class="nav-link"
+            data-testid="mutation-testing-tab"
             :class="{'active': d_current_tab === 'mutation_testing'}"
             @click="set_current_tab('mutation_testing')">
         Mutation Testing
       </div>
       <div class="nav-link"
+            data-testid="edit-groups-tab"
             :class="{'active': d_current_tab === 'edit_groups'}"
             @click="set_current_tab('edit_groups')">
         Groups & Extensions
       </div>
       <div class="nav-link"
+            data-testid="download-grades-tab"
             :class="{'active': d_current_tab === 'download_grades'}"
             @click="set_current_tab('download_grades')">
         Grades & Files
       </div>
       <div class="nav-link"
+            data-testid="rerun-tests-tab"
             :class="{'active': d_current_tab === 'rerun_tests'}"
             @click="set_current_tab('rerun_tests')">
         Rerun
       </div>
       <div class="nav-link"
+            data-testid="handgrading-tab"
             :class="{'active': d_current_tab === 'handgrading'}"
             @click="set_current_tab('handgrading')">
         Handgrading
       </div>
       <div class="nav-link"
+            data-testid="stats-tab"
             :class="{'active': d_current_tab === 'stats'}"
             @click="set_current_tab('stats')">
         Stats (Beta)

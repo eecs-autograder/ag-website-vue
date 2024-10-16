@@ -20,7 +20,7 @@ describe("<Validated_input />", () => {
     cy.mount(ValidatedInput, {
       propsData: propsData,
     });
-    cy.get("[data-testid=input]").should("have.value", "1");
+    cy.get_by_testid("input").should("have.value", "1");
   });
 
   it("emits on valid change", () => {
@@ -31,7 +31,7 @@ describe("<Validated_input />", () => {
         input: input_spy,
       },
     });
-    cy.get("[data-testid=input]").clear().type("42");
+    cy.get_by_testid("input").clear().type("42");
     cy.get("@input_spy").should("have.been.calledWith", 42);
   });
 });

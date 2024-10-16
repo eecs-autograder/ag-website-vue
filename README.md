@@ -7,14 +7,15 @@ For information about contributing to Autograder.io, see our
 Follow the [dev stack setup tutorial](https://github.com/eecs-autograder/autograder-full-stack/blob/master/docs/development_setup.md) for the [autograder-full-stack repo](https://github.com/eecs-autograder/autograder-full-stack).
 
 ## Dev commands
-The unit tests currently support Node.js version 16 (newer versions may work too).
+### Run all tests
+To run all tests, Node.js version 16 is **required**. Newer versions will not work.
 You can install this version with [NVM](https://github.com/nvm-sh/nvm/blob/master/README.md)
 by running:
 ```
 nvm install 16
 ```
 
-To run the unit tests (with coverage):
+To run both component tests and e2e tests:
 ```
 npm test
 ```
@@ -23,6 +24,46 @@ To run linters (eslint, Prettier, type checking, etc.):
 ```
 npm run lint
 npm run build
+```
+
+### Unit tests
+The unit tests currently **require** Node.js version 16. Newer versions will not work.
+See above about installing this version.
+
+To run the unit tests (with coverage):
+```
+npm run component
+```
+
+### e2e tests
+The e2e tests currently require at least Node.js version 16. Newer versions may work.
+See above for installing this version.
+
+To run the e2e tests with a headless browser:
+```
+npm run e2e
+```
+
+To open a full browser from which you can run e2e tests:
+```
+npm run e2e:browser
+```
+
+Both of these npm scripts will start a backend server for the website to interact with and
+shut it down once the tests are complete. If you don't want to wait for the app to compile
+each time you run the tests, you can alternatively start the backend manually and leave
+it running while you run the tests. If you do this, changes to the source code will automatically
+cause the app to recompile but it will be much faster than compiling everything from scratch.
+
+```
+# start backend
+npm run e2e:serve
+
+# in a different terminal, or if you ran the serve script as a background process...
+npm run e2e:cy:run
+
+# or to open in a browser...
+npm run e2e:cy:open
 ```
 
 ## Coding Standards

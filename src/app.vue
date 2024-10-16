@@ -59,6 +59,7 @@
           </a>
 
           <a id="github-icon" class="icon"
+              data-testid="github-icon"
               target="_blank"
               href="https://github.com/eecs-autograder/autograder.io">
             <i class="fab fa-github"></i>
