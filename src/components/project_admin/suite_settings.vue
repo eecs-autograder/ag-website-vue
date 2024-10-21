@@ -38,8 +38,6 @@
 
       <div class="form-field-wrapper">
         <label class="label"> Sandbox environment </label>
-
-
         <select-object :items="docker_images"
                         id_field="pk"
                         v-model="d_suite.sandbox_docker_image"
@@ -50,11 +48,17 @@
           </template>
         </select-object>
       </div>
-
       <div class="toggle-container form-field-wrapper">
-        <toggle v-model="d_suite.allow_network_access"
-                @input="$emit('field_change', d_suite)"
-                ref="allow_network_access">
+        <div>
+          <i class="fas fa-exclamation-triangle warning-tip"></i>
+          <tooltip width="large" placement="right">
+            Allowing network access may expose your files to students' code.
+          </tooltip>
+        </div>
+        <toggle :value="d_suite.allow_network_access"
+                @input="on_toogle_allow_network"
+                ref="allow_network_access"
+                >
           <div slot="on">
             Allow network access
           </div>
@@ -62,7 +66,34 @@
             Block network access
           </div>
         </toggle>
+        <modal v-if="d_show_allow_network_access_modal"
+           @close="d_show_allow_network_access_modal = false"
+           ref="allow_network_access_modal"
+           size="large"
+           :click_outside_to_close="true"
+           :show_closing_x="true">
+            <div class="modal-header">
+              Confirm Access
+            </div>
+            <div class="modal-body">
+              Are you sure you want to allow network access in this sandbox?
+                <br>
+              This may trivially expose your files to students' code.
+            </div>
+            <div class="modal-button-footer">
+              <button data-testid="allow_network_access_button"
+                      class="red-button"
+                      :disabled="false"
+                      @click="allow_network">Allow
+              </button>
+              <button class="modal-cancel-button white-button"
+                      @click="d_show_allow_network_access_modal = false">
+                Cancel
+              </button>
+            </div>
+          </modal>
       </div>
+      
 
       <div class="checkbox-input-container">
         <label class="checkbox-label">
@@ -167,6 +198,7 @@ import {
 
 import BatchSelect from '@/components/batch_select.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import Modal from '@/components/modal.vue';
 import SelectObject from '@/components/select_object.vue';
 import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
@@ -199,6 +231,7 @@ class Suite {
     DropdownTypeahead,
     BatchSelect,
     SelectObject,
+    Modal,
     Toggle,
     Tooltip,
     ValidatedInput,
@@ -215,6 +248,7 @@ export default class SuiteSettings extends Vue {
   docker_images!: SandboxDockerImageData[];
 
   d_suite: Suite | null = null;
+  d_show_allow_network_access_modal = false;
 
   readonly is_not_empty = is_not_empty;
 
@@ -225,6 +259,28 @@ export default class SuiteSettings extends Vue {
   @Watch('suite', {deep: true})
   on_suite_changed(new_value: Suite, old_value: Suite) {
     this.d_suite = deep_copy(new_value, Suite);
+  }
+
+  on_toogle_allow_network() {
+    if (!this.d_suite!.allow_network_access) {
+      // Show modal if changing from block to allow
+      this.d_show_allow_network_access_modal = true;
+    }
+    else {
+      this.block_network();
+    }
+  }
+
+  allow_network() {
+    this.d_suite!.allow_network_access = true;
+    this.$emit('field_change', this.d_suite);
+    this.d_show_allow_network_access_modal = false;
+  }
+
+  block_network() {
+    this.d_suite!.allow_network_access = false;
+    this.$emit('field_change', this.d_suite);
+    this.d_show_allow_network_access_modal = false;
   }
 
   add_instructor_file(instructor_file: InstructorFile) {
@@ -275,8 +331,10 @@ export default class SuiteSettings extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
+@import '@/styles/global.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
@@ -284,6 +342,9 @@ export default class SuiteSettings extends Vue {
 }
 
 .toggle-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
   font-size: .875rem;
   margin: 1rem 0;
 }
@@ -333,6 +394,11 @@ export default class SuiteSettings extends Vue {
   .dropdown-typeahead-container {
     flex: 1;
   }
+}
+
+.warning-tip{
+  color: $warning-red;
+  font-size: 1.25rem;
 }
 
 </style>
