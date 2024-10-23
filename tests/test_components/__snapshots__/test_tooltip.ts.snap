@@ -1,4 +1,248 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Tooltip.vue > Non-default placement and width 1`] = `
+<div>
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-small position-top"
+      data-v-fd3fea90=""
+    >
+      Small top
+    </div>
+    <div
+      class="caret position-top"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-small position-bottom"
+      data-v-fd3fea90=""
+    >
+      Small bottom
+    </div>
+    <div
+      class="caret position-bottom"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-small position-left"
+      data-v-fd3fea90=""
+    >
+      Small left
+    </div>
+    <div
+      class="caret position-left"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-small position-right"
+      data-v-fd3fea90=""
+    >
+      Small right
+    </div>
+    <div
+      class="caret position-right"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-medium position-top"
+      data-v-fd3fea90=""
+    >
+      Medium top
+    </div>
+    <div
+      class="caret position-top"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-medium position-bottom"
+      data-v-fd3fea90=""
+    >
+      Medium bottom
+    </div>
+    <div
+      class="caret position-bottom"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-medium position-left"
+      data-v-fd3fea90=""
+    >
+      Medium left
+    </div>
+    <div
+      class="caret position-left"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-medium position-right"
+      data-v-fd3fea90=""
+    >
+      Medium right
+    </div>
+    <div
+      class="caret position-right"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-large position-top"
+      data-v-fd3fea90=""
+    >
+      Large top
+    </div>
+    <div
+      class="caret position-top"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-large position-bottom"
+      data-v-fd3fea90=""
+    >
+      Large bottom
+    </div>
+    <div
+      class="caret position-bottom"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-large position-left"
+      data-v-fd3fea90=""
+    >
+      Large left
+    </div>
+    <div
+      class="caret position-left"
+      data-v-fd3fea90=""
+    />
+  </span>
+   
+  <span
+    class="tooltip"
+    data-v-fd3fea90=""
+  >
+    <i
+      class="default-icon fas fa-question-circle"
+      data-v-fd3fea90=""
+    />
+    <div
+      class="text width-large position-right"
+      data-v-fd3fea90=""
+    >
+      Large right
+    </div>
+    <div
+      class="caret position-right"
+      data-v-fd3fea90=""
+    />
+  </span>
+</div>
+`;
 
 exports[`Tooltip.vue Non-default placement and width 1`] = `
 <div>

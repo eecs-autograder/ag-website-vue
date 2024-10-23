@@ -94,7 +94,7 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   @Prop({required: false, default: ""})
   input_style!: string | object;
 
-  @Prop({required: false, type: String})
+  @Prop({required: false, type: String, default: ""})
   placeholder!: string;
 
   @Prop({default: false})

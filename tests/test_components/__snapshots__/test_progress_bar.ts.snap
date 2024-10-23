@@ -1,4 +1,118 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Progress bar tests > Partial progress 1`] = `
+<div
+  class="total-progress"
+  data-v-a22d59b9=""
+>
+  <div
+    class="completed-progress"
+    data-v-a22d59b9=""
+    style="width: 51%;"
+  />
+  <div
+    class="progress-text"
+    data-v-a22d59b9=""
+  >
+    51%
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests > Progress > 100% custom slot 1`] = `
+<div
+  class="total-progress"
+  data-v-a22d59b9=""
+>
+  <div
+    class="completed-progress fully-round"
+    data-v-a22d59b9=""
+    style="width: 100%;"
+  />
+  <div
+    class="progress-text"
+    data-v-a22d59b9=""
+  >
+    Finishing request
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests > Progress > 100% default slot 1`] = `
+<div
+  class="total-progress"
+  data-v-a22d59b9=""
+>
+  <div
+    class="completed-progress fully-round"
+    data-v-a22d59b9=""
+    style="width: 100%;"
+  />
+  <div
+    class="progress-text"
+    data-v-a22d59b9=""
+  >
+     Please wait... 
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests > Progress 0 1`] = `
+<div
+  class="total-progress"
+  data-v-a22d59b9=""
+>
+  <div
+    class="completed-progress"
+    data-v-a22d59b9=""
+    style="width: 0%;"
+  />
+  <div
+    class="progress-text"
+    data-v-a22d59b9=""
+  >
+    0%
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests > Progress 100% custom slot 1`] = `
+<div
+  class="total-progress"
+  data-v-a22d59b9=""
+>
+  <div
+    class="completed-progress fully-round"
+    data-v-a22d59b9=""
+    style="width: 100%;"
+  />
+  <div
+    class="progress-text"
+    data-v-a22d59b9=""
+  >
+    Finishing request
+  </div>
+</div>
+`;
+
+exports[`Progress bar tests > Progress 100% default slot 1`] = `
+<div
+  class="total-progress"
+  data-v-a22d59b9=""
+>
+  <div
+    class="completed-progress fully-round"
+    data-v-a22d59b9=""
+    style="width: 100%;"
+  />
+  <div
+    class="progress-text"
+    data-v-a22d59b9=""
+  >
+     Please wait... 
+  </div>
+</div>
+`;
 
 exports[`Progress bar tests Partial progress 1`] = `
 <div

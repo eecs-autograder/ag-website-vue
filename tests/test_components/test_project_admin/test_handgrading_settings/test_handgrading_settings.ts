@@ -237,7 +237,8 @@ describe('Initialize handgrading tests', () => {
 
         let select_project_to_import_from = <Wrapper<SelectObject>> wrapper.findComponent(
             {ref: 'project_to_import_from'});
-        await select_project_to_import_from.findAll('option').at(1).setSelected();
+        await set_select_object_value(
+            select_project_to_import_from, project_with_rubric.pk);
 
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_project_to_import_from).toEqual(project_with_rubric);

@@ -251,9 +251,9 @@ describe('InstructorFiles.vue', () => {
         delete_stub.callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
 
-        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
+        wrapper.findAll('.single-instructor-file-component input').at(0).setChecked(true);
         await wrapper.vm.$nextTick();
-        wrapper.findAll('.single-instructor-file-component input').at(1).trigger('click');
+        wrapper.findAll('.single-instructor-file-component input').at(1).setChecked(true);
         await wrapper.vm.$nextTick();
 
 
@@ -275,11 +275,11 @@ describe('InstructorFiles.vue', () => {
         delete_stub.callsFake(
             async () => InstructorFile.notify_instructor_file_deleted(instructor_file_1));
 
-        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
+        wrapper.findAll('.single-instructor-file-component input').at(0).setChecked(true);
         await wrapper.vm.$nextTick();
 
         expect(delete_stub.callCount).toEqual(0);
-        wrapper.find('.batch-delete-files-button').trigger('click');
+        await wrapper.find('.batch-delete-files-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find('.files-to-delete').findAll('li').length).toEqual(1);
@@ -302,15 +302,15 @@ describe('InstructorFiles.vue', () => {
 
         expect(delete_stub1.callCount).toEqual(0);
         expect(delete_stub2.callCount).toEqual(0);
-        wrapper.findAll('.single-instructor-file-component input').at(0).trigger('click');
+        wrapper.findAll('.single-instructor-file-component input').at(0).setChecked(true);
         await wrapper.vm.$nextTick();
-        wrapper.findAll('.single-instructor-file-component input').at(1).trigger('click');
+        wrapper.findAll('.single-instructor-file-component input').at(1).setChecked(true);
         await wrapper.vm.$nextTick();
-        wrapper.findAll('.single-instructor-file-component input').at(2).trigger('click');
+        wrapper.findAll('.single-instructor-file-component input').at(2).setChecked(true);
         await wrapper.vm.$nextTick();
 
         // click again to test deselect behavior
-        wrapper.findAll('.single-instructor-file-component input').at(2).trigger('click');
+        wrapper.findAll('.single-instructor-file-component input').at(2).setChecked(false);
         await wrapper.vm.$nextTick();
 
         wrapper.find('.batch-delete-files-button').trigger('click');

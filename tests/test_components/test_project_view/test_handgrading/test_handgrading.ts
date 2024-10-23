@@ -739,7 +739,7 @@ describe('Comment tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.d_handgrading_result!.applied_annotations.length).toEqual(4);
         expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('2/10');
-        
+
         let to_delete = wrapper.vm.d_handgrading_result!.applied_annotations[3];
         let delete_stub = sinon.stub(
             to_delete, 'delete'
@@ -842,12 +842,12 @@ describe('Footer tests', () => {
             wrapper.vm.d_handgrading_result, 'save_finished_grading');
         expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(false);
 
-        await wrapper.find('#finished-grading').trigger('click');
+        await wrapper.find('#finished-grading').setChecked(true);
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(true);
         expect(save_result_stub.calledOnce).toBe(true);
 
-        await wrapper.find('#finished-grading').trigger('click');
+        await wrapper.find('#finished-grading').setChecked(false);
         expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
         expect(checkbox_is_checked(wrapper.find('#finished-grading'))).toBe(false);
         expect(save_result_stub.calledTwice).toBe(true);

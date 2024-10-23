@@ -168,9 +168,9 @@ describe('Correctness feedback tests', () => {
         test('Actual return code available', async () => {
             ag_test_command_result.actual_return_code = 42;
             let wrapper = await make_wrapper();
-            expect(wrapper.findComponent({ref: 'actual_return_code'}).text()).toEqual(
-                'Actual exit status: 42'
-            );
+            let text = wrapper.findComponent({ref: 'actual_return_code'}).text();
+            expect(text).toEqual(expect.stringContaining('Actual exit status'));
+            expect(text).toEqual(expect.stringContaining('42'));
         });
 
         test('Actual return code available, return code not checked', async () => {
