@@ -23,3 +23,7 @@ coverage
 
 # Cypress artifacts
 cypress/screenshots
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

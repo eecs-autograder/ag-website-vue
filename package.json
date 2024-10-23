@@ -41,11 +41,13 @@
     "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.1",
     "@testing-library/jest-dom": "^5.11.9",
     "@types/dompurify": "^3.0.5",
     "@types/file-saver": "^2.0.1",
     "@types/jsdom": "^16.2.14",
     "@types/lodash": "^4.14.168",
+    "@types/node": "^22.7.9",
     "@types/showdown": "^2.0.6",
     "@types/sinon": "^7.5.2",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -61,6 +63,7 @@
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^7.20.0",
     "jsdom": "^20.0.0",
+    "playwright": "^1.48.1",
     "prettier": "3.3.3",
     "sass": "^1.66.1",
     "sass-loader": "^10.1.1",
