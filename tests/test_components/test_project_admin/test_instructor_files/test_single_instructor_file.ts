@@ -1,7 +1,7 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
 import { HttpError, InstructorFile } from 'ag-client-typescript';
-import * as FileSaver from 'file-saver';
+const file_saver = require('file-saver');
 import * as sinon from "sinon";
 
 import APIErrors from '@/components/api_errors.vue';
@@ -11,15 +11,16 @@ import ValidatedInput from '@/components/validated_input.vue';
 import { set_validated_input_text, validated_input_is_valid } from '@/tests/utils';
 
 
-jest.mock('file-saver');
-
 describe('SingleInstructorFile tests', () => {
     let wrapper: Wrapper<SingleInstructorFile>;
     let component: SingleInstructorFile;
     let file_1: InstructorFile;
     let validated_input: ValidatedInput;
 
+    let save_as_stub: sinon.SinonStub;
+
     beforeEach(() => {
+        save_as_stub = sinon.stub(file_saver, 'saveAs');
         file_1 = new InstructorFile({
             pk: 1,
             project: 10,
@@ -123,7 +124,7 @@ describe('SingleInstructorFile tests', () => {
 
         expect(get_content_stub.calledOnce).toBe(true);
         // tslint:disable-next-line:deprecation
-        expect(FileSaver.saveAs).toBeCalled();
+        expect(save_as_stub.called).toBe(true);
     });
 
     test('File names must be unique - violates condition', async () => {

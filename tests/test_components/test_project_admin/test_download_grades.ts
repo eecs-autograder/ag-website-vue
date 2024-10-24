@@ -1,7 +1,7 @@
 import { Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
-import * as FileSaver from 'file-saver';
+const file_saver = require('file-saver');
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
@@ -11,8 +11,6 @@ import { safe_assign } from '@/utils';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { wait_for_load, wait_until } from '@/tests/utils';
-
-jest.mock('file-saver');
 
 const DOWNLOAD_TASK_PKS = data_ut.counter();
 
@@ -38,6 +36,7 @@ let project: ag_cli.Project;
 let http_get_stub: sinon.SinonStub;
 let http_get_file_stub: sinon.SinonStub;
 let http_post_stub: sinon.SinonStub;
+let save_as_stub: sinon.SinonStub;
 
 beforeEach(() => {
     course = data_ut.make_course();
@@ -45,6 +44,11 @@ beforeEach(() => {
 
     http_get_stub = sinon.stub(ag_cli.HttpClient.get_instance(), 'get');
     http_get_file_stub = sinon.stub(ag_cli.HttpClient.get_instance(), 'get_file');
+    save_as_stub = sinon.stub(file_saver, 'saveAs');
+});
+
+afterEach(() => {
+    save_as_stub.restore();
 });
 
 function get_tasks_stub_resolves(data: DownloadTask[]) {
@@ -250,5 +254,5 @@ test('Download task result', async () => {
     expect(await wait_until(wrapper, w => !w.vm.d_creating_download_task)).toBe(true);
     await wrapper.vm.$nextTick();
     // tslint:disable-next-line:deprecation
-    expect(FileSaver.saveAs).toBeCalled();
+    expect(save_as_stub.called).toBe(true);
 });

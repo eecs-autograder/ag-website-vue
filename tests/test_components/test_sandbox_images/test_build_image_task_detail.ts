@@ -2,6 +2,7 @@ import { Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
+const file_saver = require('file-saver');
 
 import BuildImageTaskDetail from '@/components/sandbox_images/build_image_task_detail.vue';
 import ViewFile from '@/components/view_file/view_file.vue';
@@ -10,8 +11,6 @@ import { assert_not_null, deep_copy } from '@/utils';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { compress_whitespace, set_props, wait_until } from '@/tests/utils';
-
-jest.mock('file-saver');
 
 let build_task: ag_cli.BuildSandboxDockerImageTask;
 let load_output_stub: sinon.SinonStub;
@@ -26,6 +25,7 @@ beforeEach(() => {
         callback(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 30});
         return Promise.resolve(new Blob([output]));
     });
+    sinon.stub(file_saver, 'saveAs');
 });
 
 async function make_wrapper(build_task_ = build_task, refresh_in_progress = false) {

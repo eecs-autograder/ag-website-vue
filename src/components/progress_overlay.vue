@@ -17,7 +17,7 @@ import ProgressBar from '@/components/progress_bar.vue';
     ProgressBar,
   }
 })
-export default class  extends Vue {
+export default class ProgressOverlay extends Vue {
   @Prop({default: null, type: Number})
   progress!: number | null;
 }

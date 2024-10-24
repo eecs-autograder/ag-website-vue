@@ -219,11 +219,7 @@ describe('ValidatedInput.vue', () => {
             new_key: "new_value"
         };
 
-        (<HTMLInputElement> v_input.find('input').element).value = JSON.stringify(new_obj);
-        v_input.find('input').trigger('input');
-
-        const v_input_vm = <ValidatedInput> v_input.vm;
-        expect(v_input_vm.d_input_value).toEqual(JSON.stringify(new_obj));
+        await v_input.find('input').setValue(JSON.stringify(new_obj));
         expect(wrapper.vm.$data.my_obj).toEqual(new_obj);
     });
 

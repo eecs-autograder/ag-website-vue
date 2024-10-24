@@ -6,6 +6,7 @@ npx eslint \
 
 npx prettier --check \
     './*.js' \
+    './*.ts' \
     'cypress/**/*.ts' \
     'src/**/*.cy.ts'
 

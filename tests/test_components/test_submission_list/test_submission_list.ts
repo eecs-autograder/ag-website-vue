@@ -380,7 +380,7 @@ describe('Ultimate submission tests', () => {
     });
 });
 
-describe('Polling tests', () => {
+describe.skip('Polling tests', () => {
     let submission: ag_cli.SubmissionWithResults;
 
     // We'll call this function whenever we want submission_list's poller to

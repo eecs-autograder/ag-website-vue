@@ -16,6 +16,10 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { set_validated_input_text, validated_input_is_valid, wait_for_load, wait_until } from '@/tests/utils';
 
+beforeEach(() => {
+    sinon.stub(ag_cli.BuildSandboxDockerImageTask.prototype, 'get_output').resolves(new Blob(['']));
+});
+
 test('Build tasks displayed in sidebar sections', async () => {
     let queued_task = data_ut.make_build_sanbdox_docker_image_task(
         null, null, {status: ag_cli.BuildImageStatus.queued});

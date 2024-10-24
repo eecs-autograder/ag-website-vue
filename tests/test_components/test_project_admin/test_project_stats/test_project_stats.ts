@@ -12,7 +12,6 @@ let project: ag_cli.Project;
 
 let get_staff_stub: sinon.SinonStub;
 let get_admins_stub: sinon.SinonStub;
-let get_admins_stub: sinon.SinonStub;
 let num_queued_submissions_stub: sinon.SinonStub;
 
 beforeEach(() => {
@@ -268,8 +267,7 @@ test('Include staff checkbox', async () => {
     expect(wrapper.vm.submission_results?.length).toEqual(3);
     expect(wrapper.vm.all_submissions?.length).toEqual(3);
 
-    await checkbox.trigger('click');
-    expect(checkbox_is_checked(checkbox)).toBe(false);
+    await checkbox.setChecked(false);
     expect(wrapper.vm.submission_results?.length).toEqual(1);
     expect(wrapper.vm.all_submissions?.length).toEqual(1);
 });

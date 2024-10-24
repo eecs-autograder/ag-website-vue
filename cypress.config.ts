@@ -1,12 +1,12 @@
 import { defineConfig } from "cypress";
-import * as child_process from 'child_process';
+import * as child_process from "child_process";
 
-const SUPERUSER_NAME = 'superuser@autograder.io'
-const ADMIN_NAME = 'admin@autograder.io'
-const STAFF_NAME = 'staff@autograder.io'
-const STUDENT_NAME = 'student@autograder.io'
+const SUPERUSER_NAME = "superuser@autograder.io";
+const ADMIN_NAME = "admin@autograder.io";
+const STAFF_NAME = "staff@autograder.io";
+const STUDENT_NAME = "student@autograder.io";
 
-const CONTAINER_NAME = 'ag-vue-e2e-django'
+const CONTAINER_NAME = "ag-vue-e2e-django";
 
 export default defineConfig({
   component: {
@@ -18,11 +18,11 @@ export default defineConfig({
 
   e2e: {
     setupNodeEvents(on, config) {
-      on('task', {
-        setup_db
-      })
+      on("task", {
+        setup_db,
+      });
     },
-    baseUrl: 'http://localhost:8080',
+    baseUrl: "http://localhost:8080",
     env: {
       superuser: SUPERUSER_NAME,
       admin: ADMIN_NAME,
@@ -33,7 +33,7 @@ export default defineConfig({
 });
 
 const setup_db = () => {
-    let django_code = `import shutil
+  let django_code = `import shutil
 from django.core.cache import cache;
 from django.contrib.auth.models import User
 from autograder.core.models import Course, SandboxDockerImage, BuildSandboxDockerImageTask
@@ -58,19 +58,27 @@ staff.save()
 student = User.objects.get_or_create(username='${STUDENT_NAME}')[0]
 student.save()
 `;
-    return run_in_django_shell(django_code);
-}
+  return run_in_django_shell(django_code);
+};
 
 const run_in_django_shell = (python_str: string) => {
   // If you add -it to the docker command, be sure to set
   // stdio to ['inherit', ...] for stdin.
-  let result = child_process.spawnSync(
-      'docker', ['exec', CONTAINER_NAME, 'python', 'manage.py', 'shell',
-                 '-c', python_str]);
+  let result = child_process.spawnSync("docker", [
+    "exec",
+    CONTAINER_NAME,
+    "python",
+    "manage.py",
+    "shell",
+    "-c",
+    python_str,
+  ]);
   let stdout = result.stdout.toString();
   let stderr = result.stderr.toString();
   if (result.status !== 0) {
-      throw new Error('Running Django shell code failed:\n' + stdout + '\n' + stderr);
+    throw new Error(
+      "Running Django shell code failed:\n" + stdout + "\n" + stderr,
+    );
   }
-  return {stdout: stdout, stderr: stderr, status: result.status};
-}
+  return { stdout: stdout, stderr: stderr, status: result.status };
+};

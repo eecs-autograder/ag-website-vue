@@ -1,6 +1,6 @@
 import * as ag_cli from 'ag-client-typescript';
-import * as FileSaver from 'file-saver';
 import * as sinon from 'sinon';
+const file_saver = require('file-saver');
 
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 import SubmissionDetail from '@/components/project_view/submission_detail/submission_detail.vue';
@@ -9,14 +9,13 @@ import * as data_ut from '@/tests/data_utils.ts';
 import { managed_mount } from '@/tests/setup';
 import { compress_whitespace, expect_html_element_has_value, find_by_name, wait_until } from '@/tests/utils';
 
-jest.mock('file-saver');
-
 let user: ag_cli.User;
 let course: ag_cli.Course;
 let project: ag_cli.Project;
 let group: ag_cli.Group;
 let submission_with_results: ag_cli.SubmissionWithResults;
 let get_submission_result_stub: sinon.SinonStub;
+let save_as_stub: sinon.SinonStub;
 
 function make_wrapper(is_ultimate_submission: boolean = false) {
     let wrapper = managed_mount(SubmissionDetail, {
@@ -32,6 +31,7 @@ function make_wrapper(is_ultimate_submission: boolean = false) {
 }
 
 beforeEach(() => {
+    save_as_stub = sinon.stub(file_saver, 'saveAs');
     user = data_ut.make_user();
     course = data_ut.make_course();
     project = data_ut.make_project(course.pk);
@@ -292,7 +292,7 @@ describe('Submitted files tests', () => {
 
         expect(get_file_content_stub.callCount).toEqual(1);
         // tslint:disable-next-line:deprecation
-        expect(FileSaver.saveAs).toBeCalled();
+        expect(save_as_stub.called).toBe(true);
     });
 
     test('viewing a file', async () => {

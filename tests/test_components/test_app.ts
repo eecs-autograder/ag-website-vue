@@ -35,7 +35,7 @@ describe('Breadcrumb and global error tests', () => {
     beforeEach(async () => {
         user = make_user();
         sinon.stub(User, 'get_current').resolves(user);
-        sinon.stub(cookie, 'get_cookie').returns('tokey');
+        vi.spyOn(cookie, 'get_cookie').mockImplementation(() => 'tokey');
 
         wrapper = make_wrapper();
         expect(await wait_for_load(wrapper)).toBe(true);
@@ -134,7 +134,7 @@ test('API error handled in login', async () => {
 describe('Login tests', () => {
     test('Token cookie available, login on create', async () => {
         let fake_token_val = 'tokey';
-        sinon.stub(cookie, 'get_cookie').returns(fake_token_val);
+        vi.spyOn(cookie, 'get_cookie').mockImplementation(() => fake_token_val);
         let authenticate_stub = sinon.stub(HttpClient.get_instance(), 'authenticate');
         let user = make_user();
         sinon.stub(User, 'get_current').resolves(user);
@@ -152,7 +152,7 @@ describe('Login tests', () => {
         });
 
         test('Token cookie unavailable, auth redirect called on button click', async () => {
-            sinon.stub(cookie, 'get_cookie').returns(null);
+            vi.spyOn(cookie, 'get_cookie').mockImplementation(() => null);
             let authenticate_stub = sinon.stub(HttpClient.get_instance(), 'authenticate');
             let fake_redirect_url = '/oauth2/something/or/other/';
             sinon.stub(User, 'get_current').rejects(
@@ -180,7 +180,9 @@ describe('Login tests', () => {
     test('Auth token bad, token cookie deleted', async () => {
         let fake_token_val = 'tokey';
         let delete_cookie_stub = sinon.stub(cookie, 'delete_all_cookies');
-        sinon.stub(cookie, 'get_cookie').returns(fake_token_val);
+        vi.spyOn(cookie, 'delete_all_cookies').mockImplementation(delete_cookie_stub);
+
+        vi.spyOn(cookie, 'get_cookie').mockImplementation(() => fake_token_val);
         let authenticate_stub = sinon.stub(HttpClient.get_instance(), 'authenticate');
         sinon.stub(User, 'get_current').rejects(new HttpError(401, 'unauthorized'));
 
@@ -195,8 +197,9 @@ describe('Login tests', () => {
 
 test('Logout', async () => {
     sinon.stub(User, 'get_current').resolves(make_user());
-    sinon.stub(cookie, 'get_cookie').returns('tokey');
+    vi.spyOn(cookie, 'get_cookie').mockImplementation(() => 'tokey');
     let delete_cookie_stub = sinon.stub(cookie, 'delete_all_cookies');
+    vi.spyOn(cookie, 'delete_all_cookies').mockImplementation(delete_cookie_stub);
 
     let wrapper = make_wrapper();
     expect(await wait_for_load(wrapper)).toBe(true);

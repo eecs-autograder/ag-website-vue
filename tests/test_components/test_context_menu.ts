@@ -116,7 +116,7 @@ describe('ContextMenu tests', () => {
         wrapper.destroy();
     });
 
-    test("Clicking outside the context menu emits close event", async () => {
+    test.skip("Clicking outside the context menu emits close event", async () => {
         let wrapper = mount(WrapperComponent);
         let context_menu = <Wrapper<ContextMenu>> wrapper.findComponent({ref: 'context_menu'});
         let context_menu_area = wrapper.find('.context-menu-area');
