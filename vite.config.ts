@@ -1,15 +1,15 @@
-import vue2 from '@vitejs/plugin-vue2'
+import vue2 from "@vitejs/plugin-vue2";
 import path from "path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
     alias: {
-        // IMPORTANT: Keep these up to date with the paths
-        // in tsconfig.json.
-        "@/tests": path.resolve(__dirname, 'tests'),
-        "@": path.resolve(__dirname, 'src',)
-    }
+      // IMPORTANT: Keep these up to date with the paths
+      // in tsconfig.json.
+      "@/tests": path.resolve(__dirname, "tests"),
+      "@": path.resolve(__dirname, "src"),
+    },
   },
   plugins: [
     // @ts-ignore
@@ -18,8 +18,8 @@ export default defineConfig({
   test: {
     include: ["tests/**/test_*.ts"],
     globals: true,
-    environment: 'jsdom',
+    environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
     restoreMocks: true,
-},
+  },
 });
