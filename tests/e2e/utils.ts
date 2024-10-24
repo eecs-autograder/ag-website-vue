@@ -1,17 +1,28 @@
-
 import { Course, NewCourseData, Semester } from "ag-client-typescript";
 import * as child_process from "child_process";
 import * as lodash from "lodash";
+import { BrowserContext } from "playwright/test";
 import * as uuid from "uuid";
 
 export const PYTHON = "python3";
 export const CONTAINER_NAME = "ag-vue-e2e-django";
 export const SUPERUSER_NAME = "superuser@localtest.autograder.io";
 
+export function fake_login(context: BrowserContext, username: string) {
+  return context.addCookies([
+    { name: "username", value: username },
+    { name: "token", value: "anytokenvalueworks" },
+  ]);
+}
+
+export function unique_name(prefix: string) {
+  return prefix + " " + uuid.v4();
+}
+
 export function make_course(course_data?: NewCourseData) {
   if (course_data === undefined) {
     course_data = {
-      name: "Test Course " + uuid.v4(),
+      name: unique_name("Test Course"),
       semester: lodash.sample(Object.values(Semester)),
       year: 2015 + Math.floor(Math.random() * 20),
     };
