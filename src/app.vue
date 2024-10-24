@@ -11,7 +11,7 @@
       <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <template v-else>
-      <div id="banner">
+      <div role="banner" id="banner">
         <div id="breadcrumbs">
           <router-link to="/" id="home-logo">
             Autograder.io
@@ -99,14 +99,14 @@
           </div>
         </div>
       </div>
-      <div id="welcome" v-if="globals.current_user === null">
+      <div role="main" id="welcome" v-if="globals.current_user === null">
         <div class="welcome-text">Welcome!</div>
         <button type="button" ref="welcome_login_button" class="blue-button" @click="login">
           Sign In
         </button>
       </div>
       <template v-else>
-        <router-view></router-view>
+        <router-view role="main"></router-view>
       </template>
     </template>
   </div>

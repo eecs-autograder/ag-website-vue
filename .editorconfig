@@ -13,8 +13,11 @@ indent_style = space
 # on these file types.
 [src/**.{ts,scss}]
 indent_size = 4
-[test/**.{ts}]
+[tests/**.{ts}]
 indent_size = 4
+
+[tests/e2e/**.ts]
+indent_size = 2
 
 [*.{html,yml,yaml,vue,json,js,cy.ts}]
 indent_size = 2

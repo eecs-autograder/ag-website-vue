@@ -1,23 +1,35 @@
-import {test as setup} from '@playwright/test';
-import * as child_process from 'child_process';
+import { test as setup, expect } from "@playwright/test";
+import { CONTAINER_NAME, PYTHON, run_in_django_shell, subprocess_check_call } from "./utils";
+import { HttpClient } from "ag-client-typescript";
 
-const PYTHON = 'python3';
-const CONTAINER_NAME = 'ag-vue-e2e-django'
+const SUPERUSER_NAME = "superuser@autograder.io";
 
+setup("Global Setup", ({ baseURL }) => {
+  expect(
+    baseURL,
+    "baseURL should be set in playwright.config.ts to point to the e2e test stack server",
+  ).not.toBeUndefined();
 
-setup('Reset DB', () => {
-    reset_db();
-})
+  // Authenticate the API client
+  HttpClient.get_instance().set_base_url(baseURL!);
+  HttpClient.get_instance().set_default_headers({
+    // Note: Make sure the test server is using fake authentication.
+    Cookie: `username=${SUPERUSER_NAME}`,
+  });
+
+  reset_db();
+});
 
 // Flushes all data from the test database and deletes the
 // test media_root filesystem.
 export function reset_db() {
-
-    subprocess_check_call(`docker exec ${CONTAINER_NAME} ${PYTHON} manage.py migrate`);
-    // Because of the overhead in flushing the database using manage.py flush,
-    // we'll instead delete all objects in the "top-level" tables that all
-    // the other data depends on.
-    let delete_data = `import shutil
+  subprocess_check_call(
+    `docker exec ${CONTAINER_NAME} ${PYTHON} manage.py migrate`,
+  );
+  // Because of the overhead in flushing the database using manage.py flush,
+  // we'll instead delete all objects in the "top-level" tables that all
+  // the other data depends on.
+  let delete_data = `import shutil
 from django.core.cache import cache;
 from django.contrib.auth.models import User
 from autograder.core.models import Course, SandboxDockerImage, BuildSandboxDockerImageTask
@@ -28,44 +40,10 @@ BuildSandboxDockerImageTask.objects.all().delete()
 
 shutil.rmtree('/usr/src/app/media_root_dev/', ignore_errors=True)
 cache.clear()
+
+superuser = User.objects.get_or_create(username='${SUPERUSER_NAME}')[0]
+superuser.is_superuser = True
+superuser.save()
 `;
-    run_in_django_shell(delete_data);
-}
-
-export function run_in_django_shell(python_str: string) {
-    // If you add -it to the docker command, be sure to set
-    // stdio to ['inherit', ...] for stdin.
-    let result = child_process.spawnSync(
-        'docker', ['exec', CONTAINER_NAME, PYTHON, 'manage.py', 'shell',
-                   '-c', python_str]);
-    let stdout = result.stdout.toString();
-    let stderr = result.stderr.toString();
-    if (result.status !== 0) {
-        throw new Error('Running Django shell code failed:\n' + stdout + '\n' + stderr);
-    }
-    return {stdout: stdout, stderr: stderr, status: result.status};
-}
-
-// Runs the given command as a subprocess and throws an exception if the command fails.
-function subprocess_check_call(cmd: string) {
-    let result = child_process.spawnSync(cmd, {shell: true});
-    let stdout = result.stdout.toString();
-    let stderr = result.stderr.toString();
-    if (result.status !== 0) {
-        throw new Error(`Command "${cmd}" exited nonzero:\n${stdout}\n${stderr}`);
-    }
-}
-
-export const SUPERUSER_NAME = 'superuser@umich.edu';
-
-export function make_superuser() {
-    let make_superuser_code = `
-from django.contrib.auth.models import User
-
-user = User.objects.get_or_create(username='${SUPERUSER_NAME}')[0]
-user.is_superuser = True
-user.save()
-        `;
-
-    run_in_django_shell(make_superuser_code);
+  run_in_django_shell(delete_data);
 }
