@@ -22,12 +22,12 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "list",
+  reporter: [["list"], ["line"]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    // Keep up to date with BASE_URL in tests/e2e/utils.ts
-    baseURL: "http://localhost:8080",
+    // IMPORTANT: Keep the base url up to date with the value in tests/e2e/utils.ts
+    baseURL: "http://127.0.0.1:8080",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",

@@ -2,7 +2,8 @@ set -ex
 
 npx eslint \
     'cypress/**/*.ts' \
-    'src/**/*.cy.ts'
+    'src/**/*.cy.ts' \
+    'tests/e2e/**/*.ts'
 
 npx prettier --check \
     './*.js' \

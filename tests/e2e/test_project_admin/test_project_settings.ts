@@ -1,5 +1,6 @@
 import { Page } from "playwright/test";
 import { test } from "./base_fixture";
+import { fake_login } from "../utils";
 
 async function save_and_refresh(page: Page) {
   await page.getByRole("button").getByText("save").click();
@@ -12,6 +13,12 @@ async function expect_checkboxes_not_checked(page: Page, labels: string[]) {
   }
 }
 
+// test.beforeEach(async ({context, page, url}) => {
+  // await page.goto('/');
+  // console.log(url);
+    // await page.goto(`/web/project_admin/${project.pk}`);
+// });
+
 // The way we set deadlines is going to change in the near future.
 // TODO: Add e2e tests for the new deadline settings.
 // Should include:
@@ -19,18 +26,18 @@ async function expect_checkboxes_not_checked(page: Page, labels: string[]) {
 // - UI errors shown
 // - API errors shown
 test.fixme("deadline settings", async () => {
-  fail();
+  test.fail();
 });
 
-test.only("publish project checkbox", async ({ page }) => {
-  const checkbox = await page.getByLabel("publish project");
-  await test.expect(checkbox.isChecked()).toBe(false);
+test("publish project checkbox", async ({ page }) => {
+  const checkbox = page.getByLabel("publish project");
+  test.expect(await checkbox.isChecked()).toBe(false);
 
   await checkbox.click();
-  await test.expect(checkbox.isChecked()).toBe(true);
+  test.expect(await checkbox.isChecked()).toBe(true);
   await save_and_refresh(page);
 
-  await test.expect(checkbox.isChecked()).toBe(true);
+  test.expect(await checkbox.isChecked()).toBe(true);
   await expect_checkboxes_not_checked(page, [
     "anyone with the link",
     "disable submitting",
@@ -39,15 +46,15 @@ test.only("publish project checkbox", async ({ page }) => {
 });
 
 test('"anyone with the link can submit" checkbox', async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test('"temporarily disable submissions" checkbox', async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("publish grades checkbox", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 [
@@ -59,50 +66,50 @@ test("publish grades checkbox", async ({ page }) => {
   test(`valid group size: min=${min_group_size}, max=${max_group_size}: `, async ({
     page,
   }) => {
-    fail();
+    test.fail();
   });
 });
 
 test("API error when min group size > max group size", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("form error when min group size blank", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("form error when min group size 0", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("form error when max group size blank", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test('"disable group registration" checkbox', async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("final graded submission policy", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("daily submission limit", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("email receipt options", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("honor pledge options", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("delete project", async ({ page }) => {
-  fail();
+  test.fail();
 });
 
 test("API error deleting project that has tests", async ({ page }) => {
-  fail();
+  test.fail();
 });
