@@ -7,7 +7,6 @@ on:
   push:
     branches: [ develop ]
   pull_request:
-    branches: [ develop ]
 
 jobs:
   lint:
@@ -52,29 +51,4 @@ jobs:
 
     - run: npm ci
     - run: npm run build
-    - run: npm run component
-
-  e2e-tests:
-    # Lint is fast. If we wait for it we guarantee a cache hit on dependencies.
-    needs: lint
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'true'
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
-    - run: npm ci
-    - run: npm run e2e
+    - run: npm run test
