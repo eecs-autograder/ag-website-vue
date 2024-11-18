@@ -44,8 +44,7 @@
         "src/**/*.tsx",
         "src/**/*.vue",
         "tests/**/*.ts",
-        "tests/**/*.tsx",
-        "cypress/**/*.ts"
+        "tests/**/*.tsx"
     ],
     "exclude": [
         "node_modules",
