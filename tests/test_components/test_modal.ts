@@ -105,6 +105,15 @@ describe('Modal.vue', () => {
         expect(emitted(wrapper, 'close').length).toBe(1);
     });
 
+    test('Enter on x emits "close"', async () => {
+        const wrapper = mount(Modal);
+        expect(wrapper.emitted('close')).toBeUndefined();
+
+        await wrapper.find('.close-button').trigger('keyup.enter');
+
+        expect(emitted(wrapper, 'close').length).toBe(1);
+    });
+
     test('Modal emits "close" when clicking outside the modal and ' +
          'click_outside_to_close is true',
          async () => {
