@@ -1,14 +1,19 @@
 <template>
   <transition name="modal">
     <div class="modal-mask"
-         @click.self="() => {click_outside_to_close ? $emit('close') : null}">
+         @click.self="() => {click_outside_to_close ? $emit('close') : null}"
+         @keyup.esc="$emit('close')">
       <div class="modal-container"
            :class="size"
-           :style="custom_width ? {width: custom_width} : ''">
+           :style="custom_width ? {width: custom_width} : ''"
+           role="dialog">
         <slot></slot>
         <div v-if="include_closing_x"
                 class="close-button"
-                @click="$emit('close')">
+                @click="$emit('close')"
+                @keyup.enter="$emit('close')"
+                tabindex="0"
+                aria-label="close-dialog">
           &#10005;
         </div>
       </div>

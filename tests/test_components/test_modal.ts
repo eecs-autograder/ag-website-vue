@@ -39,6 +39,32 @@ describe('Modal.vue', () => {
         expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
     });
 
+    test('Close modal with ESC key', async () => {
+        const component = {
+            template:  `<modal ref="modal"
+                               v-if="show_modal"
+                               @close="show_modal = false">
+                            <input type="text" data-testid="input" />
+                        </modal>`,
+            components: {
+                'modal': Modal
+            },
+            data: () => {
+                return {
+                    show_modal: false
+                };
+            }
+        };
+
+        const wrapper = mount(component);
+        await wrapper.setData({show_modal: true});
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(true);
+
+        await wrapper.find('[data-testid=input]').trigger('keyup.esc');
+
+        expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
+    });
+
     test('Ensure content is only displayed if external boolean is true', async () => {
         const component = {
             template:  `<modal ref="modal"
