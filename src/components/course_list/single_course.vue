@@ -9,12 +9,13 @@
       </router-link>
 
       <div class="toolbox" v-if="is_admin">
-        <div class="clone-course tool-icon"
-             @click="d_show_clone_course_modal = true"
-             @keypress.enter="d_show_clone_course_modal = true"
+        <div class="clone-course tool-icon" role="button"
+             @click="show_clone_course_modal"
+             @keypress.enter="show_clone_course_modal"
+             @keypress.space.prevent="show_clone_course_modal"
              :title="'Clone ' + course.name"
              tabindex="0">
-          <i class="fas fa-copy"> </i>
+          <i class="fas fa-copy" role="presentation"> </i>
         </div>
         <router-link :to="`/web/course_admin/${course.pk}`"
                      :title="'Edit ' + course.name">
@@ -136,6 +137,13 @@ export default class SingleCourse extends Vue {
     }
     let current_year = (new Date()).getFullYear();
     this.new_course_year = this.course.year !== null ? this.course.year : current_year;
+  }
+
+  show_clone_course_modal() {
+    this.d_show_clone_course_modal = true;
+    this.$nextTick(() => {
+      (<ValidatedInput> this.$refs.copy_of_course_name).focus();
+    });
   }
 
   @handle_api_errors_async(handle_add_copied_course_error)
