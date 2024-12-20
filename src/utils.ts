@@ -210,3 +210,8 @@ export function blob_to_string(blob: Promise<Blob>): Promise<string> {
         reader.readAsText(await blob);
     });
 }
+
+let next_uid = 0
+export function generate_uid() {
+    return next_uid++;
+}
