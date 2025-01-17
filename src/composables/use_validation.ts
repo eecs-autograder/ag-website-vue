@@ -18,17 +18,17 @@ function default_register(..._: unknown[]): number {
 }
 function default_unregister(..._: unknown[]): void {}
 
-class ValidationObservable {
+class ValidatorComponentListener {
   private _uid: number;
   private _is_valid: boolean;
 
-  constructor(observable_component: Vue, notify_validity_changed: () => void) {
+  constructor(validator_component: Vue, on_validity_changed: () => void) {
     this._uid = generate_uid();
     this._is_valid = false;
 
-    observable_component.$on("input_validity_changed", (value: boolean) => {
+    validator_component.$on("input_validity_changed", (value: boolean) => {
       this._is_valid = value;
-      notify_validity_changed();
+      on_validity_changed();
     });
   }
 
@@ -180,34 +180,34 @@ export function use_validation<
   return { is_valid, errors };
 }
 
-export type ObserverEmitTypes = {
+export type ValidatorEmitTypes = {
   (e: "validity_changed", value: boolean): void;
 };
 
-export function use_validation_observer<T extends ObserverEmitTypes>(emit: T) {
+export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
   const all_valid = ref(false);
-  const observables = ref<ValidationObservable[]>([]);
+  const validators = ref<ValidatorComponentListener[]>([]);
 
-  function make_observable(observable_component: Vue) {
-    return new ValidationObservable(observable_component, update_all_valid);
+  function make_validator_component_listener(validator_component: Vue) {
+    return new ValidatorComponentListener(validator_component, update_all_valid);
   }
 
-  provide("register", function (observable_component: Vue): number {
-    const obs = make_observable(observable_component);
-    observables.value.push(obs);
-    return obs.uid;
+  provide("register", function (validator_component: Vue): number {
+    const validator = make_validator_component_listener(validator_component);
+    validators.value.push(validator);
+    return validator.uid;
   });
 
   provide("unregister", function (uid: number) {
-    const index = observables.value.findIndex((elem) => elem.uid === uid);
-    observables.value.splice(index, 1);
+    const index = validators.value.findIndex((elem) => elem.uid === uid);
+    validators.value.splice(index, 1);
     update_all_valid();
   });
 
   // called by the observable itself when the component being observed emits
   // an "input_validity_changed" event
   function update_all_valid() {
-    const new_validity = observables.value.every((obs) => obs.is_valid);
+    const new_validity = validators.value.every((validator) => validator.is_valid);
     if (new_validity !== all_valid.value) {
       all_valid.value = new_validity;
       emit("validity_changed", all_valid.value);
