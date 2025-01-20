@@ -111,7 +111,7 @@ export function use_validation<
   let uid: number;
 
   // Note that the second branch of this conditional can only be reached when
-  // J == K. See UseValidationParams type definition above.
+  // Input == Output. See UseValidationParams type definition above.
   const parser: (input: Input) => ParserResponse<Output> = params.parser
     ? params.parser
     : (input: Input) => {
