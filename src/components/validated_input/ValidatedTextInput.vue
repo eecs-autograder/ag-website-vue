@@ -9,7 +9,6 @@
         <input
           class="input"
           :id="label_id"
-          :aria-labelledby="label_id"
           :style="input_style"
           :class="{ 'error-input' : !input_style && !hide_errors && errors_to_render}"
           type="text"
