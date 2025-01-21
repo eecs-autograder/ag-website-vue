@@ -46,11 +46,8 @@ type PropTypes = {
   validators: ValidatorFuncType<number>[]
   input_style?: CSSProperties
   placeholder?: string
-  show_errors_on_blur?: boolean
 };
-const props = withDefaults(defineProps<PropTypes>(), {
-  show_errors_on_blur: false
-});
+const props = defineProps<PropTypes>();
 
 const label_id = `label-${generate_uid()}`;
 const input = ref("");
@@ -65,7 +62,7 @@ const errors_to_render = ref(false);
 
 // TODO: when we upgrade to Vue>=3.3, components using use_validation can just
 // import ValidatedInputEmitTypes to define the components emits (can be used to
-// define a product type for emits as well).
+// define an intersection type for emits as well).
 // i.e. const emit = defineEmits<ValidatedInputEmitTypes<number>>();
 // See https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
 type EmitTypes = {
@@ -105,7 +102,7 @@ watch(
 watch(input, () => { hide_errors.value = false });
 
 function on_blur() {
-  if (!is_valid.value && props.show_errors_on_blur) {
+  if (!is_valid.value) {
     hide_errors.value = false;
   }
 };

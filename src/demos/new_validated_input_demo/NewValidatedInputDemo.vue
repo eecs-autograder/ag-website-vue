@@ -20,7 +20,6 @@
             make_max_length_validator(10)
           ]"
           placeholder="Enter text..."
-          show_errors_on_blur
           @validity_changed="(new_is_valid) => { is_valid_1 = new_is_valid; }"
         >
           <template v-slot:label> Input </template>
@@ -69,7 +68,7 @@
         </p>
         <p>
           Last emitted value (Note: it will not be updated until inputted value
-          is valid. Also note: warnings will <strong>NOT</strong> show up if you click on the input
+          is valid. Also note: warnings will show up if you click on the input
           and then click away, they will only show up once you start editing):
           <span style="font-weight: bold">{{val_2}}</span>
         </p>
@@ -83,10 +82,9 @@
         <small>Validated Pair 1</small>
         <hr />
         <p>
-          The below pair of inputs must be both be positive integers that sum to
-          a number that is divisible by 4. Note that the errors for the group show
-          up immediately. Also note that the custom component has a validator
-          that forms a closure with the is_valid values of the two child
+          The below pair of inputs must both be positive integers that sum to
+          a number that is divisible by 4. Note that the custom component has a
+          validator that forms a closure with the is_valid values of the two child
           ValidateIntInput components to produce it's own error if both operands
           are not valid. This would be necessary if this component were part of
           a ValidatedForm, because emitted events don't bubble. Alternatively,
