@@ -1,10 +1,9 @@
 <template>
   <div>
-    <div id="validated-text" style="padding: 10px;">
+    <div id="validated-text" class="demo">
       <h1>Validated Text Input</h1>
 
       <div id="validated-text-1">
-        <small>Validated Text 1</small>
         <hr />
         <p>
           The below input must have an even number of characters, contain an
@@ -27,57 +26,57 @@
 
         <p>
           is_valid() result:
-          <span style="font-weight: bold">{{is_valid_1}}</span>
+          <span><strong>{{is_valid_1}}</strong></span>
         </p>
         <p>
           Last emitted value (Note: it will not be updated until inputted value
           is valid. Also note: warnings will show up if you click on the input
           and then click away without editing):
-          <span style="font-weight: bold">{{val_1}}</span>
+          <span><strong>{{val_1}}</strong></span>
         </p>
       </div>
     </div>
 
-    <div id="validated-int" style="padding: 10px;">
+    <div id="validated-int" class="demo">
       <h1>Validated Int Input</h1>
 
       <div id="validated-int-1">
-        <small>Validated Int 1</small>
         <hr />
         <p>
           The below input must be an even number of dollars in the range [6,
-          24].
+          24]. Note the use of the prefix and postfix slots, along with the
+          custom styling.
         </p>
 
         <validated-int-input
           v-model="val_2"
+          :input_style="{flex: '0', minWidth: '4em', textAlign: 'right'}"
           :validators="[
             make_min_validator(6),
             make_max_validator(24),
             even_number
           ]"
-          placeholder="Enter a number of dollars..."
           @validity_changed="(new_is_valid) => { is_valid_2 = new_is_valid; }"
         >
           <template v-slot:prefix> $ </template>
+          <template v-slot:suffix> .00 </template>
           <template v-slot:label> Cost </template>
         </validated-int-input>
         <p>
           is_valid() result:
-          <span style="font-weight: bold">{{is_valid_2}}</span>
+          <span><strong>{{is_valid_2}}</strong></span>
         </p>
         <p>
           Last emitted value:
-          <span style="font-weight: bold">{{val_2}}</span>
+          <span><strong>{{val_2}}</strong></span>
         </p>
       </div>
     </div>
 
-    <div id="validated-text-area" style="padding: 10px;">
+    <div id="validated-text-area" class="demo">
       <h1>Validated Text Area</h1>
 
       <div id="validated-text-area-1">
-        <small>Validated Text Area 1</small>
         <hr />
         <p>
           The below input must be at least 2 lines, and contain the words "Mario"
@@ -98,20 +97,19 @@
         </validated-text-area-input>
         <p>
           is_valid() result:
-          <span style="font-weight: bold">{{is_valid_3}}</span>
+          <span><strong>{{is_valid_3}}</strong></span>
         </p>
         <p>
           Last emitted value:
-          <span style="font-weight: bold">{{val_3}}</span>
+          <span><strong>{{val_3}}</strong></span>
         </p>
       </div>
     </div>
 
-    <div id="validated-pair" style="padding: 10px;">
-      <h1>Validating Multiple Inputs</h1>
+    <div id="validated-pair" class="demo">
+      <h1>Custom Validated Pair Input</h1>
 
       <div id="validated-pair-1">
-        <small>Validated Pair 1</small>
         <hr />
         <p>
           The below pair of inputs must both be positive integers that sum to a
@@ -131,11 +129,11 @@
         />
         <p>
           is_valid() result:
-          <span style="font-weight: bold">{{is_valid_4}}</span>
+          <span><strong>{{is_valid_4}}</strong></span>
         </p>
         <p>
           Last emitted value:
-          <span style="font-weight: bold">{{val_4}}</span>
+          <span><strong>{{val_4}}</strong></span>
         </p>
       </div>
     </div>
@@ -143,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, CSSProperties } from "vue";
 
 import ValidatedTextInput, {
   TextInputValidator,
@@ -241,9 +239,7 @@ const is_valid_4 = ref();
 </script>
 
 <style scoped lang="scss">
-.scrollable {
-  height: 10em;
-  overflow-y: auto;
-  border: solid;
+.demo {
+  padding: 10px;
 }
 </style>

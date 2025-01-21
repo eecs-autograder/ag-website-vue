@@ -72,9 +72,9 @@
               @click="d_current_tab ='validated_form'">
             Validated Form
           </div>
-          <div :class="['sidebar-item', {active: d_current_tab === 'use_validation'}]"
-              @click="d_current_tab ='use_validation'">
-            use_validation composable
+          <div :class="['sidebar-item', {active: d_current_tab === 'new_validated_input'}]"
+              @click="d_current_tab ='new_validated_input'">
+            New Validated Input
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@
         <ViewFileDemo v-show="d_current_tab === 'view_file'"></ViewFileDemo>
         <ValidatedInputDemo v-show="d_current_tab === 'validated_input'"></ValidatedInputDemo>
         <ValidatedFormDemo v-show="d_current_tab === 'validated_form'"></ValidatedFormDemo>
-        <NewValidatedInputDemo v-show="d_current_tab === 'use_validation'"></NewValidatedInputDemo>
+        <NewValidatedInputDemo v-show="d_current_tab === 'new_validated_input'"></NewValidatedInputDemo>
       </div>
     </div>
   </div>
