@@ -35,7 +35,6 @@ import { ref, watch, CSSProperties } from "vue";
 
 import {
   use_validation,
-  ValidatorFuncType,
   ParserFuncType
 } from '@/composables/use_validation';
 import InputErrors from '@/components/validated_input/InputErrors.vue';
@@ -109,6 +108,8 @@ function on_blur() {
 </script>
 
 <script lang="ts">
+import { ValidatorFuncType } from "@/composables/use_validation";
+
 export function make_min_validator(
   min: number
 ) : ValidatorFuncType<number> {

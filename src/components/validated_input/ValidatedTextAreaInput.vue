@@ -33,7 +33,6 @@ import { ref, watch, CSSProperties } from "vue";
 
 import {
   use_validation,
-  ValidatorFuncType,
 } from '@/composables/use_validation';
 import InputErrors from '@/components/validated_input/InputErrors.vue';
 import { generate_uid } from "@/utils";
@@ -93,6 +92,8 @@ function on_blur() {
 </script>
 
 <script lang="ts">
+import { ValidatorFuncType } from "@/composables/use_validation";
+
 export type TextAreaInputValidator = ValidatorFuncType<string>;
 </script>
 
