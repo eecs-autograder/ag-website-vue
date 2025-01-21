@@ -94,7 +94,7 @@
         <ViewFileDemo v-show="d_current_tab === 'view_file'"></ViewFileDemo>
         <ValidatedInputDemo v-show="d_current_tab === 'validated_input'"></ValidatedInputDemo>
         <ValidatedFormDemo v-show="d_current_tab === 'validated_form'"></ValidatedFormDemo>
-        <UseValidationDemo v-show="d_current_tab === 'use_validation'"></UseValidationDemo>
+        <NewValidatedInputDemo v-show="d_current_tab === 'use_validation'"></NewValidatedInputDemo>
       </div>
     </div>
   </div>
@@ -122,7 +122,7 @@ import TooltipDemo from './tooltip_demo.vue';
 import ValidatedFormDemo from './validated_form_demo.vue';
 import ValidatedInputDemo from './validated_input_demo.vue';
 import ViewFileDemo from './view_file_demo.vue';
-import UseValidationDemo from './use_validation_demo/UseValidationDemo.vue';
+import NewValidatedInputDemo from './new_validated_input_demo/NewValidatedInputDemo.vue';
 
 @Component({
   components: {
@@ -144,7 +144,7 @@ import UseValidationDemo from './use_validation_demo/UseValidationDemo.vue';
     ValidatedInputDemo,
     ViewFile,
     ViewFileDemo,
-    UseValidationDemo
+    NewValidatedInputDemo
   }
 })
 export default class UIDemos extends Vue {

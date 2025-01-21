@@ -10,13 +10,14 @@ import { onMounted } from "vue";
 
 import { use_validation_group, ValidatorEmitTypes } from '@/composables/use_validation';
 
-// TODO: A limitation of the vue SFC compiler is that emit types need to be known
-// at compile time. As of 3.3, however, imported types can be used to define emits.
-// Once we upgrade to 3.3, this can be changed to the following to reduce coupling:
-//
-// type EmitTypes = ObserverEmitTypes & {
+// TODO: when we upgrade to Vue>=3.3, components using use_validation_group can
+// just import ValidatedInputEmitTypes to define the components emits (can be used to
+// define an intersection type for emits as well).
+// i.e.
+// type EmitTypes = ValidatorEmitTypes & {
 //   (e: "submit"): void
 // }
+// See https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
 type EmitTypes = {
   (e: "validity_changed", value: boolean): void;
   (e: "submit"): void
