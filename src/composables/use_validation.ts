@@ -77,10 +77,7 @@ type IsEqual<A, B> =
     ? true
     : false;
 
-type UseValidationParams<
-  Input,
-  Output = Input,
-> =
+type UseValidationParams<Input, Output = Input> =
   IsEqual<Input, Output> extends true
     ? {
         input: Ref<Input> | ComputedRef<Input>;
@@ -100,10 +97,9 @@ type UseValidationParams<
         parser: ParserFuncType<Input, Output>;
       };
 
-export function use_validation<
-  Input,
-  Output = Input,
->(params: UseValidationParams<Input, Output>) {
+export function use_validation<Input, Output = Input>(
+  params: UseValidationParams<Input, Output>,
+) {
   const { input, validators, emit } = params;
 
   const register = inject("register", default_register);
@@ -184,13 +180,15 @@ export type ValidatorEmitTypes = {
   (e: "validity_changed", value: boolean): void;
 };
 
-
 export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
   const all_valid = ref(false);
   const validators = ref<ValidatorComponentListener[]>([]);
 
   function make_validator_component_listener(validator_component: Vue) {
-    return new ValidatorComponentListener(validator_component, update_all_valid);
+    return new ValidatorComponentListener(
+      validator_component,
+      update_all_valid,
+    );
   }
 
   provide("register", function (validator_component: Vue): number {
@@ -208,7 +206,9 @@ export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
   // called by the observable itself when the component being observed emits
   // an "input_validity_changed" event
   function update_all_valid() {
-    const new_validity = validators.value.every((validator) => validator.is_valid);
+    const new_validity = validators.value.every(
+      (validator) => validator.is_valid,
+    );
     if (new_validity !== all_valid.value) {
       all_valid.value = new_validity;
       emit("validity_changed", all_valid.value);
