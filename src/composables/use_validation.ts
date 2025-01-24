@@ -22,12 +22,15 @@ class ValidatorComponentListener {
   private _uid: number;
   private _is_valid: boolean;
 
-  constructor(validator_component: Vue, on_validity_changed: () => void) {
+  constructor(
+    is_valid: Ref<boolean> | ComputedRef<boolean>,
+    on_validity_changed: () => void,
+  ) {
     this._uid = generate_uid();
-    this._is_valid = false;
+    this._is_valid = is_valid.value;
 
-    validator_component.$on("input_validity_changed", (value: boolean) => {
-      this._is_valid = value;
+    watch(is_valid, (new_value) => {
+      this._is_valid = new_value;
       on_validity_changed();
     });
   }
@@ -66,7 +69,6 @@ export type ParserFuncType<Input, Output> = (
 ) => ParserResponse<Output>;
 
 export type ValidatedInputEmitTypes<Output> = {
-  (e: "validity_changed", value: boolean): void;
   (e: "input", value: Output): void;
 };
 
@@ -130,30 +132,6 @@ export function use_validation<Input, Output = Input>(
   });
   const is_valid = computed(() => errors.value.length === 0);
 
-  // note: errors is a computed value and the only reactive dependencies are
-  // input, validators, and parser.
-  watch(
-    errors,
-    (new_errors, old_errors) => {
-      if (old_errors === undefined) {
-        // emit initial validity, but don't show errors
-        emit("validity_changed", is_valid.value);
-        return;
-      }
-
-      if (new_errors.length > 0) {
-        if (old_errors.length === 0) {
-          emit("validity_changed", is_valid.value);
-        }
-      } else {
-        if (old_errors.length > 0) {
-          emit("validity_changed", is_valid.value);
-        }
-      }
-    },
-    { immediate: true },
-  );
-
   // emit value only when there are no errors
   watch(
     parsed_value,
@@ -166,7 +144,7 @@ export function use_validation<Input, Output = Input>(
   );
 
   onMounted(() => {
-    uid = register(getCurrentInstance());
+    uid = register(is_valid);
   });
 
   onBeforeUnmount(() => {
@@ -181,21 +159,24 @@ export type ValidatorEmitTypes = {
 };
 
 export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
-  const all_valid = ref(false);
+  const all_valid = ref<boolean | undefined>();
   const validators = ref<ValidatorComponentListener[]>([]);
 
-  function make_validator_component_listener(validator_component: Vue) {
-    return new ValidatorComponentListener(
-      validator_component,
-      update_all_valid,
-    );
+  function make_validator_component_listener(
+    is_valid: Ref<boolean> | ComputedRef<boolean>,
+  ) {
+    return new ValidatorComponentListener(is_valid, update_all_valid);
   }
 
-  provide("register", function (validator_component: Vue): number {
-    const validator = make_validator_component_listener(validator_component);
-    validators.value.push(validator);
-    return validator.uid;
-  });
+  provide(
+    "register",
+    function (is_valid: Ref<boolean> | ComputedRef<boolean>): number {
+      const validator = make_validator_component_listener(is_valid);
+      validators.value.push(validator);
+      update_all_valid();
+      return validator.uid;
+    },
+  );
 
   provide("unregister", function (uid: number) {
     const index = validators.value.findIndex((elem) => elem.uid === uid);
@@ -203,8 +184,8 @@ export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
     update_all_valid();
   });
 
-  // called by the observable itself when the component being observed emits
-  // an "input_validity_changed" event
+  // called by component listeners themselves when the validity of the component
+  // they're listening to changes
   function update_all_valid() {
     const new_validity = validators.value.every(
       (validator) => validator.is_valid,

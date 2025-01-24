@@ -66,7 +66,6 @@ const errors_to_render = ref(false);
 // i.e. const emit = defineEmits<ValidatedInputEmitTypes<number>>();
 // See https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
 type EmitTypes = {
-  (e: "validity_changed", value: boolean): void;
   (e: "input", value: number): void;
 };
 const emit = defineEmits<EmitTypes>();

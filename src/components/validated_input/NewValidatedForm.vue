@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, ref } from "vue";
+import { computed, getCurrentInstance } from "vue";
 
 import { use_validation_group, ValidatorEmitTypes } from '@/composables/use_validation';
 
@@ -23,17 +23,18 @@ type EmitTypes = {
   (e: "submit_invalid"): void;
 }
 const emit = defineEmits<EmitTypes>();
-const is_valid = use_validation_group(emit);
+const all_valid = use_validation_group(emit);
 
 const event_listeners = computed(() => {
   let listeners = {...getCurrentInstance()?.proxy.$listeners};
   listeners.submit = handle_submit;
+  return listeners;
 })
 
 const handle_submit = (e: Event) => {
-  e.preventDefault;
-  e.stopPropagation;
-  if (is_valid.value) {
+  e.preventDefault();
+  e.stopPropagation();
+  if (all_valid.value) {
     emit("submit");
   }
   else {
