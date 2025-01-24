@@ -21,7 +21,7 @@
     </div>
 
     <input-errors
-      :visible="!hide_errors"
+      :visible="force_show_errors || !hide_errors"
       :errors="errors"
       @errors_to_render="(val) => { errors_to_render = val; }"
     >
@@ -45,6 +45,7 @@ type PropTypes = {
   validators: ValidatorFuncType<number>[]
   input_style?: CSSProperties
   placeholder?: string
+  force_show_errors?: boolean
 };
 const props = defineProps<PropTypes>();
 

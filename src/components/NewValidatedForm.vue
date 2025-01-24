@@ -1,12 +1,11 @@
 <template>
-  <!-- <form v-bind="$props" v-on="event_listeners"> -->
-  <form v-bind="$props" @submit="handle_submit">
+  <form v-bind="$props" v-on="event_listeners">
     <slot></slot>
   </form>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { computed, getCurrentInstance, ref } from "vue";
 
 import { use_validation_group, ValidatorEmitTypes } from '@/composables/use_validation';
 
@@ -20,17 +19,25 @@ import { use_validation_group, ValidatorEmitTypes } from '@/composables/use_vali
 // See https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
 type EmitTypes = {
   (e: "validity_changed", value: boolean): void;
-  (e: "submit"): void
+  (e: "submit"): void;
+  (e: "submit_invalid"): void;
 }
 const emit = defineEmits<EmitTypes>();
-
 const is_valid = use_validation_group(emit);
+
+const event_listeners = computed(() => {
+  let listeners = {...getCurrentInstance()?.proxy.$listeners};
+  listeners.submit = handle_submit;
+})
 
 const handle_submit = (e: Event) => {
   e.preventDefault;
   e.stopPropagation;
   if (is_valid.value) {
     emit("submit");
+  }
+  else {
+    emit("submit_invalid");
   }
 }
 </script>
