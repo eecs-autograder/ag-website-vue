@@ -79,7 +79,7 @@ type IsEqual<A, B> =
     ? true
     : false;
 
-type UseValidationParams<Input, Output = Input> =
+export type UseValidationParams<Input, Output = Input> =
   IsEqual<Input, Output> extends true
     ? {
         input: Ref<Input> | ComputedRef<Input>;
