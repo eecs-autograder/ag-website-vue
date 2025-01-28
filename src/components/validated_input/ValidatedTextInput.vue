@@ -87,7 +87,7 @@ function on_blur() {
   if (!is_valid.value) {
     hide_errors.value = false;
   }
-};
+}
 </script>
 
 <script lang="ts">
@@ -108,7 +108,7 @@ export function make_min_length_validator(
       };
     }
   };
-};
+}
 
 export function make_max_length_validator(
   num_chars: number
@@ -125,7 +125,7 @@ export function make_max_length_validator(
       };
     }
   };
-};
+}
 
 export type TextInputValidator = ValidatorFuncType<string>;
 </script>

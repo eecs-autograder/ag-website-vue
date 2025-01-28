@@ -88,7 +88,7 @@ function on_blur() {
   if (!is_valid.value) {
     hide_errors.value = false;
   }
-};
+}
 </script>
 
 <script lang="ts">

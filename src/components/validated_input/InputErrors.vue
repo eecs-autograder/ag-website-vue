@@ -65,7 +65,7 @@ watch(
         debounce_cancel_map.delete(err);
         emit("errors_to_render", true);
       }, 500)
-      debounce_cancel_map.set(err, debounce_add.cancel);
+      debounce_cancel_map.set(err, () => debounce_add.cancel());
       debounce_add();
     })
 

@@ -104,7 +104,7 @@ function on_blur() {
   if (!is_valid.value) {
     hide_errors.value = false;
   }
-};
+}
 </script>
 
 <script lang="ts">
@@ -125,7 +125,7 @@ export function make_min_validator(
       };
     }
   };
-};
+}
 
 export function make_max_validator(
   max: number
@@ -142,7 +142,7 @@ export function make_max_validator(
       };
     }
   };
-};
+}
 
 export type IntInputValidator = ValidatorFuncType<number>;
 </script>

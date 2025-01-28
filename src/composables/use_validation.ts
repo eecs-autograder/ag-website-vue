@@ -1,6 +1,5 @@
-import Vue, {
+import {
   provide,
-  getCurrentInstance,
   ref,
   computed,
   inject,
@@ -159,7 +158,7 @@ export type ValidatorEmitTypes = {
 };
 
 export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
-  const all_valid = ref<boolean | undefined>();
+  const all_valid = ref<boolean>();
   const validators = ref<ValidatorComponentListener[]>([]);
 
   function make_validator_component_listener(
@@ -195,6 +194,14 @@ export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
       emit("validity_changed", all_valid.value);
     }
   }
+
+  onMounted(() => {
+    // This should only be the case if no validators registered, and
+    // we still want an initial validity in this case.
+    if (all_valid.value === undefined) {
+      update_all_valid();
+    }
+  });
 
   return all_valid;
 }
