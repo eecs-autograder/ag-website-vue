@@ -257,7 +257,7 @@ describe("use_validation", () => {
 });
 
 describe("use_validation_group", () => {
-  it("provides register and unregister functions", () => {
+  test("provides register and unregister functions", () => {
     const child = make_use_validation_group_child(ref(true));
 
     // sanity check -- we expect mounting the child without a parent that uses
@@ -275,7 +275,7 @@ describe("use_validation_group", () => {
     wrapper.destroy();
   });
 
-  it("emits validity_changed with initial validity", () => {
+  test("emits validity_changed with initial validity", () => {
     let child_is_valid = ref(true);
     let child = make_use_validation_group_child(child_is_valid);
     let wrapper = mount(make_use_validation_group_comp(child));
@@ -287,7 +287,7 @@ describe("use_validation_group", () => {
     expect(wrapper.emitted("validity_changed")?.[0]).toEqual([false]);
   });
 
-  it("emits validity_changed with changes in validity", async () => {
+  test("emits validity_changed with changes in validity", async () => {
     const child_is_valid = ref(true);
     const child = make_use_validation_group_child(child_is_valid);
     const wrapper = mount(make_use_validation_group_comp(child));
@@ -301,7 +301,7 @@ describe("use_validation_group", () => {
     expect(wrapper.emitted("validity_changed")?.[2]).toEqual([true]);
   });
 
-  it("does not emit validity_changed when group validity doesn't change", async () => {
+  test("does not emit validity_changed when group validity doesn't change", async () => {
     const child_1_is_valid = ref(false);
     const child_2_is_valid = ref(false);
     const child_1 = make_use_validation_group_child(child_1_is_valid);
@@ -317,7 +317,7 @@ describe("use_validation_group", () => {
     expect(wrapper.emitted("validity_changed")?.length).toEqual(1);
   });
 
-  it("returns correct initial value", () => {
+  test("returns correct initial value", () => {
     let wrapper = mount(make_use_validation_group_comp());
     let vm = wrapper.vm as unknown as UseValidationGroupCompInstance;
     expect(vm.all_valid).toBe(true);
@@ -339,7 +339,7 @@ describe("use_validation_group", () => {
     expect(vm.all_valid).toBe(false);
   });
 
-  it("updates return value when a child becomes invalid", async () => {
+  test("updates return value when a child becomes invalid", async () => {
     const child_is_valid = ref(true);
     const child = make_use_validation_group_child(child_is_valid);
     const wrapper = mount(make_use_validation_group_comp(child));
@@ -350,7 +350,7 @@ describe("use_validation_group", () => {
     expect(vm.all_valid).toBe(false);
   });
 
-  it("updates return value when a child becomes valid", async () => {
+  test("updates return value when a child becomes valid", async () => {
     const child_is_valid = ref(false);
     const child = make_use_validation_group_child(child_is_valid);
     const wrapper = mount(make_use_validation_group_comp(child));
@@ -361,7 +361,7 @@ describe("use_validation_group", () => {
     expect(vm.all_valid).toBe(true);
   });
 
-  it("updates return value correctly with multiple children", async () => {
+  test("updates return value correctly with multiple children", async () => {
     const child_1_is_valid = ref(true);
     const child_2_is_valid = ref(false);
     const child_3_is_valid = ref(true);
@@ -389,7 +389,7 @@ describe("use_validation_group", () => {
     expect(vm.all_valid).toBe(false);
   });
 
-  it("isn't affected by unregistered children", async () => {
+  test("isn't affected by unregistered children", async () => {
     const child_is_valid = ref(false);
     const child = make_use_validation_group_child(child_is_valid);
     const wrapper = mount(make_use_validation_group_comp(child));
