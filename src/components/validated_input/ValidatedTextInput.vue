@@ -35,13 +35,14 @@ import { ref, watch, CSSProperties } from "vue";
 
 import {
   use_validation,
+  ValidatorFuncType,
 } from '@/composables/use_validation';
 import InputErrors from '@/components/validated_input/InputErrors.vue';
 import { generate_uid } from "@/utils";
 
 type PropTypes = {
   value: string
-  validators: TextInputValidator[]
+  validators: ValidatorFuncType<string>[]
   input_style?: CSSProperties
   placeholder?: string
   force_show_errors?: boolean
@@ -88,46 +89,6 @@ function on_blur() {
     hide_errors.value = false;
   }
 }
-</script>
-
-<script lang="ts">
-import { ValidatorFuncType } from "@/composables/use_validation";
-
-export function make_min_length_validator(
-  num_chars: number
-) : ValidatorFuncType<string> {
-  return (input) => {
-    const is_valid = input.length >= num_chars;
-    if (is_valid) {
-      return { is_valid };
-    }
-    else {
-      return {
-        is_valid,
-        error_msg: `Input must contain at least ${num_chars} characters`
-      };
-    }
-  };
-}
-
-export function make_max_length_validator(
-  num_chars: number
-) : ValidatorFuncType<string> {
-  return (input) => {
-    const is_valid = input.length <= num_chars;
-    if (is_valid) {
-      return { is_valid };
-    }
-    else {
-      return {
-        is_valid,
-        error_msg: `Input must contain no more than ${num_chars} characters`
-      };
-    }
-  };
-}
-
-export type TextInputValidator = ValidatorFuncType<string>;
 </script>
 
 <style scoped lang="scss">

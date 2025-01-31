@@ -4,13 +4,13 @@ import { vi } from "vitest";
 
 import { ValidatorFuncType } from "@/composables/use_validation";
 
-import ValidatedIntInput, {
-  make_min_validator,
-} from "@/components/validated_input/ValidatedIntInput.vue";
-import ValidatedTextInput, {
-  make_min_length_validator,
-} from "@/components/validated_input/ValidatedTextInput.vue";
+import ValidatedIntInput from "@/components/validated_input/ValidatedIntInput.vue";
+import ValidatedTextInput from "@/components/validated_input/ValidatedTextInput.vue";
 import ValidatedTextAreaInput from "@/components/validated_input/ValidatedTextAreaInput.vue";
+import {
+  make_min_validator,
+  make_min_length_validator,
+} from "@/new_validators";
 
 type CommonProps<T> = {
   value: T;
@@ -18,7 +18,7 @@ type CommonProps<T> = {
   placeholder?: string;
   force_show_errors?: boolean;
   input_style?: CSSProperties;
-}
+};
 type ComponentType<T> = DefineComponent<CommonProps<T>>;
 
 // Driver code
@@ -36,16 +36,16 @@ runCommonTests<number>({
   validator: make_min_validator(2),
   valid_input: 2,
   invalid_input: 1,
-  error_contains: "2"
-})
+  error_contains: "2",
+});
 runCommonTests<string>({
   Component: ValidatedTextAreaInput,
   input_type: "textarea",
   validator: make_min_length_validator(2),
   valid_input: "OK",
   invalid_input: "",
-  error_contains: "2"
-})
+  error_contains: "2",
+});
 
 function runCommonTests<T>(params: {
   Component: ComponentType<T>;

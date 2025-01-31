@@ -33,13 +33,14 @@ import { ref, watch, CSSProperties } from "vue";
 
 import {
   use_validation,
+  ValidatorFuncType,
 } from '@/composables/use_validation';
 import InputErrors from '@/components/validated_input/InputErrors.vue';
 import { generate_uid } from "@/utils";
 
 type PropTypes = {
   value: string
-  validators: TextAreaInputValidator[]
+  validators: ValidatorFuncType<string>[]
   num_rows?: number
   input_style?: CSSProperties
   placeholder?: string
@@ -89,12 +90,6 @@ function on_blur() {
     hide_errors.value = false;
   }
 }
-</script>
-
-<script lang="ts">
-import { ValidatorFuncType } from "@/composables/use_validation";
-
-export type TextAreaInputValidator = ValidatorFuncType<string>;
 </script>
 
 <style scoped lang="scss">

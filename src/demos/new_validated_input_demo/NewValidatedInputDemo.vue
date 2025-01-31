@@ -26,13 +26,17 @@
 
         <p>
           is_valid() result:
-          <span><strong>{{is_valid_1}}</strong></span>
+          <span
+            ><strong>{{is_valid_1}}</strong></span
+          >
         </p>
         <p>
           Last emitted value (Note: it will not be updated until inputted value
           is valid. Also note: warnings will show up if you click on the input
           and then click away without editing):
-          <span><strong>{{val_1}}</strong></span>
+          <span
+            ><strong>{{val_1}}</strong></span
+          >
         </p>
       </div>
     </div>
@@ -64,11 +68,15 @@
         </validated-int-input>
         <p>
           is_valid() result:
-          <span><strong>{{is_valid_2}}</strong></span>
+          <span
+            ><strong>{{is_valid_2}}</strong></span
+          >
         </p>
         <p>
           Last emitted value:
-          <span><strong>{{val_2}}</strong></span>
+          <span
+            ><strong>{{val_2}}</strong></span
+          >
         </p>
       </div>
     </div>
@@ -79,8 +87,8 @@
       <div id="validated-text-area-1">
         <hr />
         <p>
-          The below input must be at least 2 lines, and contain the words "Mario"
-          or "Luigi" (case insensitive).
+          The below input must be at least 2 lines, and contain the words
+          "Mario" or "Luigi" (case insensitive).
         </p>
 
         <validated-text-area-input
@@ -97,11 +105,15 @@
         </validated-text-area-input>
         <p>
           is_valid() result:
-          <span><strong>{{is_valid_3}}</strong></span>
+          <span
+            ><strong>{{is_valid_3}}</strong></span
+          >
         </p>
         <p>
           Last emitted value:
-          <span><strong>{{val_3}}</strong></span>
+          <span
+            ><strong>{{val_3}}</strong></span
+          >
         </p>
       </div>
     </div>
@@ -129,11 +141,15 @@
         />
         <p>
           is_valid() result:
-          <span><strong>{{is_valid_4}}</strong></span>
+          <span
+            ><strong>{{is_valid_4}}</strong></span
+          >
         </p>
         <p>
           Last emitted value:
-          <span><strong>{{val_4}}</strong></span>
+          <span
+            ><strong>{{val_4}}</strong></span
+          >
         </p>
       </div>
     </div>
@@ -143,26 +159,24 @@
 <script setup lang="ts">
 import { ref, CSSProperties } from "vue";
 
-import ValidatedTextInput, {
-  TextInputValidator,
-  make_min_length_validator,
-  make_max_length_validator
-} from '@/components/validated_input/ValidatedTextInput.vue';
-import ValidatedIntInput, {
-  IntInputValidator,
+import ValidatedTextInput from '@/components/validated_input/ValidatedTextInput.vue';
+import ValidatedIntInput from "@/components/validated_input/ValidatedIntInput.vue";
+import ValidatedTextAreaInput from "@/components/validated_input/ValidatedTextAreaInput.vue";
+import {
   make_min_validator,
-  make_max_validator
-} from "@/components/validated_input/ValidatedIntInput.vue";
-import ValidatedTextAreaInput, {
-  TextAreaInputValidator
-} from "@/components/validated_input/ValidatedTextAreaInput.vue";
+  make_max_validator,
+  make_max_length_validator,
+  make_min_length_validator,
+  TextValidator,
+  NumberValidator,
+} from "@/new_validators";
 import PairedInputs from "./PairedInputs.vue";
 
 /**** ValidatedTextInput demo ****/
 const val_1 = ref("ab");
 const is_valid_1 = ref(true);
 
-const has_even_number_of_chars: TextInputValidator = (input: string) => {
+const has_even_number_of_chars: TextValidator = (input: string) => {
   if (input.length % 2 === 0) {
     return { is_valid: true }
   }
@@ -174,7 +188,7 @@ const has_even_number_of_chars: TextInputValidator = (input: string) => {
   }
 }
 
-const has_exclamation_point: TextInputValidator = (input: string) => {
+const has_exclamation_point: TextValidator = (input: string) => {
   if (input.includes('!')) {
     return { is_valid: true }
   }
@@ -190,7 +204,7 @@ const has_exclamation_point: TextInputValidator = (input: string) => {
 const val_2 = ref(0);
 const is_valid_2 = ref(true);
 
-const even_number: IntInputValidator = (input: number) => {
+const even_number: NumberValidator = (input: number) => {
   if (input % 2 == 0) {
     return { is_valid: true };
   }
@@ -206,7 +220,7 @@ const even_number: IntInputValidator = (input: number) => {
 const val_3 = ref("");
 const is_valid_3 = ref(true)
 
-const has_luigi_or_mario: TextAreaInputValidator = (input: string) => {
+const has_luigi_or_mario: TextValidator = (input: string) => {
   const text = input.toLowerCase();
   if (!(text.includes('luigi') || text.includes('mario'))) {
     return {
@@ -220,7 +234,7 @@ const has_luigi_or_mario: TextAreaInputValidator = (input: string) => {
     }
   }
 }
-const two_or_more_lines: TextAreaInputValidator = (input: string) => {
+const two_or_more_lines: TextValidator = (input: string) => {
   const num_lines = input.split('\n');
   if (num_lines.length >= 2) {
     return { is_valid: true };

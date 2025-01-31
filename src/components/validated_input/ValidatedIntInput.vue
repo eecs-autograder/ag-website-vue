@@ -35,6 +35,7 @@ import { ref, watch, CSSProperties } from "vue";
 
 import {
   use_validation,
+  ValidatorFuncType,
   ParserFuncType
 } from '@/composables/use_validation';
 import InputErrors from '@/components/validated_input/InputErrors.vue';
@@ -105,46 +106,6 @@ function on_blur() {
     hide_errors.value = false;
   }
 }
-</script>
-
-<script lang="ts">
-import { ValidatorFuncType } from "@/composables/use_validation";
-
-export function make_min_validator(
-  min: number
-) : ValidatorFuncType<number> {
-  return (input) => {
-    const is_valid = input >= min;
-    if (is_valid) {
-      return { is_valid };
-    }
-    else {
-      return {
-        is_valid,
-        error_msg: `Input must be greater than or equal to ${min}`
-      };
-    }
-  };
-}
-
-export function make_max_validator(
-  max: number
-) : ValidatorFuncType<number> {
-  return (input) => {
-    const is_valid = input <= max;
-    if (is_valid) {
-      return { is_valid };
-    }
-    else {
-      return {
-        is_valid,
-        error_msg: `Input must be less than or equal to ${max}`
-      };
-    }
-  };
-}
-
-export type IntInputValidator = ValidatorFuncType<number>;
 </script>
 
 <style scoped lang="scss">
