@@ -3,7 +3,8 @@ set -ex
 npx eslint \
     'tests/e2e/**/*.ts' \
     'src/composables/**/*.ts' \
-    'src/components/validated_input/**/*.vue'
+    'src/components/validated_input/**/*.vue' \
+    'tests/test_components/test_validated_input/**/*.ts'
 
 npx prettier --check \
     './*.js' \
@@ -11,6 +12,7 @@ npx prettier --check \
     'tests/e2e/**/*.ts' \
     './src/composables/**/*.ts' \
     './src/components/validated_input/**/*.vue' \
-    'tests/test_composables/**/*.ts'
+    'tests/test_composables/**/*.ts' \
+    'tests/test_components/test_validated_input/**/*.ts'
 
 ./check_subscribe_unsubscribe.py 'src/**/*.vue'
