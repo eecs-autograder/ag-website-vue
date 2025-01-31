@@ -21,7 +21,7 @@ type CommonProps<T> = {
 };
 type ComponentType<T> = DefineComponent<CommonProps<T>>;
 
-// Driver code
+// Driver code for common behavior between validated input components
 runCommonTests<string>({
   Component: ValidatedTextInput,
   input_type: "input",
@@ -50,8 +50,7 @@ runCommonTests<string>({
 function runCommonTests<T>(params: {
   Component: ComponentType<T>;
   input_type: string;
-  // validator: ValidatorFuncType<T>;
-  validator: unknown;
+  validator: ValidatorFuncType<T>;
   valid_input: T;
   invalid_input: T;
   error_contains: string;
