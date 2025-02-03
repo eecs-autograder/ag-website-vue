@@ -23,9 +23,8 @@
 import { ref } from 'vue';
 
 import NewValidatedForm from '@/components/validated_input/NewValidatedForm.vue';
-import ValidatedTextInput, {
-  make_min_length_validator
-} from '@/components/validated_input/ValidatedTextInput.vue';
+import ValidatedTextInput from '@/components/validated_input/ValidatedTextInput.vue';
+import { make_min_length_validator } from '@/new_validators';
 
 const empty_val = ref("");
 const has_submitted = ref(false);

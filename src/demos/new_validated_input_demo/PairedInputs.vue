@@ -28,8 +28,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import ValidatedIntInput, { make_min_validator } from '@/components/validated_input/ValidatedIntInput.vue';
+import ValidatedIntInput from '@/components/validated_input/ValidatedIntInput.vue';
 import InputErrors from '@/components/validated_input/InputErrors.vue';
+import { make_min_validator } from '@/new_validators';
 import { use_validation, ValidatorFuncType, ParserFuncType } from '@/composables/use_validation';
 
 type NumberPair = {
