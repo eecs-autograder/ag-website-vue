@@ -4,6 +4,7 @@ import { Course, GradingStatus, Group, HttpError, Project, Submission, User } fr
 // @ts-ignore
 import moment from "moment";
 import * as sinon from 'sinon';
+import { vi } from 'vitest';
 
 import APIErrors from "@/components/api_errors.vue";
 import FileUpload from "@/components/file_upload.vue";
@@ -127,6 +128,27 @@ describe('Deadline info tests', () => {
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#deadline-countdown').text()).toEqual('(> 1 month)');
+    });
+
+    test('More than one month until soft closing time at end of long month', async () => {
+        // mock system time
+        const fake_now = new Date("2025-01-31");
+        vi.setSystemTime(fake_now);
+
+        project.soft_closing_time = moment(fake_now)
+            .add(1, 'months').add(1, 'days').add(1, 'minutes').format();
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('(> 1 month)');
+
+        // reset system time
+        vi.setSystemTime(new Date());
     });
 
     test('Days until soft closing time', async () => {
@@ -302,6 +324,29 @@ describe('Deadline info tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#deadline-countdown').text()).toEqual('');
         expect(wrapper.find('#extension-countdown').text()).toEqual('(> 1 month)');
+    });
+
+    test('More than one month until extension at end of long month', async () => {
+        // mock system time
+        const fake_now = new Date("2025-01-31");
+        vi.setSystemTime(fake_now);
+
+        project.soft_closing_time = moment(fake_now).subtract(7, 'hours').format();
+        group.extended_due_date = moment(fake_now)
+            .add(1, 'months').add(1, 'days').add(1, 'minutes').format();
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            }
+        });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('#deadline-countdown').text()).toEqual('');
+        expect(wrapper.find('#extension-countdown').text()).toEqual('(> 1 month)');
+
+        // reset system time
+        vi.setSystemTime(new Date());
     });
 
     test('Extension countdown updates when d_now changes', async () => {
