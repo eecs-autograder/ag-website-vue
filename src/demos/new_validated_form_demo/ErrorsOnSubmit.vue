@@ -5,8 +5,12 @@
   >
     <p>
       Sometimes you'll have form inputs that start out invalid. Warnings for
-      those fields will be enabled when the user changes the data or tries to
-      submit the form.
+      those fields will be enabled when the user changes the data. They can also
+      be enabled by listening for the `submit_invalid` event from the form and
+      using that to set the `force_show_errors` prop on the validated input component.
+
+      The below input must be non-empty, and the initial error will be displayed
+      after trying to submit with an empty value.
     </p>
 
     <validated-text-input
