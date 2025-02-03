@@ -130,7 +130,7 @@ describe('Deadline info tests', () => {
         expect(wrapper.find('#deadline-countdown').text()).toEqual('(> 1 month)');
     });
 
-    test('More than one month until soft closing time at end of long month', async () => {
+    test('More than one month until soft closing time at end of February', async () => {
         // mock system time
         const fake_now = new Date("2025-01-31");
         vi.setSystemTime(fake_now);
@@ -326,7 +326,7 @@ describe('Deadline info tests', () => {
         expect(wrapper.find('#extension-countdown').text()).toEqual('(> 1 month)');
     });
 
-    test('More than one month until extension at end of long month', async () => {
+    test('More than one month until extension at end of February', async () => {
         // mock system time
         const fake_now = new Date("2025-01-31");
         vi.setSystemTime(fake_now);
