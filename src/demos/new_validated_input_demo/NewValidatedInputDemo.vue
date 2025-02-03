@@ -25,7 +25,7 @@
         </validated-text-input>
 
         <p>
-          is_valid() result:
+          Last emitted validity:
           <span
             ><strong>{{is_valid_1}}</strong></span
           >
@@ -67,7 +67,7 @@
           <template v-slot:label> Cost </template>
         </validated-int-input>
         <p>
-          is_valid() result:
+          Last emitted validity:
           <span
             ><strong>{{is_valid_2}}</strong></span
           >
@@ -104,7 +104,7 @@
           <template v-slot:label> Text Area </template>
         </validated-text-area-input>
         <p>
-          is_valid() result:
+          Last emitted validity:
           <span
             ><strong>{{is_valid_3}}</strong></span
           >
@@ -125,14 +125,21 @@
         <hr />
         <p>
           The below pair of inputs must both be positive integers that sum to a
-          number that is divisible by 4. Note that the custom component has a
-          validator that forms a closure with the is_valid values of the two
-          child ValidateIntInput components to produce it's own error if both
-          operands are not valid. This would be necessary if this component were
-          part of a ValidatedForm, because emitted events don't bubble.
-          Alternatively, the component could listen for the validity_changed
-          events of the child components and re-emit them without creating
-          another validator.
+          number that is divisible by 4. Note that each input will individually
+          display an error if the value is not a positive integer, and the pair
+          of inputs shows an error if the sum is not divisibly by 4.
+        </p>
+        <p>
+          Note: the change in validity is <strong>only</strong> emitted when the
+          validity of the <strong>PairedInputs</strong> component changes.
+          Because the ValidatedIntInput components only update the input value
+          when they are valid, changing the inputs to something valid (i.e. 4 +
+          4) to something where one operand is invalid (i.e. A + 4) will not
+          change the last emitted validity shown below. This
+          <strong>does not</strong>
+          affect how nested validated input components behave when used inside a
+          NewValidatedForm component, because that mechanism for tracking
+          validity does not rely on emitted events.
         </p>
 
         <paired-inputs
@@ -140,7 +147,7 @@
           @validity_changed="(new_is_valid) => { is_valid_4 = new_is_valid; }"
         />
         <p>
-          is_valid() result:
+          Last emitted pair validity:
           <span
             ><strong>{{is_valid_4}}</strong></span
           >
@@ -216,7 +223,7 @@ const even_number: NumberValidator = (input: number) => {
   }
 }
 
-/*** PairedInput demo ****/
+/*** ValidatedTextArea demo ****/
 const val_3 = ref("");
 const is_valid_3 = ref(true)
 

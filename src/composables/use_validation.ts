@@ -8,6 +8,7 @@ import {
   onMounted,
   onBeforeUnmount,
   watch,
+  watchEffect,
 } from "vue";
 
 import { generate_uid } from "@/utils";
@@ -69,6 +70,7 @@ export type ParserFuncType<Input, Output> = (
 
 export type ValidatedInputEmitTypes<Output> = {
   (e: "input", value: Output): void;
+  (e: "validity_changed", value: boolean): void;
 };
 
 // Utility class that checks for type equality at compile time.
@@ -141,6 +143,12 @@ export function use_validation<Input, Output = Input>(
     },
     { immediate: true },
   );
+
+  // eagerly emit validity-changed whenever a dependency changes
+  // (the non-computed dependencies are input, parser, and validators)
+  watchEffect(() => {
+    emit("validity_changed", is_valid.value);
+  });
 
   onMounted(() => {
     uid = register(is_valid);

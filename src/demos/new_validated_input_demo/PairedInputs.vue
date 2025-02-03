@@ -7,7 +7,6 @@
       <validated-int-input
         v-model="first"
         :validators="[make_min_validator(1)]"
-        @validity_changed="(val) => valid_first = val"
         style="padding-right:5px;"
       >
         <template v-slot:label>First operand</template>
@@ -15,7 +14,6 @@
       <validated-int-input
         v-model="second"
         :validators="[make_min_validator(1)]"
-        @validity_changed="(val) => valid_second = val"
       >
         <template v-slot:prefix>+</template>
         <template v-slot:label>Second operand</template>
@@ -41,8 +39,6 @@ type NumberPair = {
 const first = ref<number>(1);
 const second = ref<number>(1);
 const pair = computed<NumberPair>(() => ({first: first.value, second: second.value}));
-const valid_first = ref(false);
-const valid_second = ref(false);
 
 type EmitTypes = {
   (e: "validity_changed", value: boolean): void;
@@ -57,13 +53,7 @@ const parser: ParserFuncType<NumberPair, number> = (value: NumberPair) => {
 };
 
 const is_div_by_4_validator: ValidatorFuncType<number> = (value: number) => {
-  const valid_operands = valid_first.value && valid_second.value;
-  if (!valid_operands) {
-    return {
-      is_valid: false,
-      error_msg: "Both operands must be valid"
-    }
-  } else if (value % 4 === 0) {
+  if (value % 4 === 0) {
     return { is_valid: true }
   } else {
     return {
