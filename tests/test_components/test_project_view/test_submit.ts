@@ -41,6 +41,10 @@ beforeEach(() => {
     });
 });
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe('Deadline info tests', () => {
     test('Project has soft closing time, group has no extension', () => {
         project.soft_closing_time = moment([2018, 4, 18, 16, 33]).toISOString();
@@ -146,9 +150,6 @@ describe('Deadline info tests', () => {
         });
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#deadline-countdown').text()).toEqual('(> 1 month)');
-
-        // reset system time
-        vi.setSystemTime(new Date());
     });
 
     test('Days until soft closing time', async () => {
@@ -344,9 +345,6 @@ describe('Deadline info tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#deadline-countdown').text()).toEqual('');
         expect(wrapper.find('#extension-countdown').text()).toEqual('(> 1 month)');
-
-        // reset system time
-        vi.setSystemTime(new Date());
     });
 
     test('Extension countdown updates when d_now changes', async () => {
