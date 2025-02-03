@@ -267,7 +267,7 @@ export default class Submit extends Vue {
       return '';
     }
 
-    return this._format_time_diff(deadline, this.d_now);
+    return this._format_time_until_deadline({deadline: deadline, now: this.d_now});
   }
 
   get time_until_extension() {
@@ -277,16 +277,19 @@ export default class Submit extends Vue {
       return '';
     }
 
-    return this._format_time_diff(extension, this.d_now);
+    return this._format_time_until_deadline({deadline: extension, now: this.d_now});
   }
 
-  _format_time_diff(first: moment.Moment, second: moment.Moment): string {
-    let diff = moment.duration(first.diff(second));
+  _format_time_until_deadline(params: {deadline: moment.Moment, now: moment.Moment}): string {
+    const { deadline, now } = params;
 
-    if (diff.asMonths() >= 1) {
+    let month_later = now.clone();
+    month_later = month_later.add(1, "months");
+    if (month_later.isBefore(deadline)) {
       return '(> 1 month)';
     }
 
+    let diff = moment.duration(deadline.diff(now));
     let days = diff.days();
     let hours = diff.hours();
     let hours_str = `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
