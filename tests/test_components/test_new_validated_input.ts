@@ -180,5 +180,32 @@ function runCommonTests<T>(params: {
       const style = getComputedStyle(wrapper.find(input_type).element);
       expect(style.backgroundColor).toBe("yellow");
     });
+
+    test("emits validity_changed event when validity changes", async () => {
+      const wrapper = mount(Component, {
+        propsData: {
+          value: ref(invalid_input),
+          validators: [validator],
+          input_style: { backgroundColor: "yellow" },
+        },
+      });
+
+      await Vue.nextTick();
+      console.log(wrapper.emitted('validity_changed'))
+      expect(wrapper.emitted('validity_changed')?.length).toBe(1);
+      expect(wrapper.emitted('validity_changed')?.[0]).toStrictEqual([false]);
+
+      await wrapper.find(input_type).setValue(valid_input);
+      await Vue.nextTick();
+      console.log(wrapper.emitted('validity_changed'))
+      expect(wrapper.emitted('validity_changed')?.length).toBe(2);
+      expect(wrapper.emitted('validity_changed')?.[1]).toStrictEqual([true]);
+
+      await wrapper.find(input_type).setValue(invalid_input);
+      await Vue.nextTick();
+      console.log(wrapper.emitted('validity_changed'))
+      expect(wrapper.emitted('validity_changed')?.length).toBe(3);
+      expect(wrapper.emitted('validity_changed')?.[2]).toStrictEqual([false]);
+    })
   });
 }
