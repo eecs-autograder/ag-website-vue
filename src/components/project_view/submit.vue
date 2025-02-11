@@ -82,7 +82,7 @@
         <div class="confirm-pledge">
           <label class="label">
             Sign your username "{{expected_honor_pledge_signature}}" to confirm: <br>
-            <input type="text" class="input" v-model="d_honor_pledge_signature">
+            <input type="text" class="input" v-model="d_honor_pledge_signature" @keyup.enter="attempt_to_submit">
           </label>
         </div>
       </template>
@@ -253,6 +253,13 @@ export default class Submit extends Vue {
   destroyed() {
     if (this.d_now_timer_id !== null) {
       clearInterval(this.d_now_timer_id);
+    }
+  }
+
+  attempt_to_submit() {
+    const fileUploader = this.$refs.submit_file_upload as FileUpload;
+    if (fileUploader && this.honor_pledged_signed) {
+      fileUploader.attempt_to_upload();
     }
   }
 

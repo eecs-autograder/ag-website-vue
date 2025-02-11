@@ -1,4 +1,4 @@
-import { Wrapper } from '@vue/test-utils';
+import { shallowMount, Wrapper } from '@vue/test-utils';
 
 import { Course, GradingStatus, Group, HttpError, Project, Submission, User } from "ag-client-typescript";
 // @ts-ignore
@@ -12,7 +12,7 @@ import ExpectedStudentFilesList from '@/components/project_view/expected_student
 import GroupMembers from '@/components/project_view/group_members.vue';
 import Submit from '@/components/project_view/submit.vue';
 import { format_datetime } from '@/utils';
-
+import Vue from 'vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { compress_whitespace, emitted, find_by_name, find_component, set_data, wait_fixed, wait_until } from '@/tests/utils';
@@ -524,6 +524,7 @@ describe('Group members tests', () => {
         expect(group_members.vm.include_late_day_totals).toBe(false);
     });
 });
+
 
 describe('Submission limit, bonus submission, late day tests', () => {
     test('No submissions per day limit', () => {
@@ -1063,5 +1064,60 @@ describe('Honor pledge tests', () => {
 
         let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
         expect(file_upload.vm.disable_upload_button).toBe(true);
+    });
+
+    
+    test('Enter key triggers attempt_to_submit when the Enter key is pressed on the input', async () => {
+        project.use_honor_pledge = true;
+        project.honor_pledge_text = "some text";
+        let wrapper = make_wrapper();
+
+        // Add a manual method to track calls
+        let called = false;
+        wrapper.vm.attempt_to_submit = () => {
+            called = true; // Set to true when called
+            // Perform original operations if necessary, or leave empty if not
+        };
+        await wrapper.vm.$nextTick();
+
+        // Ensure the input field is set with the correct data
+        await wrapper.vm.$set(wrapper.vm, 'd_honor_pledge_signature', current_user.username);
+
+        // Find the input element within '.confirm-pledge' and trigger the 'keyup.enter' event
+        const input = wrapper.find('.confirm-pledge input[type="text"].input');
+        if (input.exists()) {
+            await input.trigger('keyup.enter');
+            // Check if the attempt_to_submit method was manually set to be called
+            expect(called).toBe(true);
+        } else {
+            throw new Error('Input element not found');
+        }
+    });
+
+    test('attempt_to_upload from FileUpload is not called if the honor pledge is not correctly signed', async () => {
+        project.use_honor_pledge = true;
+        let wrapper = make_wrapper();
+        let uploadCalled = false;
+        // Mock fileUploader and its attempt_to_upload method
+        const fileUploadComponent = <Wrapper<FileUpload>> wrapper.findComponent({ ref: 'submit_file_upload' });
+
+
+        fileUploadComponent.vm.attempt_to_upload = () => {
+            uploadCalled = true;  // Set to true when called
+        };
+    
+        // Set an incorrect signature to test the condition
+        await wrapper.vm.$set(wrapper.vm, 'd_honor_pledge_signature', 'incorrect_signature');
+        await wrapper.vm.$nextTick();
+    
+        const input = wrapper.find('.confirm-pledge input[type="text"].input');
+        if (input.exists()) {
+            await input.trigger('keyup.enter');
+    
+            // Check if attempt_to_upload was not called due to incorrect signature
+            expect(uploadCalled).toBe(false);
+        } else {
+            throw new Error('Input element not found');
+        }
     });
 });
