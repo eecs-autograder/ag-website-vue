@@ -61,6 +61,14 @@ const hide_errors = ref(true);
 // This is updated when InputErrors emits.
 const errors_to_render = ref(false);
 
+watch(
+  () => props.value,
+  (new_value) => { input.value = new_value},
+  { immediate: true}
+);
+
+watch(input, () => { hide_errors.value = false });
+
 // TODO: when we upgrade to Vue>=3.3, components using use_validation can just
 // import ValidatedInputEmitTypes to define the components emits (can be used to
 // define a product type for emits as well).
@@ -77,14 +85,6 @@ const { is_valid, errors } = use_validation<string>({
     validators: props.validators,
     emit
 });
-
-watch(
-  () => props.value,
-  (new_value) => { input.value = new_value},
-  { immediate: true}
-);
-
-watch(input, () => { hide_errors.value = false });
 
 function on_blur() {
   if (!is_valid.value) {
