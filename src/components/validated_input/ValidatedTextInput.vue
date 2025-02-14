@@ -10,7 +10,9 @@
           class="input"
           :id="label_id"
           :style="input_style"
-          :class="{ 'error-input' : !input_style && !hide_errors && errors_to_render}"
+          :class="{
+            'error-input': !input_style && !hide_errors && errors_to_render,
+          }"
           type="text"
           v-model="input"
           :placeholder="placeholder"
@@ -23,7 +25,11 @@
     <input-errors
       :visible="force_show_errors || !hide_errors"
       :errors="errors"
-      @errors_to_render="(val) => { errors_to_render = val; }"
+      @errors_to_render="
+        (val) => {
+          errors_to_render = val;
+        }
+      "
     >
       <slot v-if="$slots.errors" name="errors"></slot>
     </input-errors>
@@ -36,16 +42,16 @@ import { ref, watch, CSSProperties } from "vue";
 import {
   use_validation,
   ValidatorFuncType,
-} from '@/composables/use_validation';
-import InputErrors from '@/components/validated_input/InputErrors.vue';
+} from "@/composables/use_validation";
+import InputErrors from "@/components/validated_input/InputErrors.vue";
 import { generate_uid } from "@/utils";
 
 type PropTypes = {
-  value: string
-  validators: ValidatorFuncType<string>[]
-  input_style?: CSSProperties
-  placeholder?: string
-  force_show_errors?: boolean
+  value: string;
+  validators: ValidatorFuncType<string>[];
+  input_style?: CSSProperties;
+  placeholder?: string;
+  force_show_errors?: boolean;
 };
 const props = defineProps<PropTypes>();
 
@@ -62,11 +68,15 @@ const errors_to_render = ref(false);
 
 watch(
   () => props.value,
-  (new_value) => { input.value = new_value},
-  { immediate: true}
+  (new_value) => {
+    input.value = new_value;
+  },
+  { immediate: true },
 );
 
-watch(input, () => { hide_errors.value = false });
+watch(input, () => {
+  hide_errors.value = false;
+});
 
 // TODO: when we upgrade to Vue>=3.3, components using use_validation can just
 // import ValidatedInputEmitTypes to define the components emits (can be used to
@@ -80,9 +90,9 @@ type EmitTypes = {
 const emit = defineEmits<EmitTypes>();
 
 const { is_valid, errors } = use_validation<string>({
-    input,
-    validators: props.validators,
-    emit
+  input,
+  validators: props.validators,
+  emit,
 });
 
 function on_blur() {
@@ -93,5 +103,5 @@ function on_blur() {
 </script>
 
 <style scoped lang="scss">
-@import 'styles.scss'
+@import "styles.scss";
 </style>

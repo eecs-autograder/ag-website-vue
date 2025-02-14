@@ -5,7 +5,7 @@
       class="error-text error-li"
       :key="error.uid"
     >
-      {{error.error_msg}}
+      {{ error.error_msg }}
     </li>
   </transition-group>
 </template>
@@ -17,8 +17,8 @@ import { debounce } from "lodash";
 import { generate_uid } from "@/utils";
 
 type PropTypes = {
-  errors: string[]
-  visible: boolean
+  errors: string[];
+  visible: boolean;
 };
 const props = defineProps<PropTypes>();
 
@@ -27,13 +27,13 @@ const props = defineProps<PropTypes>();
 // displayed
 type EmitTypes = {
   (e: "errors_to_render", value: boolean): void;
-}
+};
 const emit = defineEmits<EmitTypes>();
 
 type VisibleError = {
-  error_msg: string
-  uid: number
-}
+  error_msg: string;
+  uid: number;
+};
 const errors_to_render = ref<VisibleError[]>([]);
 
 const debounce_cancel_map = new Map<string, () => void>();
@@ -41,13 +41,15 @@ const debounce_cancel_map = new Map<string, () => void>();
 watch(
   () => props.errors,
   (new_errors: string[], old_errors: string[] | undefined) => {
-    const removed_errors = old_errors?.filter((err) => !new_errors.includes(err));
+    const removed_errors = old_errors?.filter(
+      (err) => !new_errors.includes(err),
+    );
     const added_errors = new_errors.filter((err) => !old_errors?.includes(err));
 
     // immediately remove resolved errors and cancel any debounced additions
     // to visible errors
-    errors_to_render.value = errors_to_render.value.filter(
-      (err) => new_errors.includes(err.error_msg)
+    errors_to_render.value = errors_to_render.value.filter((err) =>
+      new_errors.includes(err.error_msg),
     );
     removed_errors?.forEach((err) => {
       const cancel = debounce_cancel_map.get(err);
@@ -55,32 +57,32 @@ watch(
         cancel();
       }
       debounce_cancel_map.delete(err);
-    })
+    });
 
     // Debounce additions to visible errors for smoother UX, keeping track of
     // the cancel functions
     added_errors.forEach((err) => {
       const debounce_add = debounce(() => {
-        errors_to_render.value.push({error_msg: err, uid: generate_uid()});
+        errors_to_render.value.push({ error_msg: err, uid: generate_uid() });
         debounce_cancel_map.delete(err);
         emit("errors_to_render", true);
-      }, 500)
+      }, 500);
       debounce_cancel_map.set(err, () => debounce_add.cancel());
       debounce_add();
-    })
+    });
 
     if (errors_to_render.value.length === 0) {
       emit("errors_to_render", false);
     }
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 onBeforeUnmount(() => {
   debounce_cancel_map.forEach((cancel) => cancel());
-})
+});
 </script>
 
 <style scoped lang="scss">
-@import 'styles.scss'
+@import "styles.scss";
 </style>

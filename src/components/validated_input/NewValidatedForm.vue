@@ -7,7 +7,10 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance } from "vue";
 
-import { use_validation_group, ValidatorEmitTypes } from '@/composables/use_validation';
+import {
+  use_validation_group,
+  ValidatorEmitTypes,
+} from "@/composables/use_validation";
 
 // TODO: when we upgrade to Vue>=3.3, components using use_validation_group can
 // just import ValidatedInputEmitTypes to define the components emits (can be used to
@@ -21,28 +24,27 @@ type EmitTypes = {
   (e: "validity_changed", value: boolean): void;
   (e: "submit"): void;
   (e: "submit_invalid"): void;
-}
+};
 const emit = defineEmits<EmitTypes>();
 const all_valid = use_validation_group(emit);
 
 const event_listeners = computed(() => {
-  let listeners = {...getCurrentInstance()?.proxy.$listeners};
+  let listeners = { ...getCurrentInstance()?.proxy.$listeners };
   listeners.submit = handle_submit;
   return listeners;
-})
+});
 
 const handle_submit = (e: Event) => {
   e.preventDefault();
   e.stopPropagation();
   if (all_valid.value) {
     emit("submit");
-  }
-  else {
+  } else {
     emit("submit_invalid");
   }
-}
+};
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 </style>

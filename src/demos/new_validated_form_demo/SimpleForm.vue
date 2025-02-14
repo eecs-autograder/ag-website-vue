@@ -43,41 +43,42 @@
       type="submit"
       :disabled="!is_valid"
       :class="{
-                disabled: !is_valid,
-                enabled: is_valid
-              }"
+        disabled: !is_valid,
+        enabled: is_valid,
+      }"
     >
       Save
     </button>
-    <h3>Validated Form is_valid status: {{is_valid}}</h3>
+    <h3>Validated Form is_valid status: {{ is_valid }}</h3>
     <br /><br />
   </new-validated-form>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import ValidatedIntInput from '@/components/validated_input/ValidatedIntInput.vue';
-import ValidatedTextInput, { TextInputValidator } from '@/components/validated_input/ValidatedTextInput.vue';
-import NewValidatedForm from '@/components/validated_input/NewValidatedForm.vue';
-import Toggle from '@/components/toggle.vue';
+import { ref } from "vue";
+import ValidatedIntInput from "@/components/validated_input/ValidatedIntInput.vue";
+import ValidatedTextInput, {
+  TextInputValidator,
+} from "@/components/validated_input/ValidatedTextInput.vue";
+import NewValidatedForm from "@/components/validated_input/NewValidatedForm.vue";
+import Toggle from "@/components/toggle.vue";
 
 const number_input = ref(42);
-const text_input = ref('mars');
+const text_input = ref("mars");
 const toggleable_input_value = ref(42);
 const show_toggleable_input = ref(true);
 
-
 const is_valid = ref(false);
 const is_mars: TextInputValidator = (value) => {
-  const is_valid = value === 'mars';
+  const is_valid = value === "mars";
   if (is_valid) {
     return { is_valid };
   } else {
-    return { is_valid, error_msg: 'not mars' };
+    return { is_valid, error_msg: "not mars" };
   }
-}
+};
 
-const save_data = () => alert('succesfully saved!');
+const save_data = () => alert("succesfully saved!");
 </script>
 
 <style scoped lang="scss">
@@ -89,7 +90,8 @@ const save_data = () => alert('succesfully saved!');
   background-color: lightblue;
 }
 
-.enabled, .disabled {
+.enabled,
+.disabled {
   margin-top: 5px;
 }
 </style>

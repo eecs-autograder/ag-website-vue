@@ -7,7 +7,7 @@
       <validated-int-input
         v-model="first"
         :validators="[make_min_validator(1)]"
-        style="padding-right:5px;"
+        style="padding-right: 5px"
       >
         <template v-slot:label>First operand</template>
       </validated-int-input>
@@ -24,21 +24,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref } from "vue";
 
-import ValidatedIntInput from '@/components/validated_input/ValidatedIntInput.vue';
-import InputErrors from '@/components/validated_input/InputErrors.vue';
-import { make_min_validator } from '@/new_validators';
-import { use_validation, ValidatorFuncType, ParserFuncType } from '@/composables/use_validation';
+import ValidatedIntInput from "@/components/validated_input/ValidatedIntInput.vue";
+import InputErrors from "@/components/validated_input/InputErrors.vue";
+import { make_min_validator } from "@/new_validators";
+import {
+  use_validation,
+  ValidatorFuncType,
+  ParserFuncType,
+} from "@/composables/use_validation";
 
 type NumberPair = {
-  first: number
-  second: number
-}
+  first: number;
+  second: number;
+};
 
 const first = ref<number>(1);
 const second = ref<number>(1);
-const pair = computed<NumberPair>(() => ({first: first.value, second: second.value}));
+const pair = computed<NumberPair>(() => ({
+  first: first.value,
+  second: second.value,
+}));
 
 type EmitTypes = {
   (e: "validity_changed", value: boolean): void;
@@ -48,25 +55,26 @@ const emit = defineEmits<EmitTypes>();
 
 const parser: ParserFuncType<NumberPair, number> = (value: NumberPair) => {
   return {
-    is_valid: true, output: value.first + value.second
-  }
+    is_valid: true,
+    output: value.first + value.second,
+  };
 };
 
 const is_div_by_4_validator: ValidatorFuncType<number> = (value: number) => {
   if (value % 4 === 0) {
-    return { is_valid: true }
+    return { is_valid: true };
   } else {
     return {
       is_valid: false,
-      error_msg: "The sum of the operands must be divisble by 4"
-    }
+      error_msg: "The sum of the operands must be divisble by 4",
+    };
   }
 };
 
 const { errors } = use_validation<NumberPair, number>({
   input: pair,
-  validators: [ is_div_by_4_validator ],
+  validators: [is_div_by_4_validator],
   emit,
-  parser
+  parser,
 });
 </script>

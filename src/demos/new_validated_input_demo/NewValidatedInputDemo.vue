@@ -16,10 +16,14 @@
             has_even_number_of_chars,
             has_exclamation_point,
             make_min_length_validator(4),
-            make_max_length_validator(10)
+            make_max_length_validator(10),
           ]"
           placeholder="Enter text..."
-          @validity_changed="(new_is_valid) => { is_valid_1 = new_is_valid; }"
+          @validity_changed="
+            (new_is_valid) => {
+              is_valid_1 = new_is_valid;
+            }
+          "
         >
           <template v-slot:label> Input </template>
         </validated-text-input>
@@ -27,7 +31,7 @@
         <p>
           Last emitted validity:
           <span
-            ><strong>{{is_valid_1}}</strong></span
+            ><strong>{{ is_valid_1 }}</strong></span
           >
         </p>
         <p>
@@ -35,7 +39,7 @@
           is valid. Also note: warnings will show up if you click on the input
           and then click away without editing):
           <span
-            ><strong>{{val_1}}</strong></span
+            ><strong>{{ val_1 }}</strong></span
           >
         </p>
       </div>
@@ -54,13 +58,17 @@
 
         <validated-int-input
           v-model="val_2"
-          :input_style="{flex: '0', minWidth: '4em', textAlign: 'right'}"
+          :input_style="{ flex: '0', minWidth: '4em', textAlign: 'right' }"
           :validators="[
             make_min_validator(6),
             make_max_validator(24),
-            even_number
+            even_number,
           ]"
-          @validity_changed="(new_is_valid) => { is_valid_2 = new_is_valid; }"
+          @validity_changed="
+            (new_is_valid) => {
+              is_valid_2 = new_is_valid;
+            }
+          "
         >
           <template v-slot:prefix> $ </template>
           <template v-slot:suffix> .00 </template>
@@ -69,13 +77,13 @@
         <p>
           Last emitted validity:
           <span
-            ><strong>{{is_valid_2}}</strong></span
+            ><strong>{{ is_valid_2 }}</strong></span
           >
         </p>
         <p>
           Last emitted value:
           <span
-            ><strong>{{val_2}}</strong></span
+            ><strong>{{ val_2 }}</strong></span
           >
         </p>
       </div>
@@ -94,25 +102,26 @@
         <validated-text-area-input
           v-model="val_3"
           :num_rows="2"
-          :validators="[
-            two_or_more_lines,
-            has_luigi_or_mario
-          ]"
+          :validators="[two_or_more_lines, has_luigi_or_mario]"
           placeholder="Write a story about Mario or Luigi..."
-          @validity_changed="(new_is_valid) => { is_valid_3 = new_is_valid; }"
+          @validity_changed="
+            (new_is_valid) => {
+              is_valid_3 = new_is_valid;
+            }
+          "
         >
           <template v-slot:label> Text Area </template>
         </validated-text-area-input>
         <p>
           Last emitted validity:
           <span
-            ><strong>{{is_valid_3}}</strong></span
+            ><strong>{{ is_valid_3 }}</strong></span
           >
         </p>
         <p>
           Last emitted value:
           <span
-            ><strong>{{val_3}}</strong></span
+            ><strong>{{ val_3 }}</strong></span
           >
         </p>
       </div>
@@ -144,18 +153,22 @@
 
         <paired-inputs
           v-model="val_4"
-          @validity_changed="(new_is_valid) => { is_valid_4 = new_is_valid; }"
+          @validity_changed="
+            (new_is_valid) => {
+              is_valid_4 = new_is_valid;
+            }
+          "
         />
         <p>
           Last emitted pair validity:
           <span
-            ><strong>{{is_valid_4}}</strong></span
+            ><strong>{{ is_valid_4 }}</strong></span
           >
         </p>
         <p>
           Last emitted value:
           <span
-            ><strong>{{val_4}}</strong></span
+            ><strong>{{ val_4 }}</strong></span
           >
         </p>
       </div>
@@ -166,7 +179,7 @@
 <script setup lang="ts">
 import { ref, CSSProperties } from "vue";
 
-import ValidatedTextInput from '@/components/validated_input/ValidatedTextInput.vue';
+import ValidatedTextInput from "@/components/validated_input/ValidatedTextInput.vue";
 import ValidatedIntInput from "@/components/validated_input/ValidatedIntInput.vue";
 import ValidatedTextAreaInput from "@/components/validated_input/ValidatedTextAreaInput.vue";
 import {
@@ -185,27 +198,25 @@ const is_valid_1 = ref(true);
 
 const has_even_number_of_chars: TextValidator = (input: string) => {
   if (input.length % 2 === 0) {
-    return { is_valid: true }
-  }
-  else {
+    return { is_valid: true };
+  } else {
     return {
       is_valid: false,
-      error_msg: 'Input must contain an even number of characters'
-    }
+      error_msg: "Input must contain an even number of characters",
+    };
   }
-}
+};
 
 const has_exclamation_point: TextValidator = (input: string) => {
-  if (input.includes('!')) {
-    return { is_valid: true }
-  }
-  else {
+  if (input.includes("!")) {
+    return { is_valid: true };
+  } else {
     return {
       is_valid: false,
-      error_msg: 'Input must contain an exclamation point (!)'
-    }
+      error_msg: "Input must contain an exclamation point (!)",
+    };
   }
-}
+};
 
 /**** ValidatedNumberInput demo ****/
 const val_2 = ref(0);
@@ -214,45 +225,42 @@ const is_valid_2 = ref(true);
 const even_number: NumberValidator = (input: number) => {
   if (input % 2 == 0) {
     return { is_valid: true };
-  }
-  else {
+  } else {
     return {
       is_valid: false,
-      error_msg: 'Input must be an even number'
+      error_msg: "Input must be an even number",
     };
   }
-}
+};
 
 /*** ValidatedTextArea demo ****/
 const val_3 = ref("");
-const is_valid_3 = ref(true)
+const is_valid_3 = ref(true);
 
 const has_luigi_or_mario: TextValidator = (input: string) => {
   const text = input.toLowerCase();
-  if (!(text.includes('luigi') || text.includes('mario'))) {
+  if (!(text.includes("luigi") || text.includes("mario"))) {
     return {
       is_valid: false,
-      error_msg: 'Does not contain Mario or Luigi. Proposterous!'
-    }
-  }
-  else {
+      error_msg: "Does not contain Mario or Luigi. Proposterous!",
+    };
+  } else {
     return {
-      is_valid: true
-    }
+      is_valid: true,
+    };
   }
-}
+};
 const two_or_more_lines: TextValidator = (input: string) => {
-  const num_lines = input.split('\n');
+  const num_lines = input.split("\n");
   if (num_lines.length >= 2) {
     return { is_valid: true };
-  }
-  else {
+  } else {
     return {
       is_valid: false,
-      error_msg: "Input must two or more lines"
-    }
+      error_msg: "Input must two or more lines",
+    };
   }
-}
+};
 
 /*** PairedInput demo ****/
 const val_4 = ref();
