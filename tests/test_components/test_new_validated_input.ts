@@ -198,7 +198,7 @@ function runCommonTests<T>(params: {
       expect(error_occurrences.length).toBe(1);
     })
 
-    test("emits validity_changed event when validity changes", async () => {
+    test("emits update:is_valid event when validity changes", async () => {
       const wrapper = mount(Component, {
         propsData: {
           value: ref(invalid_input),
@@ -208,21 +208,21 @@ function runCommonTests<T>(params: {
       });
 
       await Vue.nextTick();
-      console.log(wrapper.emitted("validity_changed"));
-      expect(wrapper.emitted("validity_changed")?.length).toBe(1);
-      expect(wrapper.emitted("validity_changed")?.[0]).toStrictEqual([false]);
+      console.log(wrapper.emitted("update:is_valid"));
+      expect(wrapper.emitted("update:is_valid")?.length).toBe(1);
+      expect(wrapper.emitted("update:is_valid")?.[0]).toStrictEqual([false]);
 
       await wrapper.find(input_type).setValue(valid_input);
       await Vue.nextTick();
-      console.log(wrapper.emitted("validity_changed"));
-      expect(wrapper.emitted("validity_changed")?.length).toBe(2);
-      expect(wrapper.emitted("validity_changed")?.[1]).toStrictEqual([true]);
+      console.log(wrapper.emitted("update:is_valid"));
+      expect(wrapper.emitted("update:is_valid")?.length).toBe(2);
+      expect(wrapper.emitted("update:is_valid")?.[1]).toStrictEqual([true]);
 
       await wrapper.find(input_type).setValue(invalid_input);
       await Vue.nextTick();
-      console.log(wrapper.emitted("validity_changed"));
-      expect(wrapper.emitted("validity_changed")?.length).toBe(3);
-      expect(wrapper.emitted("validity_changed")?.[2]).toStrictEqual([false]);
+      console.log(wrapper.emitted("update:is_valid"));
+      expect(wrapper.emitted("update:is_valid")?.length).toBe(3);
+      expect(wrapper.emitted("update:is_valid")?.[2]).toStrictEqual([false]);
     });
   });
 }

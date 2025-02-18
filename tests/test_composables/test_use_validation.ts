@@ -275,33 +275,33 @@ describe("use_validation_group", () => {
     wrapper.destroy();
   });
 
-  test("emits validity_changed with initial validity", () => {
+  test("emits update:is_valid with initial validity", () => {
     let child_is_valid = ref(true);
     let child = make_use_validation_group_child(child_is_valid);
     let wrapper = mount(make_use_validation_group_comp(child));
-    expect(wrapper.emitted("validity_changed")?.[0]).toEqual([true]);
+    expect(wrapper.emitted("update:is_valid")?.[0]).toEqual([true]);
 
     child_is_valid = ref(false);
     child = make_use_validation_group_child(child_is_valid);
     wrapper = mount(make_use_validation_group_comp(child));
-    expect(wrapper.emitted("validity_changed")?.[0]).toEqual([false]);
+    expect(wrapper.emitted("update:is_valid")?.[0]).toEqual([false]);
   });
 
-  test("emits validity_changed with changes in validity", async () => {
+  test("emits update:is_valid with changes in validity", async () => {
     const child_is_valid = ref(true);
     const child = make_use_validation_group_child(child_is_valid);
     const wrapper = mount(make_use_validation_group_comp(child));
 
     child_is_valid.value = false;
     await Vue.nextTick();
-    expect(wrapper.emitted("validity_changed")?.[1]).toEqual([false]);
+    expect(wrapper.emitted("update:is_valid")?.[1]).toEqual([false]);
 
     child_is_valid.value = true;
     await Vue.nextTick();
-    expect(wrapper.emitted("validity_changed")?.[2]).toEqual([true]);
+    expect(wrapper.emitted("update:is_valid")?.[2]).toEqual([true]);
   });
 
-  test("does not emit validity_changed when group validity doesn't change", async () => {
+  test("does not emit update:is_valid when group validity doesn't change", async () => {
     const child_1_is_valid = ref(false);
     const child_2_is_valid = ref(false);
     const child_1 = make_use_validation_group_child(child_1_is_valid);
@@ -310,11 +310,11 @@ describe("use_validation_group", () => {
 
     child_1_is_valid.value = true;
     await Vue.nextTick();
-    expect(wrapper.emitted("validity_changed")?.length).toEqual(1);
+    expect(wrapper.emitted("update:is_valid")?.length).toEqual(1);
 
     child_1_is_valid.value = false;
     await Vue.nextTick();
-    expect(wrapper.emitted("validity_changed")?.length).toEqual(1);
+    expect(wrapper.emitted("update:is_valid")?.length).toEqual(1);
   });
 
   test("returns correct initial value", () => {

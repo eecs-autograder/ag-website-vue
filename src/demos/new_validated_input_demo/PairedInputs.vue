@@ -48,7 +48,7 @@ const pair = computed<NumberPair>(() => ({
 }));
 
 type EmitTypes = {
-  (e: "validity_changed", value: boolean): void;
+  (e: "update:is_valid", value: boolean): void;
   (e: "input", value: number): void;
 };
 const emit = defineEmits<EmitTypes>();

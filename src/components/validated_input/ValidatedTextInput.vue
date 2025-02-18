@@ -11,7 +11,7 @@
           :id="label_id"
           :style="input_style"
           :class="{
-            'error-input': !input_style && !hide_errors && errors_to_render,
+            'error-input': !input_style && !hide_errors && has_rendered_errors,
           }"
           type="text"
           v-model="input"
@@ -25,9 +25,9 @@
     <input-errors
       :visible="force_show_errors || !hide_errors"
       :errors="errors"
-      @errors_to_render="
+      @has_rendered_errors="
         (val) => {
-          errors_to_render = val;
+          has_rendered_errors = val;
         }
       "
     >
@@ -64,7 +64,7 @@ const hide_errors = ref(true);
 // Tracks whether any errors are ready to be rendered. Used to determine
 // whether error styling should be used, in conjunction with hide_errors.
 // This is updated when InputErrors emits.
-const errors_to_render = ref(false);
+const has_rendered_errors = ref(false);
 
 watch(
   () => props.value,
@@ -85,7 +85,7 @@ watch(input, () => {
 // See https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
 type EmitTypes = {
   (e: "input", value: string): void;
-  (e: "validity_changed", value: boolean): void;
+  (e: "update:is_valid", value: boolean): void;
 };
 const emit = defineEmits<EmitTypes>();
 

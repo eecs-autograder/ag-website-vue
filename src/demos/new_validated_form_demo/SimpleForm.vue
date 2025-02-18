@@ -2,7 +2,7 @@
   <new-validated-form
     @submit="save_data"
     ref="form1"
-    @validity_changed="is_valid = $event"
+    @update:is_valid="is_valid = $event"
   >
     <h3>Validated Input 1</h3>
     <p>Has to be a number</p>

@@ -8,25 +8,25 @@ import { make_min_length_validator } from "@/new_validators";
 describe("NewValidatedForm", () => {
   test("emits initial valid value when there are no validated input children", () => {
     const wrapper = make_form_wrapper(make_simple_slot_component(0));
-    expect(wrapper.emitted("validity_changed")?.[0]).toEqual([true]);
+    expect(wrapper.emitted("update:is_valid")?.[0]).toEqual([true]);
   });
 
   test("emits valid value only when all validated input children are valid", async () => {
     const wrapper = make_form_wrapper(make_simple_slot_component(3));
-    expect(wrapper.emitted("validity_changed")?.[0]).toEqual([false]);
+    expect(wrapper.emitted("update:is_valid")?.[0]).toEqual([false]);
 
     const inputs = wrapper.findAll("input");
     expect(inputs.length).toBe(3);
 
     await inputs.at(0).setValue("valid");
-    expect(wrapper.emitted("validity_changed")?.length).toBe(1);
+    expect(wrapper.emitted("update:is_valid")?.length).toBe(1);
 
     await inputs.at(1).setValue("valid");
-    expect(wrapper.emitted("validity_changed")?.length).toBe(1);
+    expect(wrapper.emitted("update:is_valid")?.length).toBe(1);
 
     await inputs.at(2).setValue("valid");
-    expect(wrapper.emitted("validity_changed")?.length).toBe(2);
-    expect(wrapper.emitted("validity_changed")?.[1]).toEqual([true]);
+    expect(wrapper.emitted("update:is_valid")?.length).toBe(2);
+    expect(wrapper.emitted("update:is_valid")?.[1]).toEqual([true]);
   });
 
   test("emits submit_invalid when form is submitted with an invalid input", async () => {
@@ -39,28 +39,28 @@ describe("NewValidatedForm", () => {
 
   test("emits valid value when only invalid child input is destroyed", () => {
     const wrapper = make_form_wrapper(make_simple_slot_component(1));
-    expect(wrapper.emitted("validity_changed")?.[0]).toEqual([false]);
+    expect(wrapper.emitted("update:is_valid")?.[0]).toEqual([false]);
 
     wrapper.findComponent(ValidatedTextInput).destroy();
-    expect(wrapper.emitted("validity_changed")?.[1]).toEqual([true]);
+    expect(wrapper.emitted("update:is_valid")?.[1]).toEqual([true]);
   });
 
   test("emits correct validity with deeply nested validated input components", async () => {
     const wrapper = make_form_wrapper(make_nested_slot_component());
-    expect(wrapper.emitted("validity_changed")?.[0]).toEqual([false]);
+    expect(wrapper.emitted("update:is_valid")?.[0]).toEqual([false]);
 
     const inputs = wrapper.findAll("input");
     expect(inputs.length).toBe(3);
 
     await inputs.at(0).setValue("valid");
-    expect(wrapper.emitted("validity_changed")?.length).toBe(1);
+    expect(wrapper.emitted("update:is_valid")?.length).toBe(1);
 
     await inputs.at(1).setValue("valid");
-    expect(wrapper.emitted("validity_changed")?.length).toBe(1);
+    expect(wrapper.emitted("update:is_valid")?.length).toBe(1);
 
     await inputs.at(2).setValue("valid");
-    expect(wrapper.emitted("validity_changed")?.length).toBe(2);
-    expect(wrapper.emitted("validity_changed")?.[1]).toEqual([true]);
+    expect(wrapper.emitted("update:is_valid")?.length).toBe(2);
+    expect(wrapper.emitted("update:is_valid")?.[1]).toEqual([true]);
   });
 });
 

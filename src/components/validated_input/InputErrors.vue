@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<PropTypes>(), {
 // i.e. a parent component might put a red border around the input when errors are
 // displayed
 type EmitTypes = {
-  (e: "errors_to_render", value: boolean): void;
+  (e: "has_rendered_errors", value: boolean): void;
 };
 const emit = defineEmits<EmitTypes>();
 
@@ -75,14 +75,14 @@ watch(
       const debounce_add = debounce(() => {
         debounced_errors.value.push({ error_msg: err, uid: generate_uid() });
         debounce_cancel_map.delete(err);
-        emit("errors_to_render", true);
+        emit("has_rendered_errors", true);
       }, 500);
       debounce_cancel_map.set(err, () => debounce_add.cancel());
       debounce_add();
     });
 
     if (debounced_errors.value.length === 0) {
-      emit("errors_to_render", false);
+      emit("has_rendered_errors", false);
     }
   },
   { immediate: true },

@@ -9,7 +9,7 @@ import { computed, getCurrentInstance } from "vue";
 
 import {
   use_validation_group,
-  ValidatorEmitTypes,
+  ValidationGroupEmitTypes,
 } from "@/composables/use_validation";
 
 // TODO: when we upgrade to Vue>=3.3, components using use_validation_group can
@@ -21,7 +21,7 @@ import {
 // }
 // See https://vuejs.org/guide/typescript/composition-api.html#syntax-limitations
 type EmitTypes = {
-  (e: "validity_changed", value: boolean): void;
+  (e: "update:is_valid", value: boolean): void;
   (e: "submit"): void;
   (e: "submit_invalid"): void;
 };

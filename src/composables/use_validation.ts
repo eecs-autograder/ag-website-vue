@@ -70,7 +70,7 @@ export type ParserFuncType<Input, Output> = (
 
 export type ValidatedInputEmitTypes<Output> = {
   (e: "input", value: Output): void;
-  (e: "validity_changed", value: boolean): void;
+  (e: "update:is_valid", value: boolean): void;
 };
 
 // Utility class that checks for type equality at compile time.
@@ -147,7 +147,7 @@ export function use_validation<Input, Output = Input>(
   // eagerly emit validity-changed whenever a dependency changes
   // (the non-computed dependencies are input, parser, and validators)
   watchEffect(() => {
-    emit("validity_changed", is_valid.value);
+    emit("update:is_valid", is_valid.value);
   });
 
   onMounted(() => {
@@ -161,11 +161,11 @@ export function use_validation<Input, Output = Input>(
   return { is_valid, errors };
 }
 
-export type ValidatorEmitTypes = {
-  (e: "validity_changed", value: boolean): void;
+export type ValidationGroupEmitTypes = {
+  (e: "update:is_valid", value: boolean): void;
 };
 
-export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
+export function use_validation_group<T extends ValidationGroupEmitTypes>(emit: T) {
   const all_valid = ref<boolean>();
   const validators = ref<ValidatorComponentListener[]>([]);
 
@@ -199,7 +199,7 @@ export function use_validation_group<T extends ValidatorEmitTypes>(emit: T) {
     );
     if (new_validity !== all_valid.value) {
       all_valid.value = new_validity;
-      emit("validity_changed", all_valid.value);
+      emit("update:is_valid", all_valid.value);
     }
   }
 
