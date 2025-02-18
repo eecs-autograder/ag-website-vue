@@ -116,21 +116,6 @@ function runCommonTests<T>(params: {
       expect(wrapper.text()).not.toContain(error_contains);
     });
 
-    test("does display error messages initially if force_show_errors is provided ", async () => {
-      const wrapper = mount(Component, {
-        propsData: {
-          value: ref(invalid_input),
-          validators: [validator],
-          force_show_errors: true,
-        },
-      });
-
-      // wait for error to display (it should)
-      vi.runAllTimers();
-      await Vue.nextTick();
-      expect(wrapper.text()).toContain(error_contains);
-    });
-
     test("removes errors immediately as they are corrected", async () => {
       const wrapper = mount(Component, {
         propsData: {
@@ -184,12 +169,13 @@ function runCommonTests<T>(params: {
     test("only renders one error", async () => {
       const wrapper = mount(Component, {
         propsData: {
-          value: ref(invalid_input),
+          value: ref(valid_input),
           validators: [validator, validator, validator],
           force_show_errors: true,
         },
       });
 
+      await wrapper.find(input_type).setValue(invalid_input);
       vi.runAllTimers();
       await Vue.nextTick();
 

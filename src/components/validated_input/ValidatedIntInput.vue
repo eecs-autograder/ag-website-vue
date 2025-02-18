@@ -23,7 +23,7 @@
     </div>
 
     <input-errors
-      :visible="force_show_errors || !hide_errors"
+      v-if="!hide_errors"
       :errors="errors"
       @has_rendered_errors="
         (val) => {
@@ -52,7 +52,6 @@ type PropTypes = {
   validators: ValidatorFuncType<number>[];
   input_style?: CSSProperties;
   placeholder?: string;
-  force_show_errors?: boolean;
 };
 const props = defineProps<PropTypes>();
 

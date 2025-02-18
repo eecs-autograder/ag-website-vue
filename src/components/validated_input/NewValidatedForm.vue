@@ -23,7 +23,6 @@ import {
 type EmitTypes = {
   (e: "update:is_valid", value: boolean): void;
   (e: "submit"): void;
-  (e: "submit_invalid"): void;
 };
 const emit = defineEmits<EmitTypes>();
 const all_valid = use_validation_group(emit);
@@ -39,8 +38,6 @@ const handle_submit = (e: Event) => {
   e.stopPropagation();
   if (all_valid.value) {
     emit("submit");
-  } else {
-    emit("submit_invalid");
   }
 };
 </script>

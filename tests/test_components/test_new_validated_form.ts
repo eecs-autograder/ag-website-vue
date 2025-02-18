@@ -29,14 +29,6 @@ describe("NewValidatedForm", () => {
     expect(wrapper.emitted("update:is_valid")?.[1]).toEqual([true]);
   });
 
-  test("emits submit_invalid when form is submitted with an invalid input", async () => {
-    const wrapper = make_form_wrapper(make_simple_slot_component(1));
-    await wrapper.find('button[type="submit"]').trigger("submit");
-
-    expect(wrapper.emitted("submit"))?.toBeFalsy();
-    expect(wrapper.emitted("submit_invalid"))?.toBeTruthy();
-  });
-
   test("emits valid value when only invalid child input is destroyed", () => {
     const wrapper = make_form_wrapper(make_simple_slot_component(1));
     expect(wrapper.emitted("update:is_valid")?.[0]).toEqual([false]);

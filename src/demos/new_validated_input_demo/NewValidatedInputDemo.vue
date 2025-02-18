@@ -19,7 +19,7 @@
             make_max_length_validator(10),
           ]"
           placeholder="Enter text..."
-          @validity_changed="
+          @update:is_valid="
             (new_is_valid) => {
               is_valid_1 = new_is_valid;
             }
@@ -64,7 +64,7 @@
             make_max_validator(24),
             even_number,
           ]"
-          @validity_changed="
+          @update:is_valid="
             (new_is_valid) => {
               is_valid_2 = new_is_valid;
             }
@@ -104,7 +104,7 @@
           :num_rows="2"
           :validators="[two_or_more_lines, has_luigi_or_mario]"
           placeholder="Write a story about Mario or Luigi..."
-          @validity_changed="
+          @update:is_valid="
             (new_is_valid) => {
               is_valid_3 = new_is_valid;
             }
@@ -153,7 +153,7 @@
 
         <paired-inputs
           v-model="val_4"
-          @validity_changed="
+          @update:is_valid="
             (new_is_valid) => {
               is_valid_4 = new_is_valid;
             }

@@ -1,5 +1,5 @@
 <template>
-  <transition-group v-if="visible" name="fade" class="error-ul" tag="ul">
+  <transition-group name="fade" class="error-ul" tag="ul">
     <li
       v-for="error of errors_to_render"
       class="error-text error-li"
@@ -19,7 +19,6 @@ import { generate_uid } from "@/utils";
 type PropTypes = {
   errors: string[];
   max_errors_to_show: number | null;
-  visible: boolean;
 };
 const props = withDefaults(defineProps<PropTypes>(), {
   max_errors_to_show: 1,
