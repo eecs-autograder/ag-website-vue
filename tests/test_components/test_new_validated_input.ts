@@ -182,7 +182,7 @@ function runCommonTests<T>(params: {
       const regex = new RegExp(error_contains, "g");
       const error_occurrences = wrapper.text().match(regex) || [];
       expect(error_occurrences.length).toBe(1);
-    })
+    });
 
     test("emits update:is_valid event when validity changes", async () => {
       const wrapper = mount(Component, {

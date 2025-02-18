@@ -165,7 +165,9 @@ export type ValidationGroupEmitTypes = {
   (e: "update:is_valid", value: boolean): void;
 };
 
-export function use_validation_group<T extends ValidationGroupEmitTypes>(emit: T) {
+export function use_validation_group<T extends ValidationGroupEmitTypes>(
+  emit: T,
+) {
   const all_valid = ref<boolean>();
   const validators = ref<ValidatorComponentListener[]>([]);
 
