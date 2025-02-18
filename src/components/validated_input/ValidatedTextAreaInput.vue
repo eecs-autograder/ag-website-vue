@@ -53,7 +53,7 @@ type PropTypes = {
   force_show_errors?: boolean;
 };
 const props = withDefaults(defineProps<PropTypes>(), {
-  num_rows: 1,
+  num_rows: 3,
 });
 
 const label_id = `label-${generate_uid()}`;
