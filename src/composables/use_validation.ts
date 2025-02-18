@@ -24,14 +24,14 @@ class ValidatorComponentListener {
 
   constructor(
     is_valid: Ref<boolean> | ComputedRef<boolean>,
-    on_validity_changed: () => void,
+    notify_validity_changed: () => void,
   ) {
     this._uid = generate_uid();
     this._is_valid = is_valid.value;
 
     watch(is_valid, (new_value) => {
       this._is_valid = new_value;
-      on_validity_changed();
+      notify_validity_changed();
     });
   }
 
@@ -168,13 +168,13 @@ export type ValidationGroupEmitTypes = {
 export function use_validation_group<T extends ValidationGroupEmitTypes>(
   emit: T,
 ) {
-  const all_valid = ref<boolean>();
+  const is_valid = ref<boolean>();
   const validators = ref<ValidatorComponentListener[]>([]);
 
   function make_validator_component_listener(
     is_valid: Ref<boolean> | ComputedRef<boolean>,
   ) {
-    return new ValidatorComponentListener(is_valid, update_all_valid);
+    return new ValidatorComponentListener(is_valid, update_group_validity);
   }
 
   provide(
@@ -182,7 +182,7 @@ export function use_validation_group<T extends ValidationGroupEmitTypes>(
     function (is_valid: Ref<boolean> | ComputedRef<boolean>): number {
       const validator = make_validator_component_listener(is_valid);
       validators.value.push(validator);
-      update_all_valid();
+      update_group_validity();
       return validator.uid;
     },
   );
@@ -190,28 +190,28 @@ export function use_validation_group<T extends ValidationGroupEmitTypes>(
   provide("unregister", function (uid: number) {
     const index = validators.value.findIndex((elem) => elem.uid === uid);
     validators.value.splice(index, 1);
-    update_all_valid();
+    update_group_validity();
   });
 
   // called by component listeners themselves when the validity of the component
   // they're listening to changes
-  function update_all_valid() {
+  function update_group_validity() {
     const new_validity = validators.value.every(
       (validator) => validator.is_valid,
     );
-    if (new_validity !== all_valid.value) {
-      all_valid.value = new_validity;
-      emit("update:is_valid", all_valid.value);
+    if (new_validity !== is_valid.value) {
+      is_valid.value = new_validity;
+      emit("update:is_valid", is_valid.value);
     }
   }
 
   onMounted(() => {
     // This should only be the case if no validators registered, and
     // we still want an initial validity in this case.
-    if (all_valid.value === undefined) {
-      update_all_valid();
+    if (is_valid.value === undefined) {
+      update_group_validity();
     }
   });
 
-  return all_valid;
+  return is_valid;
 }
