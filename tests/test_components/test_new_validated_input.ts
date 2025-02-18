@@ -181,6 +181,23 @@ function runCommonTests<T>(params: {
       expect(style.backgroundColor).toBe("yellow");
     });
 
+    test("only renders one error", async () => {
+      const wrapper = mount(Component, {
+        propsData: {
+          value: ref(invalid_input),
+          validators: [validator, validator, validator],
+          force_show_errors: true,
+        },
+      });
+
+      vi.runAllTimers();
+      await Vue.nextTick();
+
+      const regex = new RegExp(error_contains, "g");
+      const error_occurrences = wrapper.text().match(regex) || [];
+      expect(error_occurrences.length).toBe(1);
+    })
+
     test("emits validity_changed event when validity changes", async () => {
       const wrapper = mount(Component, {
         propsData: {

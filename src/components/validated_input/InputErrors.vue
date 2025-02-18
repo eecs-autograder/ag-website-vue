@@ -11,16 +11,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount } from "vue";
+import { computed, ref, watch, onBeforeUnmount } from "vue";
 import { debounce } from "lodash";
 
 import { generate_uid } from "@/utils";
 
 type PropTypes = {
   errors: string[];
+  max_errors_to_show: number | null;
   visible: boolean;
 };
-const props = defineProps<PropTypes>();
+const props = withDefaults(defineProps<PropTypes>(), {
+  max_errors_to_show: 1,
+});
 
 // Allows parent component to know if any errors are rendered for consistent styling,
 // i.e. a parent component might put a red border around the input when errors are
@@ -34,7 +37,14 @@ type VisibleError = {
   error_msg: string;
   uid: number;
 };
-const errors_to_render = ref<VisibleError[]>([]);
+const debounced_errors = ref<VisibleError[]>([]);
+const errors_to_render = computed(() => {
+  if (props.max_errors_to_show === null) {
+    return debounced_errors.value;
+  } else {
+    return debounced_errors.value.slice(0, props.max_errors_to_show);
+  }
+});
 
 const debounce_cancel_map = new Map<string, () => void>();
 
@@ -48,7 +58,7 @@ watch(
 
     // immediately remove resolved errors and cancel any debounced additions
     // to visible errors
-    errors_to_render.value = errors_to_render.value.filter((err) =>
+    debounced_errors.value = debounced_errors.value.filter((err) =>
       new_errors.includes(err.error_msg),
     );
     removed_errors?.forEach((err) => {
@@ -63,7 +73,7 @@ watch(
     // the cancel functions
     added_errors.forEach((err) => {
       const debounce_add = debounce(() => {
-        errors_to_render.value.push({ error_msg: err, uid: generate_uid() });
+        debounced_errors.value.push({ error_msg: err, uid: generate_uid() });
         debounce_cancel_map.delete(err);
         emit("errors_to_render", true);
       }, 500);
@@ -71,7 +81,7 @@ watch(
       debounce_add();
     });
 
-    if (errors_to_render.value.length === 0) {
+    if (debounced_errors.value.length === 0) {
       emit("errors_to_render", false);
     }
   },
