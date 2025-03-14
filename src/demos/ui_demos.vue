@@ -72,6 +72,14 @@
               @click="d_current_tab ='validated_form'">
             Validated Form
           </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'new_validated_input'}]"
+              @click="d_current_tab ='new_validated_input'">
+            New Validated Input
+          </div>
+          <div :class="['sidebar-item', {active: d_current_tab === 'new_validated_form'}]"
+              @click="d_current_tab ='new_validated_form'">
+            New Validated Form
+          </div>
         </div>
       </div>
       <div class="body" :class="{'body-closed': !d_show_sidebar}">
@@ -90,6 +98,8 @@
         <ViewFileDemo v-show="d_current_tab === 'view_file'"></ViewFileDemo>
         <ValidatedInputDemo v-show="d_current_tab === 'validated_input'"></ValidatedInputDemo>
         <ValidatedFormDemo v-show="d_current_tab === 'validated_form'"></ValidatedFormDemo>
+        <NewValidatedInputDemo v-show="d_current_tab === 'new_validated_input'"></NewValidatedInputDemo>
+        <NewValidatedFormDemo v-show="d_current_tab === 'new_validated_form'"></NewValidatedFormDemo>
       </div>
     </div>
   </div>
@@ -117,6 +127,8 @@ import TooltipDemo from './tooltip_demo.vue';
 import ValidatedFormDemo from './validated_form_demo.vue';
 import ValidatedInputDemo from './validated_input_demo.vue';
 import ViewFileDemo from './view_file_demo.vue';
+import NewValidatedInputDemo from './new_validated_input_demo/NewValidatedInputDemo.vue';
+import NewValidatedFormDemo from './new_validated_form_demo/NewValidatedFormDemo.vue'
 
 @Component({
   components: {
@@ -137,7 +149,9 @@ import ViewFileDemo from './view_file_demo.vue';
     ValidatedFormDemo,
     ValidatedInputDemo,
     ViewFile,
-    ViewFileDemo
+    ViewFileDemo,
+    NewValidatedInputDemo,
+    NewValidatedFormDemo
   }
 })
 export default class UIDemos extends Vue {

@@ -1,0 +1,91 @@
+@import '@/styles/colors.scss';
+@import '@/styles/forms.scss';
+
+* {
+  box-sizing: border-box;
+}
+
+.validated-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.error-ul {
+  list-style-type: none; /* Remove bullets */
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.error-li:first-child {
+  margin-top: -.625rem;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.error-li:last-child {
+  margin-bottom: 0;
+  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.error-ul .error-li {
+  word-wrap: break-word;
+  padding: .625rem .875rem;
+  margin-bottom: -1px;    /* Prevent double borders */
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+.input.error-input {
+  border: 1px solid $warning-red;
+}
+
+.error-input:focus {
+  outline: none;
+  box-shadow: 0 0 10px $warning-red;
+  border: 1px solid $warning-red;
+  border-radius: 2px;
+}
+
+.input-line {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.prefix {
+  padding-right: 0.25em;
+}
+
+.suffix {
+  padding-left: 0.25em;
+}
+
+.input {
+  flex: 1;
+  width: auto;
+
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.input::placeholder {
+  color: $stormy-gray-light;
+}
+
+.validated-input-component {
+  display: inline-block;
+  width: 100%;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}

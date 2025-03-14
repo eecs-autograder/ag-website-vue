@@ -9,11 +9,13 @@
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-type-checked"
     ],
+    "parser": "vue-eslint-parser",
     "parserOptions": {
         "project": true,
         "ecmaVersion": 12,
         "parser": "@typescript-eslint/parser",
-        "sourceType": "module"
+        "sourceType": "module",
+        "extraFileExtensions": [".vue"]
     },
     "plugins": [
         "vue",
