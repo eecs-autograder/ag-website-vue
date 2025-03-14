@@ -9,7 +9,6 @@ import { computed, getCurrentInstance } from "vue";
 
 import {
   use_validation_group,
-  ValidationGroupEmitTypes,
 } from "@/composables/use_validation";
 
 // TODO: when we upgrade to Vue>=3.3, components using use_validation_group can
