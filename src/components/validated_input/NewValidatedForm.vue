@@ -7,9 +7,7 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance } from "vue";
 
-import {
-  use_validation_group,
-} from "@/composables/use_validation";
+import { use_validation_group } from "@/composables/use_validation";
 
 // TODO: when we upgrade to Vue>=3.3, components using use_validation_group can
 // just import ValidatedInputEmitTypes to define the components emits (can be used to
