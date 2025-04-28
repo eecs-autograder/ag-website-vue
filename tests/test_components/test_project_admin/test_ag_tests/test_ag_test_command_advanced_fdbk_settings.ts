@@ -6,7 +6,7 @@ import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_tes
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, set_data, set_props } from '@/tests/utils';
+import { checkbox_is_checked, set_data, set_props, find_collapsible_section_header } from '@/tests/utils';
 
 
 describe('AGTestCommandAdvancedFdbkSettings tests', () => {
@@ -101,7 +101,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('return_code_fdbk_level binding', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let return_code_fdbk_level_input = wrapper.find('[data-testid=return_code_fdbk_level]');
 
@@ -122,7 +122,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('stdout_fdbk_level binding', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let stdout_fdbk_level_input = wrapper.find('[data-testid=stdout_fdbk_level]');
 
@@ -143,7 +143,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('stderr_fdbk_level binding', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let stderr_fdbk_level_input = wrapper.find('[data-testid=stderr_fdbk_level]');
 
@@ -164,7 +164,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('show_points binding', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_points_input = wrapper.find('[data-testid=show_points]');
 
@@ -187,7 +187,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('show_actual_stdout binding', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_actual_stdout_input = wrapper.find('[data-testid=show_actual_stdout]');
 
@@ -210,7 +210,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('show_actual_stderr binding', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_actual_stderr_input = wrapper.find('[data-testid=show_actual_stderr]');
 
@@ -233,7 +233,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('show_whether_timed_out binding', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_whether_timed_out_input = wrapper.find('[data-testid=show_whether_timed_out]');
 
@@ -256,7 +256,7 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('value Watcher', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         expect(wrapper.vm.d_feedback_config!).toEqual(feedback_config);
 
@@ -266,23 +266,5 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         });
         await set_props(wrapper, {'value': new_config});
         expect(wrapper.vm.d_feedback_config).toEqual(new_config);
-    });
-
-    test('toggle_is_open', async () => {
-        expect(wrapper.vm.d_is_open).toBe(false);
-
-        wrapper.vm.toggle_is_open();
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_is_open).toBe(true);
-
-        wrapper.vm.toggle_is_open();
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_is_open).toBe(false);
-
-        await wrapper.find('.advanced-settings-label').trigger('click');
-        expect(wrapper.vm.d_is_open).toBe(true);
-
-        await wrapper.find('.advanced-settings-label').trigger('click');
-        expect(wrapper.vm.d_is_open).toBe(false);
     });
 });

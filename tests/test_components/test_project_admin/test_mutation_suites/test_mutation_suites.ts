@@ -21,6 +21,7 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
     find_by_name,
+    find_collapsible_section_header,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid,
@@ -473,9 +474,8 @@ describe('MutationSuites tests', () => {
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.visible
         ).toBe(true);
 
-        await wrapper.findComponent({ref: 'past_limit_edit_feedback_settings'}).find(
-            '.advanced-settings-label'
-        ).trigger('click');
+        const feedback_settings = wrapper.findComponent({ref: 'past_limit_edit_feedback_settings'});
+        await find_collapsible_section_header(feedback_settings).trigger('click');
 
         // return code correctness
         expect(

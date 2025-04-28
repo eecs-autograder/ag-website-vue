@@ -6,7 +6,7 @@ import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_tests
 
 import { make_ag_test_suite_fdbk_config } from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, set_data } from '@/tests/utils';
+import { checkbox_is_checked, set_data, find_collapsible_section_header } from '@/tests/utils';
 
 
 describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
@@ -73,7 +73,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('show_individual_tests binding', async () => {
-        await wrapper.setData({d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_individual_tests_input = wrapper.find('[data-testid=show_individual_tests]');
 
@@ -98,8 +98,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_setup_return_code', async () => {
-        wrapper.setData({d_is_open: true});
-        await wrapper.vm.$nextTick();
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_setup_return_code_input = wrapper.find('[data-testid=show_setup_return_code]');
 
@@ -124,8 +123,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_setup_timed_out', async () => {
-        wrapper.setData({d_is_open: true});
-        await wrapper.vm.$nextTick();
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_setup_timed_out_input = wrapper.find('[data-testid=show_setup_timed_out]');
 
@@ -151,8 +149,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_setup_stdout', async () => {
-        wrapper.setData({d_is_open: true});
-        await wrapper.vm.$nextTick();
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_setup_stdout_input = wrapper.find('[data-testid=show_setup_stdout]');
 
@@ -177,8 +174,7 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_setup_stderr', async () => {
-        wrapper.setData({d_is_open: true});
-        await wrapper.vm.$nextTick();
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_setup_stderr_input = wrapper.find('[data-testid=show_setup_stderr]');
 
@@ -213,21 +209,5 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_feedback_config!).toEqual(new_val);
-    });
-
-    test('toggle_is_open', async () => {
-        expect(wrapper.vm.d_is_open).toBe(false);
-
-        wrapper.vm.toggle_is_open();
-        expect(wrapper.vm.d_is_open).toBe(true);
-
-        wrapper.vm.toggle_is_open();
-        expect(wrapper.vm.d_is_open).toBe(false);
-
-        await wrapper.find('.advanced-settings-label').trigger('click');
-        expect(wrapper.vm.d_is_open).toBe(true);
-
-        await wrapper.find('.advanced-settings-label').trigger('click');
-        expect(wrapper.vm.d_is_open).toBe(false);
     });
 });

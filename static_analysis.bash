@@ -8,7 +8,9 @@ npx eslint \
     'src/demos/new_validated_form_demo/**/*.vue' \
     'tests/test_composables/**/*.ts' \
     'tests/test_components/test_new_validated_input.ts' \
-    'tests/test_components/test_new_validated_form.ts'
+    'tests/test_components/test_new_validated_form.ts' \
+    'src/components/CollapsibleSection.vue' \
+    'tests/test_components/test_collapsible_section.ts'
 
 npx prettier --check --no-editorconfig \
     '*.js' \
@@ -20,6 +22,8 @@ npx prettier --check --no-editorconfig \
     'src/demos/new_validated_form_demo/**/*.vue' \
     'tests/test_composables/**/*.ts' \
     'tests/test_components/test_new_validated_input.ts' \
-    'tests/test_components/test_new_validated_form.ts'
+    'tests/test_components/test_new_validated_form.ts' \
+    'src/components/CollapsibleSection.vue' \
+    'tests/test_components/test_collapsible_section.ts'
 
 ./check_subscribe_unsubscribe.py 'src/**/*.vue'
