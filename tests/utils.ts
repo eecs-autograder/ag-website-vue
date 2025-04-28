@@ -233,3 +233,7 @@ export function expect_not_has_class(wrapper: Wrapper<Vue>, class_: string) {
         fail(`CSS class "${class_}" unexpectedly found in [${class_list.join(', ')}]`);
     }
 }
+
+export function find_collapsible_section_header(wrapper: Wrapper<Vue>): Wrapper<Vue> {
+    return wrapper.find('[data-testid=collapsible-section-header]');
+}

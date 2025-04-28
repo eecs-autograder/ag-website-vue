@@ -9,7 +9,7 @@ import MutationTestSuiteAdvancedFdbkSettings from '@/components/project_admin/mu
 
 import { make_mutation_test_suite_fdbk_config } from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, emitted, set_data, set_props } from '@/tests/utils';
+import { checkbox_is_checked, emitted, set_data, set_props, find_collapsible_section_header } from '@/tests/utils';
 
 
 describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
@@ -49,7 +49,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('bugs_exposed_fdbk_level binding', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let bugs_exposed_fdbk_level_input = wrapper.get('[data-testid=bugs_exposed_fdbk_level]');
 
@@ -75,7 +75,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_invalid_test_names', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_invalid_test_names = wrapper.find('[data-testid=show_invalid_test_names]');
 
@@ -99,7 +99,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_points', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_points = wrapper.find('[data-testid=show_points]');
 
@@ -122,7 +122,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_setup_return_code', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_setup_return_code = wrapper.find('[data-testid=show_setup_return_code]');
 
@@ -145,7 +145,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_setup_stdout', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_setup_stdout = wrapper.find('[data-testid=show_setup_stdout]');
 
@@ -168,7 +168,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_setup_stderr', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_setup_stderr = wrapper.find('[data-testid=show_setup_stderr]');
 
@@ -191,7 +191,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_get_test_names_return_code', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_get_test_names_return_code = wrapper.get(
             '[data-testid=show_test_name_discovery_return_code]'
@@ -216,7 +216,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_get_test_names_stdout', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_get_test_names_stdout = wrapper.find(
             '[data-testid=show_test_name_discovery_stdout]');
@@ -240,7 +240,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_get_test_names_stderr', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_get_test_names_stderr = wrapper.find(
             '[data-testid=show_test_name_discovery_stderr]');
@@ -264,7 +264,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_validity_check_stdout', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_validity_check_stdout = wrapper.find('[data-testid=show_validity_check_stdout]');
 
@@ -287,7 +287,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_validity_check_stderr', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_validity_check_stderr = wrapper.find('[data-testid=show_validity_check_stderr]');
 
@@ -310,7 +310,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_grade_buggy_impls_stdout', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_grade_buggy_impls_stdout = wrapper.find(
             '[data-testid=show_grade_buggy_impls_stdout]');
@@ -334,7 +334,7 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
     });
 
     test('Toggle show_grade_buggy_impls_stderr', async () => {
-        await set_data(wrapper, {d_is_open: true});
+        await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_grade_buggy_impls_stderr = wrapper.find(
             '[data-testid=show_grade_buggy_impls_stderr]');
@@ -374,23 +374,5 @@ describe('MutationTestSuiteAdvancedFdbkSettings tests', () => {
 
         await set_props(wrapper, {'config_name': "past-limit"});
         expect(wrapper.vm.config_name).toEqual("past-limit");
-    });
-
-    test('toggle_is_open', async () => {
-        expect(wrapper.vm.d_is_open).toBe(false);
-
-        wrapper.vm.toggle_is_open();
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_is_open).toBe(true);
-
-        wrapper.vm.toggle_is_open();
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_is_open).toBe(false);
-
-        await wrapper.find('.advanced-settings-label').trigger('click');
-        expect(wrapper.vm.d_is_open).toBe(true);
-
-        await wrapper.find('.advanced-settings-label').trigger('click');
-        expect(wrapper.vm.d_is_open).toBe(false);
     });
 });
