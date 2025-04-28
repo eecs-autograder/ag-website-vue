@@ -22,13 +22,13 @@ describe("CollapsibleSection", () => {
     expect(wrapper.html()).not.toContain("Bar");
   });
 
-  test("renders header and body after being clicked", async () => {
+  test("renders header and body after header is clicked", async () => {
     await find_collapsible_section_header(wrapper).trigger("click");
     expect(wrapper.html()).toContain("Foo");
     expect(wrapper.html()).toContain("Bar");
   });
 
-  test("only renders header after clicking header twice", async () => {
+  test("hides body after header is clicked twice", async () => {
     await find_collapsible_section_header(wrapper).trigger("click");
     await find_collapsible_section_header(wrapper).trigger("click");
     expect(wrapper.html()).toContain("Foo");
