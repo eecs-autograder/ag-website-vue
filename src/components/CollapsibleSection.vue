@@ -34,12 +34,13 @@ function toggle_is_open() {
 @import "@/styles/section_header.scss";
 
 .collapsible-section-label {
-  @include collapsible-section-header($line-color: $navy-blue);
+  @include collapsible-section-header(
+    $line-color: rgba(0, 0, 0, 0.1),
+    $text-color: $navy-blue,
+  );
 
   box-sizing: border-box;
-
   font-size: 1rem;
-  color: $navy-blue;
   cursor: pointer;
 
   .collapsible-section-header-slot {

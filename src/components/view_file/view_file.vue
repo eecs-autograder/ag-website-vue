@@ -43,7 +43,13 @@
                 @mouseenter="grow_highlighted_region(index)"
                 @mouseup="stop_highlighting($event, index)"
                 data-testid="code_line">
-              <td class="line-number" :class="{'line-number-code': is_code_file}">{{line_num}}</td>
+              <td
+                v-if="show_line_numbers"
+                class="line-number"
+                :class="{'line-number-code': is_code_file}"
+              >
+                {{line_num}}
+              </td>
               <td class="line-of-file-content"
                   :class="{'line-of-file-content-code': is_code_file}"
                   :style="{'user-select': (handgrading_enabled
@@ -224,6 +230,9 @@ export default class ViewFile extends Vue implements Created {
   // When true, file contents have syntax-highlighting
   @Prop({default: false, type: Boolean})
   is_code_file!: boolean;
+
+  @Prop({default: true, type: Boolean})
+  show_line_numbers!: boolean;
 
   // Tracking file copying
   d_is_file_hovered = false;
@@ -495,6 +504,7 @@ export default class ViewFile extends Vue implements Created {
 
 table {
   border-spacing: 0;
+  min-height: 3em;
 }
 
 .view-file-component {

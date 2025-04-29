@@ -1,5 +1,5 @@
 <template>
-  <div class="feedback-config-panel">
+  <div class="section-box" class_old="feedback-config-panel">
 
     <div class="header">
       <div class="header-text">
@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div class="footer">
+    <div class="body">
       <slot name="settings"> </slot>
     </div>
   </div>
@@ -131,6 +131,7 @@ export default class FeedbackConfigPanel extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/section_box.scss';
 
 * {
   box-sizing: border-box;

@@ -31,7 +31,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@types/minimatch": "^3.0.5",
-    "ag-client-typescript": "2.8.0",
+    "ag-client-typescript": "file:ag-client-typescript",
     "chart.js": "^3.9.1",
     "chartjs-adapter-moment": "^1.0.1",
     "chartjs-plugin-zoom": "^1.2.1",

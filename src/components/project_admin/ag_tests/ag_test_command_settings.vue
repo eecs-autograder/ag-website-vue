@@ -157,265 +157,409 @@
       </fieldset>
 
       <fieldset class="fieldset">
-        <legend class="legend"> Return Code </legend>
-        <div class="form-field-wrapper">
-          <label class="label"> Expected Return Code </label>
-          <div class="dropdown">
-            <select id="expected-return-code"
-                    v-model="d_ag_test_command.expected_return_code"
-                    class="select">
-              <option :value="ExpectedReturnCode.none">
-                Don't Check
-              </option>
-              <option :value="ExpectedReturnCode.zero">
-                Zero
-              </option>
-              <option :value="ExpectedReturnCode.nonzero">
-                Nonzero
-              </option>
-            </select>
-          </div>
+        <legend class="legend"> Correctness and Scoring </legend>
+
+        <div class="section-box">
+          <fieldset class="fieldset-box">
+            <div class="header">
+              <legend class="header-text"> Return Code </legend>
+            </div>
+            <div class="body">
+              <div class="form-field-wrapper">
+                <label class="label"> Expected Return Code </label>
+                <div class="dropdown">
+                  <select id="expected-return-code"
+                          v-model="d_ag_test_command.expected_return_code"
+                          class="select">
+                    <option :value="ExpectedReturnCode.none">
+                      Don't Check
+                    </option>
+                    <option :value="ExpectedReturnCode.zero">
+                      Zero
+                    </option>
+                    <option :value="ExpectedReturnCode.nonzero">
+                      Nonzero
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div v-if="d_ag_test_command.expected_return_code !== ExpectedReturnCode.none"
+                   class="form-field-wrapper correct-incorrect-points-wrapper">
+                <div class="form-field-wrapper">
+                  <label class="label"> Correct return code </label>
+                  <validated-input ref="points_for_correct_return_code"
+                                    v-model="d_ag_test_command.points_for_correct_return_code"
+                                    :validators="[
+                                      is_not_empty,
+                                      is_integer,
+                                      is_greater_than_or_equal_to_zero
+                                    ]"
+                                    input_style="width: 80px;"
+                                    :from_string_fn="string_to_num">
+                    <div slot="suffix" class="unit-of-measurement"> points </div>
+                  </validated-input>
+                </div>
+
+                <div class="form-field-wrapper">
+                  <label class="label"> Wrong return code </label>
+                  <validated-input ref="deduction_for_wrong_return_code"
+                                    v-model="
+                                    d_ag_test_command.deduction_for_wrong_return_code"
+                                    :validators="[
+                                      is_not_empty,
+                                      is_integer,
+                                      is_less_than_or_equal_to_zero
+                                    ]"
+                                    input_style="width: 80px;"
+                                    :from_string_fn="string_to_num">
+                    <div slot="suffix" class="unit-of-measurement"> points </div>
+                  </validated-input>
+                </div>
+              </div>
+            </div>
+          </fieldset>
         </div>
 
-        <div v-if="d_ag_test_command.expected_return_code !== ExpectedReturnCode.none"
-             class="form-field-wrapper correct-incorrect-points-wrapper">
-          <div class="form-field-wrapper">
-            <label class="label"> Correct return code </label>
-            <validated-input ref="points_for_correct_return_code"
-                              v-model="d_ag_test_command.points_for_correct_return_code"
-                              :validators="[
-                                is_not_empty,
-                                is_integer,
-                                is_greater_than_or_equal_to_zero
-                              ]"
-                              input_style="width: 80px;"
-                              :from_string_fn="string_to_num">
-              <div slot="suffix" class="unit-of-measurement"> points </div>
-            </validated-input>
-          </div>
+        <div class="section-box">
+          <fieldset class="fieldset-box">
+            <div class="header">
+              <legend class="header-text"> Output Diff</legend>
+            </div>
 
-          <div class="form-field-wrapper">
-            <label class="label"> Wrong return code </label>
-            <validated-input ref="deduction_for_wrong_return_code"
-                              v-model="
-                              d_ag_test_command.deduction_for_wrong_return_code"
-                              :validators="[
-                                is_not_empty,
-                                is_integer,
-                                is_less_than_or_equal_to_zero
-                              ]"
-                              input_style="width: 80px;"
-                              :from_string_fn="string_to_num">
-              <div slot="suffix" class="unit-of-measurement"> points </div>
-            </validated-input>
-          </div>
+            <div class="body">
+              <!-- stdout diff -->
+              <fieldset class="fieldset">
+                <legend class="legend"> Stdout </legend>
+                <div class="form-field-wrapper">
+                  <label class="label"> Check stdout against: </label>
+                  <br>
+                  <select id="expected-stdout-source"
+                          v-model="d_ag_test_command.expected_stdout_source"
+                          class="select">
+                    <option :value="ExpectedOutputSource.none">
+                      Don't Check
+                    </option>
+                    <option
+                      :value="ExpectedOutputSource.text"
+                      :disabled="d_ag_test_command.partial_credit_source === PartialCreditSource.stdout"
+                    >
+                      Text
+                    </option>
+                    <option
+                      :value="ExpectedOutputSource.instructor_file"
+                      :disabled="d_ag_test_command.partial_credit_source === PartialCreditSource.stdout"
+                      >
+                      Instructor file content
+                    </option>
+                  </select>
+                  <info-blurb v-if="d_ag_test_command.partial_credit_source === PartialCreditSource.stdout">
+                    Disable custom score parsing from stdout to diff check stdout
+                  </info-blurb>
+                </div>
+
+                <div v-if="d_ag_test_command.expected_stdout_source === ExpectedOutputSource.text"
+                      class="form-field-wrapper">
+                  <label class="label"> Expected stdout text: </label>
+                  <validated-input ref="expected_stdout_text"
+                                   placeholder="Enter the expected stdout output here."
+                                   v-model="d_ag_test_command.expected_stdout_text"
+                                   :num_rows="5"
+                                   :validators="[]">
+                  </validated-input>
+                </div>
+
+                <div v-if="d_ag_test_command.expected_stdout_source
+                           === ExpectedOutputSource.instructor_file"
+                     class="form-field-wrapper">
+                  <label class="label"> File </label>
+                  <select-object ref="expected_stdout_instructor_file"
+                                :items="project.instructor_files"
+                                v-model="d_ag_test_command.expected_stdout_instructor_file"
+                                id_field="pk">
+                    <option selected disabled :value="null">-- Select a File --</option>
+                    <template v-slot:option-text="{item}">
+                      {{item.name}}
+                    </template>
+                  </select-object>
+                </div>
+
+                <div v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none"
+                      class="form-field-wrapper correct-incorrect-points-wrapper">
+                  <div class="form-field-wrapper">
+                    <label class="label"> Correct stdout </label>
+                    <validated-input ref="points_for_correct_stdout"
+                                      v-model="d_ag_test_command.points_for_correct_stdout"
+                                      :validators="[
+                                        is_not_empty,
+                                        is_integer,
+                                        is_greater_than_or_equal_to_zero
+                                      ]"
+                                      input_style="width: 80px;"
+                                      :from_string_fn="string_to_num">
+                      <div slot="suffix" class="unit-of-measurement"> points </div>
+                    </validated-input>
+                  </div>
+
+                  <div class="form-field-wrapper">
+                    <label class="label"> Wrong stdout</label>
+                    <validated-input ref="deduction_for_wrong_stdout"
+                                      v-model="d_ag_test_command.deduction_for_wrong_stdout"
+                                      :validators="[
+                                        is_not_empty,
+                                        is_integer,
+                                        is_less_than_or_equal_to_zero
+                                      ]"
+                                      input_style="width: 80px;"
+                                      :from_string_fn="string_to_num">
+                      <div slot="suffix" class="unit-of-measurement"> points </div>
+                    </validated-input>
+                  </div>
+                </div>
+              </fieldset>
+
+              <!-- stderr diff -->
+              <fieldset class="fieldset">
+                <legend class="legend"> Stderr </legend>
+                <div class="form-field-wrapper">
+                  <label class="label"> Check stderr against: </label>
+                  <br>
+                  <select id="expected-stderr-source"
+                          v-model="d_ag_test_command.expected_stderr_source"
+                          class="select">
+                    <option :value="ExpectedOutputSource.none">
+                      Don't Check
+                    </option>
+                    <option
+                      :value="ExpectedOutputSource.text"
+                      :disabled="d_ag_test_command.partial_credit_source === PartialCreditSource.stderr"
+                    >
+                      Text
+                    </option>
+                    <option
+                      :value="ExpectedOutputSource.instructor_file"
+                      :disabled="d_ag_test_command.partial_credit_source === PartialCreditSource.stderr"
+                    >
+                      Instructor file content
+                    </option>
+                  </select>
+                  <info-blurb v-if="d_ag_test_command.partial_credit_source === PartialCreditSource.stderr">
+                    Disable custom score parsing from stdout to diff check stderr
+                  </info-blurb>
+                </div>
+
+                <div v-if="d_ag_test_command.expected_stderr_source === ExpectedOutputSource.text"
+                     class="form-field-wrapper">
+                  <label class="label"> Expected stderr text </label>
+                  <validated-input ref="expected_stderr_text"
+                                   placeholder="Enter the expected stderr output here."
+                                   v-model="d_ag_test_command.expected_stderr_text"
+                                   :num_rows="5"
+                                   :validators="[]">
+                  </validated-input>
+                </div>
+
+                <div v-if="d_ag_test_command.expected_stderr_source
+                           === ExpectedOutputSource.instructor_file"
+                     class="form-field-wrapper">
+                  <label class="label"> File </label>
+                  <select-object ref="expected_stderr_instructor_file"
+                                :items="project.instructor_files"
+                                v-model="d_ag_test_command.expected_stderr_instructor_file"
+                                id_field="pk">
+                    <option selected disabled :value="null">-- Select a File --</option>
+                    <template v-slot:option-text="{item}">
+                      {{item.name}}
+                    </template>
+                  </select-object>
+                </div>
+
+                <div v-if="d_ag_test_command.expected_stderr_source
+                            !== ExpectedOutputSource.none"
+                      class="form-field-wrapper correct-incorrect-points-wrapper">
+                  <div class="form-field-wrapper">
+                    <label class="label"> Correct stderr </label>
+                    <validated-input ref="points_for_correct_stderr"
+                                     v-model="d_ag_test_command.points_for_correct_stderr"
+                                     :validators="[
+                                       is_not_empty,
+                                       is_integer,
+                                       is_greater_than_or_equal_to_zero
+                                     ]"
+                                     input_style="width: 80px;"
+                                     :from_string_fn="string_to_num">
+                      <div slot="suffix" class="unit-of-measurement"> points </div>
+                    </validated-input>
+                  </div>
+
+                  <div class="form-field-wrapper">
+                    <label class="label">  Wrong stderr </label>
+                    <validated-input ref="deduction_for_wrong_stderr"
+                                     v-model="d_ag_test_command.deduction_for_wrong_stderr"
+                                     :validators="[
+                                       is_not_empty,
+                                       is_integer,
+                                       is_less_than_or_equal_to_zero
+                                     ]"
+                                     input_style="width: 80px;"
+                                     :from_string_fn="string_to_num">
+                      <div slot="suffix" class="unit-of-measurement"> points </div>
+                    </validated-input>
+                  </div>
+                </div>
+              </fieldset>
+
+              <!-- diff options -->
+              <fieldset v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none
+                              || d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
+                        class="fieldset"
+                        ref="diff_options">
+                <legend class="legend"> Diff Options </legend>
+                <div class="checkbox-input-container">
+                  <label class="checkbox-label">
+                    <input id="ignore-case"
+                           type="checkbox"
+                           class="checkbox"
+                           v-model="d_ag_test_command.ignore_case">
+                    Ignore case
+                  </label>
+                </div>
+
+                <div class="checkbox-input-container">
+                  <label class="checkbox-label">
+                    <input id="ignore-whitespace"
+                           type="checkbox"
+                           class="checkbox"
+                           v-model="d_ag_test_command.ignore_whitespace">
+                    Ignore whitespace
+                  </label>
+                </div>
+
+                <div class="checkbox-input-container">
+                  <label class="checkbox-label">
+                    <input id="ignore-whitespace-changes"
+                           type="checkbox"
+                           class="checkbox"
+                           v-model="d_ag_test_command.ignore_whitespace_changes">
+                    Ignore whitespace changes
+                  </label>
+                </div>
+
+                <div class="checkbox-input-container">
+                  <label class="checkbox-label">
+                    <input id="ignore-blank-lines"
+                           type="checkbox"
+                           class="checkbox"
+                           v-model="d_ag_test_command.ignore_blank_lines">
+                    Ignore blank lines
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+          </fieldset>
         </div>
-      </fieldset>
 
-      <fieldset class="fieldset">
-        <legend class="legend"> Stdout </legend>
-        <div class="form-field-wrapper">
-          <label class="label"> Check stdout against: </label>
-          <br>
-          <select id="expected-stdout-source"
-                  v-model="d_ag_test_command.expected_stdout_source"
-                  class="select">
-            <option :value="ExpectedOutputSource.none">
-              Don't Check
-            </option>
-            <option :value="ExpectedOutputSource.text">
-              Text
-            </option>
-            <option :value="ExpectedOutputSource.instructor_file">
-              Instructor file content
-            </option>
-          </select>
-        </div>
+        <div class="section-box">
+          <fieldset class="fieldset-box">
+            <div class="header">
+              <legend class="header-text">
+                Custom Scoring
+                <tooltip width="large" placement="top">
+                  Assign points based on a parsed pattern output from the test command
+                </tooltip>
+              </legend>
+            </div>
+            <div class="body">
+              <div class="form-field-wrapper">
+                <div class="checkbox-input-container" style="margin: 0;">
+                  <label class="checkbox-label">
+                    <input
+                      type="checkbox"
+                      v-model="custom_scoring_enabled"
+                      :disabled="!can_enable_custom_scoring"
+                    >
+                    Enable custom scoring
+                  </label>
+                </div>
+              </div>
 
-        <div v-if="d_ag_test_command.expected_stdout_source === ExpectedOutputSource.text"
-              class="form-field-wrapper">
-          <label class="label"> Expected stdout text: </label>
-          <validated-input ref="expected_stdout_text"
-                           placeholder="Enter the expected stdout output here."
-                           v-model="d_ag_test_command.expected_stdout_text"
-                           :num_rows="5"
-                           :validators="[]">
-          </validated-input>
-        </div>
+              <div v-if="custom_scoring_enabled">
+                <info-blurb>
+                  The last output that matches the pattern will be used to assign points.
+                  The entirety of the pattern must be on a single line of output. Using
+                  the default regex pattern, the following print statement in a Python
+                  test would assign 5 points:
 
-        <div v-if="d_ag_test_command.expected_stdout_source
-                   === ExpectedOutputSource.instructor_file"
-             class="form-field-wrapper">
-          <label class="label"> File </label>
-          <select-object ref="expected_stdout_instructor_file"
-                        :items="project.instructor_files"
-                        v-model="d_ag_test_command.expected_stdout_instructor_file"
-                        id_field="pk">
-            <option selected disabled :value="null">-- Select a File --</option>
-            <template v-slot:option-text="{item}">
-              {{item.name}}
-            </template>
-          </select-object>
-        </div>
+                  <div class="code-snippet">
+                    <code>
+                      print('&lt;!! score: 5 !!&gt;')
+                    </code>
+                    <copy-button
+                      style="position: right;"
+                      content_to_copy="print(<!! score: 5 !!>')"
+                    />
+                  </div>
 
-        <div v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none"
-              class="form-field-wrapper correct-incorrect-points-wrapper">
-          <div class="form-field-wrapper">
-            <label class="label"> Correct stdout </label>
-            <validated-input ref="points_for_correct_stdout"
-                              v-model="d_ag_test_command.points_for_correct_stdout"
-                              :validators="[
-                                is_not_empty,
-                                is_integer,
-                                is_greater_than_or_equal_to_zero
-                              ]"
-                              input_style="width: 80px;"
-                              :from_string_fn="string_to_num">
-              <div slot="suffix" class="unit-of-measurement"> points </div>
-            </validated-input>
-          </div>
+                </info-blurb>
 
-          <div class="form-field-wrapper">
-            <label class="label"> Wrong stdout</label>
-            <validated-input ref="deduction_for_wrong_stdout"
-                              v-model="d_ag_test_command.deduction_for_wrong_stdout"
-                              :validators="[
-                                is_not_empty,
-                                is_integer,
-                                is_less_than_or_equal_to_zero
-                              ]"
-                              input_style="width: 80px;"
-                              :from_string_fn="string_to_num">
-              <div slot="suffix" class="unit-of-measurement"> points </div>
-            </validated-input>
-          </div>
-        </div>
-      </fieldset>
+                <div class="form-field-wrapper">
 
-      <fieldset class="fieldset">
-        <legend class="legend"> Stderr </legend>
-        <div class="form-field-wrapper">
-          <label class="label"> Check stderr against: </label>
-          <br>
-          <select id="expected-stderr-source"
-                  v-model="d_ag_test_command.expected_stderr_source"
-                  class="select">
-            <option :value="ExpectedOutputSource.none">
-              Don't Check
-            </option>
-            <option :value="ExpectedOutputSource.text">
-              Text
-            </option>
-            <option :value="ExpectedOutputSource.instructor_file">
-              Instructor file content
-            </option>
-          </select>
-        </div>
+                  <label class="label"> Parse score from: </label>
+                  <br>
+                  <select id="partial-credit-source"
+                          v-model="d_ag_test_command.partial_credit_source"
+                          class="select">
+                    <option
+                      :value="PartialCreditSource.stdout"
+                      :disabled="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none"
+                    >
+                      stdout
+                    </option>
+                    <option
+                      :value="PartialCreditSource.stderr"
+                      :disabled="d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
+                    >
+                      stderr
+                    </option>
+                  </select>
+                  <info-blurb v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none">
+                    Disable stdout diff checking to parse score from stdout
+                  </info-blurb>
+                  <info-blurb v-if="d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none">
+                    Disable stderr diff checking to parse score from stderr
+                  </info-blurb>
+                </div>
 
-        <div v-if="d_ag_test_command.expected_stderr_source === ExpectedOutputSource.text"
-             class="form-field-wrapper">
-          <label class="label"> Expected stderr text </label>
-          <validated-input ref="expected_stderr_text"
-                           placeholder="Enter the expected stderr output here."
-                           v-model="d_ag_test_command.expected_stderr_text"
-                           :num_rows="5"
-                           :validators="[]">
-          </validated-input>
-        </div>
+                <div class="form-field-wrapper correct-incorrect-points-wrapper">
+                  <label class="label"> Max partial credit points </label>
+                  <validated-input ref="max_partial_credit_points"
+                                   v-model="d_ag_test_command.max_points_for_partial_credit"
+                                   :validators="[
+                                     is_not_empty,
+                                     is_integer,
+                                     is_greater_than_or_equal_to_zero
+                                   ]"
+                                   input_style="width: 80px;"
+                                   :from_string_fn="string_to_num">
+                    <div slot="suffix" class="unit-of-measurement"> points </div>
+                  </validated-input>
+                </div>
+                <collapsible-section>
+                  <template #header>
+                    Advanced Settings
+                  </template>
+                  <template #body>
+                    <label class="label"> Partial credit regex </label>
+                    <validated-input ref="partial_credit_regex"
+                                     v-model="d_ag_test_command.partial_credit_regex"
+                                     :validators="[is_not_empty]"
+                                     input_style="width: 300px;" />
+                    </template>
+                </collapsible-section>
+              </div>
 
-        <div v-if="d_ag_test_command.expected_stderr_source
-                   === ExpectedOutputSource.instructor_file"
-             class="form-field-wrapper">
-          <label class="label"> File </label>
-          <select-object ref="expected_stderr_instructor_file"
-                        :items="project.instructor_files"
-                        v-model="d_ag_test_command.expected_stderr_instructor_file"
-                        id_field="pk">
-            <option selected disabled :value="null">-- Select a File --</option>
-            <template v-slot:option-text="{item}">
-              {{item.name}}
-            </template>
-          </select-object>
-        </div>
-
-        <div v-if="d_ag_test_command.expected_stderr_source
-                    !== ExpectedOutputSource.none"
-              class="form-field-wrapper correct-incorrect-points-wrapper">
-          <div class="form-field-wrapper">
-            <label class="label"> Correct stderr </label>
-            <validated-input ref="points_for_correct_stderr"
-                             v-model="d_ag_test_command.points_for_correct_stderr"
-                             :validators="[
-                               is_not_empty,
-                               is_integer,
-                               is_greater_than_or_equal_to_zero
-                             ]"
-                             input_style="width: 80px;"
-                             :from_string_fn="string_to_num">
-              <div slot="suffix" class="unit-of-measurement"> points </div>
-            </validated-input>
-          </div>
-
-          <div class="form-field-wrapper">
-            <label class="label">  Wrong stderr </label>
-            <validated-input ref="deduction_for_wrong_stderr"
-                             v-model="d_ag_test_command.deduction_for_wrong_stderr"
-                             :validators="[
-                               is_not_empty,
-                               is_integer,
-                               is_less_than_or_equal_to_zero
-                             ]"
-                             input_style="width: 80px;"
-                             :from_string_fn="string_to_num">
-              <div slot="suffix" class="unit-of-measurement"> points </div>
-            </validated-input>
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none
-                      || d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
-                class="fieldset"
-                ref="diff_options">
-        <legend class="legend"> Diff Options </legend>
-        <div class="checkbox-input-container">
-          <label class="checkbox-label">
-            <input id="ignore-case"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_ag_test_command.ignore_case">
-            Ignore case
-          </label>
-        </div>
-
-        <div class="checkbox-input-container">
-          <label class="checkbox-label">
-            <input id="ignore-whitespace"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_ag_test_command.ignore_whitespace">
-            Ignore whitespace
-          </label>
-        </div>
-
-        <div class="checkbox-input-container">
-          <label class="checkbox-label">
-            <input id="ignore-whitespace-changes"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_ag_test_command.ignore_whitespace_changes">
-            Ignore whitespace changes
-          </label>
-        </div>
-
-        <div class="checkbox-input-container">
-          <label class="checkbox-label">
-            <input id="ignore-blank-lines"
-                   type="checkbox"
-                   class="checkbox"
-                   v-model="d_ag_test_command.ignore_blank_lines">
-            Ignore blank lines
-          </label>
+            </div>
+          </fieldset>
         </div>
       </fieldset>
 
@@ -624,13 +768,18 @@ import {
   AGTestCommandFeedbackConfig,
   ExpectedOutputSource,
   ExpectedReturnCode,
+  PartialCreditSource,
   Project,
   StdinSource,
   ValueFeedbackLevel,
 } from 'ag-client-typescript';
+import hljs from 'highlight.js'; // "hljs" class in HTML element styles it with imported theme
 
 import APIErrors from '@/components/api_errors.vue';
+import CollapsibleSection from '@/components/CollapsibleSection.vue';
+import CopyButton from '@/components/CopyButton.vue';
 import Dropdown from '@/components/dropdown.vue';
+import InfoBlurb from '@/components/InfoBlurb.vue';
 import Modal from '@/components/modal.vue';
 import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_tests/ag_test_command_advanced_fdbk_settings.vue';
 import {
@@ -643,13 +792,14 @@ import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import ViewFile from '@/components/view_file/view_file.vue';
 import {
   handle_api_errors_async,
   handle_global_errors_async,
   make_error_handler_func
 } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
-import { deep_copy, format_datetime, toggle } from '@/utils';
+import { assert_not_null, deep_copy, format_datetime, toggle } from '@/utils';
 import {
   is_integer,
   is_not_empty,
@@ -663,6 +813,9 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
 @Component({
   components: {
     APIErrors,
+    CopyButton,
+    CollapsibleSection,
+    InfoBlurb,
     FeedbackConfigPanel,
     Dropdown,
     AGTestCommandAdvancedFdbkSettings,
@@ -671,7 +824,8 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
     SelectObject,
     Tooltip,
     ValidatedForm,
-    ValidatedInput
+    ValidatedInput,
+    ViewFile
   }
 })
 export default class AGTestCommandSettings extends Vue {
@@ -705,6 +859,7 @@ export default class AGTestCommandSettings extends Vue {
   readonly StdinSource = StdinSource;
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;
+  readonly PartialCreditSource = PartialCreditSource;
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
   readonly FeedbackDescriptions = FeedbackDescriptions;
   readonly format_datetime = format_datetime;
@@ -720,6 +875,46 @@ export default class AGTestCommandSettings extends Vue {
 
   get case_has_exactly_one_command() {
     return this.ag_test_case.ag_test_commands.length === 1;
+  }
+
+  get custom_scoring_enabled() {
+    return this.d_ag_test_command?.partial_credit_source !== PartialCreditSource.none;
+  }
+
+  set custom_scoring_enabled(value: boolean) {
+    if (value) {
+      if (!this.can_enable_custom_scoring) {
+        throw new Error("Can't enable custom scoring when both output streams are diff checked");
+      }
+      this.enable_custom_scoring();
+    } else {
+      this.disable_custom_scoring();
+    }
+
+  }
+
+  get can_enable_custom_scoring() {
+    return (
+      this.d_ag_test_command?.expected_stdout_source === ExpectedOutputSource.none
+      || this.d_ag_test_command?.expected_stderr_source === ExpectedOutputSource.none
+    );
+  }
+
+  disable_custom_scoring() {
+    assert_not_null(this.d_ag_test_command);
+    this.d_ag_test_command.partial_credit_source = PartialCreditSource.none;
+  }
+
+  enable_custom_scoring() {
+    assert_not_null(this.d_ag_test_command);
+    if (this.d_ag_test_command.expected_stdout_source === ExpectedOutputSource.none) {
+      this.d_ag_test_command.partial_credit_source = PartialCreditSource.stdout;
+    }
+    else {
+      this.d_ag_test_command.partial_credit_source = PartialCreditSource.stderr;
+    }
+
+    console.log(`partial_credit_source=${this.d_ag_test_command.partial_credit_source}`)
   }
 
   @handle_api_errors_async(handle_save_ag_test_case_error)
@@ -874,6 +1069,7 @@ function handle_save_ag_test_cmd_settings_error(component: AGTestCommandSettings
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/modal.scss';
+@import '@/styles/section_box.scss';
 
 @import './ag_tests.scss';
 
@@ -941,4 +1137,21 @@ function handle_save_ag_test_cmd_settings_error(component: AGTestCommandSettings
   max-width: 75%;
 }
 
+.fieldset-box {
+  border: 0;
+}
+
+.fieldset-box .legend {
+  font-size: 1rem;
+  color: $navy-blue;
+}
+
+.code-snippet {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid lightgray;
+  padding: 0.375rem;
+  margin: 0.375rem 0;
+}
 </style>

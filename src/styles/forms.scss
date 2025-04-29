@@ -1,24 +1,28 @@
 @import '@/styles/colors.scss';
+@import '@/styles/section_header.scss';
 
 // Organization ---------------------------------------------------------------
 
 .fieldset {
     box-sizing: border-box;
 
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
+    border: none;
     border-color: rgba(255, 255, 255, 0.3);
     border-width: 2px;
 
-    margin: .75rem 0;
+    margin: 0 .75rem 0 0;
     padding: 0;
 }
 
 .legend {
-    box-sizing: border-box;
+    @include section-header(
+        $line-spacing: .1875rem,
+        $line-color: rgba(0, 0, 0, 0.1),
+        $text-color: darken($ocean-blue, 5),
+        $with-left-divider: false,
+    );
 
-    color: darken($ocean-blue, 5%);
+    box-sizing: border-box;
     font-size: 1.125rem;
     margin: .5rem 0;
 }
