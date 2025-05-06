@@ -475,6 +475,7 @@
                   <label class="checkbox-label">
                     <input
                       type="checkbox"
+                      class="checkbox"
                       v-model="custom_scoring_enabled"
                       :disabled="!can_enable_custom_scoring"
                     >
@@ -482,6 +483,10 @@
                   </label>
                 </div>
               </div>
+
+              <info-blurb v-if="!can_enable_custom_scoring">
+                Disable either stdout or stderr diff checking to enable custom scoring
+              </info-blurb>
 
               <div v-if="custom_scoring_enabled">
                 <info-blurb>

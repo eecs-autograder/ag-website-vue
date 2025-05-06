@@ -185,6 +185,10 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         margin: 0;
     }
 
+    .checkbox-label:has(input:disabled) {
+        color: rgba($check-mark-disabled, 0.6);
+    }
+
     $right-margin: .25rem;
     $icon-padding: .125rem;
 
@@ -227,10 +231,6 @@ $check-mark-disabled: hsl(220, 12%, 20%);
                                         rgba(lighten($checkbox-background-light, 8), .5));
         border-color: rgba(lighten($checkbox-background-dark, 1), 1);
         box-shadow: 0 0.5px 0.5px transparent;
-    }
-
-    .checkbox:disabled + label {
-        color: rgba($check-mark-disabled, 0.6);
     }
 
     .checkbox:disabled::before {
