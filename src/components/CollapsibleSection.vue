@@ -36,7 +36,7 @@ function toggle_is_open() {
 .collapsible-section-label {
   @include collapsible-section-header(
     $line-color: rgba(0, 0, 0, 0.1),
-    $text-color: $navy-blue,
+    $text-color: $navy-blue
   );
 
   box-sizing: border-box;
