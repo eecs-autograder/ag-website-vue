@@ -474,6 +474,7 @@
                 <div class="checkbox-input-container" style="margin: 0;">
                   <label class="checkbox-label">
                     <input
+                      id="enable-custom-scoring"
                       type="checkbox"
                       class="checkbox"
                       v-model="custom_scoring_enabled"
@@ -549,7 +550,7 @@
                     <div slot="suffix" class="unit-of-measurement"> points </div>
                   </validated-input>
                 </div>
-                <collapsible-section>
+                <collapsible-section data-testid="partial-credit-advanced-settings">
                   <template #header>
                     Advanced Settings
                   </template>
@@ -557,7 +558,7 @@
                     <label class="label"> Partial credit regex </label>
                     <validated-input ref="partial_credit_regex"
                                      v-model="d_ag_test_command.partial_credit_regex"
-                                     :validators="[is_not_empty]"
+                                     :validators="[is_not_empty, is_valid_regex]"
                                      input_style="width: 300px;" />
                     </template>
                 </collapsible-section>
@@ -811,6 +812,7 @@ import {
   make_max_value_validator,
   make_min_value_validator,
   string_to_num,
+  is_valid_regex,
 } from '@/validators';
 
 import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.vue';
@@ -857,6 +859,7 @@ export default class AGTestCommandSettings extends Vue {
 
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
+  readonly is_valid_regex = is_valid_regex;
   readonly is_greater_than_or_equal_to_zero = make_min_value_validator(0);
   readonly is_greater_than_or_equal_to_one = make_min_value_validator(1);
   readonly is_less_than_or_equal_to_zero = make_max_value_validator(0);
