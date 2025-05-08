@@ -2,3 +2,4 @@ node_modules
 .idea
 .git
 .vscode
+ag-client-typescript/dist

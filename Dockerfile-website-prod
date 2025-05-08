@@ -9,6 +9,10 @@ RUN apt-get install -y curl gnupg wget
 RUN wget https://nodejs.org/dist/v16.9.1/node-v16.9.1-linux-x64.tar.gz
 RUN tar -xf node-v16.9.1-linux-x64.tar.gz -C /usr/local --strip-components=1 --no-same-owner
 
+COPY ag-client-typescript ./ag-client-typescript
+RUN npm ci --prefix ag-client-typescript \
+    && npm run build --prefix ag-client-typescript
+
 COPY package.json .
 COPY package-lock.json .
 COPY .browserslistrc .
