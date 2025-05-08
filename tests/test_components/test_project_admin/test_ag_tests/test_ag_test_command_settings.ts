@@ -1155,10 +1155,6 @@ describe('AGTestCommandSettings tests', () => {
         ).toEqual(PartialCreditSource.stdout);
     });
 
-    test('Enabling stderr diff checking disables stderr custom scoring', async () => {
-
-    });
-
     test('Resource limit settings binding', async () => {
         let resource_limit_settings = find_by_name<ResourceLimitSettings>(
             wrapper, 'ResourceLimitSettings');

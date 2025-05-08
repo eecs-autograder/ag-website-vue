@@ -583,3 +583,21 @@ describe('Command Descriptions', () => {
         expect(student_description.exists()).toBe(false);
     });
 });
+
+describe('Warnings', () => {
+    test('Warning section renders when warning present', async () => {
+        ag_test_command_result.partial_credit_error = "I'M ERROR";
+        const wrapper = await make_wrapper();
+
+        const legends = wrapper.findAll('legend');
+        expect(legends.wrappers.find(legend => legend.text() === 'Warnings')?.exists()).toBe(true);
+
+        const warnings = wrapper.findComponent({ref: 'warnings'});
+        expect(warnings.text()).toContain("I'M ERROR");
+    });
+
+    test('Warning section does not render when no warning present', async () => {
+        const wrapper = await make_wrapper();
+        expect(wrapper.findComponent({ref: 'warnings'}).exists()).toBe(false);
+    })
+});

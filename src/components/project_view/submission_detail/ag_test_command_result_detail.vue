@@ -21,6 +21,21 @@
       ref="student_on_fail_description"
     ></description-renderer>
 
+    <fieldset
+      ref="warnings"
+      v-if="ag_test_command_result.partial_credit_error"
+      class="fieldset"
+    >
+      <legend class="legend"> Warnings </legend>
+      <info-blurb>
+        These warnings are due to issues with test configuration.
+        Contact your instructor with questions.
+      </info-blurb>
+      <div class="warning">
+        {{ag_test_command_result.partial_credit_error}}
+      </div>
+    </fieldset>
+
     <fieldset ref="correctness" v-if="show_correctness_fieldset" class="fieldset">
       <legend class="legend"> Correctness </legend>
 
@@ -196,6 +211,7 @@ import {
 import { GlobalData } from '@/app.vue';
 import Diff from '@/components/diff.vue';
 import DescriptionRenderer from "@/components/project_view/submission_detail/description_renderer.vue"
+import InfoBlurb from '@/components/InfoBlurb.vue';
 import ViewFile from "@/components/view_file/view_file.vue";
 import { handle_global_errors_async } from '@/error_handling';
 import { Created } from '@/lifecycle';
@@ -205,6 +221,7 @@ import { Created } from '@/lifecycle';
   components: {
     DescriptionRenderer,
     Diff,
+    InfoBlurb,
     ViewFile
   }
 })
@@ -376,6 +393,15 @@ export default class AGTestCommandResultDetail extends Vue implements Created{
     border: 2px solid $pebble-medium;
     border-radius: 3px;
     margin-bottom: 5px;
+}
+
+.warning {
+  word-wrap: break-word;
+  padding: .625rem .875rem;
+  margin-bottom: -1px;    /* Prevent double borders */
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
 }
 
 </style>
