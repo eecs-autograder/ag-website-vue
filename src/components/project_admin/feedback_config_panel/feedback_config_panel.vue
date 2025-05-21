@@ -1,5 +1,5 @@
 <template>
-  <div class="section-box" class_old="feedback-config-panel">
+  <div class="section-box">
 
     <div class="header">
       <div class="header-text">
@@ -129,45 +129,8 @@ export default class FeedbackConfigPanel extends Vue {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/section_box.scss';
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-$border-radius: 3px;
-
-.feedback-config-panel {
-  width: 100%;
-  max-width: 600px;
-
-  margin-bottom: .625rem;
-  box-shadow: 0 1px 1px $white-gray;
-  border-radius: $border-radius;
-}
-
-.header {
-  background-color: hsl(220, 30%, 94%);
-  border: 2px solid hsl(220, 30%, 92%);
-  border-bottom: none;
-  border-radius: $border-radius $border-radius 0 0;
-
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: .25rem .25rem .25rem .5rem;
-}
-
-.header-text {
-  font-weight: bold;
-  font-size: 1rem;
-}
 
 .preset-selection-container {
   display: flex;
@@ -182,14 +145,5 @@ $border-radius: 3px;
   @media only screen and (min-width: 500px) {
     display: block;
   }
-}
-
-.footer {
-  border: 2px solid hsl(210, 20%, 92%);
-  border-top: none;
-  border-radius: 0 0 $border-radius $border-radius;
-  background-color: white;
-
-  padding: .375rem;
 }
 </style>

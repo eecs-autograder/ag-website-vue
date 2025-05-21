@@ -21,8 +21,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
-import { handle_global_errors_async } from "@/error_handling";
-
 type PropTypes = {
   content_to_copy: string;
   only_show_on_hover?: boolean;
@@ -53,9 +51,6 @@ async function copy_content_to_clipboard() {
 @import '@/styles/colors.scss';
 
 .copy-button {
-  // right: 0;
-  // top: 0;
-  // position: absolute;
   opacity: 0;
   transition: opacity 0.2s;
 
