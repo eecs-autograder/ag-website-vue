@@ -54,11 +54,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Build ag-client-typescript dist
-      run: |
-        npm ci --prefix ag-client-typescript
-        npm run build --prefix ag-client-typescript
-
     - run: npm ci
     - run: npm test
 
@@ -84,11 +79,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-
-    - name: Build ag-client-typescript dist
-      run: |
-        npm ci --prefix ag-client-typescript
-        npm run build --prefix ag-client-typescript
 
     - run: docker compose -f e2e_test_stack/docker-compose.yml build
     - run: docker compose -f e2e_test_stack/docker-compose.yml pull

@@ -19,6 +19,7 @@
     "serve": "Starts the Vue dev server. Used by the 'website' dev Dockerfile."
   },
   "scripts": {
+    "preinstall": "npm --prefix ./ag-client-typescript run build:clean",
     "lint": "./static_analysis.bash",
     "build": "vue-cli-service build",
     "test": "python3 run_tests.py",
