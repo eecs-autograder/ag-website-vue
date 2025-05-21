@@ -1,7 +1,9 @@
 <template>
   <div class="info-blurb">
     <i class="fas fa-info-circle"></i>
-    <slot></slot>
+    <div class="content">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -11,9 +13,17 @@
 .info-blurb {
   margin: 0.5rem 0;
   font-size: .875rem;
-}
+  display: flex;
+  align-items: flex-start;
 
-.info-blurb > .fa-info-circle {
-  color: $ocean-blue;
+  .fa-info-circle {
+    color: $ocean-blue;
+    flex-shrink:0;
+  }
+
+  .content {
+    flex: 1;
+    margin-left: 0.5rem;
+  }
 }
 </style>

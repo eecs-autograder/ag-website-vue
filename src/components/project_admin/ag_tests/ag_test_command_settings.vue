@@ -471,7 +471,7 @@
             </div>
             <div class="body">
               <div class="form-field-wrapper">
-                <div class="checkbox-input-container" style="margin: 0;">
+                <div class="checkbox-input-container">
                   <label class="checkbox-label">
                     <input
                       id="enable-custom-scoring"
@@ -555,29 +555,43 @@
                     Advanced Settings
                   </template>
                   <template #body>
-                    <label class="label"> Custom scoring label </label>
-                      <select id="custom-scoring-label"
-                              v-model="d_ag_test_command.custom_scoring_source"
-                              class="select">
-                        <option
-                          :value="CustomScoringSource.stdout"
-                          :disabled="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none"
-                        >
-                          stdout
-                        </option>
-                        <option
-                          :value="CustomScoringSource.stderr"
-                          :disabled="d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
-                        >
-                          stderr
-                        </option>
-                      </select>
-                    <label class="label"> custom scoring regex </label>
-                    <validated-input ref="custom_scoring_regex"
-                                     v-model="d_ag_test_command.custom_scoring_regex"
-                                     :validators="[is_not_empty, is_valid_regex]"
-                                     input_style="width: 300px;" />
-                    </template>
+                    <info-blurb>
+                      The default label will show "Score" if there are no other
+                      points that can be earned for the command other than custom scoring
+                      points, or "Instructor score adjustment" if there are points available
+                      through other checks. If you do not use the default label,
+                      whichever label you provide will be shown regardless of other
+                      configurations.
+                    </info-blurb>
+
+                    <div class="form-field-wrapper">
+                      <div class="checkbox-input-container">
+                        <label class="checkbox-label">
+                          <input
+                            id="use-default-custom-scoring-label"
+                            type="checkbox"
+                            class="checkbox"
+                            v-model="custom_scoring_label_is_default"
+                          >
+                          Use default custom scoring label
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="form-field-wrapper" v-if="!custom_scoring_label_is_default">
+                      <label class="label"> Custom scoring label </label>
+                      <validated-input ref="custom_scoring_label"
+                                       v-model="d_ag_test_command.custom_scoring_label"
+                                       :validators="[is_not_empty]" />
+                    </div>
+
+                    <div class="form-field-wrapper">
+                      <label class="label"> Custom scoring regex </label>
+                      <validated-input ref="custom_scoring_regex"
+                                       v-model="d_ag_test_command.custom_scoring_regex"
+                                       :validators="[is_not_empty, is_valid_regex]" />
+                    </div>
+                  </template>
                 </collapsible-section>
               </div>
 
@@ -796,7 +810,6 @@ import {
   StdinSource,
   ValueFeedbackLevel,
 } from 'ag-client-typescript';
-import hljs from 'highlight.js'; // "hljs" class in HTML element styles it with imported theme
 
 import APIErrors from '@/components/api_errors.vue';
 import CollapsibleSection from '@/components/CollapsibleSection.vue';
@@ -900,6 +913,19 @@ export default class AGTestCommandSettings extends Vue {
 
   get case_has_exactly_one_command() {
     return this.ag_test_case.ag_test_commands.length === 1;
+  }
+
+  get custom_scoring_label_is_default() {
+    return this.d_ag_test_command?.custom_scoring_label === null;
+  }
+
+  set custom_scoring_label_is_default(value: boolean) {
+    assert_not_null(this.d_ag_test_command);
+    if (value) {
+      this.d_ag_test_command.custom_scoring_label = null;
+    } else {
+      this.d_ag_test_command.custom_scoring_label = '';
+    }
   }
 
   get custom_scoring_enabled() {

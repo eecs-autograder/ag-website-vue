@@ -28,8 +28,10 @@
     >
       <legend class="legend"> Warnings </legend>
       <info-blurb>
-        These warnings are due to issues with test configuration.
-        Contact your instructor with questions.
+        Something unexpected happened while grading this test.
+        <br>
+        It might be a minor configuration issue, or the instructor script might have done something unexpected.
+        Please notify your instructor so that they can diagnose and resolve this.
       </info-blurb>
       <div class="warning">
         {{ag_test_command_result.custom_scoring_error}}

@@ -945,22 +945,77 @@ describe('AGTestCommandSettings tests', () => {
         return clickable_header.trigger('click');
     }
 
-    test('Custom scoring regex input only rendered after clicking advanced settings', async () => {
+    test('Custom scoring advanced settings only rendered after clicking advanced settings', async () => {
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
 
         await enable_custom_scoring.setChecked(true);
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'custom_scoring_label'}).exists()).toBe(false);
 
         await click_custom_scoring_advanced_settings();
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(true);
+        expect(wrapper.find('#use-default-custom-scoring-label').exists()).toBe(true);
 
         await click_custom_scoring_advanced_settings();
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
+        expect(wrapper.find('#use-default-custom-scoring-label').exists()).toBe(false);
 
         await click_custom_scoring_advanced_settings();
         await enable_custom_scoring.setChecked(false);
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
+        expect(wrapper.find('#use-default-custom-scoring-label').exists()).toBe(false);
+    });
+
+    test('Use default custom scoring label binding', async () => {
+        const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
+        await enable_custom_scoring.setChecked(true);
+        await click_custom_scoring_advanced_settings();
+
+        expect(wrapper.vm.custom_scoring_label_is_default).toEqual(true);
+
+        await wrapper.find('#use-default-custom-scoring-label').setChecked(false);
+        expect(wrapper.vm.custom_scoring_label_is_default).toEqual(false);
+
+        await wrapper.find('#use-default-custom-scoring-label').setChecked(true);
+        expect(wrapper.vm.custom_scoring_label_is_default).toEqual(true);
+
+        await set_data(wrapper, {custom_scoring_label_is_default: false});
+        expect(wrapper.find('#use-default-custom-scoring-label').element).not.toBeChecked();
+
+        await set_data(wrapper, {custom_scoring_label_is_default: true});
+        expect(wrapper.find('#use-default-custom-scoring-label').element).toBeChecked();
+
+    });
+
+    test('Custom scoring label input is only rendered when use default custom scoring label is unchecked', async () => {
+        const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
+        await enable_custom_scoring.setChecked(true);
+        await click_custom_scoring_advanced_settings();
+
+        expect(wrapper.findComponent({ref: 'custom_scoring_label'}).exists()).toBe(false);
+
+        await wrapper.find('#use-default-custom-scoring-label').setChecked(false);
+        expect(wrapper.findComponent({ref: 'custom_scoring_label'}).exists()).toBe(true);
+
+        await wrapper.find('#use-default-custom-scoring-label').setChecked(true);
+        expect(wrapper.findComponent({ref: 'custom_scoring_label'}).exists()).toBe(false);
+    });
+
+    test('Custom scoring label binding', async () => {
+        const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
+        await enable_custom_scoring.setChecked(true);
+        await click_custom_scoring_advanced_settings();
+        await wrapper.find('#use-default-custom-scoring-label').setChecked(false);
+
+        const custom_scoring_label = wrapper.findComponent({ref: 'custom_scoring_label'})
+        await set_validated_input_text(custom_scoring_label, "Kudos");
+        expect(validated_input_is_valid(custom_scoring_label));
+        expect(wrapper.vm.d_ag_test_command?.custom_scoring_label).toEqual('Kudos');
+
+        await set_data(wrapper, {d_ag_test_command: {custom_scoring_label: ''}});
+        expect(!validated_input_is_valid(custom_scoring_label));
+        expect(get_validated_input_text(custom_scoring_label)).toEqual('')
     });
 
     test('Custom scoring regex binding', async () => {
