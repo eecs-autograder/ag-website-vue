@@ -586,7 +586,7 @@ describe('Command Descriptions', () => {
 
 describe('Warnings', () => {
     test('Warning section renders when warning present', async () => {
-        ag_test_command_result.partial_credit_error = "I'M ERROR";
+        ag_test_command_result.custom_scoring_error = "I'M ERROR";
         const wrapper = await make_wrapper();
 
         const legends = wrapper.findAll('legend');

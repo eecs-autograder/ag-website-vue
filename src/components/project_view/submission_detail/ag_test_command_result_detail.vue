@@ -23,7 +23,7 @@
 
     <fieldset
       ref="warnings"
-      v-if="ag_test_command_result.partial_credit_error"
+      v-if="ag_test_command_result.custom_scoring_error"
       class="fieldset"
     >
       <legend class="legend"> Warnings </legend>
@@ -32,7 +32,7 @@
         Contact your instructor with questions.
       </info-blurb>
       <div class="warning">
-        {{ag_test_command_result.partial_credit_error}}
+        {{ag_test_command_result.custom_scoring_error}}
       </div>
     </fieldset>
 

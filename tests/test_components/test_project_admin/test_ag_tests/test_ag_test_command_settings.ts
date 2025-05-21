@@ -10,7 +10,7 @@ import {
     HttpError,
     HttpResponse,
     InstructorFile,
-    PartialCreditSource,
+    CustomScoringSource,
     Project,
     StdinSource,
     ValueFeedbackLevel,
@@ -877,48 +877,48 @@ describe('AGTestCommandSettings tests', () => {
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
 
         await enable_custom_scoring.setChecked(true);
-        expect(wrapper.vm.d_ag_test_command!.partial_credit_source).not.toEqual(PartialCreditSource.none);
+        expect(wrapper.vm.d_ag_test_command!.custom_scoring_source).not.toEqual(CustomScoringSource.none);
         expect(checkbox_is_checked(enable_custom_scoring)).toEqual(true);
 
         await enable_custom_scoring.setChecked(false);
-        expect(wrapper.vm.d_ag_test_command!.partial_credit_source).toEqual(PartialCreditSource.none);
+        expect(wrapper.vm.d_ag_test_command!.custom_scoring_source).toEqual(CustomScoringSource.none);
         expect(checkbox_is_checked(enable_custom_scoring)).toEqual(false);
 
-        await set_data(wrapper, {d_ag_test_command: {partial_credit_source: PartialCreditSource.stdout}});
+        await set_data(wrapper, {d_ag_test_command: {custom_scoring_source: CustomScoringSource.stdout}});
         expect(checkbox_is_checked(enable_custom_scoring)).toEqual(true);
 
-        await set_data(wrapper, {d_ag_test_command: {partial_credit_source: PartialCreditSource.none}});
+        await set_data(wrapper, {d_ag_test_command: {custom_scoring_source: CustomScoringSource.none}});
         expect(checkbox_is_checked(enable_custom_scoring)).toEqual(false);
 
-        await set_data(wrapper, {d_ag_test_command: {partial_credit_source: PartialCreditSource.stderr}});
+        await set_data(wrapper, {d_ag_test_command: {custom_scoring_source: CustomScoringSource.stderr}});
         expect(checkbox_is_checked(enable_custom_scoring)).toEqual(true);
     });
 
     test('Custom scoring settings only rendered when custom scoring enabled', async () => {
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
-        expect(wrapper.find('#partial-credit-source').exists()).toBe(false);
-        expect(wrapper.findComponent({ref: 'max_partial_credit_points'}).exists()).toBe(false);
+        expect(wrapper.find('#custom-scoring-source').exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'max_custom_scoring_points'}).exists()).toBe(false);
 
         await enable_custom_scoring.setChecked(true);
-        expect(wrapper.find('#partial-credit-source').exists()).toBe(true);
-        expect(wrapper.findComponent({ref: 'max_partial_credit_points'}).exists()).toBe(true);
+        expect(wrapper.find('#custom-scoring-source').exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'max_custom_scoring_points'}).exists()).toBe(true);
 
         await enable_custom_scoring.setChecked(false);
-        expect(wrapper.find('#partial-credit-source').exists()).toBe(false);
-        expect(wrapper.findComponent({ref: 'max_partial_credit_points'}).exists()).toBe(false);
+        expect(wrapper.find('#custom-scoring-source').exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'max_custom_scoring_points'}).exists()).toBe(false);
     });
 
     test('Custom scoring max points binding', async () => {
         await wrapper.find("#enable-custom-scoring").setChecked(true);
-        const max_partial_credit_points = wrapper.findComponent({ref: 'max_partial_credit_points'})
+        const max_custom_scoring_points = wrapper.findComponent({ref: 'max_custom_scoring_points'})
 
-        await set_validated_input_text(max_partial_credit_points, '42');
-        expect(validated_input_is_valid(max_partial_credit_points))
-        expect(wrapper.vm.d_ag_test_command!.max_points_for_partial_credit).toEqual(42);
+        await set_validated_input_text(max_custom_scoring_points, '42');
+        expect(validated_input_is_valid(max_custom_scoring_points))
+        expect(wrapper.vm.d_ag_test_command!.max_points_for_custom_scoring).toEqual(42);
 
-        await set_data(wrapper, {d_ag_test_command: {max_points_for_partial_credit: 99}});
-        expect(validated_input_is_valid(max_partial_credit_points))
-        expect(get_validated_input_text(max_partial_credit_points)).toEqual('99')
+        await set_data(wrapper, {d_ag_test_command: {max_points_for_custom_scoring: 99}});
+        expect(validated_input_is_valid(max_custom_scoring_points))
+        expect(get_validated_input_text(max_custom_scoring_points)).toEqual('99')
     });
 
     test('error - negative custom scoring max points', async () => {
@@ -926,7 +926,7 @@ describe('AGTestCommandSettings tests', () => {
         await enable_custom_scoring.setChecked(true);
 
         return do_invalid_text_input_test(
-            wrapper, {ref: 'max_partial_credit_points'}, '-5', '.sticky-save-button'
+            wrapper, {ref: 'max_custom_scoring_points'}, '-5', '.sticky-save-button'
         );
     })
 
@@ -935,32 +935,32 @@ describe('AGTestCommandSettings tests', () => {
         await enable_custom_scoring.setChecked(true);
 
         return do_invalid_text_input_test(
-            wrapper, {ref: 'max_partial_credit_points'}, '4.2', '.sticky-save-button'
+            wrapper, {ref: 'max_custom_scoring_points'}, '4.2', '.sticky-save-button'
         );
     })
 
     async function click_custom_scoring_advanced_settings() {
-        const collapsible_section = wrapper.find('[data-testid="partial-credit-advanced-settings"]')
+        const collapsible_section = wrapper.find('[data-testid="custom-scoring-advanced-settings"]')
         const clickable_header = collapsible_section.find('[data-testid="collapsible-section-header"]')
         return clickable_header.trigger('click');
     }
 
     test('Custom scoring regex input only rendered after clicking advanced settings', async () => {
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
-        expect(wrapper.findComponent({ref: 'partial_credit_regex'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
 
         await enable_custom_scoring.setChecked(true);
-        expect(wrapper.findComponent({ref: 'partial_credit_regex'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
 
         await click_custom_scoring_advanced_settings();
-        expect(wrapper.findComponent({ref: 'partial_credit_regex'}).exists()).toBe(true);
+        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(true);
 
         await click_custom_scoring_advanced_settings();
-        expect(wrapper.findComponent({ref: 'partial_credit_regex'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
 
         await click_custom_scoring_advanced_settings();
         await enable_custom_scoring.setChecked(false);
-        expect(wrapper.findComponent({ref: 'partial_credit_regex'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
     });
 
     test('Custom scoring regex binding', async () => {
@@ -968,14 +968,14 @@ describe('AGTestCommandSettings tests', () => {
         await enable_custom_scoring.setChecked(true);
         await click_custom_scoring_advanced_settings();
 
-        const partial_credit_regex = wrapper.findComponent({ref: 'partial_credit_regex'});
+        const custom_scoring_regex = wrapper.findComponent({ref: 'custom_scoring_regex'});
 
-        await set_validated_input_text(partial_credit_regex, 'foo');
-        expect(validated_input_is_valid(partial_credit_regex))
-        expect(wrapper.vm.d_ag_test_command!.partial_credit_regex).toEqual('foo');
+        await set_validated_input_text(custom_scoring_regex, 'foo');
+        expect(validated_input_is_valid(custom_scoring_regex))
+        expect(wrapper.vm.d_ag_test_command!.custom_scoring_regex).toEqual('foo');
 
-        await set_data(wrapper, {d_ag_test_command: {partial_credit_regex: 'bar'}});
-        expect(get_validated_input_text(partial_credit_regex)).toEqual('bar')
+        await set_data(wrapper, {d_ag_test_command: {custom_scoring_regex: 'bar'}});
+        expect(get_validated_input_text(custom_scoring_regex)).toEqual('bar')
     });
 
     test('error - invalid custom scoring regex', async () => {
@@ -984,7 +984,7 @@ describe('AGTestCommandSettings tests', () => {
         await click_custom_scoring_advanced_settings();
 
         return do_invalid_text_input_test(
-            wrapper, {ref: 'partial_credit_regex'}, '(', '.sticky-save-button'
+            wrapper, {ref: 'custom_scoring_regex'}, '(', '.sticky-save-button'
         );
     });
 
@@ -994,7 +994,7 @@ describe('AGTestCommandSettings tests', () => {
         await click_custom_scoring_advanced_settings();
 
         return do_invalid_text_input_test(
-            wrapper, {ref: 'partial_credit_regex'}, '', '.sticky-save-button'
+            wrapper, {ref: 'custom_scoring_regex'}, '', '.sticky-save-button'
         );
     });
 
@@ -1011,14 +1011,14 @@ describe('AGTestCommandSettings tests', () => {
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
         await enable_custom_scoring.setChecked(true);
         // sanity check default value
-        expect(wrapper.vm.d_ag_test_command!.partial_credit_source).toEqual(PartialCreditSource.stdout);
+        expect(wrapper.vm.d_ag_test_command!.custom_scoring_source).toEqual(CustomScoringSource.stdout);
 
         do_option_disabled_test('#expected-stdout-source', ExpectedOutputSource.text);
         do_option_disabled_test('#expected-stdout-source', ExpectedOutputSource.instructor_file);
 
         // disabled from props
         const test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
-        const cmd = data_ut.make_ag_test_command(test_case.pk, {partial_credit_source: PartialCreditSource.stdout});
+        const cmd = data_ut.make_ag_test_command(test_case.pk, {custom_scoring_source: CustomScoringSource.stdout});
         await set_props(wrapper, {ag_test_case: test_case, ag_test_command: cmd})
 
         do_option_disabled_test('#expected-stdout-source', ExpectedOutputSource.text);
@@ -1029,14 +1029,14 @@ describe('AGTestCommandSettings tests', () => {
         // disabled from user action
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
         await enable_custom_scoring.setChecked(true);
-        await wrapper.find('#partial-credit-source').setValue(PartialCreditSource.stderr);
+        await wrapper.find('#custom-scoring-source').setValue(CustomScoringSource.stderr);
 
         do_option_disabled_test('#expected-stderr-source', ExpectedOutputSource.text);
         do_option_disabled_test('#expected-stderr-source', ExpectedOutputSource.instructor_file);
 
         // disabled from props
         const test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
-        const cmd = data_ut.make_ag_test_command(test_case.pk, {partial_credit_source: PartialCreditSource.stderr});
+        const cmd = data_ut.make_ag_test_command(test_case.pk, {custom_scoring_source: CustomScoringSource.stderr});
         await set_props(wrapper, {ag_test_case: test_case, ag_test_command: cmd})
 
         do_option_disabled_test('#expected-stderr-source', ExpectedOutputSource.text);
@@ -1113,10 +1113,10 @@ describe('AGTestCommandSettings tests', () => {
         // enabled from user action
         await wrapper.find('#expected-stdout-source').setValue(ExpectedOutputSource.text);
         await enable_custom_scoring.setChecked(true);
-        do_option_disabled_test('#partial-credit-source', PartialCreditSource.stdout);
+        do_option_disabled_test('#custom-scoring-source', CustomScoringSource.stdout);
         expect(
-            wrapper.vm.d_ag_test_command!.partial_credit_source
-        ).toEqual(PartialCreditSource.stderr);
+            wrapper.vm.d_ag_test_command!.custom_scoring_source
+        ).toEqual(CustomScoringSource.stderr);
 
         // enabled from props
         const test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
@@ -1125,10 +1125,10 @@ describe('AGTestCommandSettings tests', () => {
         );
         await set_props(wrapper, {ag_test_case: test_case, ag_test_command: cmd})
         await enable_custom_scoring.setChecked(true);
-        do_option_disabled_test('#partial-credit-source', PartialCreditSource.stdout);
+        do_option_disabled_test('#custom-scoring-source', CustomScoringSource.stdout);
         expect(
-            wrapper.vm.d_ag_test_command!.partial_credit_source
-        ).toEqual(PartialCreditSource.stderr);
+            wrapper.vm.d_ag_test_command!.custom_scoring_source
+        ).toEqual(CustomScoringSource.stderr);
     });
 
     test('Enabling stderr diff checking disables stderr custom scoring', async () => {
@@ -1137,10 +1137,10 @@ describe('AGTestCommandSettings tests', () => {
         // enabled from user action
         await wrapper.find('#expected-stderr-source').setValue(ExpectedOutputSource.text);
         await enable_custom_scoring.setChecked(true);
-        do_option_disabled_test('#partial-credit-source', PartialCreditSource.stderr);
+        do_option_disabled_test('#custom-scoring-source', CustomScoringSource.stderr);
         expect(
-            wrapper.vm.d_ag_test_command!.partial_credit_source
-        ).toEqual(PartialCreditSource.stdout);
+            wrapper.vm.d_ag_test_command!.custom_scoring_source
+        ).toEqual(CustomScoringSource.stdout);
 
         // enabled from props
         const test_case = data_ut.make_ag_test_case(ag_test_suite.pk);
@@ -1149,10 +1149,10 @@ describe('AGTestCommandSettings tests', () => {
         );
         await set_props(wrapper, {ag_test_case: test_case, ag_test_command: cmd})
         await enable_custom_scoring.setChecked(true);
-        do_option_disabled_test('#partial-credit-source', PartialCreditSource.stderr);
+        do_option_disabled_test('#custom-scoring-source', CustomScoringSource.stderr);
         expect(
-            wrapper.vm.d_ag_test_command!.partial_credit_source
-        ).toEqual(PartialCreditSource.stdout);
+            wrapper.vm.d_ag_test_command!.custom_scoring_source
+        ).toEqual(CustomScoringSource.stdout);
     });
 
     test('Resource limit settings binding', async () => {

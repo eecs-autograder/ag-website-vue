@@ -242,18 +242,18 @@
                     </option>
                     <option
                       :value="ExpectedOutputSource.text"
-                      :disabled="d_ag_test_command.partial_credit_source === PartialCreditSource.stdout"
+                      :disabled="d_ag_test_command.custom_scoring_source === CustomScoringSource.stdout"
                     >
                       Text
                     </option>
                     <option
                       :value="ExpectedOutputSource.instructor_file"
-                      :disabled="d_ag_test_command.partial_credit_source === PartialCreditSource.stdout"
+                      :disabled="d_ag_test_command.custom_scoring_source === CustomScoringSource.stdout"
                       >
                       Instructor file content
                     </option>
                   </select>
-                  <info-blurb v-if="d_ag_test_command.partial_credit_source === PartialCreditSource.stdout">
+                  <info-blurb v-if="d_ag_test_command.custom_scoring_source === CustomScoringSource.stdout">
                     Disable custom score parsing from stdout to diff check stdout
                   </info-blurb>
                 </div>
@@ -332,18 +332,18 @@
                     </option>
                     <option
                       :value="ExpectedOutputSource.text"
-                      :disabled="d_ag_test_command.partial_credit_source === PartialCreditSource.stderr"
+                      :disabled="d_ag_test_command.custom_scoring_source === CustomScoringSource.stderr"
                     >
                       Text
                     </option>
                     <option
                       :value="ExpectedOutputSource.instructor_file"
-                      :disabled="d_ag_test_command.partial_credit_source === PartialCreditSource.stderr"
+                      :disabled="d_ag_test_command.custom_scoring_source === CustomScoringSource.stderr"
                     >
                       Instructor file content
                     </option>
                   </select>
-                  <info-blurb v-if="d_ag_test_command.partial_credit_source === PartialCreditSource.stderr">
+                  <info-blurb v-if="d_ag_test_command.custom_scoring_source === CustomScoringSource.stderr">
                     Disable custom score parsing from stdout to diff check stderr
                   </info-blurb>
                 </div>
@@ -512,17 +512,17 @@
 
                   <label class="label"> Parse score from: </label>
                   <br>
-                  <select id="partial-credit-source"
-                          v-model="d_ag_test_command.partial_credit_source"
+                  <select id="custom-scoring-source"
+                          v-model="d_ag_test_command.custom_scoring_source"
                           class="select">
                     <option
-                      :value="PartialCreditSource.stdout"
+                      :value="CustomScoringSource.stdout"
                       :disabled="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none"
                     >
                       stdout
                     </option>
                     <option
-                      :value="PartialCreditSource.stderr"
+                      :value="CustomScoringSource.stderr"
                       :disabled="d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
                     >
                       stderr
@@ -537,9 +537,9 @@
                 </div>
 
                 <div class="form-field-wrapper correct-incorrect-points-wrapper">
-                  <label class="label"> Max partial credit points </label>
-                  <validated-input ref="max_partial_credit_points"
-                                   v-model="d_ag_test_command.max_points_for_partial_credit"
+                  <label class="label"> Max custom scoring points </label>
+                  <validated-input ref="max_custom_scoring_points"
+                                   v-model="d_ag_test_command.max_points_for_custom_scoring"
                                    :validators="[
                                      is_not_empty,
                                      is_integer,
@@ -550,14 +550,31 @@
                     <div slot="suffix" class="unit-of-measurement"> points </div>
                   </validated-input>
                 </div>
-                <collapsible-section data-testid="partial-credit-advanced-settings">
+                <collapsible-section data-testid="custom-scoring-advanced-settings">
                   <template #header>
                     Advanced Settings
                   </template>
                   <template #body>
-                    <label class="label"> Partial credit regex </label>
-                    <validated-input ref="partial_credit_regex"
-                                     v-model="d_ag_test_command.partial_credit_regex"
+                    <label class="label"> Custom scoring label </label>
+                      <select id="custom-scoring-label"
+                              v-model="d_ag_test_command.custom_scoring_source"
+                              class="select">
+                        <option
+                          :value="CustomScoringSource.stdout"
+                          :disabled="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none"
+                        >
+                          stdout
+                        </option>
+                        <option
+                          :value="CustomScoringSource.stderr"
+                          :disabled="d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none"
+                        >
+                          stderr
+                        </option>
+                      </select>
+                    <label class="label"> custom scoring regex </label>
+                    <validated-input ref="custom_scoring_regex"
+                                     v-model="d_ag_test_command.custom_scoring_regex"
                                      :validators="[is_not_empty, is_valid_regex]"
                                      input_style="width: 300px;" />
                     </template>
@@ -774,7 +791,7 @@ import {
   AGTestCommandFeedbackConfig,
   ExpectedOutputSource,
   ExpectedReturnCode,
-  PartialCreditSource,
+  CustomScoringSource,
   Project,
   StdinSource,
   ValueFeedbackLevel,
@@ -867,7 +884,7 @@ export default class AGTestCommandSettings extends Vue {
   readonly StdinSource = StdinSource;
   readonly ExpectedOutputSource = ExpectedOutputSource;
   readonly ExpectedReturnCode = ExpectedReturnCode;
-  readonly PartialCreditSource = PartialCreditSource;
+  readonly CustomScoringSource = CustomScoringSource;
   readonly FeedbackConfigLabel = FeedbackConfigLabel;
   readonly FeedbackDescriptions = FeedbackDescriptions;
   readonly format_datetime = format_datetime;
@@ -886,7 +903,7 @@ export default class AGTestCommandSettings extends Vue {
   }
 
   get custom_scoring_enabled() {
-    return this.d_ag_test_command?.partial_credit_source !== PartialCreditSource.none;
+    return this.d_ag_test_command?.custom_scoring_source !== CustomScoringSource.none;
   }
 
   set custom_scoring_enabled(value: boolean) {
@@ -910,19 +927,17 @@ export default class AGTestCommandSettings extends Vue {
 
   disable_custom_scoring() {
     assert_not_null(this.d_ag_test_command);
-    this.d_ag_test_command.partial_credit_source = PartialCreditSource.none;
+    this.d_ag_test_command.custom_scoring_source = CustomScoringSource.none;
   }
 
   enable_custom_scoring() {
     assert_not_null(this.d_ag_test_command);
     if (this.d_ag_test_command.expected_stdout_source === ExpectedOutputSource.none) {
-      this.d_ag_test_command.partial_credit_source = PartialCreditSource.stdout;
+      this.d_ag_test_command.custom_scoring_source = CustomScoringSource.stdout;
     }
     else {
-      this.d_ag_test_command.partial_credit_source = PartialCreditSource.stderr;
+      this.d_ag_test_command.custom_scoring_source = CustomScoringSource.stderr;
     }
-
-    console.log(`partial_credit_source=${this.d_ag_test_command.partial_credit_source}`)
   }
 
   @handle_api_errors_async(handle_save_ag_test_case_error)
