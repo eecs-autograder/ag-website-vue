@@ -7,11 +7,17 @@
          @click="toggle_d_is_open">
 
       <template v-if="is_command">
-          <div class="command-name">{{name}}</div>
-          <div class="command-correctness">
-            <correctness-icon :correctness_level="correctness_level">
-            </correctness-icon>
-          </div>
+        <div class="command-name">{{name}}</div>
+        <div class="command-correctness">
+          <correctness-icon :correctness_level="correctness_level">
+          </correctness-icon>
+        </div>
+        <div class="command-points">
+          <span v-if="points_possible !== 0"
+                class="display-points">
+            {{points_awarded}}/{{points_possible}}
+          </span>
+        </div>
       </template>
       <template v-else>
         <div class="name">{{name}}</div>
@@ -193,10 +199,19 @@ $border-radius-value: 3px;
 
 .command-name {
   @extend %panel-column-padding;
+  width: 70%;
 }
 
 .command-correctness {
   @extend %panel-column-padding;
+  width: 20%;
+}
+
+.command-points {
+  @extend %panel-column-padding;
+  box-sizing: border-box;
+  font-weight: normal;
+  width: 20%;
 }
 
 .multiple-command-panel-body {
