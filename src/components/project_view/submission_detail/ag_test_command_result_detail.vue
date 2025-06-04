@@ -243,13 +243,13 @@
 
       <div
         class="feedback-section"
-        v-if="d_output_size?.stdout_size !== null"
+        v-if="d_output_size && d_output_size.stdout_size !== null"
         ref="actual_stdout_section"
       >
         <div class="feedback-row">
           <div class="feedback-label"> Output: </div>
           <div class="feedback">
-            <div v-if="d_output_size?.stdout_size === 0" class="short-output">No output</div>
+            <div v-if="d_output_size && d_output_size.stdout_size === 0" class="short-output">No output</div>
             <div v-else-if="d_stdout_content !== null" class="lengthy-output">
               <view-file :file_contents="d_stdout_content"
                           view_file_max_height="50vh"
@@ -262,13 +262,13 @@
 
       <div
         class="feedback-section"
-        v-if="d_output_size?.stderr_size !== null"
+        v-if="d_output_size && d_output_size.stderr_size !== null"
         ref="actual_stderr_section"
       >
         <div class="feedback-row">
           <div class="feedback-label"> Error output: </div>
           <div class="feedback">
-            <div v-if="d_output_size?.stderr_size === 0" class="short-output">No output</div>
+            <div v-if="d_output_size && d_output_size.stderr_size === 0" class="short-output">No output</div>
             <div v-else-if="d_stderr_content !== null" class="lengthy-output">
               <view-file :file_contents="d_stderr_content"
                           view_file_max_height="50vh"
