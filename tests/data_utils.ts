@@ -20,6 +20,7 @@ import {
     Course,
     Criterion,
     CriterionResult,
+    CustomScoringError,
     ExpectedOutputSource,
     ExpectedReturnCode,
     ExpectedStudentFile,
@@ -559,7 +560,7 @@ const AG_TEST_COMMAND_RESULT_FEEDBACK_PKS = counter();
 export function make_ag_test_command_result_feedback(
     ag_test_command_pk: number,
     args: Partial<AGTestCommandResultFeedback> = {}): AGTestCommandResultFeedback {
-    let defaults = {
+    const defaults = {
         pk: AG_TEST_COMMAND_RESULT_FEEDBACK_PKS.next().value,
         ag_test_command_pk: ag_test_command_pk,
         ag_test_command_name: `AG Test Command ${ag_test_command_pk}`,
@@ -570,9 +571,11 @@ export function make_ag_test_command_result_feedback(
         return_code_correct: null,
         expected_return_code: null,
         actual_return_code: null,
+        custom_scoring_used: false,
         custom_scoring_points: 0,
         custom_scoring_points_possible: 0,
-        custom_scoring_error: '',
+        custom_scoring_error: CustomScoringError.none,
+        custom_scoring_label: null,
         return_code_points: 0,
         return_code_points_possible: 0,
         stdout_correct: null,
