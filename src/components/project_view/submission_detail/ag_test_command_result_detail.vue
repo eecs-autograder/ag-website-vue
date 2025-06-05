@@ -172,10 +172,10 @@
 
       <div
         class="feedback-section"
+        v-if="ag_test_command_result.custom_scoring_used"
         ref="custom_scoring_correctness"
       >
         <div
-          v-if="ag_test_command_result.custom_scoring_used"
           class="feedback-row"
         >
           <div class="feedback-label"> {{ custom_scoring_label }}: </div>
@@ -431,7 +431,8 @@ export default class AGTestCommandResultDetail extends Vue implements Created{
                && this.ag_test_command_result.timed_out!)
            || this.ag_test_command_result.actual_return_code !== null
            || this.ag_test_command_result.stdout_correct !== null
-           || this.ag_test_command_result.stderr_correct !== null;
+           || this.ag_test_command_result.stderr_correct !== null
+           || this.ag_test_command_result.custom_scoring_used;
   }
 
   @handle_global_errors_async

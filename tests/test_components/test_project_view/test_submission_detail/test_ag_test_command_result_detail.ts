@@ -162,17 +162,7 @@ describe('Correctness feedback tests', () => {
             ag_test_command_result.return_code_correct = true;
             const wrapper = await make_wrapper();
             const component = wrapper.findComponent({ref: 'return_code_correctness'})
-            expect(component.exists()).toBe(true);
             expect(component.text()).not.toContain('expected');
-        });
-
-        test('Actual return code available', async () => {
-            ag_test_command_result.actual_return_code = 42;
-            const wrapper = await make_wrapper();
-            console.log(wrapper.html());
-            const component = wrapper.findComponent({ref: 'actual_return_code_section'});
-            expect(component.exists()).toBe(true);
-            expect(component.text()).toContain('42');
         });
 
         test('Actual return code available, return code not checked', async () => {
@@ -182,15 +172,15 @@ describe('Correctness feedback tests', () => {
             // Any status should be correct, including 2
             ag_test_command_result.actual_return_code = 2;
             const wrapper = await make_wrapper();
-            const component = wrapper.findComponent({ref: 'actual_return_code_section'});
-            expect(component.exists()).toBe(true);
-            expect(component.find('.actual-return-code-incorrect').exists()).toBe(false);
+            const component = wrapper.findComponent({ref: 'return_code_correctness'})
+            expect(component.exists()).toBe(false);
         });
 
         test('Expected return code available, return code not checked', async () => {
             ag_test_command_result.expected_return_code = ag_cli.ExpectedReturnCode.none;
             const wrapper = await make_wrapper();
-            expect(wrapper.findComponent({ref: 'expected_return_code'}).exists()).toBe(false);
+            const component = wrapper.findComponent({ref: 'return_code_correctness'})
+            expect(component.exists()).toBe(false);
         });
 
         test('Expected return code available, zero expected', async () => {
@@ -198,7 +188,7 @@ describe('Correctness feedback tests', () => {
             ag_test_command_result.return_code_correct = false;
             const wrapper = await make_wrapper();
             expect(
-                compress_whitespace(wrapper.findComponent({ref: 'return_code_correctness'}).text())
+                wrapper.findComponent({ref: 'return_code_correctness'}).text()
             ).toContain('zero');
         });
 
@@ -207,7 +197,7 @@ describe('Correctness feedback tests', () => {
             ag_test_command_result.return_code_correct = false;
             const wrapper = await make_wrapper();
             expect(
-                compress_whitespace(wrapper.findComponent({ref: 'return_code_correctness'}).text())
+                wrapper.findComponent({ref: 'return_code_correctness'}).text()
             ).toContain('nonzero');
         });
     });
@@ -260,6 +250,137 @@ describe('Correctness feedback tests', () => {
             const section_wrapper = wrapper.findComponent({ref: 'stderr_correctness'});
             expect(section_wrapper.find('.incorrect-icon').exists()).toBe(true);
             expect(section_wrapper.find('.correct-icon').exists()).toBe(false);
+        });
+    });
+
+    describe('Custom scoring correctness tests', () => {
+        test('Custom scoring used alone', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = 5;
+            ag_test_command_result.custom_scoring_points_possible = 10;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Points:');
+            expect(section_wrapper.text()).toContain('5/10');
+        });
+
+        test('Custom scoring used with return code, zero value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = 0;
+            ag_test_command_result.return_code_correct = true;
+            ag_test_command_result.return_code_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('+0');
+        });
+
+        test('Custom scoring used with stdout diff, zero value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = 0;
+            ag_test_command_result.stdout_correct = true;
+            ag_test_command_result.stdout_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('+0');
+        });
+
+        test('Custom scoring used with stderr diff, zero value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = 0;
+            ag_test_command_result.stderr_correct = true;
+            ag_test_command_result.stderr_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('+0');
+        });
+
+        test('Custom scoring used with return code, negative value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = -5;
+            ag_test_command_result.return_code_correct = true;
+            ag_test_command_result.return_code_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('-5');
+        });
+
+        test('Custom scoring used with stdout diff, negative value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = -5;
+            ag_test_command_result.stdout_correct = true;
+            ag_test_command_result.stdout_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('-5');
+        });
+
+        test('Custom scoring used with stderr diff, negative value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = -5;
+            ag_test_command_result.stderr_correct = true;
+            ag_test_command_result.stderr_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('-5');
+        });
+
+        test('Custom scoring used with return code, positive value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = 5;
+            ag_test_command_result.return_code_correct = true;
+            ag_test_command_result.return_code_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('+5');
+        });
+
+        test('Custom scoring used with stdout diff, positive value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = 5;
+            ag_test_command_result.stdout_correct = true;
+            ag_test_command_result.stdout_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('+5');
+        });
+
+        test('Custom scoring used with stderr diff, positive value', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_points = 5;
+            ag_test_command_result.stderr_correct = true;
+            ag_test_command_result.stderr_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Instructor score adjustment:');
+            expect(section_wrapper.text()).toContain('+5');
+        });
+
+        test('Custom scoring used with non-default label alone', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_label = "Kudos";
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Kudos:');
+            expect(section_wrapper.text()).toContain('0/0');
+        });
+
+        test('Custom scoring used with non-default label not alone', async () => {
+            ag_test_command_result.custom_scoring_used = true;
+            ag_test_command_result.custom_scoring_label = "Kudos";
+            ag_test_command_result.stderr_correct = true;
+            ag_test_command_result.stderr_points_possible = 5;
+            const wrapper = await make_wrapper();
+            const section_wrapper = wrapper.findComponent({ref: 'custom_scoring_correctness'});
+            expect(section_wrapper.text()).toContain('Kudos:');
+            expect(section_wrapper.text()).toContain('+0');
         });
     });
 });
@@ -375,6 +496,21 @@ describe('Actual output tests', () => {
     test('No actual output available', async () => {
         const wrapper = await make_wrapper();
         expect(wrapper.findComponent({ref: 'actual_output'}).exists()).toBe(false);
+    });
+
+    test('Actual return code available', async () => {
+        ag_test_command_result.actual_return_code = 42;
+        const wrapper = await make_wrapper();
+        const component = wrapper.findComponent({ref: 'actual_return_code_section'});
+        expect(component.text()).toContain('42');
+    });
+
+    test('Actual return code hidden', async () => {
+        ag_test_command_result.actual_return_code = null;
+        ag_test_command_result.return_code_correct = true;
+        const wrapper = await make_wrapper();
+        const component = wrapper.findComponent({ref: 'actual_return_code_section'})
+        expect(component.exists()).toBe(false);
     });
 
     test('Actual stdout available', async () => {
