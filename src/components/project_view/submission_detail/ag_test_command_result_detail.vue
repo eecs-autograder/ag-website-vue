@@ -374,7 +374,6 @@ export default class AGTestCommandResultDetail extends Vue implements Created{
   readonly CustomScoringError = CustomScoringError;
 
   async created() {
-    console.log(this.ag_test_command_result.actual_return_code)
     if (this.d_globals.user_roles.is_staff) {
       let ag_test_command = await AGTestCommand.get_by_pk(
         this.ag_test_command_result.ag_test_command_pk);
@@ -415,7 +414,7 @@ export default class AGTestCommandResultDetail extends Vue implements Created{
                 + ' points possible. The max custom scoring points possible were awarded instead of'
                 + ' the parsed value');
       case CustomScoringError.failed_to_find_pattern:
-        return 'Failed to find a custom score matching the configured pattern in command output';
+        return 'Failed to find a custom score matching the configured pattern in output';
       case CustomScoringError.non_integer:
         return 'The parsed custom score value was a non-integer. Only integer values are supported';
       default: {

@@ -254,7 +254,8 @@
                     </option>
                   </select>
                   <info-blurb v-if="d_ag_test_command.custom_scoring_source === CustomScoringSource.stdout">
-                    Disable custom score parsing from stdout to diff check stdout
+                    Diff-checking and custom scoring must use different output streams. Change the setting
+                    "Parse score from:" to stderr if you want to diff-check stdout.
                   </info-blurb>
                 </div>
 
@@ -344,7 +345,8 @@
                     </option>
                   </select>
                   <info-blurb v-if="d_ag_test_command.custom_scoring_source === CustomScoringSource.stderr">
-                    Disable custom score parsing from stdout to diff check stderr
+                    Diff-checking and custom scoring must use different output streams. Change the setting
+                    "Parse score from:" to stdout if you want to diff-check stderr.
                   </info-blurb>
                 </div>
 
@@ -465,7 +467,9 @@
               <legend class="header-text">
                 Custom Scoring
                 <tooltip width="large" placement="top">
-                  Assign points based on a parsed pattern output from the test command
+                  Programmatically assign or adjust points to this
+                  {{case_has_exactly_one_command ? 'test case' : 'command'}}
+                  by printing a simple formatted string.
                 </tooltip>
               </legend>
             </div>
@@ -486,15 +490,16 @@
               </div>
 
               <info-blurb v-if="!can_enable_custom_scoring">
-                Disable either stdout or stderr diff checking to enable custom scoring
+                Diff-checking and custom scoring must use different output streams.
+                If you are diff-checking stdout, set "Parse score from:" to stderr (or vice-versa).
               </info-blurb>
 
               <div v-if="custom_scoring_enabled">
                 <info-blurb>
-                  The last output that matches the pattern will be used to assign points.
-                  The entirety of the pattern must be on a single line of output. Using
-                  the default regex pattern, the following print statement in a Python
-                  test would assign 5 points:
+                  If multiple score messages are printed, the last one will be used.
+                  The whole message must be on one line of output. Using the default
+                  regex pattern, the following print statement in a Python test would
+                  assign 5 points:
 
                   <div class="code-snippet">
                     <code>
@@ -529,10 +534,12 @@
                     </option>
                   </select>
                   <info-blurb v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none">
-                    Disable stdout diff checking to parse score from stdout
+                    Custom scoring and diff-checking must use different output streams. Change the setting
+                    "Check stdout against" to "Don't check" if you want to parse the custom score from stdout.
                   </info-blurb>
                   <info-blurb v-if="d_ag_test_command.expected_stderr_source !== ExpectedOutputSource.none">
-                    Disable stderr diff checking to parse score from stderr
+                    Custom scoring and diff-checking must use different output streams. Change the setting
+                    "Check stderr against" to "Don't check" if you want to parse the custom score from stderr.
                   </info-blurb>
                 </div>
 
@@ -556,33 +563,44 @@
                   </template>
                   <template #body>
                     <info-blurb>
-                      The default label will show "Score" if there are no other
-                      points that can be earned for the command other than custom scoring
-                      points, or "Instructor score adjustment" if there are points available
-                      through other checks. If you do not use the default label,
-                      whichever label you provide will be shown regardless of other
-                      configurations.
+                      The system infers a reasonable default label for the custom score
+                      value shown to students. The default label is "Score" if no other
+                      checks in this {{case_has_exactly_one_command ? 'test case' : 'command'}}
+                      have points attached to them. If any other checks have points attached
+                      to them, the default label is "Instructor score adjustment". You can
+                      override this behavior below.
                     </info-blurb>
 
                     <div class="form-field-wrapper">
                       <div class="checkbox-input-container">
                         <label class="checkbox-label">
                           <input
-                            id="use-default-custom-scoring-label"
+                            id="override-custom-scoring-label"
                             type="checkbox"
                             class="checkbox"
-                            v-model="custom_scoring_label_is_default"
+                            v-model="override_custom_scoring_label"
                           >
-                          Use default custom scoring label
+                          Override default custom scoring label
                         </label>
                       </div>
                     </div>
 
-                    <div class="form-field-wrapper" v-if="!custom_scoring_label_is_default">
+                    <div class="form-field-wrapper" v-if="override_custom_scoring_label">
                       <label class="label"> Custom scoring label </label>
                       <validated-input ref="custom_scoring_label"
                                        v-model="d_ag_test_command.custom_scoring_label"
                                        :validators="[is_not_empty]" />
+                    </div>
+
+                    <!-- Dummy disabled input to avoid showing "null" -->
+                    <div class="form-field-wrapper" v-else>
+                      <label class="label">
+                        Custom scoring label
+                        <input ref="disabled-custom_scoring_label"
+                               class="input"
+                               disabled="true"
+                               value="" />
+                      </label>
                     </div>
 
                     <div class="form-field-wrapper">
@@ -915,17 +933,13 @@ export default class AGTestCommandSettings extends Vue {
     return this.ag_test_case.ag_test_commands.length === 1;
   }
 
-  get custom_scoring_label_is_default() {
-    return this.d_ag_test_command?.custom_scoring_label === null;
+  get override_custom_scoring_label() {
+    return this.d_ag_test_command?.custom_scoring_label !== null;
   }
 
-  set custom_scoring_label_is_default(value: boolean) {
+  set override_custom_scoring_label(value: boolean) {
     assert_not_null(this.d_ag_test_command);
-    if (value) {
-      this.d_ag_test_command.custom_scoring_label = null;
-    } else {
-      this.d_ag_test_command.custom_scoring_label = '';
-    }
+    this.d_ag_test_command.custom_scoring_label = value ? '' : null;
   }
 
   get custom_scoring_enabled() {
@@ -1202,5 +1216,10 @@ function handle_save_ag_test_cmd_settings_error(component: AGTestCommandSettings
   border: 1px solid lightgray;
   padding: 0.375rem;
   margin: 0.375rem 0;
+}
+
+.input {
+  display: inline-block;
+  width: 100%;
 }
 </style>

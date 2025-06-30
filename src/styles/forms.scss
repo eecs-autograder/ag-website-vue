@@ -1,6 +1,10 @@
 @import '@/styles/colors.scss';
 @import '@/styles/section_header.scss';
 
+// Shared colors ---------------------------------------------------------------------
+$disabled: hsl(220, 12%, 20%);
+$disabled-label: rgba($disabled, 0.6);
+
 // Organization ---------------------------------------------------------------
 
 .fieldset {
@@ -99,6 +103,10 @@
     margin: 0 0 .25rem 0;
 }
 
+.label:has(input:disabled) {
+    color: $disabled-label;
+}
+
 // Danger Zone -----------------------------------
 
 .danger-zone-container {
@@ -169,7 +177,6 @@ $input-text-color: #495057;
 
 $checkbox-background-light: hsl(200, 100%, 99%);
 $checkbox-background-dark: hsl(220, 30%, 90%);
-$check-mark-disabled: hsl(220, 12%, 20%);
 
 .checkbox-input-container {
     margin: .625rem 0;
@@ -186,7 +193,7 @@ $check-mark-disabled: hsl(220, 12%, 20%);
     }
 
     .checkbox-label:has(input:disabled) {
-        color: rgba($check-mark-disabled, 0.6);
+        color: $disabled-label;
     }
 
     $right-margin: .25rem;
@@ -239,7 +246,7 @@ $check-mark-disabled: hsl(220, 12%, 20%);
     }
 
     .checkbox:checked:disabled::before {
-        color: rgba($check-mark-disabled, 0.4);
+        color: rgba($disabled, 0.4);
         @extend %disabled-checkbox-shared;
     }
 }

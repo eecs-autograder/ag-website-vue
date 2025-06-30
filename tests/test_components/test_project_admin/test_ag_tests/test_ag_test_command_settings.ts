@@ -955,50 +955,50 @@ describe('AGTestCommandSettings tests', () => {
 
         await click_custom_scoring_advanced_settings();
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(true);
-        expect(wrapper.find('#use-default-custom-scoring-label').exists()).toBe(true);
+        expect(wrapper.find('#override-custom-scoring-label').exists()).toBe(true);
 
         await click_custom_scoring_advanced_settings();
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
-        expect(wrapper.find('#use-default-custom-scoring-label').exists()).toBe(false);
+        expect(wrapper.find('#override-custom-scoring-label').exists()).toBe(false);
 
         await click_custom_scoring_advanced_settings();
         await enable_custom_scoring.setChecked(false);
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
-        expect(wrapper.find('#use-default-custom-scoring-label').exists()).toBe(false);
+        expect(wrapper.find('#override-custom-scoring-label').exists()).toBe(false);
     });
 
-    test('Use default custom scoring label binding', async () => {
+    test('Override custom scoring label binding', async () => {
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
         await enable_custom_scoring.setChecked(true);
         await click_custom_scoring_advanced_settings();
 
-        expect(wrapper.vm.custom_scoring_label_is_default).toEqual(true);
+        expect(wrapper.vm.override_custom_scoring_label).toEqual(false);
 
-        await wrapper.find('#use-default-custom-scoring-label').setChecked(false);
-        expect(wrapper.vm.custom_scoring_label_is_default).toEqual(false);
+        await wrapper.find('#override-custom-scoring-label').setChecked(false);
+        expect(wrapper.vm.override_custom_scoring_label).toEqual(false);
 
-        await wrapper.find('#use-default-custom-scoring-label').setChecked(true);
-        expect(wrapper.vm.custom_scoring_label_is_default).toEqual(true);
+        await wrapper.find('#override-custom-scoring-label').setChecked(true);
+        expect(wrapper.vm.override_custom_scoring_label).toEqual(true);
 
-        await set_data(wrapper, {custom_scoring_label_is_default: false});
-        expect(wrapper.find('#use-default-custom-scoring-label').element).not.toBeChecked();
+        await set_data(wrapper, {override_custom_scoring_label: false});
+        expect(wrapper.find('#override-custom-scoring-label').element).not.toBeChecked();
 
-        await set_data(wrapper, {custom_scoring_label_is_default: true});
-        expect(wrapper.find('#use-default-custom-scoring-label').element).toBeChecked();
+        await set_data(wrapper, {override_custom_scoring_label: true});
+        expect(wrapper.find('#override-custom-scoring-label').element).toBeChecked();
 
     });
 
-    test('Custom scoring label input is only rendered when use default custom scoring label is unchecked', async () => {
+    test('Custom scoring label input is only rendered when override custom scoring label is checked', async () => {
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
         await enable_custom_scoring.setChecked(true);
         await click_custom_scoring_advanced_settings();
 
         expect(wrapper.findComponent({ref: 'custom_scoring_label'}).exists()).toBe(false);
 
-        await wrapper.find('#use-default-custom-scoring-label').setChecked(false);
+        await wrapper.find('#override-custom-scoring-label').setChecked(true);
         expect(wrapper.findComponent({ref: 'custom_scoring_label'}).exists()).toBe(true);
 
-        await wrapper.find('#use-default-custom-scoring-label').setChecked(true);
+        await wrapper.find('#override-custom-scoring-label').setChecked(false);
         expect(wrapper.findComponent({ref: 'custom_scoring_label'}).exists()).toBe(false);
     });
 
@@ -1006,7 +1006,7 @@ describe('AGTestCommandSettings tests', () => {
         const enable_custom_scoring = wrapper.find('#enable-custom-scoring');
         await enable_custom_scoring.setChecked(true);
         await click_custom_scoring_advanced_settings();
-        await wrapper.find('#use-default-custom-scoring-label').setChecked(false);
+        await wrapper.find('#override-custom-scoring-label').setChecked(true);
 
         const custom_scoring_label = wrapper.findComponent({ref: 'custom_scoring_label'})
         await set_validated_input_text(custom_scoring_label, "Kudos");
@@ -1121,7 +1121,7 @@ describe('AGTestCommandSettings tests', () => {
         await expected_stdout_source_input.setValue(ExpectedOutputSource.text);
         expect(enable_custom_scoring.element).toBeDisabled();
 
-        /*** enable diff checking from user action ***/
+        /*** enable diff checking from props ***/
         let test_case;
         let cmd;
 
