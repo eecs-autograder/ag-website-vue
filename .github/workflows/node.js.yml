@@ -35,6 +35,12 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    # Yes, we're running this on each step because I couldn't figure out
+    # the quirks of uploading/downloading artifacts into the right
+    # directory
+    - name: Update version number (on dispatch only)
+      run: ./dev_scripts/ci/update_version_number.sh "${{ inputs.version }}"
+
     - run: npm ci
     - run: npm run lint
     - run: npm run build
@@ -61,6 +67,12 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    # Yes, we're running this on each step because I couldn't figure out
+    # the quirks of uploading/downloading artifacts into the right
+    # directory
+    - name: Update version number (on dispatch only)
+      run: ./dev_scripts/ci/update_version_number.sh "${{ inputs.version }}"
+
     - run: npm ci
     - run: npm test
 
@@ -76,7 +88,7 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: 'true'
 
@@ -87,6 +99,12 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    # Yes, we're running this on each step because I couldn't figure out
+    # the quirks of uploading/downloading artifacts into the right
+    # directory
+    - name: Update version number (on dispatch only)
+      run: ./dev_scripts/ci/update_version_number.sh "${{ inputs.version }}"
+
     - run: docker compose -f e2e_test_stack/docker-compose.yml build
     - run: docker compose -f e2e_test_stack/docker-compose.yml pull
 
@@ -96,3 +114,47 @@ jobs:
       run: npx playwright install --with-deps
 
     - run: npm run e2e:once
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'workflow_dispatch'
+
+    needs:
+    - lint
+    # - unit-tests
+    # - e2e-tests
+
+    permissions:
+      contents: write  # IMPORTANT: mandatory for making GitHub Releases
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Yes, we're running this on each step because I couldn't figure out
+      # the quirks of uploading/downloading artifacts into the right
+      # directory
+      - name: Update version number (on dispatch only)
+        run: ./dev_scripts/ci/update_version_number.sh "${{ inputs.version }}"
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit updated version files
+        run: |
+          git add package.json package-lock.json
+          git commit -m "Version ${{ inputs.version }}"
+          git push --dry-run
+          git tag ${{ inputs.version }}
+          git push --tags --dry-run
+
+      # - name: Create GitHub Release
+      #   env:
+      #     GITHUB_TOKEN: ${{ github.token }}
+      #   run: >-
+      #     gh release create
+      #     "${{ inputs.version }}"
+      #     --repo "$GITHUB_REPOSITORY"
+      #     --notes ""
