@@ -88,3 +88,54 @@ Add the names of such files to the Prettier and eslint commands in static_analys
     - Use the `deep_copy` function in `src/utils.ts` to make deep copies of
       class instances that have a constructor and/or member functions. For other
       objects, `JSON.parse(JSON.stringify(...))` is the preferred approach.
+
+# Versioning & Branches
+This package uses calendar versioning following [Python conventions](https://packaging.python.org/en/latest/discussions/versioning/), with version numbers of the form `yyyy.mm.X`, where `X` is for minor versions.
+For example: `2024.08.0` corresponds to August 2024.
+We also make use of pre-release modifiers such as `.devX`.
+For consistency across Autograder.io's modules, pre-release modifiers will start with a dot (e.g., `.devX`) in **Git tags**.
+In `package.json` and `package-lock.json`, pre-release modifiers will start with a hyphen (e.g., `-devX`) because npm requires this format.
+Note that `npm version` will also strip leading zeros from the version.
+Include them anyway when triggering a `workflow_dispatch` event so that the branch and tag names are zero-padded.
+
+## Development & Release Branches: Protocols and Workflow
+
+### "develop" branch
+Use feature branches for all changes, and make a pull request against the `develop` branch.
+
+This repo has two submodules: `autograder-server` (`tests/local_stack/autograder-server`) and `ag-client-typescript`.
+The `develop` branch is for changes based on the `develop` branch of the submodules.
+Update the submodules' `develop` branches when starting work on a feature that depends on new `autograder-server` or `ag-client-typescript` commits.
+Use the following steps on your feature branch:
+```
+# Fetch latest submodule commits
+git submodule update --remote
+# git status should show new commits in the submodule
+git status
+git add tests/local_stack/autograder-server ag-client-typescript
+git commit -m "Update submodules"
+```
+
+### "release-*" branches
+Name release branches as `release-YYYY.MM.x`, replacing YYYY with the full year and MM with the zero padded month (e.g., `release-2024.08.x`).
+
+**IMPORTANT**: When you create a release branch, update the `branch` field in the `autograder-server` and `ag-client-typescript` entries of `.gitmodules` to point to the corresponding release branch in the submodules.
+Then run `git submodule update --remote` and commit the changes.
+
+Do NOT merge or rebase directly between the develop and release branches.
+Once a release branch is created, it should only be updated with bugfix- or (rarely) feature-style branches.
+Squash-and-merge for this type of PR.
+After the squashed branch is merged into a release branch, cherry-pick the squashed commit on top of `develop` and open a pull request to merge the changes into `develop`.
+
+The version of `README.md` (this file) on the `develop` branch is the source of truth.
+Update this file on release branches just before publishing a release.
+If instructions differ across releases, include both, and label which version the instructions apply to.
+
+### Publishing a release
+To create a github release, trigger a `workflow_dispatch` event on the release branch.
+Pass the version number as input.
+
+CI will update the version number, lint and test the module, tag the release, and create a GitHub release.
+
+Note that `npm version` will strip leading zeros from the version numbers written to `package*.json`.
+Include them anyway when triggering a `workflow_dispatch` event so that the branch and tag names are zero-padded.
