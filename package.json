@@ -19,6 +19,7 @@
     "serve": "Starts the Vue dev server. Used by the 'website' dev Dockerfile."
   },
   "scripts": {
+    "preinstall": "npm --prefix ./ag-client-typescript run build:clean",
     "lint": "./static_analysis.bash",
     "build": "vue-cli-service build",
     "test": "python3 run_tests.py",
@@ -31,7 +32,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@types/minimatch": "^3.0.5",
-    "ag-client-typescript": "2.8.0",
+    "ag-client-typescript": "file:ag-client-typescript",
     "chart.js": "^3.9.1",
     "chartjs-adapter-moment": "^1.0.1",
     "chartjs-plugin-zoom": "^1.2.1",

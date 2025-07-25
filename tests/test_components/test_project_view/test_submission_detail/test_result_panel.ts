@@ -166,6 +166,7 @@ describe('ResultPanel tests', () => {
         });
         expect(wrapper.find('.command-name').exists()).toBe(true);
         expect(wrapper.find('.command-correctness').exists()).toBe(true);
+        expect(wrapper.find('.command-points').exists()).toBe(true);
         expect(wrapper.find('.name').exists()).toBe(false);
         expect(wrapper.find('.correctness').exists()).toBe(false);
         expect(wrapper.find('.points').exists()).toBe(false);
@@ -182,6 +183,7 @@ describe('ResultPanel tests', () => {
         });
         expect(wrapper.find('.command-name').exists()).toBe(false);
         expect(wrapper.find('.command-correctness').exists()).toBe(false);
+        expect(wrapper.find('.command-points').exists()).toBe(false);
         expect(wrapper.find('.name').exists()).toBe(true);
         expect(wrapper.find('.correctness').exists()).toBe(true);
         expect(wrapper.find('.points').exists()).toBe(true);

@@ -1,24 +1,32 @@
 @import '@/styles/colors.scss';
+@import '@/styles/section_header.scss';
+
+// Shared colors ---------------------------------------------------------------------
+$disabled: hsl(220, 12%, 20%);
+$disabled-label: rgba($disabled, 0.6);
 
 // Organization ---------------------------------------------------------------
 
 .fieldset {
     box-sizing: border-box;
 
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
+    border: none;
     border-color: rgba(255, 255, 255, 0.3);
     border-width: 2px;
 
-    margin: .75rem 0;
+    margin: 0 .75rem 0 0;
     padding: 0;
 }
 
 .legend {
-    box-sizing: border-box;
+    @include section-header(
+        $line-spacing: .1875rem,
+        $line-color: rgba(0, 0, 0, 0.1),
+        $text-color: darken($ocean-blue, 5),
+        $with-left-divider: false,
+    );
 
-    color: darken($ocean-blue, 5%);
+    box-sizing: border-box;
     font-size: 1.125rem;
     margin: .5rem 0;
 }
@@ -95,6 +103,10 @@
     margin: 0 0 .25rem 0;
 }
 
+.label:has(input:disabled) {
+    color: $disabled-label;
+}
+
 // Danger Zone -----------------------------------
 
 .danger-zone-container {
@@ -165,7 +177,6 @@ $input-text-color: #495057;
 
 $checkbox-background-light: hsl(200, 100%, 99%);
 $checkbox-background-dark: hsl(220, 30%, 90%);
-$check-mark-disabled: hsl(220, 12%, 20%);
 
 .checkbox-input-container {
     margin: .625rem 0;
@@ -179,6 +190,10 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         font-size: .875rem;
         font-weight: bold;
         margin: 0;
+    }
+
+    .checkbox-label:has(input:disabled) {
+        color: $disabled-label;
     }
 
     $right-margin: .25rem;
@@ -225,17 +240,13 @@ $check-mark-disabled: hsl(220, 12%, 20%);
         box-shadow: 0 0.5px 0.5px transparent;
     }
 
-    .checkbox:disabled + label {
-        color: rgba($check-mark-disabled, 0.6);
-    }
-
     .checkbox:disabled::before {
         color: transparent;
         @extend %disabled-checkbox-shared;
     }
 
     .checkbox:checked:disabled::before {
-        color: rgba($check-mark-disabled, 0.4);
+        color: rgba($disabled, 0.4);
         @extend %disabled-checkbox-shared;
     }
 }

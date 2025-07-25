@@ -31,12 +31,11 @@
         </validated-input>
     </div>
 
-    <div class="advanced-limits-info">
-      <i class="fas fa-info-circle"></i>
+    <info-blurb>
       The options below can be used to apply stricter resource limits
       for pedagogical purposes.<br>
       We apply separate limits to preserve system integrity.
-    </div>
+    </info-blurb>
 
     <div class="form-field-wrapper">
       <div class="checkbox-input-container">
@@ -100,6 +99,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
+import InfoBlurb from '@/components/InfoBlurb.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import {
@@ -131,6 +131,7 @@ class ResourceLimits {
 
 @Component({
   components: {
+    InfoBlurb,
     Tooltip,
     ValidatedInput,
   }

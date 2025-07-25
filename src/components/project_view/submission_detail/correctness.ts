@@ -26,14 +26,15 @@ export function setup_return_code_correctness(setup_return_code: number | null,
 export function ag_test_case_result_correctness(
     case_result: AGTestCaseResultFeedback
 ): CorrectnessLevel {
-    let return_code_correctness = ag_test_case_result_return_code_correctness(case_result);
-    let output_correctness = ag_test_case_result_output_correctness(case_result);
+    const return_code_correctness = ag_test_case_result_return_code_correctness(case_result);
+    const output_correctness = ag_test_case_result_output_correctness(case_result);
+    const custom_scoring_correctness = ag_test_case_result_custom_scoring_correctness(case_result);
 
     if (case_result.total_points === 0 && case_result.total_points_possible !== 0) {
         return CorrectnessLevel.none_correct;
     }
 
-    let correctnesses = [return_code_correctness, output_correctness];
+    let correctnesses = [return_code_correctness, output_correctness, custom_scoring_correctness];
 
     correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.not_available);
     if (correctnesses.length === 0) {
@@ -57,7 +58,7 @@ export function ag_test_case_result_correctness(
 }
 
 export function ag_test_case_result_return_code_correctness(case_result: AGTestCaseResultFeedback) {
-    let without_not_available = case_result.ag_test_command_results.filter(
+    const without_not_available = case_result.ag_test_command_results.filter(
         (cmd_result) => cmd_result.return_code_correct !== null
                         || cmd_result.timed_out!
                         || cmd_result.actual_return_code !== null);
@@ -65,7 +66,7 @@ export function ag_test_case_result_return_code_correctness(case_result: AGTestC
         return CorrectnessLevel.not_available;
     }
 
-    let all_show_return_code_only = without_not_available.every(
+    const all_show_return_code_only = without_not_available.every(
         (cmd_result) => cmd_result.return_code_correct === null
                         && (cmd_result.actual_return_code !== null || cmd_result.timed_out!));
 
@@ -73,13 +74,13 @@ export function ag_test_case_result_return_code_correctness(case_result: AGTestC
         return CorrectnessLevel.info_only;
     }
 
-    let all_correct = case_result.ag_test_command_results.every(
+    const all_correct = case_result.ag_test_command_results.every(
         (cmd_result) => cmd_result.return_code_correct === null || cmd_result.return_code_correct);
     if (all_correct) {
         return CorrectnessLevel.all_correct;
     }
 
-    let none_correct = !case_result.ag_test_command_results.some(
+    const none_correct = !case_result.ag_test_command_results.some(
         (cmd_result) => cmd_result.return_code_correct !== null && cmd_result.return_code_correct);
     if (none_correct) {
         return CorrectnessLevel.none_correct;
@@ -88,12 +89,12 @@ export function ag_test_case_result_return_code_correctness(case_result: AGTestC
 }
 
 export function ag_test_case_result_output_correctness(case_result: AGTestCaseResultFeedback) {
-    let not_available = case_result.ag_test_command_results.every(
+    const not_available = case_result.ag_test_command_results.every(
         (cmd_result) => cmd_result.stdout_correct === null
                         && cmd_result.stderr_correct === null
     );
 
-    let some_show_info_only = case_result.ag_test_command_results.some(
+    const some_show_info_only = case_result.ag_test_command_results.some(
         (cmd_result) => (cmd_result.stdout_points_possible === 0
                         && cmd_result.stderr_points_possible === 0)
                         && (cmd_result.fdbk_settings.show_actual_stdout
@@ -107,18 +108,50 @@ export function ag_test_case_result_output_correctness(case_result: AGTestCaseRe
         return CorrectnessLevel.not_available;
     }
 
-    let all_correct = case_result.ag_test_command_results.every(
+    const all_correct = case_result.ag_test_command_results.every(
         (cmd_result) => (cmd_result.stdout_correct === null || cmd_result.stdout_correct) &&
                         (cmd_result.stderr_correct === null || cmd_result.stderr_correct));
     if (all_correct) {
         return CorrectnessLevel.all_correct;
     }
 
-    let none_correct = !case_result.ag_test_command_results.some(
+    const none_correct = !case_result.ag_test_command_results.some(
         (cmd_result) => cmd_result.stdout_correct !== null && cmd_result.stdout_correct
                         || cmd_result.stderr_correct !== null && cmd_result.stderr_correct);
     if (none_correct) {
         return CorrectnessLevel.none_correct;
     }
     return CorrectnessLevel.some_correct;
-  }
+}
+
+export function ag_test_case_result_custom_scoring_correctness(case_result: AGTestCaseResultFeedback) {
+    const not_available = case_result.ag_test_command_results.every(
+        (cmd_result) => !cmd_result.custom_scoring_used
+    );
+
+    if (not_available) {
+        return CorrectnessLevel.not_available;
+    }
+
+    const all_correct = case_result.ag_test_command_results.every(
+        (cmd_result) => (
+            cmd_result.custom_scoring_used === false
+            || cmd_result.custom_scoring_points === cmd_result.custom_scoring_points_possible
+        )
+    );
+    if (all_correct) {
+        return CorrectnessLevel.all_correct;
+    }
+
+    const none_correct = !case_result.ag_test_command_results.some(
+        (cmd_result) => (
+            cmd_result.custom_scoring_used === false
+            || cmd_result.custom_scoring_points === cmd_result.custom_scoring_points_possible
+        )
+    );
+    if (none_correct) {
+        return CorrectnessLevel.none_correct;
+    }
+
+    return CorrectnessLevel.some_correct;
+}

@@ -87,3 +87,29 @@ export function string_to_num(value: string): number {
     }
     return Number(value);
 }
+
+export function is_valid_regex(pattern: string): ValidatorResponse {
+    let flags = '';
+    let cleaned_pattern = pattern;
+
+    // js doesn't support inline flags, so need to parse them out from the pattern
+    const inline_flag_match = pattern.match(/^\(\?([a-z]+)\)/i);
+
+    if (inline_flag_match) {
+      flags = inline_flag_match[1];
+      cleaned_pattern = pattern.slice(inline_flag_match[0].length);
+    }
+
+    try {
+        new RegExp(cleaned_pattern, flags);
+        return {
+            is_valid: true,
+            error_msg: ""
+        }
+    } catch {
+        return {
+            is_valid: false,
+            error_msg: "Please enter a valid regex pattern",
+        }
+    }
+}

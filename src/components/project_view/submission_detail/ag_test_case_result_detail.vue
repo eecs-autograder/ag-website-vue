@@ -21,6 +21,8 @@
           ref="ag_test_command_panel"
           :key="ag_test_command_result.pk"
           :name="ag_test_command_result.ag_test_command_name"
+          :points_awarded="ag_test_command_result.total_points"
+          :points_possible="ag_test_command_result.total_points_possible"
           :correctness_level="command_result_correctness(ag_test_command_result)"
           :is_command="true">
           <AGTestCommandResultDetail
@@ -97,6 +99,7 @@ export default class AGTestCaseResultDetail extends Vue implements Created {
     let return_code_correctness = this.command_result_return_code_correctness(command_result);
     let stdout_correctness = this.command_result_output_correctness(command_result.stdout_correct);
     let stderr_correctness = this.command_result_output_correctness(command_result.stderr_correct);
+    let custom_scoring_correctness = this.command_result_custom_scoring_correctness(command_result);
 
     if (command_result.total_points < 0 || (command_result.total_points === 0
          && command_result.total_points_possible !== 0)) {
@@ -110,7 +113,12 @@ export default class AGTestCaseResultDetail extends Vue implements Created {
           || command_result.fdbk_settings.show_actual_stderr)
     );
 
-    let correctnesses = [return_code_correctness, stdout_correctness, stderr_correctness];
+    let correctnesses = [
+      return_code_correctness,
+      stdout_correctness,
+      stderr_correctness,
+      custom_scoring_correctness,
+    ];
     correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.not_available);
 
     if (correctnesses.length === 0) {
@@ -155,6 +163,22 @@ export default class AGTestCaseResultDetail extends Vue implements Created {
     }
     else if (output_is_correct) {
       return CorrectnessLevel.all_correct;
+    }
+    return CorrectnessLevel.none_correct;
+  }
+
+  command_result_custom_scoring_correctness(command_result: AGTestCommandResultFeedback) {
+    if (!command_result.custom_scoring_used) {
+      return CorrectnessLevel.not_available;
+    }
+    else if (command_result.custom_scoring_points === command_result.custom_scoring_points_possible) {
+      return CorrectnessLevel.all_correct;
+    }
+    else if (
+      command_result.custom_scoring_points > 0
+      && command_result.custom_scoring_points < command_result.custom_scoring_points_possible
+    ) {
+      return CorrectnessLevel.some_correct;
     }
     return CorrectnessLevel.none_correct;
   }
