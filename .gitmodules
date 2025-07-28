@@ -1,8 +1,8 @@
 [submodule "e2e_test_stack/autograder-server"]
 	path = e2e_test_stack/autograder-server
-	url = git@github.com:eecs-autograder/autograder-server.git
+	url = ../autograder-server.git
 	branch = develop
 [submodule "ag-client-typescript"]
 	path = ag-client-typescript
-	url = https://github.com/eecs-autograder/ag-client-typescript
+	url = ../ag-client-typescript
 	branch = develop
