@@ -3,3 +3,5 @@ node_modules
 .git
 .vscode
 ag-client-typescript/dist
+ag-client-typescript/autograder-server
+e2e_test_stack/autograder-server
