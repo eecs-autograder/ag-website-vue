@@ -1,21 +1,21 @@
 <template>
-  <div v-if="d_loading" class="loading-container">
+  <div v-if="state.d_loading" class="loading-container">
     <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
     <i v-else class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"></i>
   </div>
-  <div v-else :class="{'fullscreen': d_fullscreen}">
+  <div v-else :class="{'fullscreen': state.d_fullscreen}">
     <div class="diff-headers">
       <div class="header">{{left_header}}</div>
       <div class="header right-header">
         {{right_header}}
-        <div class="fullscreen-icon" @click="d_fullscreen = !d_fullscreen">
-          <i v-if="!d_fullscreen" class="fas fa-expand"></i>
+        <div class="fullscreen-icon" @click="state.d_fullscreen = !state.d_fullscreen">
+          <i v-if="!state.d_fullscreen" class="fas fa-expand"></i>
           <i v-else class="fas fa-compress"></i>
         </div>
       </div>
     </div>
 
-    <div class="diff-body-wrapper" :style="{'max-height': d_fullscreen ? 'none' : diff_max_height}">
+    <div class="diff-body-wrapper" :style="{'max-height': state.d_fullscreen ? 'none' : diff_max_height}">
       <table class="diff-body" cellpadding="0" cellspacing="0">
         <tbody>
           <tr v-for="(n, i) in num_lines_to_show">
@@ -27,9 +27,9 @@
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                    Do NOT add whitespace to these elements.-->
               <span class="prefix">{{left[i].prefix}}</span>
-              <span class="content no-whitespace" v-show="!d_show_whitespace">{{
+              <span class="content no-whitespace" v-show="!state.d_show_whitespace">{{
                 left[i].content}}</span>
-              <span class="content with-whitespace" v-show="d_show_whitespace">{{
+              <span class="content with-whitespace" v-show="state.d_show_whitespace">{{
                 left_with_whitespace[i].content}}</span>
             </td>
 
@@ -41,15 +41,15 @@
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                     Do NOT add whitespace to these <span> elements.-->
               <span class="prefix">{{right[i].prefix}}</span>
-              <span class="content no-whitespace" v-show="!d_show_whitespace">{{
+              <span class="content no-whitespace" v-show="!state.d_show_whitespace">{{
                 right[i].content}}</span>
-              <span class="content with-whitespace" v-show="d_show_whitespace">{{
+              <span class="content with-whitespace" v-show="state.d_show_whitespace">{{
                 right_with_whitespace[i].content}}</span>
             </td>
           </tr>
         </tbody>
       </table>
-      <div class="show-more-button-container" v-if="d_num_lines_rendered < left.length">
+      <div class="show-more-button-container" v-if="state.d_num_lines_rendered < left.length">
         <button type="button"
                 class="blue-button"
                 data-testid="show_more_button"
@@ -60,7 +60,7 @@
     </div>
 
     <div class="toggle-container">
-      <toggle v-model="d_show_whitespace" active_background_color="slategray">
+      <toggle v-model="state.d_show_whitespace" active_background_color="slategray">
         <template slot="on">
           Show Whitespace
         </template>
@@ -73,11 +73,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+export class DiffPrefixError extends Error {}
+</script>
 
-import ProgressBar from './progress_bar.vue';
-import Toggle from './toggle.vue';
-
+<script setup lang="ts">
+import { reactive, computed, ref } from 'vue'
+import ProgressBar from './progress_bar.vue'
+import Toggle from './toggle.vue'
 
 interface DiffCellData {
   line_number: number | null;
@@ -85,190 +87,190 @@ interface DiffCellData {
   content: string;
 }
 
-export class DiffPrefixError extends Error {}
+// Props
+type PropTypes = {
+  diff_contents?: Promise<string[]>
+  left_header?: string
+  right_header?: string
+  diff_max_height?: string
+  progress?: number | null
+}
 
-@Component({
-  components: {
-    ProgressBar,
-    Toggle,
+const props = withDefaults(defineProps<PropTypes>(), {
+  diff_contents: () => Promise.resolve([]),
+  left_header: "",
+  right_header: "",
+  diff_max_height: '100%',
+  progress: null
+})
+
+// Reactive state object
+const state = reactive({
+  d_show_whitespace: false,
+  d_fullscreen: false,
+  d_loading: true,
+  d_num_lines_rendered: 1000 // num_lines_per_page
+})
+
+// Non-reactive arrays for performance (as in original)
+let left: DiffCellData[] = []
+let right: DiffCellData[] = []
+
+// Constants
+const num_lines_per_page = 1000
+
+const line_num_highlighting = {
+  '- ': 'negative-line-num',
+  '+ ': 'positive-line-num',
+  '  ': ''
+}
+
+const content_highlighting = {
+  '- ': 'negative',
+  '+ ': 'positive',
+  '  ': ''
+}
+
+const special_char_replacements: {[key: string]: string} = {
+  ' ': '\u2219',
+  '\t': '\u21e5\t',
+  '\n': '\u21b5\n',
+  '\r': '\\r\r',
+  '\b': '\\b',  // backspace
+  '\f': '\\f',  // form-feed
+  '\v': '\\v',  // vertical tab
+  '\0': '\\0',  // null character
+}
+
+// Computed properties
+const left_with_whitespace = computed(() => {
+  return left.map(cell_data => {
+    return {
+      line_number: cell_data.line_number,
+      prefix: cell_data.prefix,
+      content: replace_whitespace(cell_data.content)
+    };
+  });
+})
+
+const right_with_whitespace = computed(() => {
+  return right.map(cell_data => {
+    return {
+      line_number: cell_data.line_number,
+      prefix: cell_data.prefix,
+      content: replace_whitespace(cell_data.content)
+    };
+  });
+})
+
+const whitespace_regex = computed(() => {
+  // Some browsers might not yet support \p (unicode property escapes)
+  try {
+    // Match whitespace sequences and the "Other" unicode property category
+    // https://unicode.org/reports/tr18/#General_Category_Property
+    return new RegExp('[ \t\n\r\b\f\v\0]|\\p{C}', 'gu');
+  }
+  catch (e) {
+    // It's unclear how/maybe impossible to mock a constructor call, so we
+    // don't have a unit test for this fallback behavior currently.
+    // istanbul ignore next
+    return new RegExp('[ \t\n\r\b\f\v\0]', 'g');
   }
 })
-export default class Diff extends Vue {
 
-  @Prop({default: Promise.resolve([]), type: Promise})
-  diff_contents!: Promise<string[]>;
+const num_lines_to_show = computed(() => {
+  return Math.min(state.d_num_lines_rendered, left.length);
+})
 
-  @Prop({default: "", type: String})
-  left_header!: string;
+const line_num_width = computed(() => {
+  return `${num_lines_to_show.value.toString().length + 1}ch`;
+})
 
-  @Prop({default: "", type: String})
-  right_header!: string;
-
-  @Prop({default: '100%', type: String})
-  diff_max_height!: string;
-
-  // A number from 0 to 100 that will be displayed as
-  // the progress in loading diff_contents.
-  @Prop({default: null, type: Number})
-  progress!: number | null;
-
-  // IMPORTANT: We are intentionally making these member variables NON-REACTIVE
-  // by not initializing them here. This is very important for performance.
-  // Indexing into large reactive arrays in the template will significantly
-  // increase render times.
-  private left!: DiffCellData[];
-  private right!: DiffCellData[];
-
-  private get left_with_whitespace() {
-    return this.left.map(cell_data => {
-      return {
-        line_number: cell_data.line_number,
-        prefix: cell_data.prefix,
-        content: this.replace_whitespace(cell_data.content)
-      };
-    });
+// Methods
+const pad_if_needed = (left: DiffCellData[], right: DiffCellData[]) => {
+  if (left.length === right.length) {
+    return;
   }
-
-  private get right_with_whitespace() {
-    return this.right.map(cell_data => {
-      return {
-        line_number: cell_data.line_number,
-        prefix: cell_data.prefix,
-        content: this.replace_whitespace(cell_data.content)
-      };
-    });
+  let to_pad: DiffCellData[];
+  let bigger: DiffCellData[];
+  if (left.length > right.length) {
+    bigger = left;
+    to_pad = right;
   }
-
-  d_show_whitespace = false;
-  d_fullscreen = false;
-
-  d_loading = true;
-
-  readonly num_lines_per_page = 1000;
-  d_num_lines_rendered = this.num_lines_per_page;
-
-  async created() {
-    let left_line_number = 1;
-    let right_line_number = 1;
-
-    this.left = [];
-    this.right = [];
-
-    for (let item of await this.diff_contents) {
-      let prefix = item.substring(0, 2);
-      let content = item.substring(2);
-      if (prefix === "- ") {
-        this.left.push({line_number: left_line_number, prefix: prefix, content: content});
-        left_line_number += 1;
-      }
-      else if (prefix === "  ") {
-        this.pad_if_needed(this.left, this.right);
-
-        this.left.push({line_number: left_line_number, prefix: prefix, content: content});
-        this.right.push({line_number: right_line_number, prefix: prefix, content: content});
-
-        left_line_number += 1;
-        right_line_number += 1;
-      }
-      else if (prefix === "+ ") {
-        this.right.push({line_number: right_line_number, prefix: prefix, content: content});
-        right_line_number += 1;
-      }
-      else {  // Treat invalid prefixes as "+ "
-        this.right.push({line_number: right_line_number, prefix: "+ ", content: item});
-        right_line_number += 1;
-      }
-    }
-    this.pad_if_needed(this.left, this.right);
-
-    this.d_loading = false;
- }
-
-  pad_if_needed(left: DiffCellData[], right: DiffCellData[]) {
-    if (left.length === right.length) {
-      return;
-    }
-    let to_pad: DiffCellData[];
-    let bigger: DiffCellData[];
-    if (left.length > right.length) {
-      bigger = left;
-      to_pad = right;
-    }
-    else {
-      bigger = right;
-      to_pad = left;
-    }
-    while (to_pad.length < bigger.length) {
-      to_pad.push({line_number: null, prefix: ' ', content: ''});
-    }
+  else {
+    bigger = right;
+    to_pad = left;
   }
-
-  readonly line_num_highlighting = {
-    '- ': 'negative-line-num',
-    '+ ': 'positive-line-num',
-    '  ': ''
-  };
-
-  readonly content_highlighting = {
-    '- ': 'negative',
-    '+ ': 'positive',
-    '  ': ''
-  };
-
-  get whitespace_regex() {
-    // Some browsers might not yet support \p (unicode property escapes)
-    try {
-      // Match whitespace sequences and the "Other" unicode property category
-      // https://unicode.org/reports/tr18/#General_Category_Property
-      return new RegExp('[ \t\n\r\b\f\v\0]|\\p{C}', 'gu');
-    }
-    catch (e) {
-      // It's unclear how/maybe impossible to mock a constructor call, so we
-      // don't have a unit test for this fallback behavior currently.
-      // istanbul ignore next
-      return new RegExp('[ \t\n\r\b\f\v\0]', 'g');
-    }
-  }
-
-  replace_whitespace(str: string): string {
-    return str.replace(this.whitespace_regex, (matched) => {
-      if (matched in this.special_char_replacements) {
-        return this.special_char_replacements[matched];
-      }
-
-      // Replace "Other" unicode characters with their escape sequences
-      let unpadded_char_code = matched.charCodeAt(0).toString(16);
-      let num_leading_zeros = Math.max(0, 4 - unpadded_char_code.length);
-      return `\\u${('0'.repeat(num_leading_zeros) + unpadded_char_code)}`;
-    });
-  }
-
-  readonly special_char_replacements: {[key: string]: string} = {
-    ' ': '\u2219',
-    '\t': '\u21e5\t',
-    '\n': '\u21b5\n',
-    '\r': '\\r\r',
-    '\b': '\\b',  // backspace
-    '\f': '\\f',  // form-feed
-    '\v': '\\v',  // vertical tab
-    '\0': '\\0',  // null character
-  };
-
-  private get num_lines_to_show() {
-    return Math.min(this.d_num_lines_rendered, this.left.length);
-  }
-
-  private render_more_lines() {
-    this.d_num_lines_rendered = Math.min(
-      this.left.length,
-      this.d_num_lines_rendered + this.num_lines_per_page
-    );
-  }
-
-  private get line_num_width() {
-    return `${this.num_lines_to_show.toString().length + 1}ch`;
+  while (to_pad.length < bigger.length) {
+    to_pad.push({line_number: null, prefix: ' ', content: ''});
   }
 }
+
+const replace_whitespace = (str: string): string => {
+  return str.replace(whitespace_regex.value, (matched) => {
+    if (matched in special_char_replacements) {
+      return special_char_replacements[matched];
+    }
+
+    // Replace "Other" unicode characters with their escape sequences
+    let unpadded_char_code = matched.charCodeAt(0).toString(16);
+    let num_leading_zeros = Math.max(0, 4 - unpadded_char_code.length);
+    return `\\u${('0'.repeat(num_leading_zeros) + unpadded_char_code)}`;
+  });
+}
+
+const render_more_lines = () => {
+  state.d_num_lines_rendered = Math.min(
+    left.length,
+    state.d_num_lines_rendered + num_lines_per_page
+  );
+}
+
+// Initialize component (equivalent to created lifecycle)
+const initialize = async () => {
+  let left_line_number = 1;
+  let right_line_number = 1;
+
+  left = [];
+  right = [];
+
+  for (let item of await props.diff_contents) {
+    let prefix = item.substring(0, 2);
+    let content = item.substring(2);
+    if (prefix === "- ") {
+      left.push({line_number: left_line_number, prefix: prefix, content: content});
+      left_line_number += 1;
+    }
+    else if (prefix === "  ") {
+      pad_if_needed(left, right);
+
+      left.push({line_number: left_line_number, prefix: prefix, content: content});
+      right.push({line_number: right_line_number, prefix: prefix, content: content});
+
+      left_line_number += 1;
+      right_line_number += 1;
+    }
+    else if (prefix === "+ ") {
+      right.push({line_number: right_line_number, prefix: prefix, content: content});
+      right_line_number += 1;
+    }
+    else {  // Treat invalid prefixes as "+ "
+      right.push({line_number: right_line_number, prefix: "+ ", content: item});
+      right_line_number += 1;
+    }
+  }
+  pad_if_needed(left, right);
+
+  state.d_loading = false;
+}
+
+// Call initialization
+initialize()
+
+// Expose state for external access (tests, parent components)
+defineExpose({
+  state
+})
 </script>
 
 <style scoped lang="scss">

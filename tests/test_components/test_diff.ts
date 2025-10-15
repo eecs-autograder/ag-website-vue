@@ -72,7 +72,8 @@ describe('Diff tests', () => {
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
-        await wrapper.setData({d_show_whitespace: true});
+        wrapper.vm.state.d_show_whitespace = true;
+        await wrapper.vm.$nextTick();
 
         let expected_left: RenderedDiffCell[] = [
             {line_number: 1, prefix: '', content: 'line\u2219\u21e5\tone\\r\r\u21b5'},
