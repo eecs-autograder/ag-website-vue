@@ -79,3 +79,17 @@ export function handle_global_errors_async(
         }
     };
 }
+
+export function new_handle_global_errors_async<TArgs extends unknown[], TReturn>(
+    fn: (...args: TArgs) => Promise<TReturn>
+): (...args: TArgs) => Promise<TReturn | undefined> {
+    return async (...args: TArgs): Promise<TReturn | undefined> => {
+        try {
+            return await fn(...args);
+        }
+        catch (e) {
+            GlobalErrorsSubject.get_instance().report_error(e);
+            return undefined;
+        }
+    };
+}
