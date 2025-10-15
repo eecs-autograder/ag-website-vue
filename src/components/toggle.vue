@@ -1,6 +1,6 @@
 <template>
   <div class="toggle-button-space">
-    <div v-if="is_on" class="active-option-style on-border"
+    <div v-if="state.d_is_on" class="active-option-style on-border"
          :style="[{backgroundColor: active_background_color}]">
       <slot name="on"> </slot>
     </div>
@@ -8,7 +8,7 @@
       <slot name="on"> </slot>
     </div>
 
-    <div v-if="is_on" @click="_toggle()" class="inactive-option-style off-border">
+    <div v-if="state.d_is_on" @click="_toggle()" class="inactive-option-style off-border">
       <slot name="off"> </slot>
     </div>
     <div v-else class="active-option-style off-border"
@@ -19,34 +19,48 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { reactive, watch } from 'vue'
 
-@Component
-export default class Toggle extends Vue {
-
-  @Prop({default: false, type: Boolean})
-  value!: boolean;
-
-  @Watch('value')
-  on_value_changed(new_value: boolean, old_value: boolean) {
-    this.is_on = new_value;
-  }
-
-  @Prop({default: 'hsl(208, 59%, 49%)', type: String})
-  active_background_color!: string;
-
-  is_on: boolean = false;
-
-  created() {
-    this.is_on = this.value;
-  }
-
-  private _toggle() {
-    this.is_on = !this.is_on;
-    this.$emit('input', this.is_on);
-  }
+// Props
+type PropTypes = {
+  value?: boolean
+  active_background_color?: string
 }
+
+const props = withDefaults(defineProps<PropTypes>(), {
+  value: false,
+  active_background_color: 'hsl(208, 59%, 49%)'
+})
+
+// Emits
+const emit = defineEmits<{
+  input: [value: boolean]
+}>()
+
+// Reactive state object
+const state = reactive({
+  d_is_on: false
+})
+
+// Watch for prop changes (equivalent to @Watch('value'))
+watch(() => props.value, (new_value: boolean, old_value: boolean) => {
+  state.d_is_on = new_value;
+})
+
+// Methods
+const _toggle = () => {
+  state.d_is_on = !state.d_is_on;
+  emit('input', state.d_is_on);
+}
+
+// Initialize (equivalent to created lifecycle)
+state.d_is_on = props.value;
+
+// Expose state for external access (tests, parent components)
+defineExpose({
+  state
+})
 </script>
 
 <style scoped lang="scss">

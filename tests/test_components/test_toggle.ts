@@ -11,7 +11,7 @@ describe('Toggle.vue', () => {
 
     test('Toggle data set to default values when not specified by parent', () => {
         const wrapper = mount(Toggle);
-        expect(wrapper.vm.is_on).toBe(false);
+        expect(wrapper.vm.state.d_is_on).toBe(false);
     });
 
     test('Toggle data set to values passed in by parent', () => {
@@ -25,7 +25,7 @@ describe('Toggle.vue', () => {
             }
         });
 
-        expect(wrapper.vm.is_on).toBe(true);
+        expect(wrapper.vm.state.d_is_on).toBe(true);
         let toggle_on_side = wrapper.find('.active-option-style');
         expect(toggle_on_side.text()).toContain("Come in, we're open!");
         let toggle_off_side = wrapper.find('.inactive-option-style');
@@ -44,34 +44,34 @@ describe('Toggle.vue', () => {
             }
         });
 
-        expect(wrapper.vm.is_on).toBe(false);
+        expect(wrapper.vm.state.d_is_on).toBe(false);
 
         // Turn on
         let toggle_on_side = wrapper.find('.inactive-option-style');
         expect(toggle_on_side.text()).toContain("Come in, we're open!");
         await toggle_on_side.trigger('click');
-        expect(wrapper.vm.is_on).toBe(true);
+        expect(wrapper.vm.state.d_is_on).toBe(true);
 
         // Turn off
         let toggle_off_side = wrapper.find('.inactive-option-style');
         expect(toggle_off_side.text()).toContain("Sorry, we're closed");
         await toggle_off_side.trigger('click');
-        expect(wrapper.vm.is_on).toBe(false);
+        expect(wrapper.vm.state.d_is_on).toBe(false);
 
         // Turn on
         toggle_on_side = wrapper.find('.inactive-option-style');
         expect(toggle_on_side.text()).toContain("Come in, we're open!");
         await toggle_on_side.trigger('click');
-        expect(wrapper.vm.is_on).toBe(true);
+        expect(wrapper.vm.state.d_is_on).toBe(true);
     });
 
     test("test click to turn off while already off doesn't change value of 'is_on'", async () => {
         const wrapper = mount(Toggle);
-        expect(wrapper.vm.is_on).toBe(false);
+        expect(wrapper.vm.state.d_is_on).toBe(false);
 
         let toggle_off_side = wrapper.find('.active-option-style');
         await toggle_off_side.trigger('click');
-        expect(wrapper.vm.is_on).toBe(false);
+        expect(wrapper.vm.state.d_is_on).toBe(false);
     });
 
     test("test click to turn on while already on doesn't change value of 'is_on'", async () => {
@@ -81,11 +81,11 @@ describe('Toggle.vue', () => {
             }
         });
 
-        expect(wrapper.vm.is_on).toBe(true);
+        expect(wrapper.vm.state.d_is_on).toBe(true);
 
         let toggle_on_side = wrapper.find('.active-option-style');
         await toggle_on_side.trigger('click');
-        expect(wrapper.vm.is_on).toBe(true);
+        expect(wrapper.vm.state.d_is_on).toBe(true);
     });
 
     test("v-model binding", async () => {
@@ -101,13 +101,13 @@ describe('Toggle.vue', () => {
 
         const wrapper = mount(WrapperComponent);
         const toggle = <Wrapper<Toggle>> wrapper.findComponent(Toggle);
-        expect(toggle.vm.is_on).toEqual(false);
+        expect(toggle.vm.state.d_is_on).toEqual(false);
 
         await set_data(wrapper, {my_toggle: true});
-        expect(toggle.vm.is_on).toEqual(true);
+        expect(toggle.vm.state.d_is_on).toEqual(true);
 
         await toggle.find('.inactive-option-style').trigger('click');
-        expect(toggle.vm.is_on).toEqual(false);
+        expect(toggle.vm.state.d_is_on).toEqual(false);
         expect(wrapper.vm.my_toggle).toEqual(false);
     });
 });
