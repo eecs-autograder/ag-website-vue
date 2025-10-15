@@ -15,30 +15,28 @@
   </span>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
 
-import { Component, Prop, Vue } from 'vue-property-decorator';
+// Props
+type PropTypes = {
+  placement?: 'top' | 'bottom' | 'left' | 'right'
+  width?: 'small' | 'medium' | 'large'
+}
 
-@Component
-export default class Tooltip extends Vue {
-  @Prop({
-    default: "top",
-    type: String,
-    validator: value => ['top', 'bottom', 'left', 'right'].includes(<string> value)
-  })
-  placement!: 'top' | 'bottom' | 'left' | 'right';
+const props = withDefaults(defineProps<PropTypes>(), {
+  placement: 'top',
+  width: 'small'
+})
 
-  @Prop({
-    default: "small",
-    type: String,
-    validator: value => ['small', 'medium', 'large'].includes(<string> value)
-  })
-  width!: 'small' | 'medium' | 'large';
+// Template ref
+const tooltip_text = ref<HTMLElement>()
 
-  mounted() {
-    if (this.placement === 'top' || this.placement === 'bottom') {
-      let tooltip_text = (<HTMLElement> this.$refs.tooltip_text);
-      let right = tooltip_text.getBoundingClientRect().right;
+// Lifecycle
+onMounted(() => {
+  if (props.placement === 'top' || props.placement === 'bottom') {
+    if (tooltip_text.value) {
+      let right = tooltip_text.value.getBoundingClientRect().right;
 
       // Adjust the horizontal positioning if needed to prevent overflow.
       // istanbul ignore next
@@ -47,11 +45,11 @@ export default class Tooltip extends Vue {
         // !! IMPORTANT !! The "8" in this calculation
         // has to match the $padding SCSS variable defined
         // in this component's <style> tag.
-        tooltip_text.style.left = `-${correction + 8}px`;
+        tooltip_text.value.style.left = `-${correction + 8}px`;
       }
     }
   }
-}
+})
 </script>
 
 <style scoped lang="scss">
