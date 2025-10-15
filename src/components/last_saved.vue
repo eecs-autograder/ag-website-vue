@@ -7,25 +7,23 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { format_datetime, format_datetime_short } from '@/utils'
 
-import { format_datetime, format_datetime_short } from '@/utils';
-
-@Component
-export default class LastSaved extends Vue {
-  @Prop({required: true, type: String})
-  last_modified!: string;
-
-  @Prop({default: false, type: Boolean})
-  saving!: boolean;
-
-  @Prop({default: true, type: Boolean})
-  short!: boolean;
-
-  readonly format_datetime = format_datetime;
-  readonly format_datetime_short = format_datetime_short;
+// Props
+type PropTypes = {
+  last_modified: string
+  saving?: boolean
+  short?: boolean
 }
+
+const props = withDefaults(defineProps<PropTypes>(), {
+  saving: false,
+  short: true
+})
+
+// Make utility functions available to template
+const { last_modified, saving, short } = props
 </script>
 
 <style scoped lang="scss">
