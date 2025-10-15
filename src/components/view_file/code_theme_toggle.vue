@@ -8,84 +8,88 @@
     </label>
 </template>
 
-<script lang="ts">
-import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import { new_handle_global_errors_async } from '@/error_handling'
+import { CODE_THEME_STORE, set_code_theme } from './code_theme_store'
 
-import { handle_global_errors_async } from '@/error_handling';
-import { Created } from '@/lifecycle';
+const CODE_LIGHT_THEME_NAME = 'github'
+const CODE_DARK_THEME_NAME = 'tokyo-night-dark'
+const HLJS_LINK_ID = 'hljs-code-theme'
 
-import { CODE_THEME_STORE, set_code_theme } from './code_theme_store';
+// Computed properties
+const is_code_theme_dark = computed(() => {
+  return CODE_THEME_STORE.current_code_theme === 'dark'
+})
 
-const CODE_LIGHT_THEME_NAME = 'github';
-const CODE_DARK_THEME_NAME = 'tokyo-night-dark';
-const HLJS_LINK_ID = 'hljs-code-theme';
-
-@Component
-export default class CodeThemeToggle extends Vue implements Created {
-  @handle_global_errors_async
-  async created() {
-    this.init_hljs();
+// Methods
+const init_hljs = () => {
+  // Check if style link already exists
+  const code_theme_elt = document.getElementById(HLJS_LINK_ID)
+  if (code_theme_elt !== null) {
+    return
   }
 
-  // Let us have an updated state even when another toggle instance is changed
-  private get is_code_theme_dark() {
-    return CODE_THEME_STORE.current_code_theme === 'dark';
+  // Determine initial theme based on user's system preference
+  const is_init_theme_dark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  const theme_name = is_init_theme_dark ? 'dark' : 'light'
+  set_code_theme(theme_name)
+
+  // Add link
+  const created_link = document.createElement('link')
+  created_link.rel = 'stylesheet'
+  created_link.id = HLJS_LINK_ID
+  created_link.setAttribute('data-theme', theme_name)
+  document.head.appendChild(created_link)
+
+  update_hljs_theme()
+}
+
+const switch_code_theme = () => {
+  const curr_theme = CODE_THEME_STORE.current_code_theme
+  if (curr_theme === 'light') {
+    set_code_theme('dark')
+  }
+  else {
+    set_code_theme('light')
   }
 
-  private init_hljs() {
-    // Check if style link already exists
-    const code_theme_elt = document.getElementById(HLJS_LINK_ID);
-    if (code_theme_elt !== null) {
-      return;
-    }
+  update_hljs_theme()
+}
 
-    // Determine initial theme based on user's system preference
-    const is_init_theme_dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme_name = is_init_theme_dark ? 'dark' : 'light';
-    set_code_theme(theme_name);
+// Get the CDN url for the specified highlight.js theme
+const get_hljs_cdn_theme_link = (theme: string) => {
+  return `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${theme}.min.css`
+}
 
-    // Add link
-    const created_link = document.createElement('link');
-    created_link.rel = 'stylesheet';
-    created_link.id = HLJS_LINK_ID;
-    created_link.setAttribute('data-theme', theme_name);
-    document.head.appendChild(created_link);
+// Uses currently set hljs theme to make sure link tag is up-to-date
+const update_hljs_theme = () => {
+  const link_elt = document.getElementById(HLJS_LINK_ID) as HTMLLinkElement
 
-    this.update_hljs_theme();
+  // Add null check to prevent the error
+  if (!link_elt) {
+    console.warn(`Element with ID '${HLJS_LINK_ID}' not found`)
+    return
   }
 
-  private switch_code_theme() {
-    const curr_theme = CODE_THEME_STORE.current_code_theme;
-    if (curr_theme === 'light') {
-      set_code_theme('dark');
-    }
-    else {
-      set_code_theme('light');
-    }
-
-    this.update_hljs_theme();
+  if (CODE_THEME_STORE.current_code_theme === 'dark') {
+    link_elt.href = get_hljs_cdn_theme_link(CODE_DARK_THEME_NAME)
+    link_elt.setAttribute('data-theme', 'dark')
   }
-
-  // Get the CDN url for the specified highlight.js theme
-  private get_hljs_cdn_theme_link(theme: string) {
-    return `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${theme}.min.css`;
-  }
-
-  // Uses currently set hljs theme to make sure link tag is up-to-date
-  private update_hljs_theme() {
-    const link_elt = <HTMLLinkElement> document.getElementById(HLJS_LINK_ID);
-
-    if (CODE_THEME_STORE.current_code_theme === 'dark') {
-      link_elt.href = this.get_hljs_cdn_theme_link(CODE_DARK_THEME_NAME);
-      link_elt.setAttribute('data-theme', 'dark');
-    }
-    else {
-      link_elt.href = this.get_hljs_cdn_theme_link(CODE_LIGHT_THEME_NAME);
-      link_elt.setAttribute('data-theme', 'light');
-    }
+  else {
+    link_elt.href = get_hljs_cdn_theme_link(CODE_LIGHT_THEME_NAME)
+    link_elt.setAttribute('data-theme', 'light')
   }
 }
 
+// Lifecycle - wrap with error handling
+const initialize = new_handle_global_errors_async(async () => {
+  init_hljs()
+})
+
+onMounted(() => {
+  initialize()
+})
 </script>
 
 <style scoped lang="scss">
@@ -103,7 +107,7 @@ $padding-amt: 4px;
   height: $height;
 }
 
-.switch input { 
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
