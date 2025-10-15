@@ -6,32 +6,28 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import * as FileSaver from 'file-saver'
+import { SYSADMIN_CONTACT } from '@/constants'
+import { get_cookie } from '@/cookie'
 
-import * as FileSaver from 'file-saver';
+// Computed properties
+const sysadmin_contact = computed(() => {
+  return SYSADMIN_CONTACT
+})
 
-import { SYSADMIN_CONTACT } from '@/constants';
-import { get_cookie } from '@/cookie';
-
-@Component
-export default class APITokenView extends Vue {
-  // istanbul ignore next
-  mounted() {
-    let token = get_cookie('token');
-    if (token) {
-      FileSaver.saveAs(new File([token], 'agtoken'));
-    }
-    else {
-      console.error('API token not found.');
-    }
+// Lifecycle
+// istanbul ignore next
+onMounted(() => {
+  let token = get_cookie('token')
+  if (token) {
+    FileSaver.saveAs(new File([token], 'agtoken'))
   }
-
-  // istanbul ignore next
-  get sysadmin_contact() {
-    return SYSADMIN_CONTACT;
+  else {
+    console.error('API token not found.')
   }
-}
+})
 </script>
 
 <style scoped lang="scss">
