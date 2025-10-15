@@ -21,23 +21,27 @@
   </transition>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { reactive } from 'vue'
 
-@Component
-export default class Modal extends Vue {
-  @Prop({default: false, type: Boolean})
-  click_outside_to_close!: boolean;
-
-  @Prop({default: true, type: Boolean})
-  include_closing_x!: boolean;
-
-  @Prop({default: 'large', type: String})
-  size!: string;
-
-  @Prop({type: String})
-  custom_width!: string;
+// Props
+type PropTypes = {
+  click_outside_to_close?: boolean
+  include_closing_x?: boolean
+  size?: string
+  custom_width?: string
 }
+
+const props = withDefaults(defineProps<PropTypes>(), {
+  click_outside_to_close: false,
+  include_closing_x: true,
+  size: 'large'
+})
+
+// Emits
+const emit = defineEmits<{
+  close: []
+}>()
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
