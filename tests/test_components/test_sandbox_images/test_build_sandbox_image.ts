@@ -112,6 +112,6 @@ test('API errors handled', async () => {
     expect(await wait_until(wrapper, w => !w.vm.d_starting_build)).toBe(true);
 
     let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-    expect(api_errors.d_api_errors.length).toBe(1);
+    expect(api_errors.state.api_errors.length).toBe(1);
     expect(wrapper.emitted('new_build_task')).toBeUndefined();
 });

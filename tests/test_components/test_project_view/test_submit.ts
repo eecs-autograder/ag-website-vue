@@ -944,7 +944,7 @@ describe('Submit tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <Wrapper<APIErrors>> wrapper.findComponent({ref: 'api_errors'});
-        expect(api_errors.vm.d_api_errors.length).toBe(1);
+        expect(api_errors.vm.state.api_errors.length).toBe(1);
         expect(submit_stub.calledOnce).toBe(true);
 
         expect(wrapper.findComponent({ref: 'confirm_submit_modal'}).exists()).toBe(true);

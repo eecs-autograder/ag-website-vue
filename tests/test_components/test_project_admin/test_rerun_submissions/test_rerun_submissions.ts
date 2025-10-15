@@ -11,7 +11,7 @@ import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked,
     compress_whitespace,
-    find_by_name,
+    find_component,
     wait_for_load,
     wait_until,
 } from '@/tests/utils';
@@ -495,11 +495,11 @@ describe('Start rerun tests', () => {
     test('Start rerun, API errors handled', async () => {
         create_task_stub.rejects(new ag_cli.HttpError(403, 'U heked up'));
         let wrapper = await make_wrapper();
-        wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
+        await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         expect(
             await wait_until(
-                wrapper, w => find_by_name<APIErrors>(
-                    w, 'APIErrors').vm.d_api_errors.length === 1)
+                wrapper, w => find_component(
+                    w, APIErrors).vm.state.api_errors.length === 1)
         ).toBe(true);
     });
 });

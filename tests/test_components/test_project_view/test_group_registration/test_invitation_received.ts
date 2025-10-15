@@ -103,7 +103,7 @@ describe('InvitationReceived tests', () => {
 
         let api_errors
             = <APIErrors> wrapper.findComponent({ref: 'reject_invitation_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
         expect(reject_invitation_stub.calledOnce);
         expect(wrapper.findComponent({ref: 'confirm_reject_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_confirm_reject_invitation_modal).toBe(true);
@@ -236,7 +236,7 @@ describe('InvitationReceived tests', () => {
         expect(wrapper.findComponent({ref: 'confirm_accept_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_confirm_accept_invitation_modal).toBe(true);
         expect(accept_invitation_stub.calledOnce).toBe(true);
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('prospective_group_members', async () => {

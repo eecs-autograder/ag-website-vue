@@ -152,7 +152,7 @@ describe('Test name editing tests', () => {
         expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'ag_test_case_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 });
 
@@ -1265,7 +1265,7 @@ describe('AGTestCommandSettings tests', () => {
         expect(save_stub.calledOnce).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
 
         expect(wrapper.find('.sticky-save-button .fa-exclamation-triangle').exists()).toBe(true);
         expect(wrapper.find('.sticky-save-button .fa-save').exists()).toBe(false);
@@ -1310,7 +1310,7 @@ describe('AGTestCommandSettings tests', () => {
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
     });
 
     test('Delete case with exactly one command', async () => {
@@ -1343,7 +1343,7 @@ describe('AGTestCommandSettings tests', () => {
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
     });
 
     test('Parent component changes the value supplied to the test_command prop', async () => {

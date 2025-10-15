@@ -137,7 +137,7 @@ describe('EditSingleGroup tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
         expect(save_group_stub.calledOnce);
     });
 
@@ -168,7 +168,7 @@ describe('EditSingleGroup tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_group_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test("When the prop 'group' changes in the parent component, d_group is updated", async () => {

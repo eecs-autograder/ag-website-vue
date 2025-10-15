@@ -219,7 +219,7 @@ describe('MutationSuites tests', () => {
         expect(wrapper.findComponent({ref: 'new_mutation_test_suite_modal'}).exists()).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'create_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('save mutation_test_suite - successful', async () => {
@@ -259,7 +259,7 @@ describe('MutationSuites tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'save_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
         expect(save_stub.callCount).toEqual(1);
     });
 
@@ -349,7 +349,7 @@ describe('MutationSuites tests', () => {
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
 
         let errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
-        expect(errors.d_api_errors.length).toEqual(1);
+        expect(errors.state.api_errors.length).toEqual(1);
     });
 
     test('update_mutation_test_suite_changed and was the active mutation suite', async () => {

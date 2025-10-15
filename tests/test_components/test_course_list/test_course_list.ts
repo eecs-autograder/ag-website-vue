@@ -72,7 +72,7 @@ describe('Create course tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'create_course_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
     });
 });
 

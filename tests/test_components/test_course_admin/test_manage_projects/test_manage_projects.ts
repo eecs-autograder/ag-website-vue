@@ -10,7 +10,7 @@ import SingleProject from '@/components/course_admin/manage_projects/single_proj
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { find_by_name, set_validated_input_text, validated_input_is_valid, wait_until } from '@/tests/utils';
+import { find_component, set_validated_input_text, validated_input_is_valid, wait_until } from '@/tests/utils';
 
 
 describe('Manage projects tests', () => {
@@ -114,8 +114,8 @@ describe('Manage projects tests', () => {
         expect(await wait_until(wrapper, w => !w.vm.d_adding_project)).toBe(true);
 
         expect(create_project_stub.calledOnce).toBe(true);
-        let api_errors = find_by_name<APIErrors>(wrapper, 'APIErrors');
-        expect(api_errors.vm.d_api_errors.length).toEqual(1);
+        let api_errors = find_component(wrapper, APIErrors);
+        expect(api_errors.vm.state.api_errors.length).toEqual(1);
     });
 
     test('A project can be cloned to the current course', async () => {

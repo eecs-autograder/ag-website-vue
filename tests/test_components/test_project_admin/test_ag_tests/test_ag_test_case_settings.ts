@@ -106,7 +106,7 @@ describe('AG test case settings form tests', () => {
 
         expect(save_case_stub.calledOnce).toBe(true);
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('Description fields binding', async () => {

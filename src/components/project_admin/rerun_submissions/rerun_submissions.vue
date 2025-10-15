@@ -184,7 +184,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import * as ag_cli from 'ag-client-typescript';
 
 import { ArraySet, member_names_less, pk_less, pk_more } from '@/array_set';
-import APIErrors from "@/components/api_errors.vue";
+import APIErrors, {APIErrorsExposed} from "@/components/api_errors.vue";
 import Collapsible from '@/components/collapsible.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';

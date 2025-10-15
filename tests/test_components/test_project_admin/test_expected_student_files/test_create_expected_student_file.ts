@@ -60,7 +60,7 @@ describe('CreateExpectedStudentFile tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBeGreaterThan(0);
+        expect(api_errors.state.api_errors.length).toBeGreaterThan(0);
     });
 
     test("The 'create' button is disabled when an input value is invalid", async () => {

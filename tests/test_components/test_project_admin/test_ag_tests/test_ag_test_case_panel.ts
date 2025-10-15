@@ -332,7 +332,7 @@ describe('AGTestCasePanel tests', () => {
         expect(create_command_stub.calledOnce).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'new_command_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
         expect(wrapper.findComponent({ref: 'new_ag_test_command_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_new_ag_test_command_modal).toBe(true);
     });
@@ -476,7 +476,7 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.findComponent({ref: 'clone_ag_test_case_modal'}).exists()).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'clone_case_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('Edit AGTestCase settings', async () => {
@@ -528,7 +528,7 @@ describe('AGTestCasePanel tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
     });
 
     test('command in a different case changed', async () => {
