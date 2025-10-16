@@ -7,7 +7,8 @@
 
     <group-members-form v-model="d_group.member_names"
                         ref="edit_group_form"
-                        :project="project"
+                        :min_num_inputs="1"
+                        :max_num_inputs="null"
                         :course="course"
                         @submit="update_group"
                         @form_validity_changed="d_edit_group_form_is_valid = $event"

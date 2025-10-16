@@ -24,7 +24,7 @@
       <div class="add-member-container">
         <button class="add-member-button"
                 type="button"
-                :disabled="d_usernames.length >= max_num_inputs && !ignore_group_size_limits"
+                :disabled="max_num_inputs != null && d_usernames.length >= max_num_inputs"
                 @click="add_member">
           <i class="fas fa-plus"></i>
           Add Member
@@ -38,7 +38,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
-import { Course, Project } from 'ag-client-typescript';
+import { Course } from 'ag-client-typescript';
 
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
@@ -51,21 +51,23 @@ import { is_email } from '@/validators';
   }
 })
 export default class GroupMembersForm extends Vue {
-  @Prop({required: true, type: Project})
-  project!: Project;
-
   @Prop({required: true, type: Course})
   course!: Course;
 
-  // In some cases, the maximum number of members will be less
-  // than the Project's max_group_size (group invitations, for example).
-  // When provided, this field be used to determine the maximum number
-  // of text inputs.
-  @Prop({default: null, type: Number})
-  max_num_members!: number | null;
+  @Prop({
+    required: false,
+    default: null,
+    type: Number,
+    validator: (value: number) => value > 0
+  })
+  max_num_inputs!: number | null;
 
-  @Prop({default: false, type: Boolean})
-  ignore_group_size_limits!: boolean;
+  @Prop({
+    required: true,
+    type: Number,
+    validator: (value: number) => value > 0
+  })
+  min_num_inputs!: number;
 
   @Prop({default: () => [], type: Array})
   value!: string[];
@@ -94,17 +96,6 @@ export default class GroupMembersForm extends Vue {
   reset() {
     (<ValidatedForm> this.$refs.group_members_form).reset_warning_state();
     this.initialize(this.value);
-  }
-
-  get max_num_inputs() {
-    return this.max_num_members !== null ? this.max_num_members : this.project.max_group_size;
-  }
-
-  get min_num_inputs() {
-    if (this.ignore_group_size_limits) {
-      return 1;
-    }
-    return Math.min(this.project.min_group_size, this.max_num_inputs);
   }
 
   private add_member() {
