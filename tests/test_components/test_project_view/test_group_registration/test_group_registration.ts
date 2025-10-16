@@ -79,7 +79,7 @@ describe('GroupRegistration tests', () => {
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
 
         project.min_group_size = 3
-        project.max_group_size = 3
+        project.max_group_size = 5
         wrapper = managed_mount(GroupRegistration, {
             propsData: {
                 project: project,
@@ -100,7 +100,7 @@ describe('GroupRegistration tests', () => {
         const invitation_form = wrapper.findComponent({ref: 'send_invitation_form'});
         expect(invitation_form.exists()).toBe(true);
         expect(invitation_form.vm.min_num_inputs).toEqual(2);
-        expect(invitation_form.vm.max_num_inputs).toEqual(2);
+        expect(invitation_form.vm.max_num_inputs).toEqual(4);
 
         // make sure default number of inputs is the min group size, and neither can be removed
         const username_inputs = invitation_form.findAllComponents({ref: 'username_input'});

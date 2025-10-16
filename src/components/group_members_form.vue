@@ -55,10 +55,9 @@ export default class GroupMembersForm extends Vue {
   course!: Course;
 
   @Prop({
-    required: false,
-    default: null,
+    required: true,
     type: Number,
-    validator: (value: number) => value > 0
+    validator: (value: number | null) => value === null || value > 0
   })
   max_num_inputs!: number | null;
 

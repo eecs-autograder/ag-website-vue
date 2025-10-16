@@ -34,7 +34,9 @@ describe('GroupMembersForm tests', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 course: course,
-                value: value
+                value: value,
+                min_num_inputs: 2,
+                max_num_inputs: 2
             }
         });
 
@@ -138,6 +140,7 @@ describe('GroupMembersForm tests', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 min_num_inputs: 1,
+                max_num_inputs: null,
                 course: course,
                 value: ['spam']
             }
@@ -155,6 +158,7 @@ describe('GroupMembersForm tests', () => {
             propsData: {
                 course: course,
                 min_num_inputs: 2,
+                max_num_inputs: null,
                 value: ['spam', 'egg@spam.com']
             }
         });
@@ -172,6 +176,7 @@ describe('GroupMembersForm tests', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 min_num_inputs: 1,
+                max_num_inputs: null,
                 course: course,
             }
         });
@@ -191,6 +196,7 @@ describe('GroupMembersForm tests', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 min_num_inputs: 2,
+                max_num_inputs: null,
                 course: course,
                 value: value
             }
