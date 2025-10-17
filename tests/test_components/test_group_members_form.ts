@@ -1,31 +1,23 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
-import { Course, Project } from 'ag-client-typescript';
+import { Course } from 'ag-client-typescript';
 
 import GroupMembersForm from '@/components/group_members_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 
-import { make_course, make_project } from '@/tests/data_utils';
+import { make_course } from '@/tests/data_utils';
 import { emitted, get_validated_input_text, set_validated_input_text } from '@/tests/utils';
 
 let course: Course = make_course({allowed_guest_domain: '@llama.net'});
-let project: Project;
-
-beforeEach(() => {
-    project = make_project(course.pk);
-});
 
 describe('GroupMembersForm tests', () => {
     test('Default value prop, d_usernames initialized based on min_num_inputs', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
                 course: course,
+                min_num_inputs: 4,
+                max_num_inputs: 7,
             },
-            computed: {
-                min_num_inputs: () => 4,
-                max_num_inputs: () => 8
-            }
         });
 
         expect(wrapper.vm.d_usernames).toEqual(
@@ -41,9 +33,10 @@ describe('GroupMembersForm tests', () => {
         let value = ['spam', 'egg'];
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
                 course: course,
-                value: value
+                value: value,
+                min_num_inputs: 2,
+                max_num_inputs: 2
             }
         });
 
@@ -57,57 +50,12 @@ describe('GroupMembersForm tests', () => {
         }
     });
 
-    test('max_num_inputs is project.max_group_size when max_num_members is null', () => {
-        project.max_group_size = 42;
+    test('min_num_inputs is 1 with no max_num_inputs', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
                 course: course,
-            }
-        });
-        expect(wrapper.vm.max_num_inputs).toEqual(project.max_group_size);
-    });
-
-    test('max_num_inputs is max_num_members when max_num_members is non-null', () => {
-        project.max_group_size = 42;
-        let wrapper = mount(GroupMembersForm, {
-            propsData: {
-                project: project,
-                course: course,
-                max_num_members: 40,
-            }
-        });
-        expect(wrapper.vm.max_num_inputs).toEqual(40);
-    });
-
-    test('min_num_inputs is min of project.min_group_size and max_num_inputs', () => {
-        project.min_group_size = 1;
-        let options = {
-            propsData: {
-                project: project,
-                course: course,
-            },
-            computed: {
-                max_num_inputs: () => 3
-            }
-        };
-        let wrapper = mount(GroupMembersForm, options);
-        expect(wrapper.vm.min_num_inputs).toEqual(1);
-
-        wrapper.destroy();
-        project.min_group_size = 5;
-        wrapper = mount(GroupMembersForm, options);
-        expect(wrapper.vm.min_num_inputs).toEqual(3);
-    });
-
-    test('min_num_inputs is 1 when ignore_group_size_limits is true', () => {
-        project.min_group_size = 2;
-        project.max_group_size = 3;
-        let wrapper = mount(GroupMembersForm, {
-            propsData: {
-                project: project,
-                course: course,
-                ignore_group_size_limits: true,
+                min_num_inputs: 1,
+                max_num_inputs: null,
             },
         });
 
@@ -117,14 +65,11 @@ describe('GroupMembersForm tests', () => {
     test('Add member button disabled when num inputs is max_num_inputs', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
                 course: course,
-                value: ['', '', '']
+                value: ['', '', ''],
+                min_num_inputs: 1,
+                max_num_inputs: 3,
             },
-            computed: {
-                min_num_inputs: () => 1,
-                max_num_inputs: () => 3
-            }
         });
 
         expect(wrapper.find('.add-member-button').element).toBeDisabled();
@@ -133,14 +78,11 @@ describe('GroupMembersForm tests', () => {
     test('Remove member buttons disabled when num inputs is min_num_inputs', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
                 course: course,
-                value: ['', '']
+                value: ['', ''],
+                min_num_inputs: 2,
+                max_num_inputs: 3,
             },
-            computed: {
-                min_num_inputs: () => 2,
-                max_num_inputs: () => 3
-            }
         });
 
         let remove_buttons = wrapper.findAll('.remove-member-button');
@@ -150,10 +92,10 @@ describe('GroupMembersForm tests', () => {
     });
 
     test('Add member', async () => {
-        project.max_group_size = 2;
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
+                min_num_inputs: 1,
+                max_num_inputs: 2,
                 course: course,
                 value: ['spam']
             }
@@ -171,11 +113,11 @@ describe('GroupMembersForm tests', () => {
     });
 
     test('Remove member', async () => {
-        project.max_group_size = 2;
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
                 course: course,
+                min_num_inputs: 1,
+                max_num_inputs: 2,
                 value: ['spam', 'egg']
             }
         });
@@ -197,7 +139,8 @@ describe('GroupMembersForm tests', () => {
     test('value watcher', async () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
+                min_num_inputs: 1,
+                max_num_inputs: null,
                 course: course,
                 value: ['spam']
             }
@@ -213,8 +156,9 @@ describe('GroupMembersForm tests', () => {
     test('Username input invalid non-email', async () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
                 course: course,
+                min_num_inputs: 2,
+                max_num_inputs: null,
                 value: ['spam', 'egg@spam.com']
             }
         });
@@ -231,7 +175,8 @@ describe('GroupMembersForm tests', () => {
     test('reset()', async () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
+                min_num_inputs: 1,
+                max_num_inputs: null,
                 course: course,
             }
         });
@@ -250,7 +195,8 @@ describe('GroupMembersForm tests', () => {
         let value = ['spam@egg.net', 'wa@luigi.net'];
         let wrapper = mount(GroupMembersForm, {
             propsData: {
-                project: project,
+                min_num_inputs: 2,
+                max_num_inputs: null,
                 course: course,
                 value: value
             }

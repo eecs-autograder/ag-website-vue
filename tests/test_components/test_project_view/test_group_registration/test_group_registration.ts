@@ -71,6 +71,74 @@ describe('GroupRegistration tests', () => {
         ).toBe(true);
     });
 
+    test('min and max number of inputs are one less than the min and max group size', async () => {
+        // This is the only case where the minimum number of inputs should not be 1 less
+        // than the min_group_size. If the student intends to work alone they should use the work
+        // alone button.
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+
+        project.min_group_size = 3
+        project.max_group_size = 5
+        wrapper = managed_mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            },
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.invitation_sent).toEqual(null);
+
+        await wrapper.find('#send-group-invitation-button').trigger('click');
+
+        const modal = wrapper.findComponent({ref: 'send_group_invitation_modal'});
+        expect(modal.exists()).toBe(true);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
+
+        const invitation_form = wrapper.findComponent({ref: 'send_invitation_form'});
+        expect(invitation_form.exists()).toBe(true);
+        expect(invitation_form.vm.min_num_inputs).toEqual(2);
+        expect(invitation_form.vm.max_num_inputs).toEqual(4);
+
+        // make sure default number of inputs is the min group size, and neither can be removed
+        const username_inputs = invitation_form.findAllComponents({ref: 'username_input'});
+        expect(username_inputs.length).toEqual(2);
+    });
+
+    test('Min group size 1, min number of form inputs is 1 (not min_group_size - 1 like normal)', async () => {
+        // This is the only case where the minimum number of inputs should not be 1 less
+        // than the min_group_size. If the student intends to work alone they should use the work
+        // alone button.
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+
+        project.min_group_size = 1
+        project.max_group_size = 3
+        wrapper = managed_mount(GroupRegistration, {
+            propsData: {
+                project: project,
+                course: course
+            },
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(false);
+        expect(wrapper.vm.invitation_sent).toEqual(null);
+
+        await wrapper.find('#send-group-invitation-button').trigger('click');
+
+        const modal = wrapper.findComponent({ref: 'send_group_invitation_modal'});
+        expect(modal.exists()).toBe(true);
+        expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
+
+        const invitation_form = wrapper.findComponent({ref: 'send_invitation_form'});
+        expect(invitation_form.exists()).toBe(true);
+        expect(invitation_form.vm.min_num_inputs).toEqual(1);
+        expect(invitation_form.vm.max_num_inputs).toEqual(2);
+    });
+
     test('created - Project.disallow_group_registration is true', async () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
@@ -585,9 +653,11 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.findComponent({ref: 'send_group_invitation_modal'}).exists()).toBe(true);
         expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
 
+        console.log('before submit')
         wrapper.findComponent({ref: 'send_invitation_form'}).vm.$emit('submit', [user.username]);
         expect(await wait_until(wrapper, w => !w.vm.d_sending_invitation)).toBe(true);
         await wrapper.vm.$nextTick();
+        console.log('after submit')
 
         expect(send_invitation_stub.calledOnce).toBe(true);
         expect(send_invitation_stub.firstCall.calledWith(project.pk, [user.username])).toBe(true);
@@ -595,6 +665,7 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.vm.d_show_send_group_invitation_modal).toBe(true);
         expect(wrapper.vm.invitation_sent).toEqual(null);
 
+        console.log('later')
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'send_invitation_api_errors'}).vm;
         expect(api_errors.d_api_errors.length).toBe(1);
     });
