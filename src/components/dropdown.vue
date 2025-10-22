@@ -8,10 +8,10 @@
       </div>
 
       <div class="dropdown-content"
-           :style="[{display: state.d_is_open ? 'block' : 'none'}, {height: dropdown_height},
+           :style="[{display: state.is_open ? 'block' : 'none'}, {height: dropdown_height},
                     {overflowY: dropdown_height !== 'auto' ? 'scroll' : 'none'}]">
-        <div :class="['dropdown-row', {'highlight': index === state.d_highlighted_index}]"
-             v-for="(item, index) of state.d_items"
+        <div :class="['dropdown-row', {'highlight': index === state.highlighted_index}]"
+             v-for="(item, index) of state.items"
              @mousedown="$event.preventDefault()"
              @click.stop="choose_item_from_dropdown_menu(item, index)">
           <slot v-bind:item="item">{{item}}</slot>
@@ -53,42 +53,42 @@ const state = reactive({
 
 // Computed properties
 const current_highlighted_index = computed(() => {
-  return state.d_highlighted_index
+  return state.highlighted_index
 })
 
 const is_open = computed(() => {
-  return state.d_is_open
+  return state.is_open
 })
 
 // Watch for items prop changes
 watch(() => props.items, (new_val: unknown[], old_val: unknown[]) => {
-  state.d_items = new_val
-  if (state.d_highlighted_index >= state.d_items.length && state.d_items.length > 0) {
-    state.d_highlighted_index = state.d_items.length - 1
+  state.items = new_val
+  if (state.highlighted_index >= state.items.length && state.items.length > 0) {
+    state.highlighted_index = state.items.length - 1
   }
 })
 
 // Methods
 const show = () => {
-  state.d_is_open = true
+  state.is_open = true
 }
 
 const hide = () => {
-  state.d_is_open = false
+  state.is_open = false
 }
 
 const choose_item_from_dropdown_menu = (item_selected: unknown, index: number) => {
-  state.d_highlighted_index = index
+  state.highlighted_index = index
   emit("item_selected", item_selected)
   hide()
 }
 
 const move_highlighted = (event: KeyboardEvent) => {
-  if (event.code === "Enter" && is_open.value && state.d_items.length > 0) {
+  if (event.code === "Enter" && is_open.value && state.items.length > 0) {
     event.preventDefault()
     event.stopPropagation()
     choose_item_from_dropdown_menu(
-      state.d_items[state.d_highlighted_index], state.d_highlighted_index
+      state.items[state.highlighted_index], state.highlighted_index
     )
   }
   else if (event.code === 'ArrowDown') {
@@ -97,8 +97,8 @@ const move_highlighted = (event: KeyboardEvent) => {
 
     show()
 
-    if (state.d_highlighted_index < state.d_items.length - 1) {
-      state.d_highlighted_index += 1
+    if (state.highlighted_index < state.items.length - 1) {
+      state.highlighted_index += 1
     }
   }
   else if (event.code === 'ArrowUp') {
@@ -107,8 +107,8 @@ const move_highlighted = (event: KeyboardEvent) => {
 
     show()
 
-    if (state.d_highlighted_index > 0) {
-      state.d_highlighted_index -= 1
+    if (state.highlighted_index > 0) {
+      state.highlighted_index -= 1
     }
   }
   else if (event.code === 'Escape') {
@@ -117,8 +117,8 @@ const move_highlighted = (event: KeyboardEvent) => {
 }
 
 // Lifecycle - equivalent to created()
-state.d_items = props.items
-state.d_highlighted_index = props.initial_highlighted_index
+state.items = props.items
+state.highlighted_index = props.initial_highlighted_index
 
 // Lifecycle - equivalent to mounted()
 onMounted(() => {
@@ -139,7 +139,7 @@ onMounted(() => {
   })
 
   header_slot_content.addEventListener("click", () => {
-    state.d_is_open = !state.d_is_open
+    state.is_open = !state.is_open
   })
 })
 

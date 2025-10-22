@@ -1,6 +1,6 @@
 <template>
   <div class="toggle-button-space">
-    <div v-if="state.d_is_on" class="active-option-style on-border"
+    <div v-if="state.is_on" class="active-option-style on-border"
          :style="[{backgroundColor: active_background_color}]">
       <slot name="on"> </slot>
     </div>
@@ -8,7 +8,7 @@
       <slot name="on"> </slot>
     </div>
 
-    <div v-if="state.d_is_on" @click="_toggle()" class="inactive-option-style off-border">
+    <div v-if="state.is_on" @click="_toggle()" class="inactive-option-style off-border">
       <slot name="off"> </slot>
     </div>
     <div v-else class="active-option-style off-border"
@@ -45,17 +45,17 @@ const state = reactive({
 
 // Watch for prop changes (equivalent to @Watch('value'))
 watch(() => props.value, (new_value: boolean, old_value: boolean) => {
-  state.d_is_on = new_value;
+  state.is_on = new_value;
 })
 
 // Methods
 const _toggle = () => {
-  state.d_is_on = !state.d_is_on;
-  emit('input', state.d_is_on);
+  state.is_on = !state.is_on;
+  emit('input', state.is_on);
 }
 
 // Initialize (equivalent to created lifecycle)
-state.d_is_on = props.value;
+state.is_on = props.value;
 
 // Expose state for external access (tests, parent components)
 defineExpose({

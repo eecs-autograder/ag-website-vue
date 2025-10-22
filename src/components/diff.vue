@@ -1,21 +1,21 @@
 <template>
-  <div v-if="state.d_loading" class="loading-container">
+  <div v-if="state.loading" class="loading-container">
     <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
     <i v-else class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"></i>
   </div>
-  <div v-else :class="{'fullscreen': state.d_fullscreen}">
+  <div v-else :class="{'fullscreen': state.fullscreen}">
     <div class="diff-headers">
       <div class="header">{{left_header}}</div>
       <div class="header right-header">
         {{right_header}}
-        <div class="fullscreen-icon" @click="state.d_fullscreen = !state.d_fullscreen">
-          <i v-if="!state.d_fullscreen" class="fas fa-expand"></i>
+        <div class="fullscreen-icon" @click="state.fullscreen = !state.fullscreen">
+          <i v-if="!state.fullscreen" class="fas fa-expand"></i>
           <i v-else class="fas fa-compress"></i>
         </div>
       </div>
     </div>
 
-    <div class="diff-body-wrapper" :style="{'max-height': state.d_fullscreen ? 'none' : diff_max_height}">
+    <div class="diff-body-wrapper" :style="{'max-height': state.fullscreen ? 'none' : diff_max_height}">
       <table class="diff-body" cellpadding="0" cellspacing="0">
         <tbody>
           <tr v-for="(n, i) in num_lines_to_show">
@@ -27,9 +27,9 @@
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                    Do NOT add whitespace to these elements.-->
               <span class="prefix">{{left[i].prefix}}</span>
-              <span class="content no-whitespace" v-show="!state.d_show_whitespace">{{
+              <span class="content no-whitespace" v-show="!state.show_whitespace">{{
                 left[i].content}}</span>
-              <span class="content with-whitespace" v-show="state.d_show_whitespace">{{
+              <span class="content with-whitespace" v-show="state.show_whitespace">{{
                 left_with_whitespace[i].content}}</span>
             </td>
 
@@ -41,15 +41,15 @@
               <!-- IMPORTANT: "prefix" and "content" have "white-space: pre"
                     Do NOT add whitespace to these <span> elements.-->
               <span class="prefix">{{right[i].prefix}}</span>
-              <span class="content no-whitespace" v-show="!state.d_show_whitespace">{{
+              <span class="content no-whitespace" v-show="!state.show_whitespace">{{
                 right[i].content}}</span>
-              <span class="content with-whitespace" v-show="state.d_show_whitespace">{{
+              <span class="content with-whitespace" v-show="state.show_whitespace">{{
                 right_with_whitespace[i].content}}</span>
             </td>
           </tr>
         </tbody>
       </table>
-      <div class="show-more-button-container" v-if="state.d_num_lines_rendered < left.length">
+      <div class="show-more-button-container" v-if="state.num_lines_rendered < left.length">
         <button type="button"
                 class="blue-button"
                 data-testid="show_more_button"
@@ -60,7 +60,7 @@
     </div>
 
     <div class="toggle-container">
-      <toggle v-model="state.d_show_whitespace" active_background_color="slategray">
+      <toggle v-model="state.show_whitespace" active_background_color="slategray">
         <template slot="on">
           Show Whitespace
         </template>
@@ -179,7 +179,7 @@ const whitespace_regex = computed(() => {
 })
 
 const num_lines_to_show = computed(() => {
-  return Math.min(state.d_num_lines_rendered, left.length);
+  return Math.min(state.num_lines_rendered, left.length);
 })
 
 const line_num_width = computed(() => {
@@ -220,9 +220,9 @@ const replace_whitespace = (str: string): string => {
 }
 
 const render_more_lines = () => {
-  state.d_num_lines_rendered = Math.min(
+  state.num_lines_rendered = Math.min(
     left.length,
-    state.d_num_lines_rendered + num_lines_per_page
+    state.num_lines_rendered + num_lines_per_page
   );
 }
 
@@ -261,7 +261,7 @@ const initialize = async () => {
   }
   pad_if_needed(left, right);
 
-  state.d_loading = false;
+  state.loading = false;
 }
 
 // Call initialization

@@ -72,7 +72,7 @@ describe('Diff tests', () => {
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
-        wrapper.vm.state.d_show_whitespace = true;
+        wrapper.vm.state.show_whitespace = true;
         await wrapper.vm.$nextTick();
 
         let expected_left: RenderedDiffCell[] = [
