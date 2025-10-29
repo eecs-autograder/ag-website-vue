@@ -103,6 +103,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Course, Group, Project } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import GroupMembersForm from '@/components/group_members_form.vue';
 import LastSaved from '@/components/last_saved.vue';
@@ -164,7 +165,8 @@ export default class EditSingleGroup extends Vue {
     assert_not_null(this.d_group);
     try {
       this.d_saving = true;
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       await this.d_group.save();
     }
     finally {
@@ -187,7 +189,8 @@ export default class EditSingleGroup extends Vue {
 }
 
 function handle_save_group_error(component: EditSingleGroup, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

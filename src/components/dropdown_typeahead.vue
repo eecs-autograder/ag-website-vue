@@ -33,6 +33,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import Dropdown from '@/components/dropdown.vue';
+import { DropdownExposed } from '@/exposed_component_types/dropdown_exposed';
 
 @Component({
   components: { Dropdown }
@@ -61,11 +62,11 @@ export default class DropdownTypeahead extends Vue {
   }
 
   resume_search(key: KeyboardEvent) {
-    let dropdown = <Dropdown> this.$refs.dropdown_component;
-    if (!dropdown.is_open) {
+    const dropdown = this.$refs.dropdown_component as DropdownExposed | undefined;
+    if (!dropdown?.is_open()) {
       // don't want to automatically select what was previously selected
       if (key.code !== "Enter") {
-        dropdown.show();
+        dropdown?.show();
       }
     }
   }

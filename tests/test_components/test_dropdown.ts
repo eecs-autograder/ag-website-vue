@@ -86,63 +86,63 @@ describe('Dropdown tests', () => {
     });
 
     test('Clicking on header opens and closes dropdown', async () => {
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
         expect(menu_wrapper.element.style.display).toEqual('none');
 
         await header_wrapper.trigger('click');
 
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
         expect(menu_wrapper.element.style.display).toEqual('block');
 
         await header_wrapper.trigger('click');
 
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
         expect(menu_wrapper.element.style.display).toEqual('none');
     });
 
     test('Public show and hide dropdown functions', async () => {
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
         expect(menu_wrapper.element.style.display).toEqual('none');
 
         dropdown.show();
         await dropdown.$nextTick();
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
         expect(menu_wrapper.element.style.display).toEqual('block');
 
         dropdown.hide();
         await dropdown.$nextTick();
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
         expect(menu_wrapper.element.style.display).toEqual('none');
     });
 
     test('Up and down arrow keys re-open menu after closing', async () => {
         await header_wrapper.trigger('click');
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
 
         dropdown.hide();
         await dropdown.$nextTick();
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
 
         await dropdown_container_wrapper.trigger("keydown", {code: "ArrowUp"});
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
 
         dropdown.hide();
         await dropdown.$nextTick();
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
 
         await dropdown_container_wrapper.trigger("keydown", {code: "ArrowDown"});
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
     });
 
     test("Non-arrow keys don't re-open menu after closing", async () => {
         await header_wrapper.trigger('click');
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
 
         dropdown.hide();
         await dropdown.$nextTick();
 
         await dropdown_container_wrapper.trigger('keydown', {code: 'A'});
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
     });
 
     test('Up and down arrow keys change the highlighted item', async () => {
@@ -170,7 +170,7 @@ describe('Dropdown tests', () => {
         await set_props(wrapper, {items: ['first', 'second']});
 
         await header_wrapper.trigger('click');
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
 
         expect(dropdown.current_highlighted_index).toBe(0);
 
@@ -196,7 +196,7 @@ describe('Dropdown tests', () => {
 
         await highlighted_item.trigger('click');
 
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
         expect(emitted(wrapper, 'item_selected')[0][0]).toEqual(item_values[0]);
     });
 
@@ -210,28 +210,28 @@ describe('Dropdown tests', () => {
 
         await dropdown_container_wrapper.trigger("keydown", {code: "Enter" });
 
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
         expect(emitted(wrapper, 'item_selected')[0][0]).toEqual(item_values[1]);
     });
 
     test('Blur event closes dropdown', async () => {
         await header_wrapper.trigger('click');
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
 
         await header_wrapper.trigger('blur');
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
     });
 
     test('Esc key closes menu', async () => {
         await header_wrapper.trigger('click');
-        expect(dropdown.is_open).toBe(true);
+        expect(dropdown.is_open()).toBe(true);
 
         await dropdown_container_wrapper.trigger('keydown', {code: 'Escape'});
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
 
         // Make sure pressing esc again doesn't open it.
         await dropdown_container_wrapper.trigger('keydown', {code: 'Escape'});
-        expect(dropdown.is_open).toBe(false);
+        expect(dropdown.is_open()).toBe(false);
     });
 
     test("Dropdown items can change and the highlighted index adjusts appropriately", async () => {

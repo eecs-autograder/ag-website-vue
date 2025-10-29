@@ -8,7 +8,7 @@
       </div>
 
       <div class="dropdown-content"
-           :style="[{display: state.is_open ? 'block' : 'none'}, {height: dropdown_height},
+           :style="[{display: is_open() ? 'block' : 'none'}, {height: dropdown_height},
                     {overflowY: dropdown_height !== 'auto' ? 'scroll' : 'none'}]">
         <div :class="['dropdown-row', {'highlight': index === state.highlighted_index}]"
              v-for="(item, index) of state.items"
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, watch, onMounted, getCurrentInstance } from 'vue'
+import { reactive, ref, computed, watch, onMounted, getCurrentInstance } from 'vue'
 
 // Props
 type PropTypes = {
@@ -46,18 +46,15 @@ const instance = getCurrentInstance()
 
 // Reactive state object
 const state = reactive({
-  d_highlighted_index: 0,
-  d_items: [] as unknown[],
-  d_is_open: false
+  highlighted_index: 0,
+  items: [] as unknown[],
 })
+
+const _is_open = ref(false);
 
 // Computed properties
 const current_highlighted_index = computed(() => {
   return state.highlighted_index
-})
-
-const is_open = computed(() => {
-  return state.is_open
 })
 
 // Watch for items prop changes
@@ -70,11 +67,15 @@ watch(() => props.items, (new_val: unknown[], old_val: unknown[]) => {
 
 // Methods
 const show = () => {
-  state.is_open = true
+  _is_open.value = true
 }
 
 const hide = () => {
-  state.is_open = false
+  _is_open.value = false
+}
+
+const is_open = () => {
+  return _is_open.value
 }
 
 const choose_item_from_dropdown_menu = (item_selected: unknown, index: number) => {
@@ -84,7 +85,7 @@ const choose_item_from_dropdown_menu = (item_selected: unknown, index: number) =
 }
 
 const move_highlighted = (event: KeyboardEvent) => {
-  if (event.code === "Enter" && is_open.value && state.items.length > 0) {
+  if (event.code === "Enter" && _is_open.value && state.items.length > 0) {
     event.preventDefault()
     event.stopPropagation()
     choose_item_from_dropdown_menu(
@@ -139,7 +140,7 @@ onMounted(() => {
   })
 
   header_slot_content.addEventListener("click", () => {
-    state.is_open = !state.is_open
+    _is_open.value = !_is_open.value
   })
 })
 
@@ -150,8 +151,9 @@ defineExpose({
   is_open,
   show,
   hide
-})
+});
 </script>
+
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';

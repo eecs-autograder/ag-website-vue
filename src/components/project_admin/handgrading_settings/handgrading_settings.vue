@@ -292,6 +292,7 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import LastSaved from "@/components/last_saved.vue";
 import Modal from "@/components/modal.vue";
 import AnnotationForm, { AnnotationFormData } from "@/components/project_admin/handgrading_settings/annotation_form.vue";
@@ -478,7 +479,8 @@ export default class HandgradingSettings extends Vue implements Created,
   async save_rubric_settings() {
     try {
       this.d_saving = true;
-      (<APIErrors> this.$refs.settings_form_errors).clear();
+      const api_errors = this.$refs.settings_form_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
 
       assert_not_null(this.d_handgrading_rubric);
       await this.d_handgrading_rubric.save();
@@ -494,7 +496,8 @@ export default class HandgradingSettings extends Vue implements Created,
   async create_criterion(form_data: CriterionFormData) {
     try {
       this.d_creating_criterion = true;
-      (<APIErrors> this.$refs.create_criterion_errors).clear();
+      const api_errors = this.$refs.create_criterion_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
 
       assert_not_null(this.d_handgrading_rubric);
       await Criterion.create(this.d_handgrading_rubric!.pk, form_data);
@@ -550,7 +553,8 @@ export default class HandgradingSettings extends Vue implements Created,
   async create_annotation(form_data: AnnotationFormData) {
     try {
       this.d_creating_annotation = true;
-      (<APIErrors> this.$refs.create_annotation_errors).clear();
+      const api_errors = this.$refs.create_annotation_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
 
       assert_not_null(this.d_handgrading_rubric);
       await Annotation.create(this.d_handgrading_rubric!.pk, form_data);
@@ -605,15 +609,18 @@ export default class HandgradingSettings extends Vue implements Created,
 }
 
 export function handle_save_rubric_settings_error(component: HandgradingSettings, error: unknown) {
-  (<APIErrors> component.$refs.settings_form_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.settings_form_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 export function handle_create_criterion_error(component: HandgradingSettings, error: unknown) {
-  (<APIErrors> component.$refs.create_criterion_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.create_criterion_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 export function handle_create_annotation_error(component: HandgradingSettings, error: unknown) {
-  (<APIErrors> component.$refs.create_annotation_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.create_annotation_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 </script>

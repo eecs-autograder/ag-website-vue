@@ -72,10 +72,6 @@
   </div>
 </template>
 
-<script lang="ts">
-export class DiffPrefixError extends Error {}
-</script>
-
 <script setup lang="ts">
 import { reactive, computed, ref } from 'vue'
 import ProgressBar from './progress_bar.vue'
@@ -106,10 +102,10 @@ const props = withDefaults(defineProps<PropTypes>(), {
 
 // Reactive state object
 const state = reactive({
-  d_show_whitespace: false,
-  d_fullscreen: false,
-  d_loading: true,
-  d_num_lines_rendered: 1000 // num_lines_per_page
+  show_whitespace: false,
+  fullscreen: false,
+  loading: true,
+  num_lines_rendered: 1000 // num_lines_per_page
 })
 
 // Non-reactive arrays for performance (as in original)

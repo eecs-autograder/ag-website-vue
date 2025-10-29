@@ -40,7 +40,7 @@ const emit = defineEmits<{
 
 // Reactive state object
 const state = reactive({
-  d_is_on: false
+  is_on: false
 })
 
 // Watch for prop changes (equivalent to @Watch('value'))

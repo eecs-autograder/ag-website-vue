@@ -48,6 +48,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Group, Project } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import GroupLookup from '@/components/group_lookup.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import { handle_api_errors_async } from '@/error_handling';
@@ -97,7 +98,8 @@ export default class MergeGroups extends Vue {
 }
 
 function handle_merge_groups_error(component: MergeGroups, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

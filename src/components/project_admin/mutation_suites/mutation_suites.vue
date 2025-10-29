@@ -271,6 +271,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import LastSaved from "@/components/last_saved.vue";
 import Modal from '@/components/modal.vue';
 import {
@@ -615,7 +616,8 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   async save_mutation_test_suite() {
     try {
       this.d_saving = true;
-      (<APIErrors> this.$refs.save_errors).clear();
+      const api_errors = this.$refs.save_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       await this.d_active_mutation_test_suite!.save();
     }
     finally {
@@ -625,15 +627,16 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
 }
 
 function handle_save_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-  let api_errors_elt = <APIErrors> component.$refs.save_errors;
-  api_errors_elt.show_errors_from_response(error);
+  let api_errors_elt = component.$refs.save_errors as APIErrorsExposed | undefined;
+  api_errors_elt?.show_errors_from_response(error);
   if (component.d_num_save_api_errors !== 0) {
-    api_errors_elt.$el.scrollIntoView({behavior: 'smooth'});
+    api_errors_elt?.$el.scrollIntoView({behavior: 'smooth'});
   }
 }
 
 function handle_add_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-    (<APIErrors> component.$refs.create_errors).show_errors_from_response(error);
+    const api_errors = component.$refs.create_errors as APIErrorsExposed | undefined;
+    api_errors?.show_errors_from_response(error);
 }
 </script>
 

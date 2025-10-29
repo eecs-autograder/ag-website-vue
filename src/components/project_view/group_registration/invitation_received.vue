@@ -96,6 +96,7 @@ import { Group, GroupInvitation, Project, User } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import { handle_api_errors_async } from '@/error_handling';
 import { deep_copy } from '@/utils';
@@ -145,7 +146,7 @@ export default class InvitationReceived extends Vue {
   async accept_invitation() {
     try {
       this.d_accepting = true;
-      (<APIErrors> this.$refs.accept_invitation_api_errors).clear();
+      (this.$refs.accept_invitation_api_errors as APIErrorsExposed | undefined)?.clear();
       await this.d_invitation!.accept();
       let copy_of_invitation = deep_copy(this.d_invitation!, GroupInvitation);
       this.$emit('input', copy_of_invitation);
@@ -175,7 +176,8 @@ export default class InvitationReceived extends Vue {
 
   @handle_api_errors_async(handle_reject_invitation_error)
   async reject_invitation() {
-    (<APIErrors> this.$refs.reject_invitation_api_errors).clear();
+    const api_errors = this.$refs.reject_invitation_api_errors as APIErrorsExposed | undefined;
+    api_errors?.clear();
     this.d_rejecting = true;
     await this.d_invitation!.reject();
     this.d_show_confirm_reject_invitation_modal = false;
@@ -185,11 +187,13 @@ export default class InvitationReceived extends Vue {
 }
 
 function handle_reject_invitation_error(component: InvitationReceived, error: unknown) {
-  (<APIErrors> component.$refs.reject_invitation_api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.reject_invitation_api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 function handle_accept_invitation_error(component: InvitationReceived, error: unknown) {
-  (<APIErrors> component.$refs.accept_invitation_api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.accept_invitation_api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 </script>

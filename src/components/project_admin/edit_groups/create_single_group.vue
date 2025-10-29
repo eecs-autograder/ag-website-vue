@@ -26,6 +26,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Course, Group, NewGroupData, Project } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import { handle_api_errors_async } from '@/error_handling';
@@ -55,7 +56,8 @@ export default class CreateSingleGroup extends Vue {
   async create_group(usernames: string[]) {
     try {
       this.d_creating_group = true;
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
 
       await Group.create(this.project.pk, {member_names: usernames});
     }
@@ -66,7 +68,8 @@ export default class CreateSingleGroup extends Vue {
 }
 
 function handle_create_group_error(component: CreateSingleGroup, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

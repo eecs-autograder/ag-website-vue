@@ -446,6 +446,7 @@ import { Project, UltimateSubmissionPolicy } from 'ag-client-typescript';
 import moment from "moment-timezone";
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import TimePicker from "@/components/datetime/time_picker.vue";
 import Modal from "@/components/modal.vue";
@@ -521,7 +522,8 @@ export default class ProjectSettings extends Vue {
     try {
       assert_not_null(this.d_project);
       this.d_saving = true;
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
 
       await this.d_project.save();
     }
@@ -544,7 +546,8 @@ export default class ProjectSettings extends Vue {
 }
 
 export function handle_save_project_settings_error(component: ProjectSettings, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 function is_positive_int_or_empty_str(value: string): ValidatorResponse {

@@ -78,6 +78,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { assert_not_null, toggle } from '@/utils';
 import { display_mutant_name, MutantHintService, UnlockedHintData } from './mutant_hint_service';
@@ -109,7 +110,8 @@ export default class UnlockedHint extends Vue {
   rate_hint() {
     return toggle(this, 'd_saving', () => {
       assert_not_null(this.d_hint_rating);
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       return MutantHintService.rate_hint(
         this.hint.pk,
         {hint_rating: this.d_hint_rating, user_comment: this.d_user_comment}

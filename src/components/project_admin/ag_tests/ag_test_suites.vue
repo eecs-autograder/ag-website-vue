@@ -126,6 +126,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import AGTestCaseSettings from '@/components/project_admin/ag_tests/ag_test_case_settings.vue';
 import AGTestCommandSettings from '@/components/project_admin/ag_tests/ag_test_command_settings.vue';
@@ -589,7 +590,8 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
 }
 
 function handle_add_ag_test_suite_error(component: AGTestSuites, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

@@ -77,6 +77,7 @@ import { Course, Project, User } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
@@ -145,7 +146,8 @@ export default class SingleProject extends Vue {
 }
 
 export function handle_add_cloned_project_error(component: SingleProject, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 </script>

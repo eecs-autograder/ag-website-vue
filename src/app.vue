@@ -126,6 +126,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import { GlobalErrorsObserver, GlobalErrorsSubject, handle_global_errors_async } from '@/error_handling';
 
 import { delete_all_cookies, get_cookie } from './cookie';
@@ -262,7 +263,8 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
   }
 
   handle_error(error: unknown): void {
-    (<APIErrors> this.$refs.global_errors).show_errors_from_response(error);
+    const api_errors = this.$refs.global_errors as APIErrorsExposed | undefined;
+    api_errors?.show_errors_from_response(error);
   }
 }
 

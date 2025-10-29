@@ -102,6 +102,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
 import APIErrors from "@/components/api_errors.vue";
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
@@ -220,7 +221,8 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   @handle_api_errors_async(handle_file_upload_errors)
   add_instructor_files(files: File[]) {
     this.d_upload_progress = null;
-    (<APIErrors> this.$refs.api_errors).clear();
+    const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+    api_errors?.clear();
     return toggle(this, 'd_uploading', async () => {
       for (let file of files) {
         let file_to_update = this.instructor_files.find(item => item.name === file.name);
@@ -268,7 +270,8 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
 }
 
 function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

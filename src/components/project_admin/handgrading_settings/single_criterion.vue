@@ -57,6 +57,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Criterion } from "ag-client-typescript";
 
 import APIErrors from "@/components/api_errors.vue";
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from "@/components/modal.vue";
 import CriterionForm, { CriterionFormData } from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import { handle_api_errors_async } from '@/error_handling';
@@ -127,11 +128,13 @@ export default class SingleCriterion extends Vue {
 }
 
 export function handle_save_criterion_error(component: SingleCriterion, error: unknown) {
-  (<APIErrors> component.$refs.save_criterion_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.save_criterion_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 export function handle_delete_criterion_error(component: SingleCriterion, error: unknown) {
-  (<APIErrors> component.$refs.delete_criterion_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.delete_criterion_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 </script>

@@ -266,6 +266,7 @@ import {
   handle_global_errors_async,
   make_error_handler_func
 } from '@/error_handling';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -343,7 +344,8 @@ export default class AGTestSuiteSettings extends Vue {
   @handle_api_errors_async(handle_save_ag_test_suite_settings_error)
   save_ag_test_suite_settings() {
     return toggle(this, 'd_saving', () => {
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       return this.d_ag_test_suite!.save();
     });
   }
@@ -383,10 +385,10 @@ export default class AGTestSuiteSettings extends Vue {
 }
 
 function handle_save_ag_test_suite_settings_error(component: AGTestSuiteSettings, error: unknown) {
-  let api_errors_elt = <APIErrors> component.$refs.api_errors;
-  api_errors_elt.show_errors_from_response(error);
+  const api_errors_elt = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors_elt?.show_errors_from_response(error);
   if (component.d_num_api_errors !== 0) {
-    api_errors_elt.$el.scrollIntoView({behavior: 'smooth'});
+    api_errors_elt?.$el.scrollIntoView({behavior: 'smooth'});
   }
 }
 </script>

@@ -133,6 +133,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
 import Tooltip from '@/components/tooltip.vue';
@@ -289,7 +290,8 @@ export default class AGTestSuitePanel extends Vue {
         }
       }
 
-      (<APIErrors> this.$refs.new_ag_test_case_api_errors).clear();
+      const api_errors = this.$refs.new_ag_test_case_api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       let created_case = await AGTestCase.create(
         this.ag_test_suite!.pk, {name: this.d_new_case_name}
       );
@@ -309,7 +311,8 @@ export default class AGTestSuitePanel extends Vue {
 }
 
 function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: unknown) {
-  (<APIErrors> component.$refs.new_ag_test_case_api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.new_ag_test_case_api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 
