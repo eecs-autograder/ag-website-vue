@@ -245,6 +245,11 @@ describe('Deadline info tests', () => {
     });
 
     test('Days until extension', async () => {
+        // we mock the date because the number of hours will be different
+        // when the current time is before daylight savings time change and
+        // the extended_due_date is after
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date('2025-01-01'));
         project.soft_closing_time = moment().subtract(7, 'hours').format();
         group.extended_due_date
             = moment().add(5, 'days').add(12, 'hours').add(5, 'minutes').format();
@@ -259,6 +264,7 @@ describe('Deadline info tests', () => {
         await wrapper.vm.$nextTick();
         expect(wrapper.find('#deadline-countdown').text()).toEqual('');
         expect(wrapper.find('#extension-countdown').text()).toEqual('(5 days 12 hours)');
+        vi.useRealTimers();
     });
 
     test('Hours until extension', async () => {
