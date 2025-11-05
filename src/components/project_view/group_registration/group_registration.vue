@@ -94,9 +94,9 @@
            click_outside_to_close>
       <div class="modal-header"> Send Invitation </div>
       <group-members-form ref="send_invitation_form"
-                          :project="project"
+                          :min_num_inputs="Math.max(1, project.min_group_size - 1)"
+                          :max_num_inputs="project.max_group_size - 1"
                           :course="course"
-                          :max_num_members="project.max_group_size - 1"
                           @submit="send_invitation">
         <template v-slot:header>
           <div class="users-to-invite-label"> Users to Invite: </div>
