@@ -459,4 +459,10 @@ body, input, textarea {
 a {
   text-decoration: none;
 }
+
+// Prevent overlay from interfering with e2e tests
+// https://github.com/electron/forge/issues/3265#issuecomment-2016495554
+#webpack-dev-server-client-overlay {
+  display: none;
+}
 </style>

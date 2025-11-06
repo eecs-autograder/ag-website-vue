@@ -8,7 +8,7 @@
       </div>
 
       <div class="dropdown-content"
-           :style="[{display: is_open() ? 'block' : 'none'}, {height: dropdown_height},
+           :style="[{display: state.is_open ? 'block' : 'none'}, {height: dropdown_height},
                     {overflowY: dropdown_height !== 'auto' ? 'scroll' : 'none'}]">
         <div :class="['dropdown-row', {'highlight': index === state.highlighted_index}]"
              v-for="(item, index) of state.items"
@@ -48,9 +48,8 @@ const instance = getCurrentInstance()
 const state = reactive({
   highlighted_index: 0,
   items: [] as unknown[],
+  is_open: false
 })
-
-const _is_open = ref(false);
 
 // Computed properties
 const current_highlighted_index = computed(() => {
@@ -67,15 +66,11 @@ watch(() => props.items, (new_val: unknown[], old_val: unknown[]) => {
 
 // Methods
 const show = () => {
-  _is_open.value = true
+  state.is_open = true
 }
 
 const hide = () => {
-  _is_open.value = false
-}
-
-const is_open = () => {
-  return _is_open.value
+  state.is_open = false
 }
 
 const choose_item_from_dropdown_menu = (item_selected: unknown, index: number) => {
@@ -85,7 +80,7 @@ const choose_item_from_dropdown_menu = (item_selected: unknown, index: number) =
 }
 
 const move_highlighted = (event: KeyboardEvent) => {
-  if (event.code === "Enter" && _is_open.value && state.items.length > 0) {
+  if (event.code === "Enter" && state.is_open && state.items.length > 0) {
     event.preventDefault()
     event.stopPropagation()
     choose_item_from_dropdown_menu(
@@ -140,7 +135,7 @@ onMounted(() => {
   })
 
   header_slot_content.addEventListener("click", () => {
-    _is_open.value = !_is_open.value
+    state.is_open = !state.is_open
   })
 })
 
@@ -148,7 +143,6 @@ onMounted(() => {
 defineExpose({
   state,
   current_highlighted_index,
-  is_open,
   show,
   hide
 });

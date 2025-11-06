@@ -18,7 +18,7 @@
       </template>
     </Dropdown>
     <div v-if="filtered_choices.length === 0
-               && d_mounted_called && $refs.dropdown_component.is_open"
+               && d_mounted_called && $refs.dropdown_component.state.is_open"
          class="no-matching-results">
       <div class="no-matching-results-row">
         <slot name="no_matching_results" v-bind:filter_text="filter_text">
@@ -63,7 +63,7 @@ export default class DropdownTypeahead extends Vue {
 
   resume_search(key: KeyboardEvent) {
     const dropdown = this.$refs.dropdown_component as DropdownExposed | undefined;
-    if (!dropdown?.is_open()) {
+    if (!dropdown?.state.is_open) {
       // don't want to automatically select what was previously selected
       if (key.code !== "Enter") {
         dropdown?.show();
