@@ -4,11 +4,11 @@
          :style="[{backgroundColor: active_background_color}]">
       <slot name="on"> </slot>
     </div>
-    <div v-else @click="_toggle()" class="inactive-option-style on-border cursor-pointer">
+    <div v-else @click="toggle()" class="inactive-option-style on-border cursor-pointer">
       <slot name="on"> </slot>
     </div>
 
-    <div v-if="state.is_on" @click="_toggle()" class="inactive-option-style off-border">
+    <div v-if="state.is_on" @click="toggle()" class="inactive-option-style off-border">
       <slot name="off"> </slot>
     </div>
     <div v-else class="active-option-style off-border"
@@ -49,7 +49,7 @@ watch(() => props.value, (new_value: boolean, old_value: boolean) => {
 })
 
 // Methods
-const _toggle = () => {
+const toggle = () => {
   state.is_on = !state.is_on;
   emit('input', state.is_on);
 }
