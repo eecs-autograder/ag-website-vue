@@ -24,6 +24,15 @@ npx prettier --check --no-editorconfig \
     'tests/test_components/test_new_validated_input.ts' \
     'tests/test_components/test_new_validated_form.ts' \
     'src/components/CollapsibleSection.vue' \
-    'tests/test_components/test_collapsible_section.ts'
+    'tests/test_components/test_collapsible_section.ts' \
+    'src/components/modal.vue' \
+    'src/components/toggle.vue' \
+    'src/components/toggle.vue' \
+    'src/components/view_file/code_theme_toggle.vue' \
+    'src/components/tooltip.vue' \
+    'src/components/dropdown.vue' \
+    'src/components/api_token.vue' \
+    'src/components/last_saved.vue' \
+    'src/components/api_errors.vue'
 
 ./check_subscribe_unsubscribe.py 'src/**/*.vue'

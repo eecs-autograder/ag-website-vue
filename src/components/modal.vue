@@ -1,19 +1,29 @@
 <template>
   <transition name="modal">
-    <div class="modal-mask"
-         @click.self="() => {click_outside_to_close ? $emit('close') : null}"
-         @keyup.esc="$emit('close')">
-      <div class="modal-container"
-           :class="size"
-           :style="custom_width ? {width: custom_width} : ''"
-           role="dialog">
+    <div
+      class="modal-mask"
+      @click.self="
+        () => {
+          click_outside_to_close ? $emit('close') : null;
+        }
+      "
+      @keyup.esc="$emit('close')"
+    >
+      <div
+        class="modal-container"
+        :class="size"
+        :style="custom_width ? { width: custom_width } : ''"
+        role="dialog"
+      >
         <slot></slot>
-        <div v-if="include_closing_x"
-                class="close-button"
-                @click="$emit('close')"
-                @keyup.enter="$emit('close')"
-                tabindex="0"
-                aria-label="close-dialog">
+        <div
+          v-if="include_closing_x"
+          class="close-button"
+          @click="$emit('close')"
+          @keyup.enter="$emit('close')"
+          tabindex="0"
+          aria-label="close-dialog"
+        >
           &#10005;
         </div>
       </div>
@@ -22,31 +32,31 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive } from "vue";
 
 // Props
 type PropTypes = {
-  click_outside_to_close?: boolean
-  include_closing_x?: boolean
-  size?: string
-  custom_width?: string
-}
+  click_outside_to_close?: boolean;
+  include_closing_x?: boolean;
+  size?: string;
+  custom_width?: string;
+};
 
 const props = withDefaults(defineProps<PropTypes>(), {
   click_outside_to_close: false,
   include_closing_x: true,
-  size: 'large'
-})
+  size: "large",
+});
 
 // Emits
 const emit = defineEmits<{
-  close: []
-}>()
+  close: [];
+}>();
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 * {
   box-sizing: border-box;
@@ -61,9 +71,9 @@ const emit = defineEmits<{
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, .5);
+  background-color: rgba(0, 0, 0, 0.5);
   display: block;
-  transition: opacity .3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .modal-container {
@@ -77,7 +87,7 @@ const emit = defineEmits<{
   padding: 1rem;
   background-color: #fff;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
 
   max-height: 80%;
