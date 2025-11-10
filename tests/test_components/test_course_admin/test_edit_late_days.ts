@@ -10,7 +10,7 @@ import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
-    find_by_name,
+    find_component,
     get_validated_input_text,
     set_validated_input_text,
     validated_input_is_valid,
@@ -72,8 +72,8 @@ test('Search for student', async () => {
     let other_username = 'usery';
     sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, other_username).resolves({late_days_remaining: 2});
-    find_by_name<DropdownTypeahead>(
-        wrapper, 'DropdownTypeahead').vm.filter_text = '  ' + other_username + '   ';
+    find_component(
+        wrapper, DropdownTypeahead).vm.filter_text = '  ' + other_username + '   ';
     await wrapper.find('[data-testid=search_button]').trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
@@ -97,7 +97,7 @@ test('Usernames sorted', async () => {
 test('404 handled on search', async () => {
     let stub = sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, 'steve').rejects(new ag_cli.HttpError(404, ''));
-    find_by_name<DropdownTypeahead>(wrapper, 'DropdownTypeahead').vm.filter_text = 'steve';
+    find_component(wrapper, DropdownTypeahead).vm.filter_text = 'steve';
     wrapper.find('[data-testid=search_button]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
@@ -106,7 +106,7 @@ test('404 handled on search', async () => {
 
     stub.withArgs(
         course.pk, 'stove').resolves({late_days_remaining: 2});
-    find_by_name<DropdownTypeahead>(wrapper, 'DropdownTypeahead').vm.filter_text = 'stove';
+    find_component(wrapper, DropdownTypeahead).vm.filter_text = 'stove';
     await wrapper.find('[data-testid=search_button]').trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
@@ -125,5 +125,5 @@ test('API Errors handled on save', async () => {
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
     await wrapper.vm.$nextTick();
 
-    expect(find_by_name<APIErrors>(wrapper, 'APIErrors').vm.d_api_errors.length).toEqual(1);
+    expect(find_component(wrapper, APIErrors).vm.state.api_errors.length).toEqual(1);
 });

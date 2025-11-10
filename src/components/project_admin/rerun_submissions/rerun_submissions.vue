@@ -185,6 +185,7 @@ import * as ag_cli from 'ag-client-typescript';
 
 import { ArraySet, member_names_less, pk_less, pk_more } from '@/array_set';
 import APIErrors from "@/components/api_errors.vue";
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Collapsible from '@/components/collapsible.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';
@@ -558,7 +559,8 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 }
 
 function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

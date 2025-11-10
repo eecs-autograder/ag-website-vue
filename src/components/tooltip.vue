@@ -6,39 +6,39 @@
     </slot>
 
     <!-- The tooltip text -->
-    <div ref="tooltip_text"
-         class="text"
-         :class="['width-' + width, 'position-' + placement]">
+    <div
+      ref="tooltip_text"
+      class="text"
+      :class="['width-' + width, 'position-' + placement]"
+    >
       <slot></slot>
     </div>
     <div class="caret" :class="['position-' + placement]"></div>
   </span>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
 
-import { Component, Prop, Vue } from 'vue-property-decorator';
+// Props
+type PropTypes = {
+  placement?: "top" | "bottom" | "left" | "right";
+  width?: "small" | "medium" | "large";
+};
 
-@Component
-export default class Tooltip extends Vue {
-  @Prop({
-    default: "top",
-    type: String,
-    validator: value => ['top', 'bottom', 'left', 'right'].includes(<string> value)
-  })
-  placement!: 'top' | 'bottom' | 'left' | 'right';
+const props = withDefaults(defineProps<PropTypes>(), {
+  placement: "top",
+  width: "small",
+});
 
-  @Prop({
-    default: "small",
-    type: String,
-    validator: value => ['small', 'medium', 'large'].includes(<string> value)
-  })
-  width!: 'small' | 'medium' | 'large';
+// Template ref
+const tooltip_text = ref<HTMLElement>();
 
-  mounted() {
-    if (this.placement === 'top' || this.placement === 'bottom') {
-      let tooltip_text = (<HTMLElement> this.$refs.tooltip_text);
-      let right = tooltip_text.getBoundingClientRect().right;
+// Lifecycle
+onMounted(() => {
+  if (props.placement === "top" || props.placement === "bottom") {
+    if (tooltip_text.value) {
+      let right = tooltip_text.value.getBoundingClientRect().right;
 
       // Adjust the horizontal positioning if needed to prevent overflow.
       // istanbul ignore next
@@ -47,16 +47,16 @@ export default class Tooltip extends Vue {
         // !! IMPORTANT !! The "8" in this calculation
         // has to match the $padding SCSS variable defined
         // in this component's <style> tag.
-        tooltip_text.style.left = `-${correction + 8}px`;
+        tooltip_text.value.style.left = `-${correction + 8}px`;
       }
     }
   }
-}
+});
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
-@import '@/styles/global.scss';
+@import "@/styles/colors.scss";
+@import "@/styles/global.scss";
 
 // Using px in this component is acceptable due to the placement calculations
 // required.
@@ -65,7 +65,7 @@ $background-color: darken($stormy-gray-dark, 3%);
 
 $padding: 8px;
 $caret-size: 5px;
-$font-size: .875rem;
+$font-size: 0.875rem;
 $line-height: 1.2;
 
 * {
@@ -82,14 +82,16 @@ $text-position: calc(100% + #{$caret-size});
 
 .tooltip {
   position: relative;
-  margin: 0 .25rem;
+  margin: 0 0.25rem;
 
-  .text, .caret {
+  .text,
+  .caret {
     visibility: hidden;
     z-index: 1;
   }
 
-  &:hover .text, &:hover .caret {
+  &:hover .text,
+  &:hover .caret {
     visibility: visible;
   }
 
@@ -144,7 +146,7 @@ $text-position: calc(100% + #{$caret-size});
     right: $caret-size;
   }
 
-  &.position-bottom  {
+  &.position-bottom {
     border-color: transparent transparent $background-color transparent;
     bottom: -$caret-size;
     margin-left: calc($caret-size / -2);
@@ -183,5 +185,4 @@ $text-position: calc(100% + #{$caret-size});
     width: 250px;
   }
 }
-
 </style>

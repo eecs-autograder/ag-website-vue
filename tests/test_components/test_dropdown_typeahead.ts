@@ -384,10 +384,10 @@ describe('DropdownTypeahead.vue', () => {
         );
 
         let dropdown_component = <Dropdown> dropdown_typeahead.$refs.dropdown_component;
-        expect(dropdown_component.is_open).toBe(false);
+        expect(dropdown_component.state.is_open).toBe(false);
 
         search_bar.trigger('keydown', { code: 'Space' });
-        expect(dropdown_component.is_open).toBe(true);
+        expect(dropdown_component.state.is_open).toBe(true);
 
         dropdown_typeahead.filter_text = "y ";
         await dropdown_typeahead.$nextTick();
@@ -478,12 +478,12 @@ describe('DropdownTypeahead.vue', () => {
         );
 
         let dropdown_component = <Dropdown> dropdown_typeahead.$refs.dropdown_component;
-        expect(dropdown_component.is_open).toBe(false);
+        expect(dropdown_component.state.is_open).toBe(false);
 
         search_bar.trigger('keydown', { code: 'Enter' });
         await dropdown_typeahead.$nextTick();
 
-        expect(dropdown_component.is_open).toBe(false);
+        expect(dropdown_component.state.is_open).toBe(false);
         expect(wrapper.vm.$data.chosen_items.length).toEqual(1);
     });
 

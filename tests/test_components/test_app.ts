@@ -112,7 +112,7 @@ describe('Breadcrumb and global error tests', () => {
 
         expect(wrapper.findComponent({ref: 'global_errors'}).isVisible()).toBe(true);
         expect(
-            (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).d_api_errors.length
+            (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).state.api_errors.length
         ).toBe(1);
     });
 });
@@ -127,7 +127,7 @@ test('API error handled in login', async () => {
     await wrapper.vm.$nextTick();
 
     expect(
-        (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).d_api_errors.length
+        (<APIErrors> wrapper.findComponent({ref: 'global_errors'}).vm).state.api_errors.length
     ).toBe(1);
 });
 

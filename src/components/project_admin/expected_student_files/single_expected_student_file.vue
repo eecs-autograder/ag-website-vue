@@ -88,6 +88,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { ExpectedStudentFile } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
@@ -142,7 +143,8 @@ export default class SingleExpectedStudentFile extends Vue {
   async update_expected_student_file(file: ExpectedStudentFileFormData) {
     try {
       this.d_saving = true;
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       safe_assign(this.d_expected_student_file, file);
       await this.d_expected_student_file.save();
       (<ExpectedStudentFileForm> this.$refs.form).reset();
@@ -173,7 +175,8 @@ export default class SingleExpectedStudentFile extends Vue {
 
 export function handle_edit_expected_student_file_error(component: SingleExpectedStudentFile,
                                                         error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

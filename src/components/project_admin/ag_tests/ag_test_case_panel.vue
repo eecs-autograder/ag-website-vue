@@ -184,6 +184,7 @@ import Draggable from 'vuedraggable';
 import { AGTestCase, AGTestCommand, AGTestSuite } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 import Modal from '@/components/modal.vue';
@@ -348,11 +349,13 @@ export default class AGTestCasePanel extends Vue {
 }
 
 function handle_add_ag_test_command_error(component: AGTestCasePanel, error: unknown) {
-  (<APIErrors> component.$refs.new_command_api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.new_command_api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unknown) {
-    (<APIErrors> component.$refs.clone_case_api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.clone_case_api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 </script>

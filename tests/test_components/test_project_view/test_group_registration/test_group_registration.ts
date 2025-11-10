@@ -418,7 +418,7 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.vm.d_show_confirm_working_alone_modal).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'work_alone_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('delete invitation - cancel action in modal', async () => {
@@ -548,7 +548,7 @@ describe('GroupRegistration tests', () => {
 
         let api_errors
             = <APIErrors> wrapper.findComponent({ref: 'delete_invitation_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('send invitation - cancel action in modal', async () => {
@@ -667,7 +667,7 @@ describe('GroupRegistration tests', () => {
 
         console.log('later')
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'send_invitation_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('Rejecting a group invitation', async () => {

@@ -29,9 +29,9 @@
       <APIErrors ref="api_errors"></APIErrors>
     </div>
     <div v-else class="not-editing">
-      <input class="select-checkbox" 
-             @click.stop 
-             :checked="selected_for_deletion" 
+      <input class="select-checkbox"
+             @click.stop
+             :checked="selected_for_deletion"
              @change="$emit('selected_for_deletion', $event.target.checked)"
              type="checkbox" />
       <div class="file-info-actions">
@@ -59,6 +59,7 @@ import { InstructorFile } from 'ag-client-typescript';
 import * as FileSaver from 'file-saver';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -125,7 +126,8 @@ export default class SingleInstructorFile extends Vue {
 }
 
 export function handle_rename_file_error(component: SingleInstructorFile, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

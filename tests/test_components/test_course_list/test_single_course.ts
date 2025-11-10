@@ -206,7 +206,7 @@ describe('SingleCourse.vue', () => {
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(copy_course_stub.calledOnce);
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
         expect(wrapper.findComponent({ref: 'clone_course_modal'}).exists()).toBe(true);
     });
 });

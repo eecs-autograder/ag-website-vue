@@ -9,7 +9,7 @@ import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { find_by_name, wait_until } from '@/tests/utils';
+import { find_component, wait_until } from '@/tests/utils';
 
 
 describe('StaffRoster tests', () => {
@@ -39,7 +39,7 @@ describe('StaffRoster tests', () => {
     });
 
     test('Staff passed to roster component', async () => {
-        let roster = find_by_name<Roster>(wrapper, 'Roster');
+        let roster = find_component(wrapper, Roster);
         expect(roster.vm.roster).toEqual(staff);
     });
 
@@ -51,7 +51,7 @@ describe('StaffRoster tests', () => {
 
         let add_staff_stub = sinon.stub(course, 'add_staff');
 
-        let roster = find_by_name<Roster>(wrapper, 'Roster');
+        let roster = find_component(wrapper, Roster);
         roster.vm.$emit('add_users', new_usernames);
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
@@ -62,12 +62,12 @@ describe('StaffRoster tests', () => {
 
     test('Add staff API error handled', async () => {
         sinon.stub(course, 'add_staff').rejects(new HttpError(403, 'Nope'));
-        let roster = find_by_name<Roster>(wrapper, 'Roster');
+        let roster = find_component(wrapper, Roster);
         roster.vm.$emit('add_users', []);
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
-        expect(find_by_name<APIErrors>(wrapper, 'APIErrors').vm.d_api_errors.length).toBe(1);
+        expect(find_component(wrapper, APIErrors).vm.state.api_errors.length).toBe(1);
     });
 
     test('Staff removed after remove_user event', async () => {

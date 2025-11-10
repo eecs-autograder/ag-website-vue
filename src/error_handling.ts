@@ -1,6 +1,8 @@
 import { Vue } from 'vue-property-decorator';
+import { APIErrorsExposed } from './exposed_component_types/api_errors_exposed';
 
-import APIErrors from '@/components/api_errors.vue';
+// utility error
+export class DiffPrefixError extends Error {}
 
 // tslint:disable-next-line:no-any
 type PropertyDescriptorType = TypedPropertyDescriptor<(...args: any[]) => any>;
@@ -29,7 +31,8 @@ export function handle_api_errors_async(
 export function make_error_handler_func(api_errors_ref: string = 'api_errors') {
     // tslint:disable-next-line:no-any
     return function(component: Vue, response: unknown) {
-        (<APIErrors> component.$refs[api_errors_ref]).show_errors_from_response(response);
+        const api_errors = component.$refs[api_errors_ref] as APIErrorsExposed | undefined
+        api_errors?.show_errors_from_response(response);
     };
 }
 
@@ -76,6 +79,20 @@ export function handle_global_errors_async(
             catch (e) {
                 GlobalErrorsSubject.get_instance().report_error(e);
             }
+        }
+    };
+}
+
+export function new_handle_global_errors_async<TArgs extends unknown[], TReturn>(
+    fn: (...args: TArgs) => Promise<TReturn>
+): (...args: TArgs) => Promise<TReturn | undefined> {
+    return async (...args: TArgs): Promise<TReturn | undefined> => {
+        try {
+            return await fn(...args);
+        }
+        catch (e) {
+            GlobalErrorsSubject.get_instance().report_error(e);
+            return undefined;
         }
     };
 }

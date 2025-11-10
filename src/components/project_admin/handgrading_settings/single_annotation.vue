@@ -61,6 +61,7 @@ import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Annotation } from "ag-client-typescript";
 
 import APIErrors from "@/components/api_errors.vue";
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from "@/components/modal.vue";
 import AnnotationForm, { AnnotationFormData } from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 import { handle_api_errors_async } from '@/error_handling';
@@ -132,11 +133,13 @@ export default class SingleAnnotation extends Vue {
 }
 
 export function handle_save_annotation_error(component: SingleAnnotation, error: unknown) {
-  (<APIErrors> component.$refs.save_annotation_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.save_annotation_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 export function handle_delete_annotation_error(component: SingleAnnotation, error: unknown) {
-  (<APIErrors> component.$refs.delete_annotation_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.delete_annotation_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 </script>

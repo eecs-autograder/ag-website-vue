@@ -1,36 +1,39 @@
 <template>
   <div class="last-saved-timestamp">
-    <i v-if="saving" class=" loading fa fa-spinner fa-pulse"></i>
+    <i v-if="saving" class="loading fa fa-spinner fa-pulse"></i>
     <template v-else>
-      Last saved: {{short ? format_datetime_short(last_modified) : format_datetime(last_modified)}}
+      Last saved:
+      {{
+        short
+          ? format_datetime_short(last_modified)
+          : format_datetime(last_modified)
+      }}
     </template>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { format_datetime, format_datetime_short } from "@/utils";
 
-import { format_datetime, format_datetime_short } from '@/utils';
+// Props
+type PropTypes = {
+  last_modified: string;
+  saving?: boolean;
+  short?: boolean;
+};
 
-@Component
-export default class LastSaved extends Vue {
-  @Prop({required: true, type: String})
-  last_modified!: string;
+const props = withDefaults(defineProps<PropTypes>(), {
+  saving: false,
+  short: true,
+});
 
-  @Prop({default: false, type: Boolean})
-  saving!: boolean;
-
-  @Prop({default: true, type: Boolean})
-  short!: boolean;
-
-  readonly format_datetime = format_datetime;
-  readonly format_datetime_short = format_datetime_short;
-}
+// Make utility functions available to template
+const { last_modified, saving, short } = props;
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/forms.scss';
-@import '@/styles/loading.scss';
+@import "@/styles/forms.scss";
+@import "@/styles/loading.scss";
 
 .last-saved-timestamp {
   @extend %last-saved-timestamp;

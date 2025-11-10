@@ -172,6 +172,7 @@ import moment from "moment";
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
@@ -292,6 +293,9 @@ export default class Submit extends Vue {
     let diff = moment.duration(deadline.diff(now));
     let days = diff.days();
     let hours = diff.hours();
+    console.log(`now: ${now.format('LLL')}`)
+    console.log(`deadline: ${deadline.format('LLL')}`)
+    console.log(`hours: ${hours}`)
     let hours_str = `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
     if (days >= 1) {
       return `(${days} ${days === 1 ? 'day' : 'days'} ${hours_str})`;
@@ -429,7 +433,8 @@ export default class Submit extends Vue {
 
   @handle_api_errors_async(handle_submit_error)
   submit() {
-    (<APIErrors> this.$refs.api_errors).clear();
+    const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+    api_errors?.clear();
     this.d_submit_progress = 0;
 
     return toggle(this, 'd_submitting', async () => {
@@ -474,7 +479,8 @@ export default class Submit extends Vue {
 }
 
 function handle_submit_error(component: Submit, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 const MINIMATCH_ARGS = {

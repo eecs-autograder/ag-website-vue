@@ -33,6 +33,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import FileUpload from '@/components/file_upload.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
@@ -58,7 +59,8 @@ export default class BuildSandboxImage extends Vue {
   @handle_api_errors_async(make_error_handler_func())
   start_build_task(files: File[]) {
     this.d_file_upload_progress = null;
-    (<APIErrors> this.$refs.api_errors).clear();
+    const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+    api_errors?.clear();
     return toggle(this, 'd_starting_build', async () => {
       let progress_listener = (event: ProgressEvent) => {
         if (event.lengthComputable) {

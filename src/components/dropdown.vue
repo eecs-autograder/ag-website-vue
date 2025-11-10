@@ -1,131 +1,178 @@
 <template>
   <div class="outermost-dropdown-container">
-    <div class="dropdown-container"
-         @keydown="move_highlighted($event)">
-
+    <div class="dropdown-container" @keydown="move_highlighted($event)">
       <div class="header-container">
         <slot name="header"> </slot>
       </div>
 
-      <div class="dropdown-content"
-           :style="[{display: is_open ? 'block' : 'none'}, {height: dropdown_height},
-                    {overflowY: dropdown_height !== 'auto' ? 'scroll' : 'none'}]">
-        <div :class="['dropdown-row', {'highlight': index === d_highlighted_index}]"
-             v-for="(item, index) of d_items"
-             @mousedown="$event.preventDefault()"
-             @click.stop="choose_item_from_dropdown_menu(item, index)">
-          <slot v-bind:item="item">{{item}}</slot>
+      <div
+        class="dropdown-content"
+        :style="[
+          { display: state.is_open ? 'block' : 'none' },
+          { height: dropdown_height },
+          { overflowY: dropdown_height !== 'auto' ? 'scroll' : 'none' },
+        ]"
+      >
+        <div
+          :class="[
+            'dropdown-row',
+            { highlight: index === state.highlighted_index },
+          ]"
+          v-for="(item, index) of state.items"
+          @mousedown="$event.preventDefault()"
+          @click.stop="choose_item_from_dropdown_menu(item, index)"
+        >
+          <slot v-bind:item="item">{{ item }}</slot>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import {
+  reactive,
+  ref,
+  computed,
+  watch,
+  onMounted,
+  getCurrentInstance,
+} from "vue";
 
-@Component
-export default class Dropdown extends Vue {
+// Props
+type PropTypes = {
+  items: unknown[];
+  initial_highlighted_index?: number;
+  dropdown_height?: string;
+};
 
-  @Prop({required: true, type: Array})
-  items!: unknown[];
+const props = withDefaults(defineProps<PropTypes>(), {
+  initial_highlighted_index: 0,
+  dropdown_height: "auto",
+});
 
-  @Prop({default: 0, type: Number})
-  initial_highlighted_index!: number;
+// Emits
+const emit = defineEmits<{
+  item_selected: [item: unknown];
+}>();
 
-  @Prop({default: "auto", type: String})
-  dropdown_height!: string;
+// Get current instance to access $slots
+const instance = getCurrentInstance();
 
-  private d_highlighted_index = 0;
-  private d_items: unknown[] = [];
-  private d_is_open = false;
+// Reactive state object
+const state = reactive({
+  highlighted_index: 0,
+  items: [] as unknown[],
+  is_open: false,
+});
 
-  created() {
-    this.d_items = this.items;
-    this.d_highlighted_index = this.initial_highlighted_index;
-  }
+// Computed properties
+const current_highlighted_index = computed(() => {
+  return state.highlighted_index;
+});
 
-  mounted() {
-    if (this.$slots.header === undefined) {
-      throw Error('Missing required slot: "header"');
+// Watch for items prop changes
+watch(
+  () => props.items,
+  (new_val: unknown[], old_val: unknown[]) => {
+    state.items = new_val;
+    if (
+      state.highlighted_index >= state.items.length &&
+      state.items.length > 0
+    ) {
+      state.highlighted_index = state.items.length - 1;
     }
-    let header_slot_content = this.$slots.header[0].elm!;
-    header_slot_content.addEventListener("blur", () => {
-      this.hide();
-    });
-    header_slot_content.addEventListener("click", () => {
-      this.d_is_open = !this.d_is_open;
-    });
-  }
+  },
+);
 
-  get current_highlighted_index() {
-    return this.d_highlighted_index;
-  }
+// Methods
+const show = () => {
+  state.is_open = true;
+};
 
-  @Watch('items')
-  on_items_changed(new_val: unknown[], old_val: unknown[]) {
-    this.d_items = new_val;
-    if (this.d_highlighted_index >= this.d_items.length && this.d_items.length > 0) {
-      this.d_highlighted_index = this.d_items.length - 1;
+const hide = () => {
+  state.is_open = false;
+};
+
+const choose_item_from_dropdown_menu = (
+  item_selected: unknown,
+  index: number,
+) => {
+  state.highlighted_index = index;
+  emit("item_selected", item_selected);
+  hide();
+};
+
+const move_highlighted = (event: KeyboardEvent) => {
+  if (event.code === "Enter" && state.is_open && state.items.length > 0) {
+    event.preventDefault();
+    event.stopPropagation();
+    choose_item_from_dropdown_menu(
+      state.items[state.highlighted_index],
+      state.highlighted_index,
+    );
+  } else if (event.code === "ArrowDown") {
+    event.preventDefault();
+    event.stopPropagation();
+
+    show();
+
+    if (state.highlighted_index < state.items.length - 1) {
+      state.highlighted_index += 1;
     }
-  }
+  } else if (event.code === "ArrowUp") {
+    event.preventDefault();
+    event.stopPropagation();
 
-  get is_open() {
-    return this.d_is_open;
-  }
+    show();
 
-  show() {
-    this.d_is_open = true;
-  }
-
-  hide() {
-    this.d_is_open = false;
-  }
-
-  choose_item_from_dropdown_menu(item_selected: unknown, index: number) {
-    this.d_highlighted_index = index;
-    this.$emit("item_selected", item_selected);
-    this.hide();
-  }
-
-  move_highlighted(event: KeyboardEvent) {
-    if (event.code === "Enter" && this.is_open && this.d_items.length > 0) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.choose_item_from_dropdown_menu(
-        this.d_items[this.d_highlighted_index], this.d_highlighted_index
-      );
+    if (state.highlighted_index > 0) {
+      state.highlighted_index -= 1;
     }
-    else if (event.code === 'ArrowDown') {
-      event.preventDefault();
-      event.stopPropagation();
-
-      this.show();
-
-      if (this.d_highlighted_index < this.d_items.length - 1) {
-        this.d_highlighted_index += 1;
-      }
-    }
-    else if (event.code === 'ArrowUp') {
-      event.preventDefault();
-      event.stopPropagation();
-
-      this.show();
-
-      if (this.d_highlighted_index > 0) {
-        this.d_highlighted_index -= 1;
-      }
-    }
-    else if (event.code === 'Escape') {
-      this.hide();
-    }
+  } else if (event.code === "Escape") {
+    hide();
   }
-}
+};
+
+// Lifecycle - equivalent to created()
+state.items = props.items;
+state.highlighted_index = props.initial_highlighted_index;
+
+// Lifecycle - equivalent to mounted()
+onMounted(() => {
+  if (!instance || !instance.proxy || !instance.proxy.$slots.header) {
+    throw Error('Missing required slot: "header"');
+  }
+
+  // Access slots through the instance proxy (Vue 2.7 style)
+  const headerSlot = instance.proxy.$slots.header;
+  if (!headerSlot || !headerSlot[0] || !headerSlot[0].elm) {
+    throw Error("Header slot element not found");
+  }
+
+  const header_slot_content = headerSlot[0].elm as HTMLElement;
+
+  header_slot_content.addEventListener("blur", () => {
+    hide();
+  });
+
+  header_slot_content.addEventListener("click", () => {
+    state.is_open = !state.is_open;
+  });
+});
+
+// Expose state and methods for external access (tests, parent components)
+defineExpose({
+  state,
+  current_highlighted_index,
+  show,
+  hide,
+});
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
-@import '@/styles/components/dropdown_styles.scss';
+@import "@/styles/colors.scss";
+@import "@/styles/components/dropdown_styles.scss";
 
 .dropdown-container {
   display: block;
@@ -156,5 +203,4 @@ export default class Dropdown extends Vue {
 .highlight {
   background-color: $pebble-dark;
 }
-
 </style>

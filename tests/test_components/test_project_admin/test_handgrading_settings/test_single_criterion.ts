@@ -121,14 +121,14 @@ describe('Save criterion tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'save_criterion_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(0);
+        expect(api_errors.state.api_errors.length).toEqual(0);
 
         expect(wrapper.vm.d_criterion_form_is_valid).toEqual(true);
         await wrapper.findComponent({ref: 'criterion_form'}).trigger('submit');
         expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
         await wrapper.vm.$nextTick();
 
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
     });
 });
 
@@ -170,14 +170,14 @@ describe('Delete criterion tests', () => {
         expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_criterion_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(0);
+        expect(api_errors.state.api_errors.length).toEqual(0);
 
         delete_stub.returns(Promise.reject(new HttpError(403, 'Permission denied')));
 
         await wrapper.find('.delete-button').trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         await wrapper.vm.$nextTick();
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
         expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(true);
     });
 });

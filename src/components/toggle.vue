@@ -1,56 +1,86 @@
 <template>
   <div class="toggle-button-space">
-    <div v-if="is_on" class="active-option-style on-border"
-         :style="[{backgroundColor: active_background_color}]">
+    <div
+      v-if="state.is_on"
+      class="active-option-style on-border"
+      :style="[{ backgroundColor: active_background_color }]"
+    >
       <slot name="on"> </slot>
     </div>
-    <div v-else @click="_toggle()" class="inactive-option-style on-border cursor-pointer">
+    <div
+      v-else
+      @click="toggle()"
+      class="inactive-option-style on-border cursor-pointer"
+    >
       <slot name="on"> </slot>
     </div>
 
-    <div v-if="is_on" @click="_toggle()" class="inactive-option-style off-border">
+    <div
+      v-if="state.is_on"
+      @click="toggle()"
+      class="inactive-option-style off-border"
+    >
       <slot name="off"> </slot>
     </div>
-    <div v-else class="active-option-style off-border"
-         :style="[{backgroundColor: active_background_color}]">
+    <div
+      v-else
+      class="active-option-style off-border"
+      :style="[{ backgroundColor: active_background_color }]"
+    >
       <slot name="off"> </slot>
     </div>
-
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { reactive, watch } from "vue";
 
-@Component
-export default class Toggle extends Vue {
+// Props
+type PropTypes = {
+  value?: boolean;
+  active_background_color?: string;
+};
 
-  @Prop({default: false, type: Boolean})
-  value!: boolean;
+const props = withDefaults(defineProps<PropTypes>(), {
+  value: false,
+  active_background_color: "hsl(208, 59%, 49%)",
+});
 
-  @Watch('value')
-  on_value_changed(new_value: boolean, old_value: boolean) {
-    this.is_on = new_value;
-  }
+// Emits
+const emit = defineEmits<{
+  input: [value: boolean];
+}>();
 
-  @Prop({default: 'hsl(208, 59%, 49%)', type: String})
-  active_background_color!: string;
+// Reactive state object
+const state = reactive({
+  is_on: false,
+});
 
-  is_on: boolean = false;
+// Watch for prop changes (equivalent to @Watch('value'))
+watch(
+  () => props.value,
+  (new_value: boolean, old_value: boolean) => {
+    state.is_on = new_value;
+  },
+);
 
-  created() {
-    this.is_on = this.value;
-  }
+// Methods
+const toggle = () => {
+  state.is_on = !state.is_on;
+  emit("input", state.is_on);
+};
 
-  private _toggle() {
-    this.is_on = !this.is_on;
-    this.$emit('input', this.is_on);
-  }
-}
+// Initialize (equivalent to created lifecycle)
+state.is_on = props.value;
+
+// Expose state for external access (tests, parent components)
+defineExpose({
+  state,
+});
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 * {
   box-sizing: border-box;
@@ -58,9 +88,10 @@ export default class Toggle extends Vue {
   padding: 0;
 }
 
-.active-option-style, .inactive-option-style {
+.active-option-style,
+.inactive-option-style {
   display: inline-block;
-  padding: .5rem .75rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .active-option-style {
@@ -82,5 +113,4 @@ export default class Toggle extends Vue {
 .on-border {
   border-radius: 3px 0 0 3px;
 }
-
 </style>

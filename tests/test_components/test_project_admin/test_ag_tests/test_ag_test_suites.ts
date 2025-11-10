@@ -132,7 +132,7 @@ describe('Creating ag_test_suite', () => {
         expect(wrapper.vm.d_ag_test_suites.length).toEqual(0);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
         expect(wrapper.vm.d_show_new_ag_test_suite_modal).toBe(true);
         expect(wrapper.findComponent({ref: 'new_ag_test_suite_modal'}).exists()).toBe(true);
     });

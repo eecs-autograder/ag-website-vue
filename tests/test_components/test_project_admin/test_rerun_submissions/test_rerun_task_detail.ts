@@ -73,7 +73,7 @@ test('Cancel rerun API errors handled', async () => {
 
     expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(true);
     let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-    expect(api_errors.d_api_errors.length).toBe(1);
+    expect(api_errors.state.api_errors.length).toBe(1);
 });
 
 test('Cancel button hidden when task is done', () => {

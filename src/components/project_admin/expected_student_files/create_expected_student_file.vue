@@ -20,6 +20,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import { handle_api_errors_async } from '@/error_handling';
 
@@ -42,7 +43,8 @@ export default class CreateExpectedStudentFile extends Vue {
     new_expected_student_file_data: NewExpectedStudentFileData) {
     try {
       this.d_create_pending = true;
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       await ExpectedStudentFile.create(this.project.pk, new_expected_student_file_data);
       (<ExpectedStudentFileForm> this.$refs.form).reset();
     }
@@ -54,7 +56,8 @@ export default class CreateExpectedStudentFile extends Vue {
 
 export function handle_add_expected_student_file_error(component: CreateExpectedStudentFile,
                                                        error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

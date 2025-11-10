@@ -198,7 +198,7 @@ describe('AGTestSuiteSettings tests', () => {
         expect(save_stub.calledOnce).toBe(true);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('Delete a Suite', async () => {
@@ -235,7 +235,7 @@ describe('AGTestSuiteSettings tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
     });
 
     test('Parent component changes the value of the ag_test_suite prop', async () => {

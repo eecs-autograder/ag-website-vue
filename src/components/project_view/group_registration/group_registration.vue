@@ -157,6 +157,7 @@ import { Course, Group, GroupInvitation, Project, User } from 'ag-client-typescr
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import Modal from '@/components/modal.vue';
 import { GroupMember } from "@/components/project_admin/edit_groups/create_single_group.vue";
@@ -230,7 +231,8 @@ export default class GroupRegistration extends Vue {
   async delete_invitation() {
     try {
       this.d_deleting_invitation = true;
-      (<APIErrors> this.$refs.delete_invitation_api_errors).clear();
+      const api_errors = this.$refs.delete_invitation_api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       await this.invitation_sent!.reject();
       this.invitation_sent = null;
       this.d_show_delete_invitation_modal = false;
@@ -249,7 +251,8 @@ export default class GroupRegistration extends Vue {
   async send_invitation(usernames: string[]) {
     try {
       this.d_sending_invitation = true;
-      (<APIErrors> this.$refs.send_invitation_api_errors).clear();
+      const api_errors = this.$refs.send_invitation_api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       this.invitation_sent = await GroupInvitation.send_invitation(this.project.pk, usernames);
       this.d_show_send_group_invitation_modal = false;
     }
@@ -271,15 +274,18 @@ export default class GroupRegistration extends Vue {
 }
 
 function handle_work_alone_error(component: GroupRegistration, error: unknown) {
-  (<APIErrors> component.$refs.work_alone_api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.work_alone_api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 function handle_delete_invitation_error(component: GroupRegistration, error: unknown) {
-  (<APIErrors> component.$refs.delete_invitation_api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.delete_invitation_api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 
 function handle_send_invitation_error(component: GroupRegistration, error: unknown) {
-  (<APIErrors> component.$refs.send_invitation_api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.send_invitation_api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

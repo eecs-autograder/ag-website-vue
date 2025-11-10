@@ -408,11 +408,11 @@ describe('Handgrading settings tests', () => {
             Promise.reject(new HttpError(403, 'Permission denied')));
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'settings_form_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(0);
+        expect(api_errors.state.api_errors.length).toEqual(0);
         await wrapper.findComponent({ref: 'handgrading_settings_form'}).trigger('submit');
         expect(await wait_until(wrapper, w => !w.vm.d_saving));
 
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
     });
 });
 
@@ -494,14 +494,14 @@ describe('Criteria and annotation tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'create_criterion_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(0);
+        expect(api_errors.state.api_errors.length).toEqual(0);
 
         let criterion_form
             = <Wrapper<CriterionForm>> wrapper.findComponent({ref: 'create_criterion_form'});
         criterion_form.vm.submit();
 
         expect(await wait_until(wrapper, w => !w.vm.d_creating_criterion)).toBe(true);
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
         expect(wrapper.findComponent({ref: 'create_criterion_modal'}).exists()).toBe(true);
     });
 
@@ -576,7 +576,7 @@ describe('Criteria and annotation tests', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'create_annotation_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toEqual(0);
+        expect(api_errors.state.api_errors.length).toEqual(0);
 
         let annotation_form
             = <Wrapper<AnnotationForm>> wrapper.findComponent({ref: 'create_annotation_form'});
@@ -584,7 +584,7 @@ describe('Criteria and annotation tests', () => {
 
         expect(await wait_until(wrapper, w => !w.vm.d_creating_annotation)).toBe(true);
         await wrapper.vm.$nextTick();
-        expect(api_errors.d_api_errors.length).toEqual(1);
+        expect(api_errors.state.api_errors.length).toEqual(1);
         expect(wrapper.findComponent({ref: 'create_annotation_modal'}).exists()).toBe(true);
     });
 

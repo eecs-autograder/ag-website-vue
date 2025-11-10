@@ -830,6 +830,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import CollapsibleSection from '@/components/CollapsibleSection.vue';
 import CopyButton from '@/components/CopyButton.vue';
 import Dropdown from '@/components/dropdown.vue';
@@ -1006,7 +1007,8 @@ export default class AGTestCommandSettings extends Vue {
   @handle_api_errors_async(handle_save_ag_test_cmd_settings_error)
   save_ag_test_command_settings() {
     return toggle(this, 'd_saving', () => {
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       return this.d_ag_test_command!.save();
     });
   }
@@ -1114,15 +1116,15 @@ export default class AGTestCommandSettings extends Vue {
 }
 
 function handle_save_ag_test_case_error(component: AGTestCommandSettings, error: unknown) {
-  let api_errors_elt = <APIErrors> component.$refs.ag_test_case_api_errors;
-  api_errors_elt.show_errors_from_response(error);
+  let api_errors_elt = component.$refs.ag_test_case_api_errors as APIErrorsExposed | undefined;
+  api_errors_elt?.show_errors_from_response(error);
 }
 
 function handle_save_ag_test_cmd_settings_error(component: AGTestCommandSettings, error: unknown) {
-  let api_errors_elt = <APIErrors> component.$refs.api_errors;
-  api_errors_elt.show_errors_from_response(error);
+  let api_errors_elt = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors_elt?.show_errors_from_response(error);
   if (component.d_num_api_errors !== 0) {
-    api_errors_elt.$el.scrollIntoView({behavior: 'smooth'});
+    api_errors_elt?.$el.scrollIntoView({behavior: 'smooth'});
   }
 }
 </script>

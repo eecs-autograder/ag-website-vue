@@ -299,7 +299,7 @@ describe('AGTestSuitePanel tests', () => {
         expect(create_case_stub.callCount).toEqual(1);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'new_ag_test_case_api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('Remove command from create_case_modal', async () => {

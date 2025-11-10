@@ -63,7 +63,7 @@ describe('Course settings', () => {
         await wrapper.vm.$nextTick();
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(2);
+        expect(api_errors.state.api_errors.length).toBe(2);
     });
 });
 

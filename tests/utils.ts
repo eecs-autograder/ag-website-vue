@@ -217,7 +217,7 @@ type SetDataInputPartial<T> = {
 };
 
 export function api_error_count(wrapper: Wrapper<Vue>, selector: RefSelector) {
-    return (<APIErrors> wrapper.findComponent(selector).vm).d_api_errors.length;
+    return (<APIErrors> wrapper.findComponent(selector).vm).state.api_errors.length;
 }
 
 export function expect_has_class(wrapper: Wrapper<Vue>, class_: string) {

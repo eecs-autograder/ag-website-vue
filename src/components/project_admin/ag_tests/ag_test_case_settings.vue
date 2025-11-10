@@ -114,6 +114,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { AGTestCase } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import AGTestCaseFdbkConfigPanel from '@/components/project_admin/ag_tests/ag_test_case_fdbk_config_panel.vue';
 import { FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_admin/feedback_config_panel/feedback_config_utils';
 import Tooltip from '@/components/tooltip.vue';
@@ -158,7 +159,8 @@ export default class AGTestCaseSettings extends Vue {
   async save_ag_test_case_settings() {
     try {
       this.d_saving = true;
-      (<APIErrors> this.$refs.api_errors).clear();
+      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
+      api_errors?.clear();
       await this.d_ag_test_case!.save();
     }
     finally {
@@ -168,7 +170,8 @@ export default class AGTestCaseSettings extends Vue {
 }
 
 function handle_save_ag_test_case_settings_error(component: AGTestCaseSettings, error: unknown) {
-  (<APIErrors> component.$refs.api_errors).show_errors_from_response(error);
+  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
+  api_errors?.show_errors_from_response(error);
 }
 </script>
 

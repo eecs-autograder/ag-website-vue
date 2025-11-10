@@ -155,7 +155,7 @@ describe('SingleProject.vue', () => {
 
         expect(wrapper.findComponent({ref: 'clone_project_modal'}).exists()).toBe(true);
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.d_api_errors.length).toBe(1);
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('Visibility icons toggle based on project visibility to students', async () => {
