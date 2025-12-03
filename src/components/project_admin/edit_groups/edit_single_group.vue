@@ -36,20 +36,18 @@
 
         <div id="bonus-submissions-container" class="form-field-wrapper extra-space">
           <label id="bonus-submissions-label" class="label"> Bonus Submissions </label>
-          <validated-input ref="bonus_submissions_remaining_input"
+          <validated-int-input ref="bonus_submissions_remaining_input"
                           v-model="d_group.bonus_submissions_remaining"
-                          :validators="[is_integer, is_non_negative, is_not_empty]"
-                          :num_rows="1"
-                          input_style="width: 80px"
-                          :from_string_fn="string_to_num">
-          </validated-input>
+                          :validators="[make_min_validator(0)]"
+                          input_style="width: 80px">
+          </validated-int-input>
         </div>
         <APIErrors ref="api_errors"></APIErrors>
 
         <div class="button-footer">
           <button class="update-group-button"
                   type="submit"
-                  :disabled="d_saving"> Update Group </button>
+                  :disabled="d_saving || !d_edit_group_form_is_valid"> Update Group </button>
 
           <last-saved :saving="d_saving" :last_modified="group.last_modified"></last-saved>
         </div>
@@ -109,11 +107,10 @@ import GroupMembersForm from '@/components/group_members_form.vue';
 import LastSaved from '@/components/last_saved.vue';
 import Modal from '@/components/modal.vue';
 import Toggle from '@/components/toggle.vue';
-import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedIntInput from '@/components/validated_input/ValidatedIntInput.vue';
 import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { assert_not_null, deep_copy, format_datetime, toggle } from '@/utils';
-import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/validators';
+import { make_min_validator } from '@/new_validators';
 
 @Component({
   components: {
@@ -123,16 +120,12 @@ import { is_integer, is_non_negative, is_not_empty, string_to_num } from '@/vali
     LastSaved,
     Modal,
     Toggle,
-    ValidatedForm,
-    ValidatedInput,
+    ValidatedIntInput,
   }
 })
 export default class EditSingleGroup extends Vue {
 
-  readonly is_not_empty = is_not_empty;
-  readonly is_non_negative = is_non_negative;
-  readonly is_integer = is_integer;
-  readonly string_to_num = string_to_num;
+  readonly make_min_validator = make_min_validator;
 
   @Prop({required: true, type: Course})
   course!: Course;

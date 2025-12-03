@@ -53,15 +53,12 @@ export function use_validation<Input, Output = Input>(
 
   // emit value only when there are no errors. parsed_value depends on input,
   // parser, and validators.
-  watch(
-    parsed_value,
-    (new_parsed_value) => {
-      if (new_parsed_value.is_valid && is_valid.value) {
-        emit("input", new_parsed_value.output);
-      }
-    },
-    { immediate: true },
-  );
+  watch(parsed_value, (new_parsed_value) => {
+    if (new_parsed_value.is_valid && is_valid.value) {
+      console.log(`emitted input:${String(new_parsed_value.output)}`);
+      emit("input", new_parsed_value.output);
+    }
+  });
 
   // emit validity-changed whenever a dependency changes
   // (the non-computed reactive dependencies are input, parser, and validators)
@@ -70,6 +67,7 @@ export function use_validation<Input, Output = Input>(
   });
 
   onMounted(() => {
+    console.log("mounted");
     uid = register(is_valid);
   });
 
@@ -177,7 +175,7 @@ type Invalid = {
   is_valid: false;
   error_msg: string;
 };
-type ValidatorResponse = Valid | Invalid;
+export type ValidatorResponse = Valid | Invalid;
 export type ValidatorFuncType<K> = (value: K) => ValidatorResponse;
 
 // Parser types

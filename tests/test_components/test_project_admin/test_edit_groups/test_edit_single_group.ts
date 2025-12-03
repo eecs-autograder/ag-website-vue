@@ -14,7 +14,7 @@ import APIErrors from '@/components/api_errors.vue';
 import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import GroupMembersForm from '@/components/group_members_form.vue';
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedIntInput from '@/components/validated_input/ValidatedIntInput.vue';
 import { assert_not_null } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
@@ -66,30 +66,39 @@ describe('EditSingleGroup tests', () => {
     });
 
     test('bonus_submissions_remaining cannot be a negative number', async () => {
-        let bonus_submissions_validator = <ValidatedInput> wrapper.findComponent({
-            ref: 'bonus_submissions_remaining_input'
-        }).vm;
-        await set_validated_input_text(
-            wrapper.findComponent({ref: 'bonus_submissions_remaining_input'}), "-4");
+        const input = wrapper.findComponent({ ref: 'bonus_submissions_remaining_input' });
+        await set_validated_input_text(input, "-4");
 
-        expect(wrapper.vm.d_edit_group_form_is_valid).toBe(false);
-        expect(bonus_submissions_validator.is_valid).toBe(false);
+        let submit = wrapper.find('button[type="submit"]');
+        expect(submit.attributes('disabled')).toBeDefined();
+
+        await set_validated_input_text(input, "1");
+        submit = wrapper.find('button[type="submit"]');
+        expect(submit.attributes('disabled')).toBeUndefined();
+
+        await set_validated_input_text(input, "-1");
+        expect(submit.attributes('disabled')).toBeDefined();
     });
 
     test('bonus_submissions_remaining cannot be empty or not a number', async () => {
-        let bonus_submissions_input
-            = wrapper.findComponent({ref: 'bonus_submissions_remaining_input'});
-        let bonus_submissions_validator = <ValidatedInput> wrapper.findComponent({
-            ref: 'bonus_submissions_remaining_input'
-        }).vm;
-        set_validated_input_text(bonus_submissions_input, "");
+        // Find the validated input
+        const input = wrapper.findComponent({ ref: 'bonus_submissions_remaining_input' });
 
-        expect(bonus_submissions_validator.is_valid).toBe(false);
+        await set_validated_input_text(input, "1");
+        let submit = wrapper.find('button[type="submit"]');
+        expect(submit.attributes('disabled')).toBeUndefined();
 
-        set_validated_input_text(bonus_submissions_input, "spam");
+        await set_validated_input_text(input, "");
+        submit = wrapper.find('button[type="submit"]');
+        expect(submit.attributes('disabled')).toBeDefined();
 
-        expect(wrapper.vm.d_edit_group_form_is_valid).toBe(false);
-        expect(bonus_submissions_validator.is_valid).toBe(false);
+        await set_validated_input_text(input, "1");
+        submit = wrapper.find('button[type="submit"]');
+        expect(submit.attributes('disabled')).toBeUndefined();
+
+        await set_validated_input_text(input, "spam");
+        submit = wrapper.find('button[type="submit"]');
+        expect(submit.attributes('disabled')).toBeDefined();
     });
 
     test('Clicking extension display opens datetime picker', () => {

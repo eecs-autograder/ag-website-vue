@@ -41,16 +41,6 @@ describe("use_validation", () => {
     expect(unregister).toHaveBeenCalledWith(uid);
   });
 
-  test("emits initial valid input value", () => {
-    const comp = make_use_validation_comp({
-      input: ref(""),
-      validators: [],
-    });
-
-    const wrapper = mount(comp);
-    expect(wrapper.emitted("input")?.[0]).toEqual([""]);
-  });
-
   test("does not emit initial invalid input value", () => {
     const comp = make_use_validation_comp({
       input: ref(""),
@@ -88,11 +78,7 @@ describe("use_validation", () => {
     input.value = "invalid!";
 
     await Vue.nextTick();
-    expect(
-      (wrapper.emitted("input") as Array<[string]>).some(
-        (event) => event[0] === "invalid!",
-      ),
-    ).toBeFalsy();
+    expect(wrapper.emitted("input")).toBeUndefined();
   });
 
   test("updates return values when input is changed to an invalid value", async () => {
