@@ -139,11 +139,9 @@ import GroupMembersForm from "@/components/group_members_form.vue";
 import LastSaved from "@/components/last_saved.vue";
 import Modal from "@/components/modal.vue";
 import ValidatedIntInput from "@/components/validated_input/ValidatedIntInput.vue";
-import { new_handle_global_errors_async } from "@/error_handling";
 import { assert_not_null, deep_copy, format_datetime, toggle } from "@/utils";
 import { make_min_validator } from "@/new_validators";
 
-// Props
 type PropTypes = {
   course: Course;
   group: Group;
@@ -152,12 +150,10 @@ type PropTypes = {
 
 const props = defineProps<PropTypes>();
 
-// Template refs
 const api_errors = ref<APIErrorsExposed>();
 const delete_group_api_errors = ref<APIErrorsExposed>();
 const extension_datetime_picker = ref<InstanceType<typeof DatetimePicker>>();
 
-// Reactive state object
 const state = reactive({
   group: null as Group | null,
   saving: false,
@@ -166,21 +162,19 @@ const state = reactive({
   deleting: false,
 });
 
-// Methods
-const update_group = new_handle_global_errors_async(async () => {
-  assert_not_null(state.group);
-  try {
-    state.saving = true;
-    api_errors.value?.clear();
-    await state.group.save();
-  } catch (error: unknown) {
-    api_errors.value?.show_errors_from_response(error);
-  } finally {
-    state.saving = false;
-  }
-});
+const update_group = () => {
+  return toggle(state, "saving", async () => {
+    assert_not_null(state.group);
+    try {
+      api_errors.value?.clear();
+      await state.group.save();
+    } catch (error: unknown) {
+      api_errors.value?.show_errors_from_response(error);
+    }
+  });
+};
 
-const delete_group = new_handle_global_errors_async(async () => {
+const delete_group = () => {
   return toggle(state, "deleting", async () => {
     assert_not_null(state.group);
     try {
@@ -190,7 +184,7 @@ const delete_group = new_handle_global_errors_async(async () => {
       delete_group_api_errors.value?.show_errors_from_response(error);
     }
   });
-});
+};
 
 const toggle_extension_visibility = () => {
   if (extension_datetime_picker.value) {
@@ -198,18 +192,14 @@ const toggle_extension_visibility = () => {
   }
 };
 
-// Watch for group prop changes
 watch(
   () => props.group,
   (new_group: Group, old_group: Group) => {
     state.group = deep_copy(new_group, Group);
   },
 );
-
-// Lifecycle - equivalent to created()
 state.group = deep_copy(props.group, Group);
 
-// Expose state for external access (tests, parent components)
 defineExpose({
   state,
 });

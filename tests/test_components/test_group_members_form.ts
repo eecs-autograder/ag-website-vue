@@ -1,7 +1,9 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { vi } from 'vitest';
+import { mount, Wrapper, flushPromises } from '@vue/test-utils';
 
 import { Course } from 'ag-client-typescript';
 
+import InputErrors from '@/components/validated_input/InputErrors.vue';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import ValidatedTextInput from '@/components/validated_input/ValidatedTextInput.vue';
 import NewValidatedForm from '@/components/validated_input/NewValidatedForm.vue';
@@ -155,6 +157,8 @@ describe('GroupMembersForm tests', () => {
     });
 
     test('Username input invalid non-email', async () => {
+        vi.useFakeTimers()
+
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 course: course,
@@ -165,9 +169,34 @@ describe('GroupMembersForm tests', () => {
         });
         let inputs = wrapper.findAllComponents(ValidatedTextInput);
 
+        const wait_for_debounce = () => {
+            vi.runAllTimers();
+            return wrapper.vm.$nextTick();
+        }
+
+        const error_exists = () => {
+            const errors_component = wrapper.findComponent(InputErrors);
+            if (!errors_component.exists()) {
+                return false;
+            }
+            return errors_component.text().includes('email');
+        }
+
+        // don't show error on intial load
+        await wait_for_debounce();
         expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false]]);
+        expect(error_exists()).toBe(false);
+
         await set_validated_input_text(inputs.at(0), 'wa@luigi.net');
+        await wait_for_debounce();
         expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true]]);
+        expect(error_exists()).toBe(false);
+        expect(emitted(wrapper, 'input')).toEqual([[['wa@luigi.net', 'egg@spam.com']]]);
+
+        await set_validated_input_text(inputs.at(0), 'waaaaaaa');
+        await wait_for_debounce();
+        expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true], [false]]);
+        expect(error_exists()).toBe(true);
         expect(emitted(wrapper, 'input')).toEqual([[['wa@luigi.net', 'egg@spam.com']]]);
     });
 

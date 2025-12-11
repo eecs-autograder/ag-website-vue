@@ -56,7 +56,6 @@ import NewValidatedForm from "./validated_input/NewValidatedForm.vue";
 import ValidatedTextInput from "./validated_input/ValidatedTextInput.vue";
 import { is_email } from "@/new_validators";
 
-// Props
 type PropTypes = {
   course: Course;
   max_num_inputs: Number;
@@ -68,25 +67,20 @@ const props = withDefaults(defineProps<PropTypes>(), {
   value: () => [],
 });
 
-// Emits
 const emit = defineEmits<{
   form_validity_changed: [is_valid: boolean];
   input: [usernames: string[]];
   submit: [usernames: string[]];
 }>();
 
-// Template refs
 const group_members_form = ref<InstanceType<typeof NewValidatedForm>>();
 const username_input = ref<InstanceType<typeof ValidatedTextInput>[]>([]);
 
-// Reactive state object
 const state = reactive({
   usernames: [] as string[],
 });
 
-// Methods
 const initialize = (value: string[]) => {
-  console.log("initialize called");
   if (value.length === 0) {
     state.usernames = Array(props.min_num_inputs).fill(
       props.course.allowed_guest_domain,
@@ -114,7 +108,6 @@ const reset = () => {
   initialize(props.value);
 };
 
-// Watch for value prop changes
 watch(
   () => props.value,
   (new_value: string[], old_value: string[]) => {
@@ -123,10 +116,8 @@ watch(
   { deep: true },
 );
 
-// Lifecycle - equivalent to created()
 initialize(props.value);
 
-// Lifecycle - equivalent to mounted()
 onMounted(() => {
   const inputs = username_input.value;
   if (inputs && inputs[0]) {
@@ -134,7 +125,6 @@ onMounted(() => {
   }
 });
 
-// Expose state and methods for external access (tests, parent components)
 defineExpose({
   state,
   submit,

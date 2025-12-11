@@ -55,7 +55,6 @@ export function use_validation<Input, Output = Input>(
   // parser, and validators.
   watch(parsed_value, (new_parsed_value) => {
     if (new_parsed_value.is_valid && is_valid.value) {
-      console.log(`emitted input:${String(new_parsed_value.output)}`);
       emit("input", new_parsed_value.output);
     }
   });
@@ -67,7 +66,6 @@ export function use_validation<Input, Output = Input>(
   });
 
   onMounted(() => {
-    console.log("mounted");
     uid = register(is_valid);
   });
 

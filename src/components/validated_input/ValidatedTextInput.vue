@@ -102,7 +102,7 @@ function on_blur() {
   }
 }
 
-// Calls .focus() on the underlying input/textarea element.
+// Calls .focus() on the underlying inputelement.
 // Options object:
 // - cursor_to_front: If true, will put the cursor at the beginning of the
 //   input text.
