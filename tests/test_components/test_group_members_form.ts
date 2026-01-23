@@ -1,9 +1,12 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { vi } from 'vitest';
+import { mount, Wrapper, flushPromises } from '@vue/test-utils';
 
 import { Course } from 'ag-client-typescript';
 
+import InputErrors from '@/components/validated_input/InputErrors.vue';
 import GroupMembersForm from '@/components/group_members_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedTextInput from '@/components/validated_input/ValidatedTextInput.vue';
+import NewValidatedForm from '@/components/validated_input/NewValidatedForm.vue';
 
 import { make_course } from '@/tests/data_utils';
 import { emitted, get_validated_input_text, set_validated_input_text } from '@/tests/utils';
@@ -11,7 +14,7 @@ import { emitted, get_validated_input_text, set_validated_input_text } from '@/t
 let course: Course = make_course({allowed_guest_domain: '@llama.net'});
 
 describe('GroupMembersForm tests', () => {
-    test('Default value prop, d_usernames initialized based on min_num_inputs', () => {
+    test('Default value prop, usernames initialized based on min_num_inputs', () => {
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 course: course,
@@ -20,9 +23,9 @@ describe('GroupMembersForm tests', () => {
             },
         });
 
-        expect(wrapper.vm.d_usernames).toEqual(
+        expect(wrapper.vm.state.usernames).toEqual(
             ['@llama.net', '@llama.net', '@llama.net', '@llama.net']);
-        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents(ValidatedTextInput);
         expect(inputs.length).toEqual(4);
         for (let i = 0; i < inputs.length; ++i) {
             expect(get_validated_input_text(inputs.at(i))).toEqual(course.allowed_guest_domain);
@@ -40,10 +43,10 @@ describe('GroupMembersForm tests', () => {
             }
         });
 
-        expect(wrapper.vm.d_usernames).not.toBe(value);
-        expect(wrapper.vm.d_usernames).toEqual(value);
+        expect(wrapper.vm.state.usernames).not.toBe(value);
+        expect(wrapper.vm.state.usernames).toEqual(value);
 
-        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents(ValidatedTextInput);
         expect(inputs.length).toEqual(value.length);
         for (let i = 0; i < inputs.length; ++i) {
             expect(get_validated_input_text(inputs.at(i))).toEqual(value[i]);
@@ -105,7 +108,7 @@ describe('GroupMembersForm tests', () => {
         expect(add_button.element).not.toBeDisabled();
         await add_button.trigger('click');
 
-        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents(ValidatedTextInput);
         expect(inputs.length).toEqual(2);
 
         expect(get_validated_input_text(inputs.at(0))).toEqual('spam');
@@ -121,14 +124,14 @@ describe('GroupMembersForm tests', () => {
                 value: ['spam', 'egg']
             }
         });
-        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
+        let inputs = wrapper.findAllComponents(ValidatedTextInput);
         expect(inputs.length).toEqual(2);
 
         let remove_button = wrapper.findAll('.remove-member-button').at(1);
         expect(remove_button.element).not.toBeDisabled();
         await remove_button.trigger('click');
 
-        inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
+        inputs = wrapper.findAllComponents(ValidatedTextInput);
         expect(inputs.length).toEqual(1);
 
         expect(get_validated_input_text(inputs.at(0))).toEqual('spam');
@@ -145,15 +148,17 @@ describe('GroupMembersForm tests', () => {
                 value: ['spam']
             }
         });
-        expect(wrapper.vm.d_usernames).toEqual(['spam']);
+        expect(wrapper.vm.state.usernames).toEqual(['spam']);
 
         let new_value = ['egg'];
         await wrapper.setProps({value: new_value});
-        expect(wrapper.vm.d_usernames).not.toBe(new_value);
-        expect(wrapper.vm.d_usernames).toEqual(new_value);
+        expect(wrapper.vm.state.usernames).not.toBe(new_value);
+        expect(wrapper.vm.state.usernames).toEqual(new_value);
     });
 
     test('Username input invalid non-email', async () => {
+        vi.useFakeTimers()
+
         let wrapper = mount(GroupMembersForm, {
             propsData: {
                 course: course,
@@ -162,13 +167,36 @@ describe('GroupMembersForm tests', () => {
                 value: ['spam', 'egg@spam.com']
             }
         });
-        let inputs = wrapper.findAllComponents({name: 'ValidatedInput'});
-        expect((<ValidatedInput> inputs.at(0).vm).is_valid).toBe(false);
-        expect((<ValidatedInput> inputs.at(1).vm).is_valid).toBe(true);
+        let inputs = wrapper.findAllComponents(ValidatedTextInput);
 
+        const wait_for_debounce = () => {
+            vi.runAllTimers();
+            return wrapper.vm.$nextTick();
+        }
+
+        const error_exists = () => {
+            const errors_component = wrapper.findComponent(InputErrors);
+            if (!errors_component.exists()) {
+                return false;
+            }
+            return errors_component.text().includes('email');
+        }
+
+        // don't show error on intial load
+        await wait_for_debounce();
         expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false]]);
+        expect(error_exists()).toBe(false);
+
         await set_validated_input_text(inputs.at(0), 'wa@luigi.net');
+        await wait_for_debounce();
         expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true]]);
+        expect(error_exists()).toBe(false);
+        expect(emitted(wrapper, 'input')).toEqual([[['wa@luigi.net', 'egg@spam.com']]]);
+
+        await set_validated_input_text(inputs.at(0), 'waaaaaaa');
+        await wait_for_debounce();
+        expect(emitted(wrapper, 'form_validity_changed')).toEqual([[false], [true], [false]]);
+        expect(error_exists()).toBe(true);
         expect(emitted(wrapper, 'input')).toEqual([[['wa@luigi.net', 'egg@spam.com']]]);
     });
 
@@ -180,15 +208,15 @@ describe('GroupMembersForm tests', () => {
                 course: course,
             }
         });
-        let input = <Wrapper<ValidatedInput>> wrapper.findComponent({name: 'ValidatedInput'});
+        const input = wrapper.findComponent(ValidatedTextInput);
         await set_validated_input_text(input, 'wa@luigi.net');
-        expect(wrapper.vm.d_usernames).toEqual(['wa@luigi.net']);
+        expect(wrapper.vm.state.usernames).toEqual(['wa@luigi.net']);
 
         wrapper.vm.reset();
         await wrapper.vm.$nextTick();
 
         expect(get_validated_input_text(input)).toEqual(course.allowed_guest_domain);
-        expect(wrapper.vm.d_usernames).toEqual([course.allowed_guest_domain]);
+        expect(wrapper.vm.state.usernames).toEqual([course.allowed_guest_domain]);
     });
 
     test('submit()', async () => {
@@ -202,7 +230,7 @@ describe('GroupMembersForm tests', () => {
             }
         });
 
-        wrapper.findComponent({name: 'ValidatedForm'}).vm.$emit('submit');
+        wrapper.findComponent(NewValidatedForm).vm.$emit('submit');
         await wrapper.vm.$nextTick();
         expect(emitted(wrapper, 'submit')[0][0]).toEqual(value);
     });

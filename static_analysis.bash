@@ -33,6 +33,8 @@ npx prettier --check --no-editorconfig \
     'src/components/dropdown.vue' \
     'src/components/api_token.vue' \
     'src/components/last_saved.vue' \
-    'src/components/api_errors.vue'
+    'src/components/api_errors.vue' \
+    'src/components/group_members_form.vue' \
+    'src/components/project_admin/edit_groups/edit_single_group.vue'
 
 ./check_subscribe_unsubscribe.py 'src/**/*.vue'

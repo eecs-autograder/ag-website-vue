@@ -7,6 +7,7 @@
       <div class="input-line">
         <span class="prefix"><slot name="prefix"> </slot></span>
         <input
+          ref="input_element"
           class="input"
           :id="label_id"
           :style="input_style"
@@ -56,6 +57,7 @@ const props = defineProps<PropTypes>();
 
 const label_id = `label-${generate_uid()}`;
 const input = ref("");
+const input_element = ref<InstanceType<typeof HTMLInputElement>>();
 
 // Don't show errors until input changes or on_blur
 const hide_errors = ref(true);
@@ -99,6 +101,27 @@ function on_blur() {
     hide_errors.value = false;
   }
 }
+
+// Calls .focus() on the underlying inputelement.
+// Options object:
+// - cursor_to_front: If true, will put the cursor at the beginning of the
+//   input text.
+// - select: If true, will highlight the input text.
+function focus({ cursor_to_front = false, select = false } = {}) {
+  input_element.value?.focus();
+
+  if (cursor_to_front) {
+    input_element.value?.setSelectionRange(0, 0);
+  }
+
+  if (select) {
+    input_element.value?.select();
+  }
+}
+
+defineExpose({
+  focus,
+});
 </script>
 
 <style scoped lang="scss">

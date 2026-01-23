@@ -1,4 +1,5 @@
-import { ValidatorFuncType } from "@/composables/use_validation";
+import { ValidatorFuncType, ValidatorResponse } from "@/composables/use_validation";
+import * as utils from '@/utils';
 
 export type NumberValidator = ValidatorFuncType<number>;
 export type TextValidator = ValidatorFuncType<string>;
@@ -61,4 +62,17 @@ export function make_max_validator(max: number): NumberValidator {
       };
     }
   };
+}
+
+export function is_email(value: string) : ValidatorResponse {
+    if (utils.is_email(value)) {
+        return {
+            is_valid: true,
+        };
+    } else {
+        return {
+            is_valid: false,
+            error_msg: "Please enter an email address"
+        }
+    }
 }
