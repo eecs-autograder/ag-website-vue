@@ -37,6 +37,7 @@
         vertical-align: top;
     }
 
+    // TODO: delete once we remove DatetimePicker component
     .datetime-input {
         margin: 0 .25rem .25rem 0;
         background-color: $white-gray;
@@ -64,4 +65,31 @@
             margin-left: .375rem;
         }
     }
+}
+
+input[type="datetime-local"] {
+    margin: 0 .25rem .25rem 0;
+    background-color: $white-gray;
+    border: 1px solid darken($white-gray, 2);
+    border-radius: 2px;
+    padding: .5rem;
+    display: inline-block;
+    box-sizing: border-box;
+    height: auto;
+    font: inherit;
+}
+
+input[type="time"] {
+  box-sizing: border-box;
+  height: auto;
+  padding: .5rem;
+  margin: .25rem .25rem .25rem 0;
+
+  background-color: $white-gray;
+  border: 1px solid darken($white-gray, 2);
+  border-radius: 2px;
+
+  font: inherit;
+  line-height: 1;
+  vertical-align: middle;
 }
