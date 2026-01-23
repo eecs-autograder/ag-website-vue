@@ -10,7 +10,8 @@ npx eslint \
     'tests/test_components/test_new_validated_input.ts' \
     'tests/test_components/test_new_validated_form.ts' \
     'src/components/CollapsibleSection.vue' \
-    'tests/test_components/test_collapsible_section.ts'
+    'tests/test_components/test_collapsible_section.ts' \
+    'src/components/project_admin/project_settings.vue' \
 
 npx prettier --check --no-editorconfig \
     '*.js' \
@@ -35,6 +36,8 @@ npx prettier --check --no-editorconfig \
     'src/components/last_saved.vue' \
     'src/components/api_errors.vue' \
     'src/components/group_members_form.vue' \
-    'src/components/project_admin/edit_groups/edit_single_group.vue'
+    'src/components/project_admin/edit_groups/edit_single_group.vue' \
+    'src/components/project_admin/project_settings.vue' \
+    'tests/test_components/test_project_admin/test_project_settings.ts'
 
 ./check_subscribe_unsubscribe.py 'src/**/*.vue'

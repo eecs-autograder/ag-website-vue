@@ -4,6 +4,7 @@ import { RefSelector, VueClass, Wrapper, WrapperArray } from "@vue/test-utils";
 
 import APIErrors from "@/components/api_errors.vue";
 import ValidatedInput from "@/components/validated_input.vue";
+import ValidatedIntInput from "@/components/validated_input/ValidatedIntInput.vue";
 import { assert_not_null } from '@/utils';
 
 export { sleep } from '@/utils';
@@ -62,6 +63,17 @@ export function validated_input_is_valid(wrapper: Wrapper<Vue>): boolean {
         );
     }
     return validated_input.is_valid;
+}
+
+export function new_validated_input_is_valid(wrapper: Wrapper<vue>): boolean {
+    const validated_input = wrapper.vm
+    if (validated_input.state.is_valid === undefined) {
+        throw new TypeError(
+            'Expected a ValidatedInput component, '
+            + 'but the given component has no "is_valid" attribute.'
+        );
+    }
+    return validated_input.state.is_valid;
 }
 
 // Verifies that the given wrapper holds an input tag and returns whether it is checked.
