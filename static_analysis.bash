@@ -11,7 +11,7 @@ npx eslint \
     'tests/test_components/test_new_validated_form.ts' \
     'src/components/CollapsibleSection.vue' \
     'tests/test_components/test_collapsible_section.ts' \
-    'src/components/project_admin/project_settings.vue' \
+    'src/components/project_admin/project_settings.vue'
 
 npx prettier --check --no-editorconfig \
     '*.js' \

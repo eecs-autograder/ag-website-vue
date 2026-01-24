@@ -108,16 +108,3 @@ export function is_email(value: string): ValidatorResponse {
         };
     }
 }
-
-export function is_email(value: string) : ValidatorResponse {
-    if (utils.is_email(value)) {
-        return {
-            is_valid: true,
-        };
-    } else {
-        return {
-            is_valid: false,
-            error_msg: "Please enter an email address"
-        }
-    }
-}
