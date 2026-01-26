@@ -88,7 +88,8 @@ export default class GroupMembersForm extends Vue {
   }
 
   submit() {
-    this.$emit('submit', this.d_usernames);
+    let normalized_usernames = this.d_usernames.map(email => email.trim().toLowerCase());
+    this.$emit('submit', normalized_usernames);
   }
 
   reset() {
