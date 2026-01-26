@@ -101,7 +101,9 @@ const add_member = () => {
 };
 
 const submit = () => {
-  emit("submit", state.usernames);
+  
+  let normalized_usernames = state.usernames.map((email: string) => email.trim().toLowerCase());
+  emit("submit", normalized_usernames);
 };
 
 const reset = () => {
