@@ -521,7 +521,6 @@ import {
   is_not_empty,
   make_min_validator,
   make_nullable_min_validator,
-  make_min_length_validator,
 } from "@/new_validators";
 
 type PropTypes = {

@@ -7,11 +7,7 @@ import {
 } from "ag-client-typescript";
 import * as sinon from "sinon";
 
-import APIErrors from "@/components/api_errors.vue";
-import DatetimePicker from "@/components/datetime/datetime_picker.vue";
-import TimePicker from "@/components/datetime/time_picker.vue";
 import ProjectSettings from "@/components/project_admin/project_settings.vue";
-import ValidatedInput from "@/components/validated_input.vue";
 import { assert_not_null } from "@/utils";
 
 import * as data_ut from "@/tests/data_utils";
@@ -21,9 +17,7 @@ import {
   checkbox_is_checked,
   expect_html_element_has_value,
   get_validated_input_text,
-  set_data,
   set_validated_input_text,
-  new_validated_input_is_valid,
   wait_until,
 } from "@/tests/utils";
 
