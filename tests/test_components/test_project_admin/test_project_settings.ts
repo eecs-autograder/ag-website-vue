@@ -525,7 +525,6 @@ describe("ProjectSettings tests", () => {
     expect(await wait_until(wrapper, (w) => w.vm.state.saving === false)).toBe(
       true,
     );
-    // await wrapper.vm.$nextTick();
 
     expect(save_settings_stub.calledOnce).toBe(true);
 
