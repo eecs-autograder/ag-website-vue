@@ -363,32 +363,23 @@ describe("ProjectSettings tests", () => {
     );
   });
 
-  test("Submission limit reset timezone binding", async () => {
+  test("Timezone binding", async () => {
     assert_not_null(wrapper.vm.state.project);
-    let submission_limit_reset_timezone_input = wrapper.find(
-      "#submission-limit-reset-timezone",
-    );
+    let timezone_input = wrapper.find("#timezone");
 
-    await submission_limit_reset_timezone_input.setValue("US/Mountain");
-    expect(wrapper.vm.state.project?.submission_limit_reset_timezone).toEqual(
-      "US/Mountain",
-    );
+    await timezone_input.setValue("US/Mountain");
+    expect(wrapper.vm.state.project?.timezone).toEqual("US/Mountain");
 
-    await submission_limit_reset_timezone_input.setValue("US/Eastern");
-    expect(wrapper.vm.state.project?.submission_limit_reset_timezone).toEqual(
-      "US/Eastern",
-    );
+    await timezone_input.setValue("US/Eastern");
+    expect(wrapper.vm.state.project?.timezone).toEqual("US/Eastern");
 
-    wrapper.vm.state.project.submission_limit_reset_timezone = "UTC";
+    wrapper.vm.state.project.timezone = "UTC";
     await wrapper.vm.$nextTick();
-    expect_html_element_has_value(submission_limit_reset_timezone_input, "UTC");
+    expect_html_element_has_value(timezone_input, "UTC");
 
-    wrapper.vm.state.project.submission_limit_reset_timezone = "US/Pacific";
+    wrapper.vm.state.project.timezone = "US/Pacific";
     await wrapper.vm.$nextTick();
-    expect_html_element_has_value(
-      submission_limit_reset_timezone_input,
-      "US/Pacific",
-    );
+    expect_html_element_has_value(timezone_input, "US/Pacific");
   });
 
   test("Groups get more submissions binding", async () => {

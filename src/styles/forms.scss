@@ -91,6 +91,15 @@ $disabled-label: rgba($disabled, 0.6);
     display: block;
 }
 
+
+.clear-button {
+    @extend .flat-white-button;
+
+    .clear-text {
+        margin-left: .375rem;
+    }
+}
+
 .input-tooltip {
     color: mediumvioletred;
     font-size: .875rem;

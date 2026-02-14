@@ -5,7 +5,9 @@
         <slot name="label"></slot>
       </label>
       <div class="input-line">
-        <span class="prefix"><slot name="prefix"> </slot></span>
+        <span v-if="prefix_exists" class="prefix"
+          ><slot name="prefix"> </slot
+        ></span>
         <input
           class="input"
           :id="label_id"
@@ -37,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, CSSProperties } from "vue";
+import { ref, watch, CSSProperties, useSlots } from "vue";
 
 import {
   use_validation,
@@ -57,6 +59,8 @@ const props = defineProps<PropTypes>();
 
 const label_id = `label-${generate_uid()}`;
 const input = ref("");
+
+const prefix_exists = !!useSlots().prefix;
 
 // Don't show errors until input changes or on_blur
 const hide_errors = ref(true);

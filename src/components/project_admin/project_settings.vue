@@ -18,57 +18,85 @@
         </validated-text-input>
       </div>
 
-      <fieldset class="fieldset">
-        <legend class="legend">Project Deadline</legend>
-        <div class="clearable-datetime-picker soft-deadline">
-          <div class="label">
-            Soft Deadline
-            <tooltip width="medium" placement="top">
-              The deadline shown to students.
-            </tooltip>
+      <div class="section-container">
+        <fieldset class="fieldset">
+          <legend class="legend">Project Deadline</legend>
+          <div class="form-field-wrapper">
+            <label class="label">
+              Soft Deadline
+              <tooltip width="medium" placement="top">
+                The deadline shown to students.
+              </tooltip>
+            </label>
+
+            <div>
+              <input
+                type="datetime-local"
+                v-model="state.project.soft_closing_time"
+              />
+
+              <button
+                type="button"
+                class="clear-button"
+                data-testid="clear_soft_closing_time"
+                @click.stop="state.project.soft_closing_time = null"
+                :disabled="state.project.soft_closing_time === null"
+              >
+                <i class="fas fa-times"></i>
+                <span class="clear-text">Clear</span>
+              </button>
+            </div>
           </div>
 
-          <input
-            type="datetime-local"
-            v-model="state.project.soft_closing_time"
-          />
+          <div class="form-field-wrapper">
+            <label class="label">
+              Hard Deadline
+              <tooltip width="large" placement="top">
+                The actual deadline. Submissions will not be accepted after this
+                time unless late days are allowed. This date is NOT shown to
+                students.
+              </tooltip>
+            </label>
 
-          <button
-            type="button"
-            class="clear-button"
-            data-testid="clear_soft_closing_time"
-            @click.stop="state.project.soft_closing_time = null"
-            :disabled="state.project.soft_closing_time === null"
-          >
-            <i class="fas fa-times"></i>
-            <span class="clear-text">Clear</span>
-          </button>
-        </div>
+            <div>
+              <input
+                type="datetime-local"
+                v-model="state.project.closing_time"
+              />
 
-        <div class="clearable-datetime-picker hard-deadline">
-          <div class="label">
-            Hard Deadline
-            <tooltip width="large" placement="top">
-              The actual deadline. Submissions will not be accepted after this
-              time unless late days are allowed. This date is NOT shown to
-              students.
-            </tooltip>
+              <button
+                type="button"
+                class="clear-button"
+                data-testid="clear_closing_time"
+                @click.stop="state.project.closing_time = null"
+                :disabled="state.project.closing_time === null"
+              >
+                <i class="fas fa-times"></i>
+                <span class="clear-text">Clear</span>
+              </button>
+            </div>
           </div>
 
-          <input type="datetime-local" v-model="state.project.closing_time" />
-
-          <button
-            type="button"
-            class="clear-button"
-            data-testid="clear_closing_time"
-            @click.stop="state.project.closing_time = null"
-            :disabled="state.project.closing_time === null"
-          >
-            <i class="fas fa-times"></i>
-            <span class="clear-text">Clear</span>
-          </button>
-        </div>
-      </fieldset>
+          <div class="form-field-wrapper">
+            <label class="label"> Timezone </label>
+            <div>
+              <select
+                id="timezone"
+                class="select"
+                v-model="state.project.timezone"
+              >
+                <option
+                  v-for="timezone of timezones"
+                  :value="timezone"
+                  :key="timezone"
+                >
+                  {{ timezone }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+      </div>
 
       <div class="section-container">
         <fieldset class="fieldset">
@@ -152,7 +180,7 @@
                 id="min-group-size"
                 v-model="state.project.min_group_size"
                 :validators="[make_min_validator(1)]"
-                input_style="width: 80px;"
+                input_style="max-width: 80px;"
               >
               </validated-int-input>
             </div>
@@ -167,7 +195,7 @@
                 id="max-group-size"
                 v-model="state.project.max_group_size"
                 :validators="[make_min_validator(1)]"
-                input_style="width: 80px;"
+                input_style="max-width: 80px;"
               >
               </validated-int-input>
             </div>
@@ -241,7 +269,7 @@
               id="submission-limit-per-day"
               v-model="state.project.submission_limit_per_day"
               :validators="[make_nullable_min_validator(1)]"
-              input_style="width: 80px;"
+              input_style="max-width: 80px;"
             >
             </validated-nullable-int-input>
           </div>
@@ -258,27 +286,9 @@
             </label>
           </div>
 
-          <div class="form-field-wrapper extra-space">
+          <div class="form-field-wrapper">
             <label class="label"> Reset submissions per day at: </label>
             <div id="reset-time-picker-container">
-              <div class="clearable-datetime-picker">
-                <div class="timezone">
-                  <select
-                    id="submission-limit-reset-timezone"
-                    class="select"
-                    v-model="state.project.submission_limit_reset_timezone"
-                  >
-                    <option
-                      v-for="timezone of timezones"
-                      :value="timezone"
-                      :key="timezone"
-                    >
-                      {{ timezone }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
               <input
                 type="time"
                 ref="submission_limit_reset_time_picker"
@@ -307,13 +317,13 @@
             </tooltip>
           </div>
 
-          <div class="form-field-wrapper extra-space">
+          <div class="form-field-wrapper">
             <label class="label"> Bonus submissions per group </label>
             <validated-int-input
               ref="bonus_submissions_input"
               v-model="state.project.num_bonus_submissions"
               :validators="[make_min_validator(0)]"
-              input_style="width: 80px;"
+              input_style="max-width: 80px;"
             >
             </validated-int-input>
           </div>
@@ -333,7 +343,7 @@
             </tooltip>
           </div>
 
-          <div class="form-field-wrapper extra-space">
+          <div class="form-field-wrapper">
             <label for="total-submission-limit" class="label">
               Total submission limit (Ever!)
             </label>
@@ -345,7 +355,7 @@
               id="total-submission-limit"
               v-model="state.project.total_submission_limit"
               :validators="[make_nullable_min_validator(1)]"
-              input_style="width: 80px;"
+              input_style="max-width: 80px;"
             >
             </validated-nullable-int-input>
           </div>
@@ -617,15 +627,9 @@ defineExpose({
   vertical-align: top;
 }
 
-.soft-deadline {
-  padding-bottom: 1rem;
-}
-
 #reset-time-picker-container {
-  .clearable-datetime-picker {
-    display: flex;
-    align-items: center;
-  }
+  display: flex;
+  align-items: center;
 }
 
 .delete-instructions {
