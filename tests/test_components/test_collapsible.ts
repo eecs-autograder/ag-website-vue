@@ -1,10 +1,10 @@
-import Collapsible from '@/components/collapsible.vue';
+import CollapsibleContent from '@/components/CollapsibleContent.vue';
 
 import { managed_mount } from '@/tests/setup';
 import { set_props } from '@/tests/utils';
 
 test('start_open true', () => {
-    let wrapper = managed_mount(Collapsible, {
+    let wrapper = managed_mount(CollapsibleContent, {
         propsData: {
             start_open: true
         }
@@ -14,18 +14,18 @@ test('start_open true', () => {
 });
 
 test('start_open default false', () => {
-    let wrapper = managed_mount(Collapsible);
+    let wrapper = managed_mount(CollapsibleContent);
 
     expect(wrapper.find('[data-testid=collapsible_body]').isVisible()).toBe(false);
 });
 
 test('include_caret default true', () => {
-    let wrapper = managed_mount(Collapsible);
+    let wrapper = managed_mount(CollapsibleContent);
     expect(wrapper.find('.caret').exists()).toBe(true);
 });
 
 test('include_caret false', () => {
-    let wrapper = managed_mount(Collapsible, {
+    let wrapper = managed_mount(CollapsibleContent, {
         propsData: {
             include_caret: false
         }
@@ -34,7 +34,7 @@ test('include_caret false', () => {
 });
 
 test('stay_open prevents closing when true', async () => {
-    let wrapper = managed_mount(Collapsible, {
+    let wrapper = managed_mount(CollapsibleContent, {
         propsData: {
             stay_open: true
         }

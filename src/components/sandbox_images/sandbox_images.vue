@@ -212,7 +212,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
-import Collapsible from '@/components/collapsible.vue';
+import CollapsibleContent from '@/components/CollapsibleContent.vue';
 import FileUpload from '@/components/file_upload.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
@@ -238,7 +238,7 @@ interface BuildTasksForImage {
     BuildSandboxImage,
     BuildImageStatusIcon,
     BuildImageTaskDetail,
-    Collapsible,
+    Collapsible: CollapsibleContent,
     FileUpload,
     Modal,
     ValidatedForm,

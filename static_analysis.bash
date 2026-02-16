@@ -12,6 +12,7 @@ npx eslint \
     'src/components/CollapsibleSection.vue' \
     'tests/test_components/test_collapsible_section.ts' \
     'src/components/project_admin/project_settings.vue' \
+    'src/components/CollapsibleContent.vue'
 
 npx prettier --check --no-editorconfig \
     '*.js' \
@@ -38,6 +39,7 @@ npx prettier --check --no-editorconfig \
     'src/components/group_members_form.vue' \
     'src/components/project_admin/edit_groups/edit_single_group.vue' \
     'src/components/project_admin/project_settings.vue' \
-    'tests/test_components/test_project_admin/test_project_settings.ts'
+    'tests/test_components/test_project_admin/test_project_settings.ts' \
+    'src/components/CollapsibleContent.vue'
 
 ./check_subscribe_unsubscribe.py 'src/**/*.vue'
