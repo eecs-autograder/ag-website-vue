@@ -81,6 +81,7 @@
             <label class="label"> Timezone </label>
             <div>
               <select
+                ref="timezone_input"
                 id="timezone"
                 class="select"
                 v-model="state.project.timezone"
@@ -294,6 +295,13 @@
                 ref="submission_limit_reset_time_picker"
                 v-model="state.project.submission_limit_reset_time"
               />
+              <span class="display-timezone">
+                {{ state.project.timezone }}
+                <i
+                  class="edit-timezone-icon fas fa-pencil-alt"
+                  @click="timezone_input.focus()"
+                ></i>
+              </span>
             </div>
           </div>
 
@@ -541,6 +549,7 @@ const props = defineProps<PropTypes>();
 
 const api_errors = ref<APIErrorsExposed>();
 const delete_errors = ref<APIErrorsExposed>();
+const timezone_input = ref<HTMLSelectElement>();
 
 const state = reactive({
   project: deep_copy(props.project, Project),
@@ -635,5 +644,14 @@ defineExpose({
 .delete-instructions {
   width: 100%;
   margin-bottom: 1rem;
+}
+
+.display-timezone {
+  height: auto;
+  padding: 0.5rem;
+}
+
+.edit-timezone-icon {
+  cursor: pointer;
 }
 </style>
