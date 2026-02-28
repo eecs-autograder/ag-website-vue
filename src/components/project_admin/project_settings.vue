@@ -30,17 +30,14 @@
             </label>
 
             <div>
-              <input
-                type="datetime-local"
-                v-model="state.project.soft_closing_time"
-              />
+              <input type="datetime-local" v-model="soft_closing_time_model" />
 
               <button
                 type="button"
                 class="clear-button"
                 data-testid="clear_soft_closing_time"
-                @click.stop="state.project.soft_closing_time = null"
-                :disabled="state.project.soft_closing_time === null"
+                @click.stop="soft_closing_time_model = ''"
+                :disabled="soft_closing_time_model === ''"
               >
                 <i class="fas fa-times"></i>
                 <span class="clear-text">Clear</span>
@@ -59,17 +56,14 @@
             </label>
 
             <div>
-              <input
-                type="datetime-local"
-                v-model="state.project.closing_time"
-              />
+              <input type="datetime-local" v-model="closing_time_model" />
 
               <button
                 type="button"
                 class="clear-button"
                 data-testid="clear_closing_time"
-                @click.stop="state.project.closing_time = null"
-                :disabled="state.project.closing_time === null"
+                @click.stop="closing_time_model = ''"
+                :disabled="closing_time_model === ''"
               >
                 <i class="fas fa-times"></i>
                 <span class="clear-text">Clear</span>
@@ -84,7 +78,7 @@
                 ref="timezone_input"
                 id="timezone"
                 class="select"
-                v-model="state.project.timezone"
+                v-model="timezone_model"
               >
                 <option
                   v-for="timezone of timezones"
@@ -573,6 +567,85 @@ const timezones = computed(() => {
   return moment.tz.names();
 });
 
+// This is the format that datetime-local inputs expect
+const DATETIME_LOCAL_FMT = "YYYY-MM-DD[T]HH:mm";
+
+const to_datetime_local_value = (
+  iso_with_offset: string | null,
+  zone: string,
+) => {
+  return iso_with_offset
+    ? moment.parseZone(iso_with_offset).tz(zone).format(DATETIME_LOCAL_FMT)
+    : "";
+};
+
+const from_datetime_local_value = (local_value: string, zone: string) => {
+  return local_value !== ""
+    ? moment.tz(local_value, DATETIME_LOCAL_FMT, zone).format()
+    : null;
+};
+
+const timezone_model = computed({
+  get() {
+    return state.project.timezone;
+  },
+  set(new_zone) {
+    const wall_soft_closing_time = to_datetime_local_value(
+      state.project.soft_closing_time,
+      state.project.timezone,
+    );
+
+    const wall_closing_time = to_datetime_local_value(
+      // closing_time is only undefined for students, who won't visit this page
+      state.project.closing_time as null | string,
+      state.project.timezone,
+    );
+
+    state.project.timezone = new_zone;
+
+    state.project.soft_closing_time = from_datetime_local_value(
+      wall_soft_closing_time,
+      new_zone,
+    );
+
+    state.project.closing_time = from_datetime_local_value(
+      wall_closing_time,
+      new_zone,
+    );
+  },
+});
+
+const soft_closing_time_model = computed({
+  get() {
+    return to_datetime_local_value(
+      state.project.soft_closing_time,
+      state.project.timezone,
+    );
+  },
+  set(local_value) {
+    state.project.soft_closing_time = from_datetime_local_value(
+      local_value,
+      state.project.timezone,
+    );
+  },
+});
+
+const closing_time_model = computed({
+  get() {
+    return to_datetime_local_value(
+      // closing_time is only undefined for students, who won't visit this page
+      state.project.closing_time as string | null,
+      state.project.timezone,
+    );
+  },
+  set(local_value) {
+    state.project.closing_time = from_datetime_local_value(
+      local_value,
+      state.project.timezone,
+    );
+  },
+});
+
 const save_project_settings = () => {
   return toggle(state, "saving", async () => {
     assert_not_null(state.project);
@@ -604,6 +677,7 @@ const delete_project = () => {
 
 defineExpose({
   state,
+  soft_closing_time_model,
 });
 </script>
 

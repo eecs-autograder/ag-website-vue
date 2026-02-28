@@ -6,6 +6,7 @@ import {
   UltimateSubmissionPolicy,
 } from "ag-client-typescript";
 import * as sinon from "sinon";
+import moment from "moment-timezone";
 
 import ProjectSettings from "@/components/project_admin/project_settings.vue";
 import { assert_not_null } from "@/utils";
@@ -44,14 +45,13 @@ beforeEach(() => {
 describe("ProjectSettings tests", () => {
   test("soft_closing_time clear button sets field to null", async () => {
     assert_not_null(wrapper.vm.state.project);
-    wrapper.vm.state.project.soft_closing_time = new Date().toISOString();
+    wrapper.vm.state.project.soft_closing_time = moment().format();
     await wrapper.vm.$nextTick();
 
     let button = wrapper.find("[data-testid=clear_soft_closing_time]");
     expect(button.element).not.toBeDisabled();
 
-    button.trigger("click");
-    await wrapper.vm.$nextTick();
+    await button.trigger("click");
 
     expect(wrapper.vm.state.project?.soft_closing_time).toBeNull();
     expect(button.element).toBeDisabled();
@@ -59,14 +59,13 @@ describe("ProjectSettings tests", () => {
 
   test("closing_time clear button sets field to null", async () => {
     assert_not_null(wrapper.vm.state.project);
-    wrapper.vm.state.project.closing_time = new Date().toISOString();
+    wrapper.vm.state.project.closing_time = moment().format();
     await wrapper.vm.$nextTick();
 
     let button = wrapper.find("[data-testid=clear_closing_time]");
     expect(button.element).not.toBeDisabled();
 
-    button.trigger("click");
-    await wrapper.vm.$nextTick();
+    await button.trigger("click");
 
     expect(wrapper.vm.state.project?.closing_time).toBeNull();
     expect(button.element).toBeDisabled();
@@ -380,6 +379,47 @@ describe("ProjectSettings tests", () => {
     wrapper.vm.state.project.timezone = "US/Pacific";
     await wrapper.vm.$nextTick();
     expect_html_element_has_value(timezone_input, "US/Pacific");
+  });
+
+  test("Timezone binding with closing_time ISO strings", async () => {
+    assert_not_null(wrapper.vm.state.project);
+
+    const old_soft_closing_time_iso = "2028-04-30T10:42:00Z";
+    const old_closing_time_iso = "2028-04-30T23:15:00Z";
+
+    wrapper.vm.state.project.soft_closing_time = moment
+      .parseZone(old_soft_closing_time_iso)
+      .format();
+    wrapper.vm.state.project.closing_time = moment
+      .parseZone(old_closing_time_iso)
+      .format();
+    wrapper.vm.state.project.timezone = "UTC";
+
+    const timezone_input = wrapper.find("#timezone");
+
+    const dt_local_fmt = "YYYY-MM-DD[T]HH:mm";
+
+    // compute what the old iso string should change to after changing
+    // the timezone. The wall time should remain the same, with only
+    // the offset changing.
+    const expected_after_change = (
+      old_iso: string,
+      old_zone: string,
+      new_zone: string,
+    ) => {
+      const wall = moment.parseZone(old_iso).tz(old_zone).format(dt_local_fmt);
+      return moment.tz(wall, dt_local_fmt, new_zone).format();
+    };
+
+    await timezone_input.setValue("US/Mountain");
+
+    expect(wrapper.vm.state.project.timezone).toEqual("US/Mountain");
+    expect(wrapper.vm.state.project.soft_closing_time).toEqual(
+      expected_after_change(old_soft_closing_time_iso, "UTC", "US/Mountain"),
+    );
+    expect(wrapper.vm.state.project.closing_time).toEqual(
+      expected_after_change(old_closing_time_iso, "UtC", "US/Mountain"),
+    );
   });
 
   test("Groups get more submissions binding", async () => {
