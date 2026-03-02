@@ -8,6 +8,7 @@ export const test = base.extend<{
   course: Course;
   project: Project;
   page: Page;
+  save: () => Promise<void>;
 }>({
   // eslint-disable-next-line no-empty-pattern
   course: async ({}, use) => {
@@ -18,6 +19,7 @@ export const test = base.extend<{
   project: async ({ course }, use) => {
     const project = await Project.create(course.pk, {
       name: unique_name("Project"),
+      timezone: "America/Detroit",
     });
     await use(project);
   },
@@ -26,5 +28,22 @@ export const test = base.extend<{
     await page.goto(`/web/project_admin/${project.pk}`);
 
     await use(page);
+  },
+  save: async ({ page }, use) => {
+    const saveButton = page.getByRole("button", { name: /^save$/i });
+
+    const save = async () => {
+      await Promise.all([
+        page.waitForResponse(
+          (r) =>
+            r.ok() &&
+            r.request().method() === "PATCH" &&
+            r.url().includes("/api/projects/"),
+        ),
+        saveButton.click(),
+      ]);
+    };
+
+    await use(save);
   },
 });

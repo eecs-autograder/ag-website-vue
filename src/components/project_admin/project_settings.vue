@@ -22,7 +22,7 @@
         <fieldset class="fieldset">
           <legend class="legend">Project Deadline</legend>
           <div class="form-field-wrapper">
-            <label class="label">
+            <label class="label" for="soft-deadline">
               Soft Deadline
               <tooltip width="medium" placement="top">
                 The deadline shown to students.
@@ -30,7 +30,11 @@
             </label>
 
             <div>
-              <input type="datetime-local" v-model="soft_closing_time_model" />
+              <input
+                type="datetime-local"
+                id="soft-deadline"
+                v-model="soft_closing_time_model"
+              />
 
               <button
                 type="button"
@@ -38,6 +42,7 @@
                 data-testid="clear_soft_closing_time"
                 @click.stop="soft_closing_time_model = ''"
                 :disabled="soft_closing_time_model === ''"
+                aria-label="clear soft deadline"
               >
                 <i class="fas fa-times"></i>
                 <span class="clear-text">Clear</span>
@@ -46,7 +51,7 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label">
+            <label class="label" for="hard-deadline">
               Hard Deadline
               <tooltip width="large" placement="top">
                 The actual deadline. Submissions will not be accepted after this
@@ -56,7 +61,11 @@
             </label>
 
             <div>
-              <input type="datetime-local" v-model="closing_time_model" />
+              <input
+                type="datetime-local"
+                id="hard-deadline"
+                v-model="closing_time_model"
+              />
 
               <button
                 type="button"
@@ -64,6 +73,7 @@
                 data-testid="clear_closing_time"
                 @click.stop="closing_time_model = ''"
                 :disabled="closing_time_model === ''"
+                aria-label="clear hard deadline"
               >
                 <i class="fas fa-times"></i>
                 <span class="clear-text">Clear</span>
@@ -72,7 +82,7 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label"> Timezone </label>
+            <label class="label" for="timezone"> Timezone </label>
             <div>
               <select
                 ref="timezone_input"
