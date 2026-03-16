@@ -159,6 +159,12 @@ export function is_email(str: string): boolean {
     return VALID_EMAIL_REGEX.test(str);
 }
 
+export function assert(condition: boolean, msg?: string): asserts condition {
+    if (!condition) {
+        throw new Error("Assertion failed: " + msg);
+    }
+}
+
 // A type guard that throws NonNullAssertionError if the given object is null or undefined.
 // This can be used one of two ways:
 // - As a type guard in a conditional.

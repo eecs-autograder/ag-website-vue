@@ -110,7 +110,7 @@ export default class ManageProjects extends Vue implements ProjectObserver,
         this.course.pk,
         {
           name: this.new_project_name,
-          submission_limit_reset_timezone: moment.tz.guess()
+          timezone: moment.tz.guess()
         }
       );
       this.new_project_name = "";

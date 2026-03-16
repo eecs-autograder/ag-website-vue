@@ -90,7 +90,7 @@ describe('Manage projects tests', () => {
 
         expect(create_project_stub.firstCall.calledWith(
             current_course.pk,
-            {name: new_project.name, submission_limit_reset_timezone: moment.tz.guess()}
+            {name: new_project.name, timezone: moment.tz.guess()}
         )).toBe(true);
         expect(wrapper.vm.projects.length).toEqual(3);
         expect(wrapper.vm.projects[0]).toEqual(new_project);
