@@ -6,7 +6,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
-import Collapsible from '@/components/collapsible.vue';
+import CollapsibleContent from '@/components/CollapsibleContent.vue';
 import BuildImageStatusIcon from '@/components/sandbox_images/build_image_status_icon.vue';
 import BuildImageTaskDetail from '@/components/sandbox_images/build_image_task_detail.vue';
 import SandboxImages from '@/components/sandbox_images/sandbox_images.vue';
@@ -163,7 +163,7 @@ test('Selecting image or build task deselects the other', async () => {
     let wrapper = managed_mount(SandboxImages);
     expect(await wait_for_load(wrapper)).toBe(true);
 
-    let panels = wrapper.findAllComponents(Collapsible);
+    let panels = wrapper.findAllComponents(CollapsibleContent);
 
     // The build task in the "In Progress" section
     await panels.at(0).trigger('click');
@@ -200,7 +200,7 @@ test('New image button', async () => {
     let wrapper = managed_mount(SandboxImages);
     expect(await wait_for_load(wrapper)).toBe(true);
 
-    let panels = wrapper.findAllComponents(Collapsible);
+    let panels = wrapper.findAllComponents(CollapsibleContent);
 
     expect(wrapper.vm.selected_image).toBeNull();
     expect(wrapper.vm.selected_build_task).toBeNull();
@@ -231,7 +231,7 @@ test('New bulid task event handled', async () => {
     let wrapper = managed_mount(SandboxImages);
     expect(await wait_for_load(wrapper)).toBe(true);
     expect(wrapper.vm.selected_build_task).toBeNull();
-    expect(wrapper.findAllComponents(Collapsible).length).toEqual(0);
+    expect(wrapper.findAllComponents(CollapsibleContent).length).toEqual(0);
 
     let build_task = data_ut.make_build_sanbdox_docker_image_task(null, null);
     wrapper.findComponent({ref: 'build_sandbox_image'}).vm.$emit('new_build_task', build_task);
@@ -239,7 +239,7 @@ test('New bulid task event handled', async () => {
 
     expect(wrapper.vm.selected_build_task).toEqual(build_task);
     // One "In progress" panel, one full build history panel
-    expect(wrapper.findAllComponents(Collapsible).length).toEqual(2);
+    expect(wrapper.findAllComponents(CollapsibleContent).length).toEqual(2);
 });
 
 test('Image and task lists refreshed', async () => {
@@ -322,7 +322,7 @@ test('Refresh images and tasks event handled', async () => {
     expect(await wait_for_load(wrapper)).toBe(true);
     wrapper.vm.select_build_task(build_task);
     await wrapper.vm.$nextTick();
-    expect(wrapper.findAllComponents(Collapsible).length).toEqual(2);
+    expect(wrapper.findAllComponents(CollapsibleContent).length).toEqual(2);
 
     let updated_task = deep_copy(build_task, ag_cli.BuildSandboxDockerImageTask);
     updated_task.status = ag_cli.BuildImageStatus.image_invalid;
@@ -411,7 +411,7 @@ describe('Edit and delete image tests', () => {
         expect(delete_stub.callCount).toEqual(1);
 
         expect(wrapper.vm.d_sandbox_images).toEqual(images.slice(1));
-        expect(wrapper.findAllComponents(Collapsible).length).toEqual(images.length - 1);
+        expect(wrapper.findAllComponents(CollapsibleContent).length).toEqual(images.length - 1);
         expect(wrapper.vm.d_build_tasks.length).toEqual(0);
 
         expect(wrapper.vm.d_show_delete_image_modal).toBe(false);
@@ -426,7 +426,7 @@ describe('Edit and delete image tests', () => {
 
         expect(await wait_until(wrapper, w => !w.vm.d_deleting)).toBe(true);
         expect(wrapper.vm.d_sandbox_images).toEqual(images);
-        expect(wrapper.findAllComponents(Collapsible).length).toEqual(images.length);
+        expect(wrapper.findAllComponents(CollapsibleContent).length).toEqual(images.length);
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'delete_errors'}).vm;
         expect(api_errors.state.api_errors.length).toBe(1);

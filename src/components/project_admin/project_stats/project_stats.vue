@@ -199,7 +199,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
-import Collapsible from '@/components/collapsible.vue';
+import CollapsibleContent from '@/components/CollapsibleContent.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import { handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
@@ -218,7 +218,7 @@ export interface FirstSubmissionData {
 
 @Component({
   components: {
-    Collapsible,
+    Collapsible: CollapsibleContent,
     PassFailCounts,
     ProgressBar,
     ScoreTable,

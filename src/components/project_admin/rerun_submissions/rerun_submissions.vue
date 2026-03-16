@@ -186,7 +186,7 @@ import * as ag_cli from 'ag-client-typescript';
 import { ArraySet, member_names_less, pk_less, pk_more } from '@/array_set';
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
-import Collapsible from '@/components/collapsible.vue';
+import CollapsibleContent from '@/components/CollapsibleContent.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Tooltip from '@/components/tooltip.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
@@ -213,7 +213,7 @@ interface GroupWithSubmissions {
 @Component({
   components: {
     APIErrors,
-    Collapsible,
+    Collapsible: CollapsibleContent,
     GroupLookup,
     RerunTaskDetail,
     SubmissionSelector,
