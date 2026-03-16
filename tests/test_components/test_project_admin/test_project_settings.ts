@@ -418,7 +418,7 @@ describe("ProjectSettings tests", () => {
       expected_after_change(old_soft_closing_time_iso, "UTC", "US/Mountain"),
     );
     expect(wrapper.vm.state.project.closing_time).toEqual(
-      expected_after_change(old_closing_time_iso, "UtC", "US/Mountain"),
+      expected_after_change(old_closing_time_iso, "UTC", "US/Mountain"),
     );
   });
 
