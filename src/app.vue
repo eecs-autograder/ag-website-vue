@@ -75,7 +75,7 @@
               Sign In
             </button>
           </div>
-          <div v-else role="menu" class="current-user-dropdown">
+          <div v-else class="current-user-dropdown">
             <div aria-label="open user menu" class="dropdown-header" tabindex="0">
               <i class="fas fa-user"></i>
             </div>
@@ -130,9 +130,7 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import { GlobalErrorsObserver, GlobalErrorsSubject, handle_global_errors_async } from '@/error_handling';
 
 import { delete_all_cookies, get_cookie } from './cookie';
-import UIDemos from './demos/ui_demos.vue';
 import { BeforeDestroy, Created } from './lifecycle';
-import { safe_assign } from './utils';
 
 
 /* IMPORTANT! How to use the provided globals:
