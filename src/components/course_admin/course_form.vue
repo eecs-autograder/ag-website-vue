@@ -4,17 +4,18 @@
                   @submit='submit'
                   @form_validity_changed="$emit('form_validity_changed', $event)">
     <div class="form-field-wrapper">
-      <label class="label"> Course name </label>
+      <label class="label" :id="`course-name-${label_uuid}`"> Course name </label>
       <validated-input ref="course_name_input"
                        v-model="d_form_data.name"
                        input_style="width: 100%;
                                     max-width: 500px;"
-                       :validators="[is_not_empty]">
+                       :validators="[is_not_empty]"
+                       :labelled_by="`course-name-${label_uuid}`">
       </validated-input>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label">
+      <label class="label" :id="`course-subtitle-${label_uuid}`">
         Course subtitle
         <tooltip width="large" placement="top">
           A more descriptive course title, such as "Programming and Intro Data Structures"
@@ -24,31 +25,38 @@
                       v-model="d_form_data.subtitle"
                       input_style="width: 100%;
                                     max-width: 500px;"
-                      :validators="[]">
+                      :validators="[]"
+                      :labelled_by="`course-subtitle-${label_uuid}`">
       </ValidatedInput>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label" for="semester"> Semester </label>
+      <label class="label" :id="`semester-${label_uuid}`"> Semester </label>
       <div>
-        <select data-testid="semester" v-model="d_form_data.semester" class="select">
+        <select
+          data-testid="semester"
+          v-model="d_form_data.semester"
+          class="select"
+          :aria-labelledby="`semester-${label_uuid}`"
+        >
           <option v-for="semester of semesters" :value="semester">{{semester}}</option>
         </select>
       </div>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label"> Year </label>
+      <label class="label" :id="`course-year-${label_uuid}`"> Year </label>
       <ValidatedInput ref="course_year_input"
                       v-model="d_form_data.year"
                       input_style="width: 65px;"
                       :validators="[is_not_empty, is_number, is_integer, is_valid_course_year]"
-                      :from_string_fn="string_to_num">
+                      :from_string_fn="string_to_num"
+                      :labelled_by="`course-year-${label_uuid}`"> Year </label>
       </ValidatedInput>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label">
+      <label class="label" :id="`num-late-days-${label_uuid}`">
         Late day tokens per student
         <tooltip width="large" placement="top">
           When a project's hard deadline (and a student's extension, if any)
@@ -64,12 +72,13 @@
                       v-model="d_form_data.num_late_days"
                       input_style="width: 50px;"
                       :validators="[is_not_empty, is_number, is_integer, is_non_negative]"
-                      :from_string_fn="string_to_num">
+                      :from_string_fn="string_to_num"
+                      :labelled_by="`num-late-days-${label_uuid}`">
       </ValidatedInput>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label">
+      <label class="label" :id="`allowed-guest-domain-${label_uuid}`">
         Guest usernames must end with
         <tooltip width="large" placement="top">
           If "Anyone with the link can submit" is checked in a project's settings,
@@ -82,7 +91,8 @@
       <ValidatedInput ref="allowed_guest_domain"
                       v-model="d_form_data.allowed_guest_domain"
                       :validators="[]"
-                      input_style="width: 200px;">
+                      input_style="width: 200px;"
+                      :labelled_by="`allowed-guest-domain-${label_uuid}`">
       </ValidatedInput>
     </div>
 
@@ -99,8 +109,7 @@ import { GlobalData } from '@/app.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/error_handling';
-import { deep_copy, format_datetime_short } from '@/utils';
+import { format_datetime_short, generate_uid } from '@/utils';
 import {
   is_integer,
   is_non_negative,
@@ -189,6 +198,12 @@ export default class CourseForm extends Vue {
 
   submit() {
     this.$emit('submit', this.d_form_data);
+  }
+
+  // This only needs to be unique across instances of the component.
+  // We combine it with unique id fragrments for each form input label.
+  get label_uuid() {
+    return generate_uid();
   }
 }
 </script>
