@@ -31,7 +31,7 @@
             <span v-if="globals.user_roles.is_admin">
               <router-link :to="`/web/course_admin/${globals.current_course.pk}`"
                             class="breadcrumb-link">
-                <i class="fas fa-cog cog"></i>
+                <i class="fas fa-cog cog" role="img" aria-label="course admin"></i>
               </router-link>
             </span>
 
@@ -45,7 +45,7 @@
               <span v-if="globals.user_roles.is_admin">
                 <router-link :to="`/web/project_admin/${globals.current_project.pk}`"
                               class="breadcrumb-link">
-                  <i class="fas fa-cog cog"></i>
+                  <i class="fas fa-cog cog" role="img" aria-label="project admin"></i>
                 </router-link>
               </span>
             </span>
