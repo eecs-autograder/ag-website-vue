@@ -49,7 +49,7 @@
     <div v-else id="all-semesters">
       <div v-for="current_term of courses_by_term"
            class="single-semester-container">
-        <div class="semester-name">
+        <div class="semester-name" role="heading" aria-level="1">
           {{current_term.term.semester}} {{current_term.term.year}}
         </div>
         <div class="courses-in-semester">
