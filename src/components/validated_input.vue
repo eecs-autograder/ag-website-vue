@@ -3,6 +3,7 @@
     <div class="validated-input-wrapper">
       <slot name="prefix"> </slot>
       <input class="input"
+             :aria-labelledby="labelled_by"
              data-testid="input"
              v-if="num_rows === 1"
              :style="input_style"
@@ -16,6 +17,7 @@
              @input="$e => change_input($e.target.value)"/>
 
       <textarea v-else
+                :aria-labelledby="labelled_by"
                 :rows="num_rows"
                 :style="input_style"
                 class="input"
@@ -90,6 +92,9 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
   @Prop({required: false, default: ""})
   input_style!: string | object;
+
+  @Prop({required: false, default: ""})
+  labelled_by!: string;
 
   @Prop({required: false, type: String, default: ""})
   placeholder!: string;
