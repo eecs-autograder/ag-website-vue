@@ -1,10 +1,10 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="loading"></i>
     </div>
   </div>
-  <div v-else id="course-list">
+  <main v-else id="course-list">
     <div v-if="d_can_create_courses" class="create-course-wrapper">
       <button type="button"
               class="flat-white-button"
@@ -62,7 +62,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">

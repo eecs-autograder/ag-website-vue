@@ -11,7 +11,7 @@
       <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <template v-else>
-      <div role="banner" id="banner">
+      <header id="banner">
         <div id="breadcrumbs">
           <router-link to="/" id="home-logo">
             Autograder.io
@@ -99,15 +99,17 @@
             </div>
           </div>
         </div>
-      </div>
-      <div role="main" id="welcome" v-if="globals.current_user === null">
+      </header>
+      <main id="welcome" v-if="globals.current_user === null">
         <div class="welcome-text">Welcome!</div>
         <button type="button" ref="welcome_login_button" class="blue-button" @click="login">
           Sign In
         </button>
-      </div>
+      </main>
       <template v-else>
-        <router-view role="main"></router-view>
+        <!-- Don't give this role=main. Let the top-level page components apply
+             the appropriate structure. E.g., many of them have their own nav elements. -->
+        <router-view></router-view>
       </template>
     </template>
   </div>
