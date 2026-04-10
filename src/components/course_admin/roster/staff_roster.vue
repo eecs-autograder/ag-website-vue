@@ -1,7 +1,7 @@
 <template>
   <div class="staff-roster-container">
     <roster ref="staff_roster"
-            role="staff"
+            user_role="staff"
             :roster="d_staff"
             @add_users="add_staff_to_roster($event)"
             @remove_user="remove_staff_from_roster($event)">

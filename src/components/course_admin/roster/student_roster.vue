@@ -1,7 +1,7 @@
 <template>
   <div class="student-roster-container">
     <roster ref="student_roster"
-            role="students"
+            user_role="students"
             :roster="d_students"
             :include_replace_button="true"
             @add_users="add_students_to_roster($event)"
