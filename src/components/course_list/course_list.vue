@@ -18,7 +18,7 @@
              @close="d_show_create_course_modal = false"
              :include_closing_x="!d_creating_course"
              :click_outside_to_close="!d_creating_course">
-        <div class="modal-header">New Course</div>
+        <div class="modal-header" role="heading" aria-level="1">New Course</div>
         <course-form ref="new_course_form"
                      @submit="create_course"
                      @form_validity_changed="d_new_course_form_is_valid = $event">
