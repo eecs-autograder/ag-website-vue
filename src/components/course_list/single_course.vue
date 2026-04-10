@@ -32,7 +32,7 @@
            :include_closing_x="!d_cloning"
            :click_outside_to_close="!d_cloning"
            size="large">
-      <div class="modal-header">
+      <div class="modal-header" role="heading" aria-level="1">
         Clone <span class="course-to-copy">"{{format_course_name(course)}}"</span>
       </div>
       <ValidatedForm ref="clone_course_form" autocomplete="off" @submit="make_copy_of_course">

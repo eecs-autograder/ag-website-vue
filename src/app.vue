@@ -11,7 +11,7 @@
       <i class="fa fa-spinner fa-pulse"></i>
     </div>
     <template v-else>
-      <div role="banner" id="banner">
+      <header id="banner">
         <div id="breadcrumbs">
           <router-link to="/" id="home-logo">
             Autograder.io
@@ -53,7 +53,7 @@
         </div>
         <div id="right-side-icons">
           <a id="docs-icon" class="icon"
-              aria-label="documentation"
+              aria-label="User Documentation"
               target="_blank"
               href="https://eecs-autograder.github.io/autograder.io/">
             <i class="fas fa-book"></i>
@@ -75,11 +75,11 @@
               Sign In
             </button>
           </div>
-          <div v-else role="menu" class="current-user-dropdown">
-            <div aria-label="open user menu" class="dropdown-header" tabindex="0">
-              <i class="fas fa-user"></i>
+          <div v-else class="current-user-dropdown">
+            <div class="dropdown-header" tabindex="0">
+              <i class="fas fa-user" role="img" aria-label="Current User"></i>
             </div>
-            <div class="menu" aria-label="user menu">
+            <div class="menu">
               <div class="greeting">Hi, {{globals.current_user.first_name}}!</div>
               <div class="signed-in-as">Signed in as:</div>
               <div class="username">{{globals.current_user.username}}</div>
@@ -99,15 +99,17 @@
             </div>
           </div>
         </div>
-      </div>
-      <div role="main" id="welcome" v-if="globals.current_user === null">
+      </header>
+      <main id="welcome" v-if="globals.current_user === null">
         <div class="welcome-text">Welcome!</div>
         <button type="button" ref="welcome_login_button" class="blue-button" @click="login">
           Sign In
         </button>
-      </div>
+      </main>
       <template v-else>
-        <router-view role="main"></router-view>
+        <!-- Don't give this role=main. Let the top-level page components apply
+             the appropriate structure. E.g., many of them have their own nav elements. -->
+        <router-view></router-view>
       </template>
     </template>
   </div>
@@ -130,9 +132,7 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import { GlobalErrorsObserver, GlobalErrorsSubject, handle_global_errors_async } from '@/error_handling';
 
 import { delete_all_cookies, get_cookie } from './cookie';
-import UIDemos from './demos/ui_demos.vue';
 import { BeforeDestroy, Created } from './lifecycle';
-import { safe_assign } from './utils';
 
 
 /* IMPORTANT! How to use the provided globals:

@@ -6,7 +6,7 @@
     }
 
     .menu {
-        display: none;
+        visibility: hidden;
         position: absolute;
         z-index: 1;
         background-color: white;
@@ -34,11 +34,11 @@
 
     @if $open-on-hover {
         &:hover .menu {
-            display: block;
+            visibility: visible;
         }
 
         &:focus-within .menu {
-            display: block;
+            visibility: visible;
         }
     }
 }

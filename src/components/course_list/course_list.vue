@@ -1,10 +1,10 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="loading"></i>
     </div>
   </div>
-  <div v-else id="course-list">
+  <main v-else id="course-list">
     <div v-if="d_can_create_courses" class="create-course-wrapper">
       <button type="button"
               class="flat-white-button"
@@ -18,7 +18,7 @@
              @close="d_show_create_course_modal = false"
              :include_closing_x="!d_creating_course"
              :click_outside_to_close="!d_creating_course">
-        <div class="modal-header">New Course</div>
+        <div class="modal-header" role="heading" aria-level="1">New Course</div>
         <course-form ref="new_course_form"
                      @submit="create_course"
                      @form_validity_changed="d_new_course_form_is_valid = $event">
@@ -49,7 +49,7 @@
     <div v-else id="all-semesters">
       <div v-for="current_term of courses_by_term"
            class="single-semester-container">
-        <div class="semester-name">
+        <div class="semester-name" role="heading" aria-level="1">
           {{current_term.term.semester}} {{current_term.term.year}}
         </div>
         <div class="courses-in-semester">
@@ -62,7 +62,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">

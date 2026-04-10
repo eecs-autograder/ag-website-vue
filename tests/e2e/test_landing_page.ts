@@ -21,12 +21,8 @@ test("logout button", async ({ context, page }) => {
   await page.goto("/");
   await test.expect(page.getByText("not enrolled")).toBeVisible();
 
-  await page.getByRole("menu").getByLabel("open user menu").hover();
-  await page
-    .getByLabel("user menu")
-    .getByRole("button")
-    .getByText("sign out")
-    .click();
+  await page.getByLabel("Current User").hover();
+  await page.getByRole("button").getByText("sign out").click();
   await test.expect(page.getByRole("main").getByText("sign in")).toBeVisible();
 });
 
@@ -37,10 +33,8 @@ test("superuser dashboard link displayed for superuser", async ({
   await fake_login(context, SUPERUSER_NAME);
   await page.goto("/");
 
-  await page.getByRole("menu").getByLabel("open user menu").hover();
-  await test
-    .expect(page.getByLabel("user menu").getByText("superuser dashboard"))
-    .toBeVisible();
+  await page.getByLabel("Current User").hover();
+  await test.expect(page.getByText("superuser dashboard")).toBeVisible();
 });
 
 test("superuser dashboard link hidden for non-superuser", async ({
@@ -50,13 +44,9 @@ test("superuser dashboard link hidden for non-superuser", async ({
   await fake_login(context, "user@user.com");
   await page.goto("/");
 
-  await page.getByRole("menu").getByLabel("open user menu").hover();
-  await test
-    .expect(page.getByLabel("user menu").getByText("signed in "))
-    .toBeVisible();
-  await test
-    .expect(page.getByLabel("user menu").getByText("superuser dashboard"))
-    .not.toBeVisible();
+  await page.getByLabel("Current User").hover();
+  await test.expect(page.getByText("signed in ")).toBeVisible();
+  await test.expect(page.getByText("superuser dashboard")).not.toBeVisible();
 });
 
 test("User's courses displayed", async ({ context, page }, testInfo) => {
