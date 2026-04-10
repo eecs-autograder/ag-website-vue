@@ -75,11 +75,28 @@
               Sign In
             </button>
           </div>
-          <div v-else class="current-user-dropdown">
-            <div aria-label="open user menu" class="dropdown-header" tabindex="0">
+          <div v-else class="current-user-dropdown" @blur="d_user_menu_open = false">
+            <a
+              @click.prevent="d_user_menu_open = !d_user_menu_open"
+              @keypress.enter="d_user_menu_open = !d_user_menu_open"
+              @keypress.space="d_user_menu_open = !d_user_menu_open"
+              @keydown.esc="d_user_menu_open = false"
+              :aria-expanded="d_user_menu_open"
+              aria-label="open user menu"
+              role="button"
+              aria-controls="user-menu"
+              class="dropdown-header"
+              tabindex="0"
+            >
               <i class="fas fa-user"></i>
-            </div>
-            <div class="menu" aria-label="user menu">
+            </a>
+            <div
+              id="user-menu"
+              v-if="d_user_menu_open"
+              class="menu"
+              aria-label="user menu"
+              @keydown.esc="d_user_menu_open = false"
+            >
               <div class="greeting">Hi, {{globals.current_user.first_name}}!</div>
               <div class="signed-in-as">Signed in as:</div>
               <div class="username">{{globals.current_user.username}}</div>
@@ -205,6 +222,8 @@ export default class App extends Vue implements GlobalErrorsObserver, Created, B
   d_global_error_count = 0;
 
   d_loading = true;
+
+  d_user_menu_open = false;
 
   @handle_global_errors_async
   async created() {
@@ -342,7 +361,7 @@ $breadcrumb-font-size: 1.5rem;
 }
 
 .current-user-dropdown {
-  @include static-dropdown($open-on-hover: true, $orient-right: true);
+  @include static-dropdown($open-on-hover: false, $orient-right: true);
 
   &:hover {
     background-color: darken($banner-background-color, 5%);
@@ -358,9 +377,14 @@ $breadcrumb-font-size: 1.5rem;
 
     white-space: nowrap;
     cursor: default;
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   .menu {
+    display: block;
     padding: .5rem;
     min-width: 250px;
   }
