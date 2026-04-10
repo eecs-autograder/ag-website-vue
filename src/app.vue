@@ -53,7 +53,7 @@
         </div>
         <div id="right-side-icons">
           <a id="docs-icon" class="icon"
-              aria-label="documentation"
+              aria-label="User Documentation"
               target="_blank"
               href="https://eecs-autograder.github.io/autograder.io/">
             <i class="fas fa-book"></i>
