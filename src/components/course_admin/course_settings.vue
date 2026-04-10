@@ -14,7 +14,7 @@
                 type="submit"
                 :disabled="!d_settings_form_is_valid || d_saving">Save</button>
 
-        <div class="last-saved-timestamp">
+        <div class="last-saved-timestamp" role="status">
           <template v-if="!d_saving">
             Last saved: {{format_datetime_short(course.last_modified)}}
           </template>
@@ -23,7 +23,7 @@
       </div>
     </course-form>
 
-    <div class="danger-zone-container">
+    <div class="danger-zone-container" role="region" aria-label="delete course">
       <div class="danger-text">
         Delete Course: {{course.name}} {{course.semester}} {{course.year}}
       </div>

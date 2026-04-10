@@ -1,6 +1,7 @@
 <template>
   <validated-form ref="form"
                   class="course-form"
+                  aria-label="Course settings"
                   @submit='submit'
                   @form_validity_changed="$emit('form_validity_changed', $event)">
     <div class="form-field-wrapper">

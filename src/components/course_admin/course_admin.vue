@@ -1,15 +1,18 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" aria-label="loading"></i>
     </div>
   </div>
   <div v-else class="course-admin-component" ref="course_admin_component">
-    <div class="navbar default-navbar">
+    <nav class="navbar default-navbar">
       <div class="nav-link"
+          role="link"
+          tabindex="0"
            ref="settings_tab"
            :class="{'active': current_tab === 'settings'}"
-           @click="set_current_tab('settings')">
+           @click="set_current_tab('settings')"
+           @keypress.enter="set_current_tab('settings')"">
         Settings
       </div>
 
@@ -17,13 +20,16 @@
            ref="roster_tab"
            :class="{'active': current_tab.endsWith('roster')}">
         <div class="dropdown">
-          <div class="roster-tab-header">
+          <div class="roster-tab-header" tabindex="0">
             Roster {{role_selected === "" ? '' : `(${role_selected})`}}
           </div>
           <div class="menu">
             <div class="menu-item"
+                 role="link"
+                 tabindex="0"
                  v-for="role of roles" :key="role"
-                 @click="role_selected = role; set_current_tab(role + '_roster')">
+                 @click="role_selected = role; set_current_tab(role + '_roster')"
+                 @keypress.enter="role_selected = role; set_current_tab(role + '_roster')"">
               {{role}}
             </div>
           </div>
@@ -31,29 +37,38 @@
       </div>
 
       <div class="nav-link"
+          role="link"
+          tabindex="0"
           ref="projects_tab"
           :class="{'active': current_tab === 'projects'}"
-          @click="set_current_tab('projects')">
+          @click="set_current_tab('projects')"
+          @keypress.enter="set_current_tab('projects')"">
         Projects
       </div>
 
       <div class="nav-link"
+          role="link"
+          tabindex="0"
           ref="late_days_tab"
           v-if="d_course.num_late_days !== 0"
           :class="{'active': current_tab === 'late_days'}"
-          @click="set_current_tab('late_days')">
+          @click="set_current_tab('late_days')"
+          @keypress.enter="set_current_tab('late_days')"">
         Late Day Tokens
       </div>
 
       <div class="nav-link"
+          role="link"
+          tabindex="0"
           ref="sandbox_images"
           :class="{'active': current_tab === 'sandbox_images'}"
-          @click="set_current_tab('sandbox_images')">
+          @click="set_current_tab('sandbox_images')"
+          @keypress.enter="set_current_tab('sandbox_images')"">
         Sandbox Images
       </div>
-    </div>
+    </nav>
 
-    <div class="body">
+    <main class="body">
       <course-settings v-show="current_tab === 'settings'"
                        v-if="loaded_tabs.has('settings')"
                        :course="d_course"
@@ -94,7 +109,7 @@
         v-show="current_tab === 'sandbox_images'"
         v-if="loaded_tabs.has('sandbox_images')"
         :course="d_course"/>
-    </div>
+    </main>
   </div>
 </template>
 
