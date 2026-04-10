@@ -77,7 +77,7 @@
           </div>
           <div v-else class="current-user-dropdown">
             <div class="dropdown-header" tabindex="0">
-              <i class="fas fa-user" role="img" aria-label="User"></i>
+              <i class="fas fa-user" role="img" aria-label="Current User"></i>
             </div>
             <div class="menu">
               <div class="greeting">Hi, {{globals.current_user.first_name}}!</div>
