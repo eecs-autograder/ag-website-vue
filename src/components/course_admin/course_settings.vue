@@ -23,7 +23,7 @@
       </div>
     </course-form>
 
-    <div class="danger-zone-container">
+    <div class="danger-zone-container" role="region" aria-label="delete course">
       <div class="danger-text">
         Delete Course: {{course.name}} {{course.semester}} {{course.year}}
       </div>
