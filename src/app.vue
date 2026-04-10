@@ -92,7 +92,7 @@
             </a>
             <div
               id="user-menu"
-              v-if="d_user_menu_open"
+              v-show="d_user_menu_open"
               class="menu"
               aria-label="user menu"
               @keydown.esc="d_user_menu_open = false"
