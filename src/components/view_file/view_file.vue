@@ -530,7 +530,7 @@ table {
 }
 
 .line-number {
-  color: $baking-pan;
+  color: $normal-text-color-3;
   font-size: .875rem;
   padding: .125rem .625rem;
   text-align: center;

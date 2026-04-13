@@ -3,7 +3,13 @@
     <div
       class="panel"
       :class="[`level-${indentation_level}`, { active: is_active }]"
+      tabindex="0"
+      role="button"
+      :aria-controls="body_id"
+      :aria-expanded="state.is_open"
       @click="toggle_is_open"
+      @keypress.space.prevent="toggle_is_open"
+      @keypress.enter="toggle_is_open"
     >
       <i
         v-if="include_caret"
@@ -18,12 +24,12 @@
       </div>
     </div>
     <template v-if="use_v_if">
-      <div v-if="state.is_open" data-testid="collapsible_body">
+      <div v-if="state.is_open" data-testid="collapsible_body" :id="body_id">
         <slot></slot>
       </div>
     </template>
     <template v-else>
-      <div v-show="state.is_open" data-testid="collapsible_body">
+      <div v-show="state.is_open" data-testid="collapsible_body" :id="body_id">
         <slot></slot>
       </div>
     </template>
@@ -31,7 +37,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { generate_uid } from "@/utils";
+import { computed, reactive } from "vue";
 
 interface PropTypes {
   start_open?: boolean;
@@ -84,6 +91,10 @@ function toggle_is_open() {
     state.is_open = true;
   }
 }
+
+const body_id = computed(() => {
+  return `collapsible-body-${generate_uid()}`;
+});
 
 defineExpose({
   state,

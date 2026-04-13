@@ -1,5 +1,5 @@
 <template>
-  <div class="progress-overlay">
+  <div class="progress-overlay" role="status">
     <i v-if="progress === null" class="fa fa-spinner fa-pulse"></i>
     <progress-bar v-else
                   class="progress"
@@ -26,7 +26,7 @@ export default class ProgressOverlay extends Vue {
 <style scoped lang="scss">
 
 .progress-overlay {
-  z-index: 10;
+  z-index: 15;
   position: fixed;
   top: 0;
   bottom: 0;

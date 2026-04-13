@@ -5,16 +5,18 @@
     </div>
   </div>
   <div v-else class="sandbox-images sidebar-container">
-    <div class="sidebar-menu">
+    <div class="sidebar-menu" role="region" aria-label="Sidebar">
       <div class="sidebar-header" :class="{'sidebar-header-closed': d_sidebar_collapsed}">
-        <span class="sidebar-collapse-button" @click="d_sidebar_collapsed = !d_sidebar_collapsed">
+        <span class="sidebar-collapse-button"
+              @click="d_sidebar_collapsed = !d_sidebar_collapsed" tabindex="0">
           <i class="fas fa-bars"></i>
         </span>
         <template v-if="!d_sidebar_collapsed">
           <span class="sidebar-header-text">Sandbox Images</span>
           <button type="button" class="sidebar-new-button"
                   data-testid="new_image_button"
-                  @click="show_new_image_build">
+                  @click="show_new_image_build"
+                  :disabled="selected_image === null && selected_build_task === null">
             <i class="fas fa-plus sidebar-plus"></i> New Image
           </button>
 
@@ -28,6 +30,8 @@
           :include_caret="false"
           :is_active="d_selected_build_task_pk === build_task.pk"
           @click="select_build_task(build_task)"
+          @keypress.space.prevent="select_build_task(build_task)"
+          @keypress.enter="select_build_task(build_task)"
         >
           <template v-slot:header_text>
             {{build_task.image === null ? 'New Image' : build_task.image.display_name}} -
@@ -46,6 +50,8 @@
             v-for="item of completed_tasks_by_image" :key="`image${item.image.pk}`"
             :stay_open="d_selected_image_pk !== item.image.pk"
             @click="select_image(item.image)"
+            @keypress.space.prevent="select_image(item.image)"
+            @keypress.enter="select_image(item.image)"
             :is_active="d_selected_image_pk === item.image.pk"
             :indentation_level="1"
           >
@@ -58,6 +64,8 @@
               :include_caret="false"
               :indentation_level="2"
               @click.stop="select_build_task(build_task)"
+              @keypress.space.prevent.stop="select_build_task(build_task)"
+              @keypress.enter.stop="select_build_task(build_task)"
               :is_active="d_selected_build_task_pk === build_task.pk"
               :always_show_icons="true"
             >
@@ -81,6 +89,8 @@
             :is_active="d_selected_build_task_pk === build_task.pk"
             :always_show_icons="true"
             @click="select_build_task(build_task)"
+            @keypress.space.prevent="select_build_task(build_task)"
+            @keypress.enter="select_build_task(build_task)"
           >
             <template v-slot:header_text>
               {{build_task.image === null ? 'New Image' : build_task.image.display_name}} -
@@ -93,7 +103,8 @@
         </div>
       </div>
     </div>
-    <div class="body" :class="{'body-closed': d_sidebar_collapsed}">
+    <div class="body" :class="{'body-closed': d_sidebar_collapsed}"
+         role="region" aria-label="Sandbox image body">
       <template v-if="selected_image !== null">
         <div class="edit-image-header">Edit "{{selected_image.display_name}}"</div>
         <validated-form @submit="save_selected_image_name"
@@ -113,7 +124,7 @@
               Save
             </button>
 
-            <div class="last-saved-timestamp">
+            <div class="last-saved-timestamp" role="status">
               <template v-if="!d_saving_image_name">
                 Last saved: {{format_datetime_short(selected_image.last_modified)}}
               </template>
@@ -151,7 +162,8 @@
         :refresh_in_progress="d_loading_images_and_tasks"
         @refresh_images_and_build_tasks="load_images_and_build_tasks"/>
 
-    <div class="danger-zone-container" v-if="selected_image !== null">
+    <div class="danger-zone-container" v-if="selected_image !== null"
+         role="region" aria-label="Delete image">
       <div class="danger-text">
         Delete "{{selected_image.display_name}}"
       </div>
@@ -426,8 +438,8 @@ $border-color: $gray-blue-1;
 
 .sidebar-section-header {
   @include section-header(
-    $line-color: $stormy-gray-dark,
-    $text-color: $stormy-gray-dark,
+    $line-color: $normal-text-color-2,
+    $text-color: $normal-text-color-2,
   );
   padding-left: .125rem;
   padding-right: .125rem;

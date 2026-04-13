@@ -38,7 +38,11 @@
           <td class="size-of-file">{{file.size}} Bytes</td>
           <td>
             <i class="fas fa-times remove-file-button"
+               role="button" :aria-label="`Remove file ${file.name}}`"
+               tabindex="0"
                @click="remove_file_from_upload(file.name, index)"
+               @keypress.enter="remove_file_from_upload(file.name, index)"
+               @keypress.space="remove_file_from_upload(file.name, index)"
                :class="file.size === 0 ? 'remove-button-icon-empty-file' :
                                          'remove-button-icon-non-empty-file'">
             </i>

@@ -3,7 +3,7 @@
     <p>
       Instructions and requirements for building custom sandbox images can be
       found in our
-      <a href="https://eecs-autograder.github.io/autograder.io/topics/custom_sandbox_images.html">
+      <a href="https://eecs-autograder.github.io/autograder.io/topics/custom_sandbox_images.html" style="text-decoration: underline;">
         UI documentation
       </a>.
     </p>
