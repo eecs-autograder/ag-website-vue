@@ -14,7 +14,8 @@
           <span class="sidebar-header-text">Sandbox Images</span>
           <button type="button" class="sidebar-new-button"
                   data-testid="new_image_button"
-                  @click="show_new_image_build">
+                  @click="show_new_image_build"
+                  :disabled="selected_image === null && selected_build_task === null">
             <i class="fas fa-plus sidebar-plus"></i> New Image
           </button>
 
