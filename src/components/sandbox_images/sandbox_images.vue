@@ -7,7 +7,7 @@
   <div v-else class="sandbox-images sidebar-container">
     <div class="sidebar-menu">
       <div class="sidebar-header" :class="{'sidebar-header-closed': d_sidebar_collapsed}">
-        <span class="sidebar-collapse-button" @click="d_sidebar_collapsed = !d_sidebar_collapsed">
+        <span class="sidebar-collapse-button" @click="d_sidebar_collapsed = !d_sidebar_collapsed" tabindex="0">
           <i class="fas fa-bars"></i>
         </span>
         <template v-if="!d_sidebar_collapsed">
