@@ -1,6 +1,6 @@
 <template>
   <div class="build-image-task-detail">
-    <div class="status-info">
+    <div class="status-info" role="status">
       <build-image-status-icon :status="build_task.status"/>
       <template v-if="build_task.status === BuildImageStatus.queued">
         In Queue
@@ -45,6 +45,9 @@
         <i
           data-testid="refresh_button"
           class="fas fa-sync-alt"
+          role="button"
+          aria-label="Refresh build status"
+          tabindex="0"
           v-if="build_task.status === BuildImageStatus.queued
                 || build_task.status === BuildImageStatus.in_progress"
           @click="refresh_images_and_build_tasks"
@@ -62,6 +65,11 @@
       Files
       <i class="fas fa-file-download"
          @click="download_files"
+         @keypress.enter="download_files"
+         @keypress.space.prevent="download_files"
+         role="button"
+         aria-label="Download files from build"
+         tabindex="0"
          data-testid="download_files_icon"></i>
       <ul class="file-list">
         <li class="filename" v-for="filename of build_task.filenames">{{filename}}</li>
