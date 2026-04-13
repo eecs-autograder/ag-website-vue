@@ -5,9 +5,10 @@
     </div>
   </div>
   <div v-else class="sandbox-images sidebar-container">
-    <div class="sidebar-menu">
+    <div class="sidebar-menu" role="region" aria-label="Sidebar">
       <div class="sidebar-header" :class="{'sidebar-header-closed': d_sidebar_collapsed}">
-        <span class="sidebar-collapse-button" @click="d_sidebar_collapsed = !d_sidebar_collapsed" tabindex="0">
+        <span class="sidebar-collapse-button"
+              @click="d_sidebar_collapsed = !d_sidebar_collapsed" tabindex="0">
           <i class="fas fa-bars"></i>
         </span>
         <template v-if="!d_sidebar_collapsed">
@@ -102,7 +103,8 @@
         </div>
       </div>
     </div>
-    <div class="body" :class="{'body-closed': d_sidebar_collapsed}">
+    <div class="body" :class="{'body-closed': d_sidebar_collapsed}"
+         role="region" aria-label="Sandbox image body">
       <template v-if="selected_image !== null">
         <div class="edit-image-header">Edit "{{selected_image.display_name}}"</div>
         <validated-form @submit="save_selected_image_name"
@@ -122,7 +124,7 @@
               Save
             </button>
 
-            <div class="last-saved-timestamp">
+            <div class="last-saved-timestamp" role="status">
               <template v-if="!d_saving_image_name">
                 Last saved: {{format_datetime_short(selected_image.last_modified)}}
               </template>
@@ -160,7 +162,8 @@
         :refresh_in_progress="d_loading_images_and_tasks"
         @refresh_images_and_build_tasks="load_images_and_build_tasks"/>
 
-    <div class="danger-zone-container" v-if="selected_image !== null">
+    <div class="danger-zone-container" v-if="selected_image !== null"
+         role="region" aria-label="Delete image">
       <div class="danger-text">
         Delete "{{selected_image.display_name}}"
       </div>
