@@ -426,8 +426,8 @@ $border-color: $gray-blue-1;
 
 .sidebar-section-header {
   @include section-header(
-    $line-color: $stormy-gray-dark,
-    $text-color: $stormy-gray-dark,
+    $line-color: $normal-text-color-2,
+    $text-color: $normal-text-color-2,
   );
   padding-left: .125rem;
   padding-right: .125rem;
