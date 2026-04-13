@@ -1,16 +1,17 @@
 <template>
-  <span v-if="status === BuildImageStatus.queued" class="queued-symbol">Q</span>
-  <i v-else-if="status === BuildImageStatus.in_progress"
+  <span v-if="status === BuildImageStatus.queued"
+        role="img" aria-label="Queued" class="queued-symbol">Q</span>
+  <i v-else-if="status === BuildImageStatus.in_progress" role="img" aria-label="In progress"
      class="fas fa-wrench"></i>
-  <i v-else-if="status === BuildImageStatus.done"
+  <i v-else-if="status === BuildImageStatus.done" role="img" aria-label="Done"
      class="fas fa-check"></i>
-  <i v-else-if="status === BuildImageStatus.failed"
+  <i v-else-if="status === BuildImageStatus.failed" role="img" aria-label="Failed"
      class="fas fa-times"></i>
-  <i v-else-if="status === BuildImageStatus.image_invalid"
+  <i v-else-if="status === BuildImageStatus.image_invalid" role="img" aria-label="Image invalid"
      class="fas fa-times"></i>
-  <i v-else-if="status === BuildImageStatus.cancelled"
+  <i v-else-if="status === BuildImageStatus.cancelled" role="img" aria-label="Cancelled"
      class="fas fa-eject"></i>
-  <i v-else-if="status === BuildImageStatus.internal_error"
+  <i v-else-if="status === BuildImageStatus.internal_error" role="img" aria-label="Internal error"
      class="fas fa-skull"></i>
 </template>
 
