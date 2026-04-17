@@ -35,7 +35,6 @@
 </template>
 
 <script setup lang="ts">
-
 // Props
 type PropTypes = {
   click_outside_to_close?: boolean;
