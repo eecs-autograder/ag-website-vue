@@ -30,8 +30,8 @@
           :include_caret="false"
           :is_active="d_selected_build_task_pk === build_task.pk"
           @click="select_build_task(build_task)"
-          @keypress.space.prevent="select_build_task(build_task)"
-          @keypress.enter="select_build_task(build_task)"
+          @keydown.space.prevent="select_build_task(build_task)"
+          @keydown.enter="select_build_task(build_task)"
         >
           <template v-slot:header_text>
             {{build_task.image === null ? 'New Image' : build_task.image.display_name}} -
@@ -50,8 +50,8 @@
             v-for="item of completed_tasks_by_image" :key="`image${item.image.pk}`"
             :stay_open="d_selected_image_pk !== item.image.pk"
             @click="select_image(item.image)"
-            @keypress.space.prevent="select_image(item.image)"
-            @keypress.enter="select_image(item.image)"
+            @keydown.space.prevent="select_image(item.image)"
+            @keydown.enter="select_image(item.image)"
             :is_active="d_selected_image_pk === item.image.pk"
             :indentation_level="1"
           >
@@ -64,8 +64,8 @@
               :include_caret="false"
               :indentation_level="2"
               @click.stop="select_build_task(build_task)"
-              @keypress.space.prevent.stop="select_build_task(build_task)"
-              @keypress.enter.stop="select_build_task(build_task)"
+              @keydown.space.prevent.stop="select_build_task(build_task)"
+              @keydown.enter.stop="select_build_task(build_task)"
               :is_active="d_selected_build_task_pk === build_task.pk"
               :always_show_icons="true"
             >
@@ -89,8 +89,8 @@
             :is_active="d_selected_build_task_pk === build_task.pk"
             :always_show_icons="true"
             @click="select_build_task(build_task)"
-            @keypress.space.prevent="select_build_task(build_task)"
-            @keypress.enter="select_build_task(build_task)"
+            @keydown.space.prevent="select_build_task(build_task)"
+            @keydown.enter="select_build_task(build_task)"
           >
             <template v-slot:header_text>
               {{build_task.image === null ? 'New Image' : build_task.image.display_name}} -

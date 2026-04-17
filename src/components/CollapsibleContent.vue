@@ -8,8 +8,8 @@
       :aria-controls="body_id"
       :aria-expanded="state.is_open"
       @click="toggle_is_open"
-      @keypress.space.prevent="toggle_is_open"
-      @keypress.enter="toggle_is_open"
+      @keydown.space.prevent="toggle_is_open"
+      @keydown.enter="toggle_is_open"
     >
       <i
         v-if="include_caret"
