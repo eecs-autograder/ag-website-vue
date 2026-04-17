@@ -2,7 +2,7 @@
   <!-- This outer div insulates the wrapped select tag from attribute
        and event bindings on the component. -->
   <div>
-    <select :aria-labelledby="labelled_by"
+    <select :id="input_id"
             class="select" v-model="d_value" @change="update_value">
       <slot></slot>
       <option v-for="item of d_items"
@@ -36,7 +36,7 @@ export default class SelectObject extends Vue {
   id_field!: string;
 
   @Prop({type: String, default: ''})
-  labelled_by!: string;
+  input_id!: string;
 
   @Watch('items')
   on_items_changed(new_items: ItemType[], old_items: ItemType[]) {

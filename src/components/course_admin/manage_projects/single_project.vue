@@ -52,9 +52,9 @@
       </div>
       <div>
         <div class="cloned-project-name form-field-wrapper">
-          <label id="cloned-course-name" class="label"> Name </label>
+          <label for="cloned-course-name" class="label"> Name </label>
           <validated-input ref="cloned_project_name"
-                           labelled_by="cloned-course-name"
+                           input_id="cloned-course-name"
                            v-model="cloned_project_name"
                            :validators="[is_not_empty]"
                            :num_rows="1"
@@ -64,9 +64,9 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label id="add-to-course-label" class="label"> Add to course: </label>
+          <label for="add-to-course" class="label"> Add to course: </label>
           <select-object ref="cloning_destinations_dropdown"
-                         labelled_by="add-to-course-label"
+                         input_id="add-to-course"
                          :items="cloning_destinations"
                          v-model="course_to_clone_to"
                          id_field="pk">

@@ -29,6 +29,7 @@
     <modal v-if="d_show_clone_course_modal"
            @close="d_show_clone_course_modal = false"
            ref="clone_course_modal"
+           aria_label="Clone course"
            :include_closing_x="!d_cloning"
            :click_outside_to_close="!d_cloning"
            size="large">
@@ -37,21 +38,23 @@
       </div>
       <ValidatedForm ref="clone_course_form" autocomplete="off" @submit="make_copy_of_course">
         <div class="cloned-course-name form-field-wrapper">
-          <label class="label"> Name </label>
+          <label for="clone-course-name" class="label"> Name </label>
           <ValidatedInput ref="copy_of_course_name"
                           v-model="new_course_name"
                           input_style="width: 100%; max-width: 500px;"
                           :validators="[is_not_empty]"
+                          input_id="clone-course-name"
                           :num_rows="1"
                           @input_validity_changed="clone_course_form_is_valid = $event">
           </ValidatedInput>
         </div>
 
         <div class="form-field-wrapper">
-          <label class="label"> Semester </label>
+          <label for="clone-course-semester" class="label"> Semester </label>
           <div class="dropdown">
             <select data-testid="semester"
                     v-model="new_course_semester"
+                    id="clone-course-semester"
                     class="select">
               <option v-for="semester of semesters" :value="semester">{{semester}}</option>
             </select>
@@ -59,10 +62,11 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="label"> Year </label>
+          <label for="clone-course-year" class="label"> Year </label>
           <ValidatedInput ref="copy_of_course_year"
                           v-model="new_course_year"
                           :num_rows="1"
+                          input_id="clone-course-year"
                           input_style="width: 65px;"
                           :validators="[is_not_empty, is_number, is_valid_course_year]"
                           @input_validity_changed="clone_course_form_is_valid = $event">
