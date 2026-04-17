@@ -1,5 +1,5 @@
 <template>
-  <span class="tooltip">
+  <span tabindex="0" class="tooltip">
     <!-- The content (text or otherwise) that the user must hover over -->
     <slot name="trigger">
       <i class="default-icon fas fa-question-circle"></i>

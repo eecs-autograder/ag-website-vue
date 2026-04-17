@@ -70,7 +70,7 @@ describe('Roster tests', () => {
 
         wrapper = mount(Roster, {
             propsData: {
-                role: "admin",
+                user_role: "admin",
                 roster: [user_1, user_2, user_3, user_4]
             }
         });
@@ -78,10 +78,14 @@ describe('Roster tests', () => {
         roster = wrapper.vm;
         expect(roster.d_roster?.length).toEqual(4);
 
-        validated_input = <Wrapper<ValidatedInput>> wrapper.find('#add-users-input');
-        validated_input_component = <ValidatedInput> wrapper.find('#add-users-input').vm;
-        roster_form_component = <ValidatedForm> wrapper.find('#add-users-form').vm;
-        roster_form_wrapper = <Wrapper<ValidatedForm>> wrapper.find('#add-users-form');
+        validated_input
+            = <Wrapper<ValidatedInput>> wrapper.findComponent({ref: 'add_users_textarea'});
+        validated_input_component
+            = <ValidatedInput> wrapper.findComponent({ref: 'add_users_textarea'}).vm;
+        roster_form_component
+            = <ValidatedForm> wrapper.findComponent({ref: 'add_users_form'}).vm;
+        roster_form_wrapper
+            = <Wrapper<ValidatedForm>> wrapper.findComponent({ref: 'add_users_form'});
     });
 
     afterEach(() => {
@@ -92,7 +96,7 @@ describe('Roster tests', () => {
 
     test('Usernames are displayed in alphabetical order', () => {
         assert_not_null(roster.d_roster);
-        expect(roster.role).toEqual("admin");
+        expect(roster.user_role).toEqual("admin");
         expect(roster.d_roster[0]).toEqual(user_2); // amandaplease
         expect(roster.d_roster[1]).toEqual(user_1); // coolmom
         expect(roster.d_roster[2]).toEqual(user_4); // freshPrince

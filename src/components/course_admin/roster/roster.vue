@@ -1,16 +1,16 @@
 <template>
   <div class="roster-container">
-    <validated-form id="add-users-form"
+    <validated-form ref="add_users_form"
                     autocomplete="off"
                     @submit="add_users"
                     @form_validity_changed="d_form_is_valid = $event">
-      <label class="enrollment-add-label"> Add {{role}}
+      <label :id="`add-users-label-${label_uuid}`" class="enrollment-add-label"> Add {{user_role}}
         <tooltip width="medium" placement="bottom">
           Enter a comma-separated list of email addresses.
         </tooltip>
       </label>
       <ValidatedInput ref="add_users_textarea"
-                      id="add-users-input"
+                      :labelled_by="`add-users-label-${label_uuid}`"
                       v-model="d_form_text"
                       :validators="[email_list_validator]"
                       :num_rows="7">
@@ -52,6 +52,7 @@
           <td class="remove-user-column">
             <i class="fas fa-user-times remove-user"
                 :title="'Delete ' + person.username"
+                tabindex="0"
                 @click="remove_person_from_roster([person], index)">
             </i>
           </td>
@@ -59,7 +60,7 @@
       </table>
     </div>
     <div v-else class="empty-roster-message">
-      The {{role}} roster is currently empty
+      The {{user_role}} roster is currently empty
     </div>
   </div>
 </template>
@@ -72,7 +73,7 @@ import { User } from 'ag-client-typescript';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { is_email } from '@/utils';
+import { generate_uid, is_email } from '@/utils';
 
 @Component({
   components: {
@@ -83,7 +84,7 @@ import { is_email } from '@/utils';
 })
 export default class Roster extends Vue {
   @Prop({required: true, type: String})
-  role!: string;
+  user_role!: string;
 
   @Prop({required: true, validator: prop => prop instanceof Array || prop === null})
   roster!: User[];
@@ -149,6 +150,12 @@ export default class Roster extends Vue {
     let validated_input = <ValidatedInput> this.$refs.add_users_textarea;
     validated_input.reset_warning_state();
     this.d_form_is_valid = false;
+  }
+
+  // This only needs to be unique across instances of the component.
+  // We combine it with unique id fragrments for each form input label.
+  get label_uuid() {
+    return generate_uid();
   }
 }
 
