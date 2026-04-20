@@ -7,20 +7,23 @@
           click_outside_to_close ? $emit('close') : null;
         }
       "
-      @keyup.esc="$emit('close')"
+      @keydown.esc="$emit('close')"
     >
       <div
         class="modal-container"
         :class="size"
         :style="custom_width ? { width: custom_width } : ''"
         role="dialog"
+        :aria-label="aria_label"
       >
         <slot></slot>
         <div
           v-if="include_closing_x"
           class="close-button"
+          role="button"
           @click="$emit('close')"
-          @keyup.enter="$emit('close')"
+          @keydown.enter="$emit('close')"
+          @keydown.space="$emit('close')"
           tabindex="0"
           aria-label="close-dialog"
         >
@@ -32,14 +35,14 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
-
 // Props
 type PropTypes = {
   click_outside_to_close?: boolean;
   include_closing_x?: boolean;
   size?: string;
   custom_width?: string;
+  // TODO: Make this required when we think we labelled all of them
+  aria_label?: string;
 };
 
 const props = withDefaults(defineProps<PropTypes>(), {

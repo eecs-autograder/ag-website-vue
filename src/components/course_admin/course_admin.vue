@@ -12,7 +12,7 @@
            ref="settings_tab"
            :class="{'active': current_tab === 'settings'}"
            @click="set_current_tab('settings')"
-           @keypress.enter="set_current_tab('settings')"">
+           @keydown.enter="set_current_tab('settings')"">
         Settings
       </div>
 
@@ -29,7 +29,7 @@
                  tabindex="0"
                  v-for="role of roles" :key="role"
                  @click="role_selected = role; set_current_tab(role + '_roster')"
-                 @keypress.enter="role_selected = role; set_current_tab(role + '_roster')"">
+                 @keydown.enter="role_selected = role; set_current_tab(role + '_roster')"">
               {{role}}
             </div>
           </div>
@@ -42,7 +42,7 @@
           ref="projects_tab"
           :class="{'active': current_tab === 'projects'}"
           @click="set_current_tab('projects')"
-          @keypress.enter="set_current_tab('projects')"">
+          @keydown.enter="set_current_tab('projects')"">
         Projects
       </div>
 
@@ -53,7 +53,7 @@
           v-if="d_course.num_late_days !== 0"
           :class="{'active': current_tab === 'late_days'}"
           @click="set_current_tab('late_days')"
-          @keypress.enter="set_current_tab('late_days')"">
+          @keydown.enter="set_current_tab('late_days')"">
         Late Day Tokens
       </div>
 
@@ -63,7 +63,7 @@
           ref="sandbox_images"
           :class="{'active': current_tab === 'sandbox_images'}"
           @click="set_current_tab('sandbox_images')"
-          @keypress.enter="set_current_tab('sandbox_images')"">
+          @keydown.enter="set_current_tab('sandbox_images')"">
         Sandbox Images
       </div>
     </nav>

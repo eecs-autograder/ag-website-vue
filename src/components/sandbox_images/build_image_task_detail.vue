@@ -65,8 +65,8 @@
       Files
       <i class="fas fa-file-download"
          @click="download_files"
-         @keypress.enter="download_files"
-         @keypress.space.prevent="download_files"
+         @keydown.enter="download_files"
+         @keydown.space.prevent="download_files"
          role="button"
          aria-label="Download files from build"
          tabindex="0"

@@ -1,6 +1,8 @@
 <template>
   <div id="manage-projects-component">
-    <div id="new-project-label"> Create a New Project </div>
+    <div>
+      <label for="new-project-name"> Create a New Project </label>
+    </div>
 
     <div class="new-project-validation-wrapper">
       <validated-form ref="new_project_form"
@@ -11,6 +13,7 @@
                          v-model="new_project_name"
                          :validators="[is_not_empty]"
                          :num_rows="1"
+                         input_id="new-project-name"
                          input_style="width: 100%;
                                       max-width: 500px;
                                       border: 1px solid #ced4da;"

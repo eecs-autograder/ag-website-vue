@@ -3,7 +3,7 @@
        ref="context_menu"
        class="context-menu-container"
        @blur="hide_context_menu"
-       @keyup.esc="hide_context_menu"
+       @keydown.esc="hide_context_menu"
        v-show="is_open">
     <slot></slot>
   </div>

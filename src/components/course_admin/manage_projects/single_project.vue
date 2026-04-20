@@ -5,18 +5,36 @@
         <div class="project-name-container">
           <span class="left-text">{{project.name}}</span>
           <span class="right-text tool-icon">
-              <i class="fa fa-eye" aria-hidden="true" v-if="project.visible_to_students"></i>
-              <i class="fa fa-eye-slash" aria-hidden="true" v-else></i>
+              <i class="fa fa-eye"
+                 role="img"
+                 title="Project is visible to students"
+                 v-if="project.visible_to_students"></i>
+              <i class="fa fa-eye-slash"
+                 role="img"
+                 title="Project is hidden from students"
+                 v-else></i>
             </span>
         </div>
       </router-link>
 
       <div class="toolbox">
-        <div class="copy-project tool-icon" @click="start_clone_dialog">
+        <div
+          class="copy-project tool-icon"
+          tabindex="0"
+          role="button"
+          :title="'Clone ' + project.name"
+          @click="start_clone_dialog"
+          @keydown.enter="start_clone_dialog"
+          @keydown.space="start_clone_dialog"
+        >
           <i class="fas fa-copy"></i>
         </div>
 
-        <router-link :to="`/web/project_admin/${project.pk}`" class="edit-project tool-icon">
+        <router-link
+          :to="`/web/project_admin/${project.pk}`"
+          class="edit-project tool-icon"
+          title="Edit project"
+        >
           <i class="fas fa-cog"></i>
         </router-link>
       </div>
@@ -26,6 +44,7 @@
            @close="d_show_clone_project_modal = false"
            ref="clone_project_modal"
            size="large"
+           aria_label="Clone project"
            :click_outside_to_close="!d_cloning"
            :include_closing_x="!d_cloning">
       <div class="modal-header">
@@ -33,8 +52,9 @@
       </div>
       <div>
         <div class="cloned-project-name form-field-wrapper">
-          <label class="label"> Name </label>
+          <label for="cloned-course-name" class="label"> Name </label>
           <validated-input ref="cloned_project_name"
+                           input_id="cloned-course-name"
                            v-model="cloned_project_name"
                            :validators="[is_not_empty]"
                            :num_rows="1"
@@ -44,8 +64,9 @@
         </div>
 
         <div class="form-field-wrapper">
-          <label class="label"> Add to course: </label>
+          <label for="add-to-course" class="label"> Add to course: </label>
           <select-object ref="cloning_destinations_dropdown"
+                         input_id="add-to-course"
                          :items="cloning_destinations"
                          v-model="course_to_clone_to"
                          id_field="pk">
@@ -131,6 +152,8 @@ export default class SingleProject extends Vue {
     this.cloned_project_name = "";
     this.course_to_clone_to = this.course;
     this.d_show_clone_project_modal = true;
+    await this.$nextTick();
+    (<HTMLElement> this.$refs.cloned_project_name).focus();
   }
 
   @handle_api_errors_async(handle_add_cloned_project_error)

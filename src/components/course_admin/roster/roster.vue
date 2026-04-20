@@ -4,13 +4,13 @@
                     autocomplete="off"
                     @submit="add_users"
                     @form_validity_changed="d_form_is_valid = $event">
-      <label :id="`add-users-label-${label_uuid}`" class="enrollment-add-label"> Add {{user_role}}
+      <label :for="`add-users-label-${label_uuid}`" class="enrollment-add-label"> Add {{user_role}}
         <tooltip width="medium" placement="bottom">
           Enter a comma-separated list of email addresses.
         </tooltip>
       </label>
       <ValidatedInput ref="add_users_textarea"
-                      :labelled_by="`add-users-label-${label_uuid}`"
+                      :input_id="`add-users-label-${label_uuid}`"
                       v-model="d_form_text"
                       :validators="[email_list_validator]"
                       :num_rows="7">
