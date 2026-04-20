@@ -31,8 +31,10 @@
                       ref="late_day_form"
                       @submit="save_late_days"
                       @form_validity_changed="d_late_day_form_is_valid = $event">
-        <label class="label">"{{d_selected_username}}" Late Day Tokens Remaining</label>
+        <label for="late-day-token-email-lookup"
+               class="label">"{{d_selected_username}}" Late Day Tokens Remaining</label>
         <validated-input ref="late_days_input"
+                         input_id="late-day-token-email-lookup"
                          v-model="d_num_late_days"
                          :from_string_fn="string_to_num"
                          :validators="[is_non_negative]"
