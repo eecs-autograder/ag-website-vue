@@ -67,7 +67,7 @@
       <div class="buggy-implementation-names-input-container">
         <textarea ref="buggy_impl_names_input"
                   class="input"
-                  @keyup.enter="add_buggy_implementation_names"
+                  @keydown.enter="add_buggy_implementation_names"
                   v-model="d_buggy_impl_names_text">
         </textarea>
         <div>

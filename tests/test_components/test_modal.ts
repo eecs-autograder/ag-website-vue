@@ -60,7 +60,7 @@ describe('Modal.vue', () => {
         await wrapper.setData({show_modal: true});
         expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(true);
 
-        await wrapper.find('[data-testid=input]').trigger('keyup.esc');
+        await wrapper.find('[data-testid=input]').trigger('keydown.esc');
 
         expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
     });
@@ -109,7 +109,7 @@ describe('Modal.vue', () => {
         const wrapper = mount(Modal);
         expect(wrapper.emitted('close')).toBeUndefined();
 
-        await wrapper.find('.close-button').trigger('keyup.enter');
+        await wrapper.find('.close-button').trigger('keydown.enter');
 
         expect(emitted(wrapper, 'close').length).toBe(1);
     });

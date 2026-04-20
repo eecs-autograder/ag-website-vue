@@ -220,7 +220,7 @@ describe('ContextMenu tests', () => {
         await wrapper.vm.$nextTick();
         expect(context_menu_wrapper.isVisible()).toBe(true);
 
-        context_menu_wrapper.trigger('keyup.esc');
+        context_menu_wrapper.trigger('keydown.esc');
         await wrapper.vm.$nextTick();
 
         expect(context_menu_wrapper.isVisible()).toBe(false);

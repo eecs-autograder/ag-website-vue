@@ -7,7 +7,7 @@
           click_outside_to_close ? $emit('close') : null;
         }
       "
-      @keyup.esc="$emit('close')"
+      @keydown.esc="$emit('close')"
     >
       <div
         class="modal-container"

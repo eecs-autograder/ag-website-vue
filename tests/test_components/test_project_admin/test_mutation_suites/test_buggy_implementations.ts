@@ -221,7 +221,7 @@ describe('BuggyImplementation tests', () => {
 
         await buggy_implementation_names_input.trigger('click');
 
-        await wrapper.findComponent({ref: 'buggy_impl_names_input'}).trigger('keyup.enter');
+        await wrapper.findComponent({ref: 'buggy_impl_names_input'}).trigger('keydown.enter');
 
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names.length).toEqual(7);
         expect(wrapper.vm.d_mutation_test_suite!.buggy_impl_names[0]).toEqual("Bug_1");
