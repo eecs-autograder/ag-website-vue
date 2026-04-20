@@ -2,7 +2,7 @@
   <span tabindex="0" class="tooltip">
     <!-- The content (text or otherwise) that the user must hover over -->
     <slot name="trigger">
-      <i class="default-icon fas fa-question-circle"></i>
+      <i class="default-icon fas fa-question-circle" role="img" aria-label="More info"></i>
     </slot>
 
     <!-- The tooltip text -->
@@ -94,6 +94,12 @@ $text-position: calc(100% + #{$caret-size});
   &:hover .caret {
     visibility: visible;
   }
+
+  &:focus-within .text,
+  &:focus-within .caret {
+    visibility: visible;
+  }
+
 
   .text {
     position: absolute;
