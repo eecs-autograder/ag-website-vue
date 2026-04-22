@@ -5,11 +5,14 @@
     </div>
   </div>
   <div v-else id="project-view">
-    <div class="navbar default-navbar">
+    <nav class="navbar default-navbar">
       <div class="nav-link"
            ref="submit_tab"
            :class="{'active': d_current_tab === 'submit'}"
+           role="link"
+           tabindex="0"
            @click="set_current_tab('submit')"
+           @keydown.enter="set_current_tab('submit')"
            v-if="can_submit">
         Submit
       </div>
@@ -19,39 +22,55 @@
              'active': d_current_tab === 'my_submissions',
              'disabled': group === null
            }"
+           role="link"
+           tabindex="0"
            @click="set_current_tab('my_submissions')"
+           @keydown.enter="set_current_tab('my_submissions')"
            v-if="can_submit">
         My Submissions
       </div>
       <div class="nav-link"
            ref="student_lookup_tab"
            :class="{'active': d_current_tab === 'student_lookup'}"
+           role="link"
+           tabindex="0"
            @click="set_current_tab('student_lookup')"
+           @keydown.enter="set_current_tab('student_lookup')"
            v-if="d_globals.user_roles.is_staff">
         Student Lookup
       </div>
       <div class="nav-link"
            ref="handgrading_tab"
            :class="{'active': d_current_tab === 'handgrading'}"
+           role="link"
+           tabindex="0"
            @click.self="set_current_tab('handgrading')"
+           @keydown.enter.self="set_current_tab('handgrading')"
            v-if="handgrading_rubric !== null">
         Handgrading
         <template v-if="d_globals.user_roles.is_admin">
           <router-link :to="`/web/project_admin/${project.pk}?current_tab=handgrading`">
-            <i id="edit-handgrading-link" class="fas fa-cog cog"></i>
+            <i id="edit-handgrading-link"
+               class="fas fa-cog cog"
+               role="img"
+               aria-label="To handgrading admin page"
+            ></i>
           </router-link>
         </template>
       </div>
       <div class="nav-link"
            ref="handgrading_result_tab"
            :class="{'active': d_current_tab === 'handgrading_result'}"
+           role="link"
+           tabindex="0"
            @click.self="set_current_tab('handgrading_result')"
+           @keydown.enter="set_current_tab('handgrading_result')"
            v-if="handgrading_result !== null">
         Handgrading Score
       </div>
-    </div>
+    </nav>
 
-    <div>
+    <main>
       <div v-if="can_submit && d_loaded_tabs.has('submit')"
            v-show="d_current_tab === 'submit'">
         <group-registration v-if="group === null"
@@ -83,7 +102,7 @@
                    v-if="handgrading_result !== null && d_loaded_tabs.has('handgrading_result')"
                    :handgrading_result="handgrading_result"
                    :readonly_handgrading_results="true"></handgrading>
-    </div>
+    </main>
   </div>
 </template>
 
