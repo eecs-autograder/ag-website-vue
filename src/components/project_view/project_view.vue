@@ -50,7 +50,11 @@
         Handgrading
         <template v-if="d_globals.user_roles.is_admin">
           <router-link :to="`/web/project_admin/${project.pk}?current_tab=handgrading`">
-            <i id="edit-handgrading-link" class="fas fa-cog cog"></i>
+            <i id="edit-handgrading-link"
+               class="fas fa-cog cog"
+               role="img"
+               aria-label="To handgrading admin page"
+            ></i>
           </router-link>
         </template>
       </div>
