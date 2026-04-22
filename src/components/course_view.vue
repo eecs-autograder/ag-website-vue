@@ -4,7 +4,7 @@
       <i class="fa fa-spinner fa-pulse"></i>
     </div>
   </div>
-  <div v-else id="project-list-component">
+  <main v-else id="project-list-component">
     <div v-if="d_projects.length === 0" id="no-projects-message">
       No projects have been published yet.
     </div>
@@ -17,8 +17,11 @@
           <div class="project-name-container">
             <span class="left-text">{{project.name}}</span>
             <span class="right-text tool-icon" v-if="!d_globals.user_roles.is_student">
-              <i class="fa fa-eye" aria-hidden="true" v-if="project.visible_to_students"></i>
-              <i class="fa fa-eye-slash" aria-hidden="true" v-else></i>
+              <i class="fa fa-eye"
+                 role="img"
+                 title="Project is published"
+                 v-if="project.visible_to_students"></i>
+              <i class="fa fa-eye-slash" role="img" title="Project is hidden" v-else></i>
             </span>
           </div>
         </router-link>
@@ -32,7 +35,7 @@
         </div>
       </div>
     </template>
-  </div>
+  </main>
 </template>
 
 <script lang="ts">
