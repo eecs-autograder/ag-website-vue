@@ -5,7 +5,7 @@
     </div>
   </div>
   <div v-else id="project-view">
-    <div class="navbar default-navbar">
+    <nav class="navbar default-navbar">
       <div class="nav-link"
            ref="submit_tab"
            :class="{'active': d_current_tab === 'submit'}"
@@ -64,9 +64,9 @@
            v-if="handgrading_result !== null">
         Handgrading Score
       </div>
-    </div>
+    </nav>
 
-    <div>
+    <main>
       <div v-if="can_submit && d_loaded_tabs.has('submit')"
            v-show="d_current_tab === 'submit'">
         <group-registration v-if="group === null"
@@ -98,7 +98,7 @@
                    v-if="handgrading_result !== null && d_loaded_tabs.has('handgrading_result')"
                    :handgrading_result="handgrading_result"
                    :readonly_handgrading_results="true"></handgrading>
-    </div>
+    </main>
   </div>
 </template>
 
