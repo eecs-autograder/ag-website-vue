@@ -9,7 +9,7 @@
       @keydown.enter="d_show = !d_show"
       @keydown.space.prevent="d_show = !d_show"
     >What files should I submit?</div>
-    <ul id="expected-files-to-submit-list" class="file-list" v-if="d_show">
+    <ul id="expected-files-to-submit-list" class="file-list" v-show="d_show">
       <li v-for="item of expected_student_files" :key="item.pk" class="file-list-item">
         - <span class="filename">{{item.pattern}}</span>
         <span class="num-matches" v-if="item.min_num_matches !== 1 || item.max_num_matches !== 1">
