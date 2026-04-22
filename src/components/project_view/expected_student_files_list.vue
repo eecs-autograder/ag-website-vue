@@ -61,15 +61,15 @@ export default class ExpectedStudentFilesList extends Vue {
 }
 
 .num-matches {
-  color: $stormy-gray-dark;
+  color: $normal-text-color-2;
 }
 
 .show-all {
   cursor: pointer;
-  color: $ocean-blue;
+  color: darken($ocean-blue, 10%);
 
   &:hover {
-    color: darken($ocean-blue, 10%);
+    color: darken($ocean-blue, 20%);
   }
 }
 
