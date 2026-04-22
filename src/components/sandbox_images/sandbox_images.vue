@@ -8,7 +8,13 @@
     <div class="sidebar-menu" role="region" aria-label="Sidebar">
       <div class="sidebar-header" :class="{'sidebar-header-closed': d_sidebar_collapsed}">
         <span class="sidebar-collapse-button"
-              @click="d_sidebar_collapsed = !d_sidebar_collapsed" tabindex="0">
+              role="button"
+              aria-label="Toggle sidebar"
+              aria-controls="sandbox-images-sidebar-content"
+              @click="d_sidebar_collapsed = !d_sidebar_collapsed"
+              @keydown.enter="d_sidebar_collapsed = !d_sidebar_collapsed"
+              @keydown.space="d_sidebar_collapsed = !d_sidebar_collapsed"
+              tabindex="0">
           <i class="fas fa-bars"></i>
         </span>
         <template v-if="!d_sidebar_collapsed">
@@ -22,7 +28,10 @@
 
         </template>
       </div>
-      <div class="sidebar-content" v-if="!d_sidebar_collapsed">
+      <div id="sandbox-images-sidebar-content"
+           class="sidebar-content"
+           v-if="!d_sidebar_collapsed"
+      >
         <div class="sidebar-section-header">In Progress</div>
         <collapsible
           ref="in_progress_build_panel"
