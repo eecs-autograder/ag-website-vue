@@ -8,8 +8,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-small position-top"
@@ -29,8 +31,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-small position-bottom"
@@ -50,8 +54,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-small position-left"
@@ -71,8 +77,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-small position-right"
@@ -92,8 +100,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-medium position-top"
@@ -113,8 +123,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-medium position-bottom"
@@ -134,8 +146,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-medium position-left"
@@ -155,8 +169,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-medium position-right"
@@ -176,8 +192,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-large position-top"
@@ -197,8 +215,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-large position-bottom"
@@ -218,8 +238,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-large position-left"
@@ -239,8 +261,10 @@ exports[`Tooltip.vue > Non-default placement and width 1`] = `
     tabindex="0"
   >
     <i
+      aria-label="More info"
       class="default-icon fas fa-question-circle"
       data-v-fd3fea90=""
+      role="img"
     />
     <div
       class="text width-large position-right"
