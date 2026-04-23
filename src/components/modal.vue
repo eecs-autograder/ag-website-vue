@@ -23,7 +23,7 @@
           role="button"
           @click="$emit('close')"
           @keydown.enter="$emit('close')"
-          @keydown.space="$emit('close')"
+          @keydown.space.prevent="$emit('close')"
           tabindex="0"
           aria-label="close-dialog"
         >

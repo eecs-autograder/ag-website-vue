@@ -12,7 +12,7 @@
         <div class="clone-course tool-icon" role="button"
              @click="show_clone_course_modal"
              @keydown.enter="show_clone_course_modal"
-             @keydown.space="show_clone_course_modal"
+             @keydown.space.prevent="show_clone_course_modal"
              :title="'Clone ' + course.name"
              tabindex="0">
           <i class="fas fa-copy" role="presentation"> </i>

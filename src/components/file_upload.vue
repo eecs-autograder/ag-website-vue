@@ -42,7 +42,7 @@
                tabindex="0"
                @click="remove_file_from_upload(file.name, index)"
                @keydown.enter="remove_file_from_upload(file.name, index)"
-               @keydown.space="remove_file_from_upload(file.name, index)"
+               @keydown.space.prevent="remove_file_from_upload(file.name, index)"
                :class="file.size === 0 ? 'remove-button-icon-empty-file' :
                                          'remove-button-icon-non-empty-file'">
             </i>

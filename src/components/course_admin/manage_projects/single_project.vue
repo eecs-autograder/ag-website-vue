@@ -25,7 +25,7 @@
           :title="'Clone ' + project.name"
           @click="start_clone_dialog"
           @keydown.enter="start_clone_dialog"
-          @keydown.space="start_clone_dialog"
+          @keydown.space.prevent="start_clone_dialog"
         >
           <i class="fas fa-copy"></i>
         </div>
