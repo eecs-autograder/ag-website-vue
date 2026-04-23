@@ -4,17 +4,18 @@
       ref="project_settings_form"
       autocomplete="off"
       spellcheck="false"
+      aria-label="Project settings"
       @submit="save_project_settings"
       @update:is_valid="state.settings_form_is_valid = $event"
     >
       <div id="project-name-container" class="form-field-wrapper">
-        <label class="label"> Project Name </label>
         <validated-text-input
           ref="project_name_input"
           v-model="state.project.name"
           :validators="[is_not_empty]"
           input_style="max-width: 500px; width: 100%"
         >
+          <template v-slot:label>Project Name</template>
         </validated-text-input>
       </div>
 
@@ -180,28 +181,30 @@
 
           <div class="form-field-wrapper">
             <div class="group-size-container">
-              <label class="label"> Min group size </label>
               <validated-int-input
                 id="min-group-size"
                 v-model="state.project.min_group_size"
                 :validators="[make_min_validator(1)]"
                 input_style="max-width: 80px;"
               >
+                <template v-slot:label> Min group size </template>
               </validated-int-input>
             </div>
 
             <div class="group-size-container">
-              <label class="label"> Max group size </label>
-              <tooltip width="large" placement="top">
-                When this is > 1, users will be prompted to register their group
-                members the first time they visit the project page.
-              </tooltip>
               <validated-int-input
                 id="max-group-size"
                 v-model="state.project.max_group_size"
                 :validators="[make_min_validator(1)]"
                 input_style="max-width: 80px;"
               >
+                <template v-slot:label>
+                  Max group size
+                  <tooltip width="large" placement="top">
+                    When this is > 1, users will be prompted to register their
+                    group members the first time they visit the project page.
+                  </tooltip>
+                </template>
               </validated-int-input>
             </div>
           </div>
@@ -269,13 +272,13 @@
         <fieldset class="fieldset">
           <legend class="legend">Submission Limits</legend>
           <div class="form-field-wrapper">
-            <label class="label"> Submissions per day </label>
             <validated-nullable-int-input
               id="submission-limit-per-day"
               v-model="state.project.submission_limit_per_day"
               :validators="[make_nullable_min_validator(1)]"
               input_style="max-width: 80px;"
             >
+              <template v-slot:label> Submissions per day </template>
             </validated-nullable-int-input>
           </div>
           <div class="checkbox-input-container">
@@ -292,17 +295,22 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label"> Reset submissions per day at: </label>
+            <label class="label" for="submission-limit-reset-time">
+              Reset submissions per day at:
+            </label>
             <div id="reset-time-picker-container">
               <input
                 type="time"
                 ref="submission_limit_reset_time_picker"
                 v-model="state.project.submission_limit_reset_time"
+                id="submission-limit-reset-time"
               />
               <span class="display-timezone">
                 {{ state.project.timezone }}
                 <i
                   class="edit-timezone-icon fas fa-pencil-alt"
+                  role="button"
+                  tabindex="0"
                   @click="timezone_input.focus()"
                 ></i>
               </span>
@@ -330,13 +338,13 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label"> Bonus submissions per group </label>
             <validated-int-input
               ref="bonus_submissions_input"
               v-model="state.project.num_bonus_submissions"
               :validators="[make_min_validator(0)]"
               input_style="max-width: 80px;"
             >
+              <template v-slot:label> Bonus submissions per group </template>
             </validated-int-input>
           </div>
 
@@ -356,12 +364,6 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label for="total-submission-limit" class="label">
-              Total submission limit (Ever!)
-            </label>
-            <tooltip width="medium" placement="top">
-              A hard limit on how many times students can submit ever.
-            </tooltip>
             <validated-nullable-int-input
               ref="total_submissions_input"
               id="total-submission-limit"
@@ -369,6 +371,12 @@
               :validators="[make_nullable_min_validator(1)]"
               input_style="max-width: 80px;"
             >
+              <template v-slot:label>
+                Total submission limit (Ever!)
+                <tooltip width="medium" placement="top">
+                  A hard limit on how many times students can submit ever.
+                </tooltip>
+              </template>
             </validated-nullable-int-input>
           </div>
         </fieldset>
@@ -431,14 +439,15 @@
             </tooltip>
           </div>
           <div class="form-field-wrapper" v-if="state.project.use_honor_pledge">
-            <label class="label">Honor pledge text</label>
             <validated-text-area-input
               data-testid="honor_pledge_text"
               v-model="state.project.honor_pledge_text"
               :validators="[]"
               :num_rows="4"
               input_style="max-width: 500px; width: 100%"
-            />
+            >
+              <template v-slot:label> Honor pledge text </template>
+            </validated-text-area-input>
           </div>
         </fieldset>
       </div>
@@ -464,7 +473,11 @@
       </div>
     </new-validated-form>
 
-    <div class="danger-zone-container">
+    <div
+      class="danger-zone-container"
+      role="region"
+      aria-label="delete project"
+    >
       <div class="delete-instructions">
         To delete this project, please delete all of its test cases first
         (regular test suites and mutation test suites).

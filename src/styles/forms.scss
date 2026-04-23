@@ -141,7 +141,8 @@ $disabled-label: rgba($disabled, 0.6);
     }
 
     .item-to-delete {
-       color: $ocean-blue;
+        font-weight: bold;
+        color: $ocean-blue;
     }
  }
 
