@@ -72,7 +72,7 @@
 
       <div class="form-field-wrapper">
         <label class="label" for="input-internal-admin-notes">
-          Staff-Only Description
+          Internal Admin Notes
         </label>
         <validated-input ref="internal_admin_notes"
                          input_id="input-internal-admin-notes"
