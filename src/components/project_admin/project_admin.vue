@@ -1,64 +1,94 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" aria-label="loading"></i>
     </div>
   </div>
   <div v-else id="project-admin">
-    <div class="navbar default-navbar">
+    <nav class="navbar default-navbar">
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'settings'}"
-            @click="set_current_tab('settings')">
+            @click="set_current_tab('settings')"
+            @keydown.enter="set_current_tab('settings')">
         Settings
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'instructor_files'}"
-            @click="set_current_tab('instructor_files')">
+            @click="set_current_tab('instructor_files')"
+            @keydown.enter="set_current_tab('settings')">
         Instructor Files
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'expected_student_files'}"
-            @click="set_current_tab('expected_student_files')">
+            @click="set_current_tab('expected_student_files')"
+            @keydown.enter="set_current_tab('expected_student_files')">
         Student Files
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'test_cases'}"
-            @click="set_current_tab('test_cases')">
+            @click="set_current_tab('test_cases')"
+            @keydown.enter="set_current_tab('test_cases')">
         Test Cases
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'mutation_testing'}"
-            @click="set_current_tab('mutation_testing')">
+            @click="set_current_tab('mutation_testing')"
+            @keydown.enter="set_current_tab('mutation_testing')">
         Mutation Testing
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'edit_groups'}"
-            @click="set_current_tab('edit_groups')">
+            @click="set_current_tab('edit_groups')"
+            @keydown.enter="set_current_tab('edit_groups')">
         Groups & Extensions
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'download_grades'}"
-            @click="set_current_tab('download_grades')">
+            @click="set_current_tab('download_grades')"
+            @keydown.enter="set_current_tab('download_grades')">
         Grades & Files
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'rerun_tests'}"
-            @click="set_current_tab('rerun_tests')">
+            @click="set_current_tab('rerun_tests')"
+            @keydown.enter="set_current_tab('rerun_tests')">
         Rerun
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'handgrading'}"
-            @click="set_current_tab('handgrading')">
+            @click="set_current_tab('handgrading')"
+            @keydown.enter="set_current_tab('handgrading')">
         Handgrading
       </div>
       <div class="nav-link"
+            role="link"
+            tabindex="0"
             :class="{'active': d_current_tab === 'stats'}"
-            @click="set_current_tab('stats')">
+            @click="set_current_tab('stats')"
+            @keydown.enter="set_current_tab('stats')">
         Stats (Beta)
       </div>
-    </div>
+    </nav>
 
-    <div class="body">
+    <main class="body">
       <project-settings v-show="d_current_tab === 'settings'"
                         v-if="d_loaded_tabs.has('settings')"
                         :project="d_project"> </project-settings>
@@ -94,7 +124,7 @@
         :course="d_globals.current_course"
         :project="d_project"
       />
-    </div>
+    </main>
   </div>
 </template>
 
