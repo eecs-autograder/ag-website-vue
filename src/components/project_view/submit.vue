@@ -70,7 +70,9 @@
     />
 
     <file-upload ref="submit_file_upload" @upload_files="process_files"
-                 :disable_upload_button="!honor_pledged_signed">
+                 :disable_upload_button="!honor_pledged_signed"
+                 role="region"
+                 aria-label="Upload files & submit">
       <template v-slot:before_upload_button v-if="project.use_honor_pledge">
         <div class="honor-pledge-text">
           <div class="honor-pledge-header">
