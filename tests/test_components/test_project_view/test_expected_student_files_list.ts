@@ -32,16 +32,16 @@ beforeEach(() => {
 });
 
 test('Show and hide file list', async () => {
-    expect(wrapper.find('.file-list').exists()).toBe(false);
-    expect(wrapper.findAll('.file-list-item').length).toEqual(0);
+    expect(wrapper.find('.file-list').isVisible()).toBe(false);
+    expect(wrapper.findAll('.file-list-item').isVisible()).toBe(false);
 
     await wrapper.find('.show-all').trigger('click');
-    expect(wrapper.find('.file-list').exists()).toBe(true);
-    expect(wrapper.findAll('.file-list-item').length).toEqual(4);
+    expect(wrapper.find('.file-list').isVisible()).toBe(true);
+    expect(wrapper.findAll('.file-list-item').isVisible()).toBe(true);
 
     await wrapper.find('.show-all').trigger('click');
-    expect(wrapper.find('.file-list').exists()).toBe(false);
-    expect(wrapper.findAll('.file-list-item').length).toEqual(0);
+    expect(wrapper.find('.file-list').isVisible()).toBe(false);
+    expect(wrapper.findAll('.file-list-item').isVisible()).toBe(false);
 });
 
 test('Filenames and num matches displayed appropriately', async () => {

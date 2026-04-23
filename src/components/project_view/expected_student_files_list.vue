@@ -1,7 +1,15 @@
 <template>
   <div class="expected-student-files-list">
-    <div class="show-all" @click="d_show = !d_show">What files should I submit?</div>
-    <ul class="file-list" v-if="d_show">
+    <div
+      class="show-all"
+      role="button"
+      tabindex="0"
+      aria-controls="expected-files-to-submit-list"
+      @click="d_show = !d_show"
+      @keydown.enter="d_show = !d_show"
+      @keydown.space.prevent="d_show = !d_show"
+    >What files should I submit?</div>
+    <ul id="expected-files-to-submit-list" class="file-list" v-show="d_show">
       <li v-for="item of expected_student_files" :key="item.pk" class="file-list-item">
         - <span class="filename">{{item.pattern}}</span>
         <span class="num-matches" v-if="item.min_num_matches !== 1 || item.max_num_matches !== 1">
@@ -53,15 +61,15 @@ export default class ExpectedStudentFilesList extends Vue {
 }
 
 .num-matches {
-  color: $stormy-gray-dark;
+  color: $normal-text-color-2;
 }
 
 .show-all {
   cursor: pointer;
-  color: $ocean-blue;
+  color: darken($ocean-blue, 10%);
 
   &:hover {
-    color: darken($ocean-blue, 10%);
+    color: darken($ocean-blue, 20%);
   }
 }
 

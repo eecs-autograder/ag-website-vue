@@ -793,8 +793,9 @@ describe('Submitted file validation tests', () => {
         expect(wrapper.findAll('.file-list-header').length).toEqual(1);
         expect(wrapper.findAll('.file-list-header').at(0).text()).toEqual('Files to submit');
 
-        expect(wrapper.findAll('.file-list').length).toEqual(1);
-        let file_list = wrapper.findAll('.file-list').at(0);
+        const confirm_submit_modal = wrapper.findComponent({ref: 'confirm_submit_modal'});
+        expect(confirm_submit_modal.findAll('.file-list').length).toEqual(1);
+        let file_list = confirm_submit_modal.findAll('.file-list').at(0);
         expect(file_list.findAll('li').length).toEqual(2);
         expect(file_list.findAll('li').at(0).text()).toEqual('required');
         expect(file_list.findAll('li').at(1).text()).toEqual('too_few_1');
@@ -827,21 +828,22 @@ describe('Submitted file validation tests', () => {
 
         expect(wrapper.findAll('.file-list-header').at(0).text()).toEqual('Files to submit');
 
-        let submitted_files = wrapper.findAll('.file-list').at(0);
+        const confirm_submit_modal = wrapper.findComponent({ref: 'confirm_submit_modal'});
+        let submitted_files = confirm_submit_modal.findAll('.file-list').at(0);
         expect(submitted_files.findAll('li').length).toEqual(4);
         expect(submitted_files.findAll('li').at(0).text()).toEqual('too_many_1');
         expect(submitted_files.findAll('li').at(1).text()).toEqual('too_many_2');
         expect(submitted_files.findAll('li').at(2).text()).toEqual('too_many_3');
         expect(submitted_files.findAll('li').at(3).text()).toEqual('unexpected');
 
-        let missing_files = wrapper.findAll('.file-list').at(1);
+        let missing_files = confirm_submit_modal.findAll('.file-list').at(1);
         expect(missing_files.findAll('li').length).toEqual(2);
         expect(missing_files.findAll('li').at(0).text()).toEqual('required');
         expect(compress_whitespace(missing_files.findAll('li').at(1).text())).toEqual(
             'Expected at least 1 file(s) matching the pattern too_few_* but got 0'
         );
 
-        let unexpected_files = wrapper.findAll('.file-list').at(2);
+        let unexpected_files = confirm_submit_modal.findAll('.file-list').at(2);
         expect(unexpected_files.findAll('li').length).toEqual(2);
         expect(unexpected_files.findAll('li').at(0).text()).toEqual('unexpected');
         expect(compress_whitespace(unexpected_files.findAll('li').at(1).text())).toEqual(
