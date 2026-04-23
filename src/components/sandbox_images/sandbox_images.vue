@@ -11,6 +11,7 @@
               role="button"
               aria-label="Toggle sidebar"
               aria-controls="sandbox-images-sidebar-content"
+              :aria-expanded="!d_sidebar_collapsed"
               @click="d_sidebar_collapsed = !d_sidebar_collapsed"
               @keydown.enter="d_sidebar_collapsed = !d_sidebar_collapsed"
               @keydown.space="d_sidebar_collapsed = !d_sidebar_collapsed"
@@ -30,7 +31,7 @@
       </div>
       <div id="sandbox-images-sidebar-content"
            class="sidebar-content"
-           v-if="!d_sidebar_collapsed"
+           v-show="!d_sidebar_collapsed"
       >
         <div class="sidebar-section-header">In Progress</div>
         <collapsible

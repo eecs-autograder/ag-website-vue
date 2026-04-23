@@ -1,7 +1,8 @@
 <template>
   <div class="sidebar-container">
-    <div class="sidebar-menu">
-      <template v-if="d_ultimate_submission !== null && !d_collapsed && !d_loading">
+    <div id="my-submissions-sidebar-container"
+         class="sidebar-menu" role="region" aria-label="Sidebar">
+      <template v-if="ultimateSubmissionAvailable && !d_collapsed">
         <div class="header">Final Graded Submission</div>
         <submission-panel
           :submission="d_ultimate_submission"
@@ -9,11 +10,26 @@
             'active': d_selected_submission !== null
                       && d_selected_submission.pk === d_ultimate_submission.pk
           }"
-          @click.native="d_selected_submission = d_ultimate_submission"></submission-panel>
+          role="button"
+          tabindex="0"
+          @click.native="d_selected_submission = d_ultimate_submission"
+          @keydown.space.native.prevent="d_selected_submission = d_ultimate_submission"
+          @keydown.enter.native="d_selected_submission = d_ultimate_submission"
+        ></submission-panel>
       </template>
 
       <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
-        <span class="collapse-sidebar-button" @click="d_collapsed = !d_collapsed">
+        <span
+          class="collapse-sidebar-button"
+          role="button"
+          tabindex="0"
+          aria-label="Toggle sidebar"
+          aria-controls="my-submissions-sidebar-container"
+          :aria-expanded="!d_collapsed"
+          @click="d_collapsed = !d_collapsed"
+          @keydown.space.prevent="d_collapsed = !d_collapsed"
+          @keydown.enter="d_collapsed = !d_collapsed"
+        >
           <i class="fas fa-bars"></i>
         </span>
         <span class="header-text" v-if="!d_collapsed">
@@ -37,7 +53,12 @@
               :key="submission.pk"
               :class="{'active': d_selected_submission !== null
                                               && d_selected_submission.pk === submission.pk}"
-              @click.native="d_selected_submission = submission"></submission-panel>
+              role="button"
+              tabindex="0"
+              @click.native="d_selected_submission = submission"
+              @keydown.space.native.prevent="d_selected_submission = submission"
+              @keydown.enter.native="d_selected_submission = submission"
+            ></submission-panel>
           </template>
         </template>
       </div>
@@ -57,11 +78,6 @@
         >
           <unlocked-hint :hint="hint"></unlocked-hint>
         </div>
-      </div>
-
-      <div class="screen-too-small-msg">
-        <i class="fas fa-exclamation-triangle"></i>
-        Your screen may be too small to display this content properly.
       </div>
 
       <div v-if="d_selected_submission !== null">
@@ -218,6 +234,10 @@ export default class SubmissionList extends Vue implements SubmissionObserver,
     );
     this.d_all_unlocked_mutant_hints.sort((a, b) => a.pk - b.pk);
     this.unrated_mutant_hint_data.unrated_hints = this.unrated_hints;
+  }
+
+  private get ultimateSubmissionAvailable() {
+    return this.d_ultimate_submission !== null && !this.d_loading;
   }
 
   private async refresh_submissions() {
