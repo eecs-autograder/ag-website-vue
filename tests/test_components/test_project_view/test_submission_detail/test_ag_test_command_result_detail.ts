@@ -730,7 +730,7 @@ describe('Warnings', () => {
         ag_test_command_result.custom_scoring_error = "I'M ERROR";
         const wrapper = await make_wrapper();
 
-        const legends = wrapper.findAll('legend');
+        const legends = wrapper.findAll('.legend');
         expect(legends.wrappers.find(legend => legend.text() === 'Warnings')?.exists()).toBe(true);
 
         const warnings = wrapper.findComponent({ref: 'warnings'});
