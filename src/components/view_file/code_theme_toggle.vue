@@ -158,6 +158,11 @@ input:checked + .slider:before {
   transform: translateX($width - $height);
 }
 
+input:focus + .slider:before {
+  outline: medium auto currentColor;
+  outline: medium auto invert;
+}
+
 .slider.round {
   border-radius: $height;
 }
