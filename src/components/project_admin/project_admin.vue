@@ -19,7 +19,7 @@
             tabindex="0"
             :class="{'active': d_current_tab === 'instructor_files'}"
             @click="set_current_tab('instructor_files')"
-            @keydown.enter="set_current_tab('settings')">
+            @keydown.enter="set_current_tab('instructor_files')">
         Instructor Files
       </div>
       <div class="nav-link"
