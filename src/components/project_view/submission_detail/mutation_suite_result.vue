@@ -6,11 +6,15 @@
       :submission="submission"
     ></mutant-hints>
 
-    <fieldset v-if="show_setup_fieldset" class="fieldset">
-      <legend class="legend" data-testid="setup_command_name">
+    <div
+      v-if="show_setup_fieldset" class="fieldset"
+      role="region"
+      :aria-label="`${mutation_test_suite_result.mutation_test_suite_name} setup result`"
+    >
+      <div class="legend" data-testid="setup_command_name">
         {{mutation_test_suite_result.setup_command_name !== null
           ? mutation_test_suite_result.setup_command_name : 'Setup'}}
-      </legend>
+      </div>
       <div data-testid="setup_section">
 
         <div v-if="mutation_test_suite_result.setup_return_code !== null
@@ -30,9 +34,11 @@
                 {{mutation_test_suite_result.setup_return_code}}
 
                 <span v-if="mutation_test_suite_result.setup_return_code === 0">
-                  <i class="fas fa-check correct-icon"></i>
+                  <i class="fas fa-check correct-icon"
+                     role="img" aria-label="Correct"></i>
                 </span>
-                <span v-else-if="mutation_test_suite_result.setup_return_code !== 0">
+                <span v-else-if="mutation_test_suite_result.setup_return_code !== 0"
+                      role="img" aria-label="Incorrect">
                   <i class="fas fa-times incorrect-icon"></i>
                 </span>
               </span>
@@ -47,7 +53,8 @@
           <div class="feedback">
             <template v-if="!d_setup_stdout_loaded">
               <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw"
+                   role="status" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -68,7 +75,8 @@
           <div class="feedback">
             <template v-if="!d_setup_stderr_loaded">
               <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw"
+                   role="status" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -83,10 +91,14 @@
         </div>
 
       </div>
-    </fieldset>
+    </div>
 
-    <fieldset class="fieldset">
-      <legend class="legend"> Student Tests </legend>
+    <div
+      class="fieldset"
+      role="region"
+      :aria-label="`${mutation_test_suite_result.mutation_test_suite_name} Student tests`"
+    >
+      <div class="legend"> Student Tests </div>
       <div data-testid="student_tests_section">
 
         <div v-if="mutation_test_suite_result.student_tests.length === 0"
@@ -109,9 +121,9 @@
 
           <div class="feedback-label test-names-feedback-label"> Discarded test cases: </div>
           <div class="feedback test-names-feedback">
-            <div class="list" data-testid="discarded_tests">
+            <div class="list" data-testid="discarded_tests" role="list">
               <div v-for="discarded_test_name of mutation_test_suite_result.discarded_tests"
-                   class="list-item">
+                   class="list-item" role="listitem">
                 <span class="list-icon"><i class="far fa-trash-alt discarded-test-icon"></i></span>
                 <span class="test-name">{{discarded_test_name}}</span>
               </div>
@@ -131,9 +143,9 @@
           </div>
           <div class="feedback-label test-names-feedback-label">Tests with false positives:</div>
           <div class="feedback test-names-feedback">
-            <div class="list" data-testid="false_positives">
+            <div class="list" data-testid="false_positives" role="list">
               <div v-for="false_positive_test of mutation_test_suite_result.invalid_tests"
-                   class="list-item">
+                   class="list-item" role="listitem">
                 <span v-if="test_timed_out(false_positive_test)"
                       class="list-icon">
                   <i class="far fa-clock timed-out-icon"></i>
@@ -158,8 +170,8 @@
              data-testid="valid_tests_section">
           <div class="feedback-label test-names-feedback-label"> Valid test cases: </div>
           <div class="feedback test-names-feedback">
-            <div class="list" data-testid="valid_tests">
-              <div v-for="valid_test of valid_tests" class="list-item">
+            <div class="list" data-testid="valid_tests" role="list">
+              <div v-for="valid_test of valid_tests" class="list-item" role="listitem">
                 <span class="list-icon"><i class="far fa-check-circle valid-test-icon"></i></span>
                 <span class="test-name">{{valid_test}}</span>
               </div>
@@ -190,7 +202,8 @@
           <div class="feedback test-names-feedback">
             <template v-if="!d_student_test_names_stdout_loaded">
               <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw"
+                   role="status" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -212,7 +225,8 @@
           <div class="feedback test-names-feedback">
             <template v-if="!d_student_test_names_stderr_loaded">
               <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw"
+                   role="status" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -249,7 +263,8 @@
           <div class="feedback">
             <template v-if="!d_validity_check_stdout_loaded">
               <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw"
+                   role="status" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -271,7 +286,8 @@
           <div class="feedback">
             <template v-if="!d_validity_check_stderr_loaded">
               <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw"
+                   role="status" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -285,11 +301,15 @@
           </div>
         </div>
       </div>
-    </fieldset>
+    </div>
 
-    <fieldset v-if="show_buggy_implementations_fieldset"
-              class="fieldset">
-      <legend class="legend"> Buggy Implementations </legend>
+    <div
+      v-if="show_buggy_implementations_fieldset"
+      class="fieldset"
+      role="region"
+      :aria-label="`${mutation_test_suite_result.mutation_test_suite_name} buggy implementations`"
+    >
+      <div class="legend"> Buggy Implementations </div>
       <div data-testid="buggy_implementations_section">
 
         <div v-if="mutation_test_suite_result.num_bugs_exposed !== null"
@@ -304,10 +324,11 @@
         <div v-if="show_exposed_bug_names" class="feedback-row">
           <div class="feedback-label buggy-impl-feedback-label"> Bugs exposed: </div>
           <div class="feedback buggy-impl-feedback">
-            <div class="list" data-testid="bugs_exposed">
+            <div class="list" data-testid="bugs_exposed" role="list">
               <div v-for="bug_name of bug_names_to_show"
                    class="list-item"
-                   :class="{'unexposed-bug': !exposed_bug_set.has(bug_name)}">
+                   :class="{'unexposed-bug': !exposed_bug_set.has(bug_name)}"
+                   role="listitem">
                 <span class="list-icon"><i class="fas fa-bug bug-icon"></i></span>
                 <span class="bug-name">{{bug_name}}</span>
               </div>
@@ -335,7 +356,8 @@
           <div class="feedback buggy-impl-feedback">
             <template v-if="!d_grade_buggy_stdout_loaded">
               <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw"
+                   role="status" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -357,7 +379,8 @@
           <div class="feedback buggy-impl-feedback">
             <template v-if="!d_grade_buggy_stderr_loaded">
               <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                <i class="fa fa-spinner fa-pulse fa-fw"
+                   role="status" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -372,7 +395,7 @@
         </div>
 
       </div>
-    </fieldset>
+    </div>
   </div>
 </template>
 
@@ -786,11 +809,6 @@ $bug-color: $navy-blue;
   @extend .white-button;
   box-shadow: none;
   margin: 0 10px;
-}
-
-.show-output-button:focus {
-  outline: none;
-  box-shadow: none;
 }
 
 .correct-icon, .incorrect-icon {

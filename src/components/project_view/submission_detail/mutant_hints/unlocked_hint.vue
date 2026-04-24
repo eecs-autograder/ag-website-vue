@@ -19,11 +19,11 @@
             class="radio"
             v-model="d_hint_rating"
             :value="3"
-            :id="`very-useful-${d_radio_button_random_num}`"
+            :id="`very-useful-${d_radio_button_uid}`"
           >
           <label
             class="label"
-            :for="`very-useful-${d_radio_button_random_num}`">
+            :for="`very-useful-${d_radio_button_uid}`">
             Very useful
           </label>
         </div>
@@ -34,11 +34,11 @@
             class="radio"
             v-model="d_hint_rating"
             :value="2"
-            :id="`somewhat-useful-${d_radio_button_random_num}`"
+            :id="`somewhat-useful-${d_radio_button_uid}`"
           >
           <label
             class="label"
-            :for="`somewhat-useful-${d_radio_button_random_num}`">
+            :for="`somewhat-useful-${d_radio_button_uid}`">
             Somewhat useful
           </label>
         </div>
@@ -49,11 +49,11 @@
             class="radio"
             v-model="d_hint_rating"
             :value="1"
-            :id="`not-useful-${d_radio_button_random_num}`"
+            :id="`not-useful-${d_radio_button_uid}`"
           >
           <label
             class="label"
-            :for="`not-useful-${d_radio_button_random_num}`">
+            :for="`not-useful-${d_radio_button_uid}`">
             Not useful
           </label>
         </div>
@@ -80,7 +80,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
-import { assert_not_null, toggle } from '@/utils';
+import { assert_not_null, generate_uid, toggle } from '@/utils';
 import { display_mutant_name, MutantHintService, UnlockedHintData } from './mutant_hint_service';
 
 @Component({
@@ -96,7 +96,7 @@ export default class UnlockedHint extends Vue {
   d_user_comment: string = '';
   d_saving = false;
 
-  d_radio_button_random_num = Math.floor(Math.random() * 1000000);
+  d_radio_button_uid = generate_uid();
 
   readonly display_mutant_name = display_mutant_name;
 

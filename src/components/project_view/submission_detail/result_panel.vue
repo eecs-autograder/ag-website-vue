@@ -4,7 +4,12 @@
                   {'command-panel-header-open': d_is_open && is_command },
                   {'panel-header-open': d_is_open && !is_command },
                   {'panel-header-closed': !d_is_open }]"
-         @click="toggle_d_is_open">
+         role="button"
+         tabindex="0"
+         @click="toggle_d_is_open"
+         @keydown.space.prevent="toggle_d_is_open"
+         @keydown.enter="toggle_d_is_open"
+    >
 
       <template v-if="is_command">
         <div class="command-name">{{name}}</div>
@@ -14,7 +19,8 @@
         </div>
         <div class="command-points">
           <span v-if="points_possible !== 0"
-                class="display-points">
+                class="display-points"
+                aria-label="Score">
             {{points_awarded}}/{{points_possible}}
           </span>
         </div>
@@ -27,7 +33,8 @@
         </div>
         <div class="points">
           <span v-if="points_possible !== 0"
-                class="display-points">
+                class="display-points"
+                aria-label="Score">
             {{points_awarded}}/{{points_possible}}
           </span>
         </div>
