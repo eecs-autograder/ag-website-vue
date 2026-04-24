@@ -655,6 +655,10 @@ $light-green: hsl(97, 42%, 79%);
   opacity: 0;
   transition: opacity 0.2s;
 
+  &:focus-within {
+    opacity: 1;
+  }
+
   &.opacity-1 {
     opacity: 1;
   }
