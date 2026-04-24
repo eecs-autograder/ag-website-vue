@@ -92,9 +92,10 @@
         This submission does <span class="does-not-count">NOT</span> count
         for the following users:
       </div>
-      <div id="does-not-count-for-list">
+      <div id="does-not-count-for-list" role="list">
         <div v-for="(username, index) of submission.does_not_count_for"
-             class="does-not-count-for-list-item">
+             class="does-not-count-for-list-item"
+             role="listitem">
           <span class="list-icon">
             <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
           </span>
@@ -103,14 +104,25 @@
       </div>
     </div>
 
-    <div class="submitted-files">
+    <div class="submitted-files" role="list">
       <div v-for="filename of submission.submitted_filenames"
-            class="submitted-file">
+            class="submitted-file" role="listitem">
         <a class="open-file-link"
             :class="{'current-file': current_filename === filename}"
-            @click="view_file(filename)">{{filename}}</a>
-        <i class="cursor-pointer fa fa-file-download download-file-icon"
-            @click="download_file(filename)">
+            role="button"
+            tabindex="0"
+            @click="view_file(filename)"
+            @keydown.space.prevent="view_file(filename)"
+            @keydown.enter="view_file(filename)"
+        >{{filename}}</a>
+        <i
+          class="cursor-pointer fa fa-file-download download-file-icon"
+          role="button"
+          tabindex="0"
+          @click="download_file(filename)"
+          @keydown.space.prevent="download_file(filename)"
+          @keydown.enter="download_file(filename)"
+        >
         </i>
       </div>
     </div>
