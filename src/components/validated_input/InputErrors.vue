@@ -18,7 +18,7 @@ import { generate_uid } from "@/utils";
 
 type PropTypes = {
   errors: string[];
-  max_errors_to_show: number | null;
+  max_errors_to_show?: number;
 };
 const props = withDefaults(defineProps<PropTypes>(), {
   max_errors_to_show: 1,
