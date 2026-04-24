@@ -32,7 +32,7 @@ test("updating timezone persists after reload and doesn't affect wall time shown
 }) => {
   const soft_deadline = page.getByRole("textbox", { name: "Soft Deadline" });
   const hard_deadline = page.getByRole("textbox", { name: "Hard Deadline" });
-  const timezone = page.getByLabel("Timezone");
+  const timezone = page.getByRole("combobox", { name: "Timezone" });
 
   const time_value = "2028-04-30T10:42";
   const timezone_value = "America/Chicago";
