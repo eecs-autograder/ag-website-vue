@@ -10,11 +10,13 @@
       <b>{{submission_result.total_points}}/{{submission_result.total_points_possible}}</b>
     </div>
     <div v-if="submission.status === GradingStatus.waiting_for_deferred"
-         id="deferred-tests-message" class="info-spacing grading-status">
+         id="deferred-tests-message" class="info-spacing grading-status"
+         role="status">
       Core tests finished. You can submit again now!
     </div>
     <div v-else-if="submission.status === GradingStatus.finished_grading"
-         id="deferred-tests-message" class="info-spacing grading-status">
+         id="deferred-tests-message" class="info-spacing grading-status"
+         role="status">
       All tests finished.
     </div>
 
@@ -25,7 +27,8 @@
     <div v-if="submission.status !== GradingStatus.waiting_for_deferred
                 && submission.status !== GradingStatus.finished_grading"
           id="grading-status-section"
-          class="grading-status info-spacing">
+          class="grading-status info-spacing"
+          role="status">
       <div v-if="submission.status === GradingStatus.received">
         We got your submission! It should be queued soon.
       </div>
