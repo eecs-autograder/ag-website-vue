@@ -326,6 +326,8 @@
                   aria-label="edit timezone"
                   tabindex="0"
                   @click="timezone_input.focus()"
+                  @keydown.space.prevent="timezone_input.focus()"
+                  @keydown.enter="timezone_input.focus()"
                 ></i>
               </span>
             </div>
