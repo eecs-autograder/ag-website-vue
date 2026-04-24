@@ -118,6 +118,7 @@
         <i
           class="cursor-pointer fa fa-file-download download-file-icon"
           role="button"
+          aria-label="Download file"
           tabindex="0"
           @click="download_file(filename)"
           @keydown.space.prevent="download_file(filename)"
@@ -151,7 +152,7 @@
     <div v-if="d_globals.user_roles.is_staff
                 && submission_with_results.status !== GradingStatus.removed_from_queue"
           id="adjust-feedback-section" class="info-spacing">
-      <span id="adjust-feedback-label"> Adjust Feedback </span>
+      <label id="adjust-feedback-label" for="adjust-feedback-select"> Adjust Feedback </label>
       <select id="adjust-feedback-select"
               class="select"
               :disabled="d_loading_results"
