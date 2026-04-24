@@ -188,55 +188,63 @@
           <div class="feedback">
             <button class="show-output-button"
                     data-testid="show_test_names_output_button"
+                    :aria-controls="`test-names-output-section-${component_uid}`"
+                    :aria-expanded="d_show_student_test_names_output"
                     @click="toggle_d_show_student_test_names_output">
               {{d_show_student_test_names_output ? 'Hide' : 'Show'}} Output
             </button>
           </div>
         </div>
 
-        <div v-if="mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout
-                   && d_show_student_test_names_output"
-             class="feedback-row"
-             data-testid="test_names_stdout_section">
-          <div class="feedback-label test-names-feedback-label"> Output: </div>
-          <div class="feedback test-names-feedback">
-            <template v-if="!d_student_test_names_stdout_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"
-                   role="status" aria-label="Loading"></i>
+        <div
+          :id="`test-names-output-section-${component_uid}`"
+          v-show="d_show_student_test_names_output"
+        >
+          <div class="feedback-row"
+              data-testid="test_names_stdout_section">
+            <div v-if="mutation_test_suite_result.fdbk_settings.show_get_test_names_stdout
+                      && d_show_student_test_names_output">
+              <div class="feedback-label test-names-feedback-label"> Output: </div>
+              <div class="feedback test-names-feedback">
+                <template v-if="!d_student_test_names_stdout_loaded">
+                  <div class="loading-output">
+                    <i class="fa fa-spinner fa-pulse fa-fw"
+                      role="status" aria-label="Loading"></i>
+                  </div>
+                </template>
+                <template v-else>
+                  <div v-if="!d_student_test_names_stdout_content" class="short-output">No output</div>
+                  <div v-else
+                      class="lengthy-output">
+                    <view-file :file_contents="d_student_test_names_stdout_content"
+                              view_file_max_height="50vh"></view-file>
+                  </div>
+                </template>
               </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_student_test_names_stdout_content" class="short-output">No output</div>
-              <div v-else
-                   class="lengthy-output">
-                <view-file :file_contents="d_student_test_names_stdout_content"
-                           view_file_max_height="50vh"></view-file>
-              </div>
-            </template>
+            </div>
           </div>
-        </div>
 
-        <div v-if="mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr
-                   && d_show_student_test_names_output"
-             class="feedback-row"
-             data-testid="test_names_stderr_section">
-          <div class="feedback-label test-names-feedback-label"> Error output: </div>
-          <div class="feedback test-names-feedback">
-            <template v-if="!d_student_test_names_stderr_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"
-                   role="status" aria-label="Loading"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_student_test_names_stderr_content" class="short-output">No output</div>
-              <div v-else
-                   class="lengthy-output">
-                <view-file :file_contents="d_student_test_names_stderr_content"
-                           view_file_max_height="50vh"></view-file>
-              </div>
-            </template>
+          <div v-if="mutation_test_suite_result.fdbk_settings.show_get_test_names_stderr
+                    && d_show_student_test_names_output"
+              class="feedback-row"
+              data-testid="test_names_stderr_section">
+            <div class="feedback-label test-names-feedback-label"> Error output: </div>
+            <div class="feedback test-names-feedback">
+              <template v-if="!d_student_test_names_stderr_loaded">
+                <div class="loading-output">
+                  <i class="fa fa-spinner fa-pulse fa-fw"
+                    role="status" aria-label="Loading"></i>
+                </div>
+              </template>
+              <template v-else>
+                <div v-if="!d_student_test_names_stderr_content" class="short-output">No output</div>
+                <div v-else
+                    class="lengthy-output">
+                  <view-file :file_contents="d_student_test_names_stderr_content"
+                            view_file_max_height="50vh"></view-file>
+                </div>
+              </template>
+            </div>
           </div>
         </div>
 
@@ -249,55 +257,59 @@
           <div class="feedback">
             <button class="show-output-button"
                     data-testid="show_validity_check_output_button"
-                    @click="toggle_d_show_validity_check_output">
+                    @click="toggle_d_show_validity_check_output"
+                    :aria-controls="`test-validity-output-section-${component_uid}`"
+                    :aria-expanded="d_show_validity_check_output">
               {{d_show_validity_check_output ? 'Hide' : 'Show'}} Output
             </button>
           </div>
         </div>
 
-        <div v-if="mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
-                   && d_show_validity_check_output"
-             class="feedback-row"
-             data-testid="validity_check_stdout_section">
-          <div class="feedback-label"> Output: </div>
-          <div class="feedback">
-            <template v-if="!d_validity_check_stdout_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"
-                   role="status" aria-label="Loading"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_validity_check_stdout_content" class="short-output">No output</div>
-              <div v-else
-                   class="lengthy-output">
-                <view-file :file_contents="d_validity_check_stdout_content"
-                           view_file_max_height="50vh"></view-file>
-              </div>
-            </template>
+        <div :id="`test-validity-output-section-${component_uid}`">
+          <div v-if="mutation_test_suite_result.fdbk_settings.show_validity_check_stdout
+                    && d_show_validity_check_output"
+              class="feedback-row"
+              data-testid="validity_check_stdout_section">
+            <div class="feedback-label"> Output: </div>
+            <div class="feedback">
+              <template v-if="!d_validity_check_stdout_loaded">
+                <div class="loading-output">
+                  <i class="fa fa-spinner fa-pulse fa-fw"
+                    role="status" aria-label="Loading"></i>
+                </div>
+              </template>
+              <template v-else>
+                <div v-if="!d_validity_check_stdout_content" class="short-output">No output</div>
+                <div v-else
+                    class="lengthy-output">
+                  <view-file :file_contents="d_validity_check_stdout_content"
+                            view_file_max_height="50vh"></view-file>
+                </div>
+              </template>
+            </div>
           </div>
-        </div>
 
-        <div v-if="mutation_test_suite_result.fdbk_settings.show_validity_check_stderr
-                   && d_show_validity_check_output"
-             class="feedback-row"
-             data-testid="validity_check_stderr_section">
-          <div class="feedback-label"> Error output: </div>
-          <div class="feedback">
-            <template v-if="!d_validity_check_stderr_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"
-                   role="status" aria-label="Loading"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_validity_check_stderr_content" class="short-output">No output</div>
-              <div v-else
-                   class="lengthy-output">
-                <view-file :file_contents="d_validity_check_stderr_content"
-                           view_file_max_height="50vh"></view-file>
-              </div>
-            </template>
+          <div v-if="mutation_test_suite_result.fdbk_settings.show_validity_check_stderr
+                    && d_show_validity_check_output"
+              class="feedback-row"
+              data-testid="validity_check_stderr_section">
+            <div class="feedback-label"> Error output: </div>
+            <div class="feedback">
+              <template v-if="!d_validity_check_stderr_loaded">
+                <div class="loading-output">
+                  <i class="fa fa-spinner fa-pulse fa-fw"
+                    role="status" aria-label="Loading"></i>
+                </div>
+              </template>
+              <template v-else>
+                <div v-if="!d_validity_check_stderr_content" class="short-output">No output</div>
+                <div v-else
+                    class="lengthy-output">
+                  <view-file :file_contents="d_validity_check_stderr_content"
+                            view_file_max_height="50vh"></view-file>
+                </div>
+              </template>
+            </div>
           </div>
         </div>
       </div>
@@ -343,54 +355,58 @@
           <div class="feedback">
             <button class="show-output-button"
                     data-testid="show_buggy_output_button"
-                    @click="toggle_d_show_buggy_implementations_output">
+                    @click="toggle_d_show_buggy_implementations_output"
+                    :aria-controls="`buggy-impl-output-section-${component_uid}`"
+                    :aria-expanded="d_show_buggy_implementations_output">
               {{d_show_buggy_implementations_output ? 'Hide' : 'Show'}} Output
             </button>
           </div>
         </div>
-        <div v-if="mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
-                     && d_show_buggy_implementations_output"
-               data-testid="buggy_stdout_section"
-               class="feedback-row">
-          <div class="feedback-label buggy-impl-feedback-label"> Output: </div>
-          <div class="feedback buggy-impl-feedback">
-            <template v-if="!d_grade_buggy_stdout_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"
-                   role="status" aria-label="Loading"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_grade_buggy_stdout_content" class="short-output">No output</div>
-              <div v-else
-                   class="lengthy-output">
-                <view-file :file_contents="d_grade_buggy_stdout_content"
-                           view_file_max_height="50vh"></view-file>
-              </div>
-            </template>
+        <div :id="`buggy-impl-output-section-${component_uid}`">
+          <div v-if="mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stdout
+                      && d_show_buggy_implementations_output"
+                data-testid="buggy_stdout_section"
+                class="feedback-row">
+            <div class="feedback-label buggy-impl-feedback-label"> Output: </div>
+            <div class="feedback buggy-impl-feedback">
+              <template v-if="!d_grade_buggy_stdout_loaded">
+                <div class="loading-output">
+                  <i class="fa fa-spinner fa-pulse fa-fw"
+                    role="status" aria-label="Loading"></i>
+                </div>
+              </template>
+              <template v-else>
+                <div v-if="!d_grade_buggy_stdout_content" class="short-output">No output</div>
+                <div v-else
+                    class="lengthy-output">
+                  <view-file :file_contents="d_grade_buggy_stdout_content"
+                            view_file_max_height="50vh"></view-file>
+                </div>
+              </template>
+            </div>
           </div>
-        </div>
 
-        <div v-if="mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr
-                   && d_show_buggy_implementations_output"
-             class="feedback-row"
-             data-testid="buggy_stderr_section">
-          <div class="feedback-label buggy-impl-feedback-label"> Error output: </div>
-          <div class="feedback buggy-impl-feedback">
-            <template v-if="!d_grade_buggy_stderr_loaded">
-              <div class="loading-output">
-                <i class="fa fa-spinner fa-pulse fa-fw"
-                   role="status" aria-label="Loading"></i>
-              </div>
-            </template>
-            <template v-else>
-              <div v-if="!d_grade_buggy_stderr_content" class="short-output">No output</div>
-              <div v-else
-                   class="lengthy-output">
-                <view-file :file_contents="d_grade_buggy_stderr_content"
-                           view_file_max_height="50vh"></view-file>
-              </div>
-            </template>
+          <div v-if="mutation_test_suite_result.fdbk_settings.show_grade_buggy_impls_stderr
+                    && d_show_buggy_implementations_output"
+              class="feedback-row"
+              data-testid="buggy_stderr_section">
+            <div class="feedback-label buggy-impl-feedback-label"> Error output: </div>
+            <div class="feedback buggy-impl-feedback">
+              <template v-if="!d_grade_buggy_stderr_loaded">
+                <div class="loading-output">
+                  <i class="fa fa-spinner fa-pulse fa-fw"
+                    role="status" aria-label="Loading"></i>
+                </div>
+              </template>
+              <template v-else>
+                <div v-if="!d_grade_buggy_stderr_content" class="short-output">No output</div>
+                <div v-else
+                    class="lengthy-output">
+                  <view-file :file_contents="d_grade_buggy_stderr_content"
+                            view_file_max_height="50vh"></view-file>
+                </div>
+              </template>
+            </div>
           </div>
         </div>
 
@@ -416,6 +432,7 @@ import ViewFile from "@/components/view_file/view_file.vue";
 import { handle_global_errors_async } from '@/error_handling';
 
 import MutantHints from "./mutant_hints/mutant_hints.vue";
+import { generate_uid } from '@/utils';
 
 @Component({
   components: {
@@ -718,6 +735,10 @@ export default class MutationSuiteResult extends Vue {
       (student_test) => !invalid_tests.has(student_test)
     );
     return valid_tests;
+  }
+
+  get component_uid() {
+    return generate_uid();
   }
 }
 </script>
