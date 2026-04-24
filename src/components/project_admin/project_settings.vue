@@ -25,7 +25,7 @@
           <div class="form-field-wrapper">
             <label class="label" for="soft-deadline">
               Soft Deadline
-              <tooltip width="medium" placement="top">
+              <tooltip width="large" placement="top">
                 The deadline shown to students.
               </tooltip>
             </label>
@@ -129,11 +129,11 @@
                 v-model="state.project.guests_can_submit"
               />
               Anyone with the link can submit
+              <tooltip width="large" placement="top">
+                This can be restricted to users with a specific email domain in
+                the course settings.
+              </tooltip>
             </label>
-            <tooltip width="large" placement="top">
-              This can be restricted to users with a specific email domain in
-              the course settings.
-            </tooltip>
           </div>
 
           <div class="checkbox-input-container">
@@ -145,11 +145,11 @@
                 v-model="state.project.disallow_student_submissions"
               />
               Disable submitting
+              <tooltip width="large" placement="top">
+                Temporarily prevent students from submitting (they can still see
+                their previous submissions).
+              </tooltip>
             </label>
-            <tooltip width="large" placement="top">
-              Temporarily prevent students from submitting (they can still see
-              their previous submissions).
-            </tooltip>
           </div>
 
           <div class="checkbox-input-container">
@@ -165,12 +165,12 @@
                 "
               />
               Publish final grades
+              <tooltip width="large" placement="top">
+                When the hard deadline has passed and scores are published,
+                students will see their final grade for the project on the submit
+                page.
+              </tooltip>
             </label>
-            <tooltip width="large" placement="top">
-              When the hard deadline has passed and scores are published,
-              students will see their final grade for the project on the submit
-              page.
-            </tooltip>
           </div>
         </fieldset>
       </div>
@@ -218,13 +218,13 @@
                 v-model="state.project.disallow_group_registration"
               />
               Disable group registration
+              <tooltip width="large" placement="top">
+                Temporarily prevent students registering new groups. Groups
+                already registered will be unaffected. <br />
+                NOTE: This will effectively prevent unregistered students from
+                submitting.
+              </tooltip>
             </label>
-            <tooltip width="large" placement="top">
-              Temporarily prevent students registering new groups. Groups
-              already registered will be unaffected. <br />
-              NOTE: This will effectively prevent unregistered students from
-              submitting.
-            </tooltip>
           </div>
         </fieldset>
       </div>
@@ -235,11 +235,11 @@
           <div class="form-field-wrapper">
             <label class="label" for="ultimate-submission-policy">
               Final graded submission policy
+              <tooltip width="large" placement="top">
+                Use students' most recent or best submission for their final
+                score.
+              </tooltip>
             </label>
-            <tooltip width="large" placement="top">
-              Use students' most recent or best submission for their final
-              score.
-            </tooltip>
             <div>
               <select
                 id="ultimate-submission-policy"
@@ -327,14 +327,14 @@
                 :disabled="state.project.max_group_size === 1"
               />
               Groups get more submissions than individuals
+              <tooltip width="large" placement="top">
+                When unchecked, individuals and groups receive the same number of
+                submissions per day. When checked, the daily limit for a group is
+                multiplied by the number of users in that group. For example, if
+                the daily limit is 2, a group with 3 members would receive 6
+                submissions per day with this box checked.
+              </tooltip>
             </label>
-            <tooltip width="large" placement="top">
-              When unchecked, individuals and groups receive the same number of
-              submissions per day. When checked, the daily limit for a group is
-              multiplied by the number of users in that group. For example, if
-              the daily limit is 2, a group with 3 members would receive 6
-              submissions per day with this box checked.
-            </tooltip>
           </div>
 
           <div class="form-field-wrapper">
@@ -357,10 +357,10 @@
                 v-model="state.project.allow_late_days"
               />
               Allow late day tokens
+              <tooltip width="large" placement="top">
+                Whether students can use late day tokens for this project.
+              </tooltip>
             </label>
-            <tooltip width="medium" placement="top">
-              Whether students can use late day tokens for this project.
-            </tooltip>
           </div>
 
           <div class="form-field-wrapper">
@@ -373,7 +373,7 @@
             >
               <template v-slot:label>
                 Total submission limit (Ever!)
-                <tooltip width="medium" placement="top">
+                <tooltip width="large" placement="top">
                   A hard limit on how many times students can submit ever.
                 </tooltip>
               </template>
@@ -394,11 +394,11 @@
                 v-model="state.project.send_email_on_submission_received"
               />
               Send submission received email
+              <tooltip width="large" placement="top">
+                Students will receive a confirmation email when their submission
+                is recorded in the database.
+              </tooltip>
             </label>
-            <tooltip width="medium" placement="top">
-              Students will receive a confirmation email when their submission
-              is recorded in the database.
-            </tooltip>
           </div>
           <div class="checkbox-input-container">
             <label class="checkbox-label">
@@ -411,11 +411,11 @@
                 "
               />
               Send score summary email
+              <tooltip width="large" placement="top">
+                Students will receive a score-summary email when all non-deferred
+                test cases are finished grading.
+              </tooltip>
             </label>
-            <tooltip width="medium" placement="top">
-              Students will receive a score-summary email when all non-deferred
-              test cases are finished grading.
-            </tooltip>
           </div>
         </fieldset>
       </div>
@@ -432,11 +432,11 @@
                 v-model="state.project.use_honor_pledge"
               />
               Require honor pledge
+              <tooltip width="large" placement="top">
+                Students will be prompted to sign an honor pledge each time they
+                submit.
+              </tooltip>
             </label>
-            <tooltip width="medium" placement="top">
-              Students will be prompted to sign an honor pledge each time they
-              submit.
-            </tooltip>
           </div>
           <div class="form-field-wrapper" v-if="state.project.use_honor_pledge">
             <validated-text-area-input
