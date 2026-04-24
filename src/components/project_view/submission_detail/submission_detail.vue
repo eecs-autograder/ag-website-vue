@@ -451,11 +451,11 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 }
 
 #submitter {
-  color: $ocean-blue;
+  color: darken($ocean-blue, 10%);
 }
 
 #submission-timestamp {
-  color: $green;
+  color: darken($green, 20%);
 }
 
 #submission-score {
