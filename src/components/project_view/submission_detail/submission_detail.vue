@@ -143,9 +143,12 @@
     <div class="discarded-files" v-if="submission.discarded_files.length !== 0">
       <i class="fas fa-exclamation-triangle"></i>
       The following unexpected files were <b>discarded</b>:
-      <div v-for="filename of submission.discarded_files" class="discarded-file">
-        <i class="far fa-trash-alt"></i>
-        {{filename}}
+      <div role="list">
+        <div v-for="filename of submission.discarded_files" class="discarded-file"
+             role="listitem">
+          <i class="far fa-trash-alt"></i>
+          {{filename}}
+        </div>
       </div>
     </div>
 
