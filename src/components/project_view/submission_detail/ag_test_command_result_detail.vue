@@ -21,12 +21,12 @@
       ref="student_on_fail_description"
     ></description-renderer>
 
-    <fieldset
+    <div
       ref="warnings"
       v-if="custom_scoring_error_msg"
       class="fieldset"
     >
-      <legend class="legend"> Warnings </legend>
+      <div class="legend"> Warnings </div>
       <info-blurb>
         Something unexpected happened while grading this test.
         <br>
@@ -36,10 +36,10 @@
       <div class="warning">
         {{custom_scoring_error_msg}}
       </div>
-    </fieldset>
+    </div>
 
-    <fieldset ref="correctness" v-if="show_correctness_fieldset" class="fieldset">
-      <legend class="legend"> Correctness </legend>
+    <div ref="correctness" v-if="show_correctness_fieldset" class="fieldset">
+      <div class="legend"> Correctness </div>
 
       <div
         class="feedback-section"
@@ -195,14 +195,14 @@
           </div>
         </div>
       </div>
-    </fieldset>
+    </div>
 
-    <fieldset v-if="d_output_size !== null
+    <div v-if="d_output_size !== null
                     && (d_output_size.stdout_diff_size !== null
                         || d_output_size.stderr_diff_size !== null)"
               class="fieldset"
               ref="diffs">
-      <legend class="legend"> Output Diffs </legend>
+      <div class="legend"> Output Diffs </div>
 
       <div class="feedback-section">
         <div v-if="d_output_size.stdout_diff_size !== null" class="feedback-row">
@@ -231,15 +231,15 @@
           </div>
         </div>
       </div>
-    </fieldset>
+    </div>
 
-    <fieldset v-if="ag_test_command_result.actual_return_code !== null
+    <div v-if="ag_test_command_result.actual_return_code !== null
                     || (d_output_size !== null
                         && (d_output_size.stdout_size !== null
                         || d_output_size.stderr_size !== null))"
               class="fieldset"
               ref="actual_output">
-      <legend class="legend"> Actual Output </legend>
+      <div class="legend"> Actual Output </div>
 
       <div
         class="feedback-section"
@@ -299,7 +299,7 @@
           </div>
         </div>
       </div>
-    </fieldset>
+    </div>
 
   </div>
 </template>

@@ -1,5 +1,9 @@
 <template>
-  <div class="suite-result">
+  <div
+    class="suite-result"
+    role="region"
+    :aria-label="`${ag_test_suite_result.ag_test_suite_name} suite results`"
+  >
 
     <div id="ag-test-suite-name">{{ag_test_suite_result.ag_test_suite_name}}</div>
 
