@@ -9,6 +9,8 @@
          @click="toggle_d_is_open"
          @keydown.space.prevent="toggle_d_is_open"
          @keydown.enter="toggle_d_is_open"
+         :aria-controls="panel_body_uid"
+         :aria-expanded="d_is_open"
     >
 
       <template v-if="is_command">
@@ -41,11 +43,17 @@
       </template>
     </div>
 
-    <div v-if="d_is_open"
+    <!-- Outer v-show so that aria-controls has something to reference. -->
+    <!-- Inner v-if so that the inner component doesn't send requests until
+         the panel is open. -->
+    <div v-show="d_is_open"
+         :id="panel_body_uid"
          :class="[`${panel_correctness}-panel-body`,
                   {'multiple-command-panel-body': is_multi_command_case},
                   {'command-panel-body': is_command}]">
-      <slot></slot>
+      <div v-if="d_is_open">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -55,6 +63,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from "@/components/project_view/submission_detail/correctness_icon.vue";
+import { generate_uid } from '@/utils';
 
 @Component({
   components: {
@@ -103,6 +112,10 @@ export default class ResultPanel extends Vue {
       return CorrectnessLevel.info_only;
     }
     return CorrectnessLevel.some_correct;
+  }
+
+  get panel_body_uid() {
+    return `result-panel-${generate_uid()}`;
   }
 
   get can_open() {
