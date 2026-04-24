@@ -5,7 +5,7 @@
                   {'panel-header-open': d_is_open && !is_command },
                   {'panel-header-closed': !d_is_open }]"
          role="button"
-         tabindex="0"
+         :tabindex="can_open ? 0 : -1"
          @click="toggle_d_is_open"
          @keydown.space.prevent="toggle_d_is_open"
          @keydown.enter="toggle_d_is_open"
@@ -105,9 +105,13 @@ export default class ResultPanel extends Vue {
     return CorrectnessLevel.some_correct;
   }
 
+  get can_open() {
+    return this.correctness_level !== CorrectnessLevel.not_available;
+  }
+
   toggle_d_is_open() {
     let top = this.$el.getBoundingClientRect().top;
-    if (this.correctness_level !== CorrectnessLevel.not_available) {
+    if (this.can_open) {
       this.d_is_open = !this.d_is_open;
     }
     // This prevents any open panels below this one from being pushed
