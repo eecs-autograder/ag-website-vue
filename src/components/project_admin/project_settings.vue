@@ -182,7 +182,7 @@
           <div class="form-field-wrapper">
             <div class="group-size-container">
               <validated-int-input
-                id="min-group-size"
+                data-testid="min_group_size"
                 v-model="state.project.min_group_size"
                 :validators="[make_min_validator(1)]"
                 input_style="max-width: 80px;"
@@ -193,7 +193,7 @@
 
             <div class="group-size-container">
               <validated-int-input
-                id="max-group-size"
+                data-testid="max_group_size"
                 v-model="state.project.max_group_size"
                 :validators="[make_min_validator(1)]"
                 input_style="max-width: 80px;"
@@ -273,7 +273,7 @@
           <legend class="legend">Submission Limits</legend>
           <div class="form-field-wrapper">
             <validated-nullable-int-input
-              id="submission-limit-per-day"
+              data-testid="submission_limit_per_day"
               v-model="state.project.submission_limit_per_day"
               :validators="[make_nullable_min_validator(1)]"
               input_style="max-width: 80px;"
@@ -367,7 +367,7 @@
           <div class="form-field-wrapper">
             <validated-nullable-int-input
               ref="total_submissions_input"
-              id="total-submission-limit"
+              data-testid="total_submission_limit"
               v-model="state.project.total_submission_limit"
               :validators="[make_nullable_min_validator(1)]"
               input_style="max-width: 80px;"

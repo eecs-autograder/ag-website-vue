@@ -173,8 +173,8 @@ describe("ProjectSettings tests", () => {
     wrapper.vm.state.project.max_group_size = 5;
     await wrapper.vm.$nextTick();
 
-    let min_group_size_input = wrapper.find("#min-group-size");
-    let max_group_size_input = wrapper.find("#max-group-size");
+    const min_group_size_input = wrapper.find("[data-testid=min_group_size]");
+    const max_group_size_input = wrapper.find("[data-testid=max_group_size]");
 
     expect(get_validated_input_text(min_group_size_input)).toEqual("4");
     expect(get_validated_input_text(max_group_size_input)).toEqual("5");
@@ -299,8 +299,8 @@ describe("ProjectSettings tests", () => {
     assert_not_null(wrapper.vm.state.project);
     wrapper.vm.state.project.submission_limit_per_day = 42;
     await wrapper.vm.$nextTick();
-    let daily_submission_limit_input = wrapper.find(
-      "#submission-limit-per-day",
+    const daily_submission_limit_input = wrapper.find(
+      "[data-testid=submission_limit_per_day]",
     );
     expect(get_validated_input_text(daily_submission_limit_input)).toEqual(
       "42",
@@ -334,7 +334,10 @@ describe("ProjectSettings tests", () => {
     expect(wrapper.vm.state.project?.submission_limit_per_day).toBeNull();
     expect(allow_past_limit_checkbox.element).toBeDisabled();
 
-    set_validated_input_text(wrapper.find("#submission-limit-per-day"), "7");
+    const daily_submission_limit_input = wrapper.find(
+      "[data-testid=submission_limit_per_day]",
+    );
+    await set_validated_input_text(daily_submission_limit_input, "7");
 
     await wrapper.vm.$nextTick();
 
@@ -493,8 +496,10 @@ describe("ProjectSettings tests", () => {
     assert_not_null(wrapper.vm.state.project);
     wrapper.vm.state.project.total_submission_limit = 42;
     await wrapper.vm.$nextTick();
-    let daily_submission_limit_input = wrapper.find("#total-submission-limit");
-    expect(get_validated_input_text(daily_submission_limit_input)).toEqual(
+    let total_submission_limit_input = wrapper.find(
+      "[data-testid=total_submission_limit]",
+    );
+    expect(get_validated_input_text(total_submission_limit_input)).toEqual(
       "42",
     );
 
@@ -502,16 +507,16 @@ describe("ProjectSettings tests", () => {
 
     wrapper.vm.state.project.total_submission_limit = null;
     await wrapper.vm.$nextTick();
-    expect(get_validated_input_text(daily_submission_limit_input)).toEqual("");
+    expect(get_validated_input_text(total_submission_limit_input)).toEqual("");
 
     expect(wrapper.vm.state.settings_form_is_valid).toBe(true);
 
-    await set_validated_input_text(daily_submission_limit_input, "7");
+    await set_validated_input_text(total_submission_limit_input, "7");
     expect(wrapper.vm.state.project?.total_submission_limit).toEqual(7);
 
     expect(wrapper.vm.state.settings_form_is_valid).toBe(true);
 
-    await set_validated_input_text(daily_submission_limit_input, "");
+    await set_validated_input_text(total_submission_limit_input, "");
     expect(wrapper.vm.state.project?.total_submission_limit).toEqual(null);
 
     expect(wrapper.vm.state.settings_form_is_valid).toBe(true);
@@ -714,7 +719,7 @@ describe("Invalid input tests", () => {
   });
 
   test("min_group_size is blank or not a number", async () => {
-    let min_num_matches_input = wrapper.find("#min-group-size");
+    const min_num_matches_input = wrapper.find("[data-testid=min_group_size]");
     expect(
       min_num_matches_input.emitted("update:is_valid")?.at(-1),
     ).toStrictEqual([true]);
@@ -731,7 +736,7 @@ describe("Invalid input tests", () => {
   });
 
   test("min_group_size is zero or negative", async () => {
-    let min_num_matches_input = wrapper.find("#min-group-size");
+    const min_num_matches_input = wrapper.find("[data-testid=min_group_size]");
     expect(
       min_num_matches_input.emitted("update:is_valid")?.at(-1),
     ).toStrictEqual([true]);
@@ -753,7 +758,7 @@ describe("Invalid input tests", () => {
   });
 
   test("max_group_size is blank or not a number", async () => {
-    let max_num_matches_input = wrapper.find("#max-group-size");
+    const max_num_matches_input = wrapper.find("[data-testid=max_group_size]");
     expect(
       max_num_matches_input.emitted("update:is_valid")?.at(-1),
     ).toStrictEqual([true]);
@@ -770,7 +775,7 @@ describe("Invalid input tests", () => {
   });
 
   test("max_group_size is zero or negative", async () => {
-    let max_num_matches_input = wrapper.find("#max-group-size");
+    const max_num_matches_input = wrapper.find("[data-testid=max_group_size]");
     expect(
       max_num_matches_input.emitted("update:is_valid")?.at(-1),
     ).toStrictEqual([true]);
@@ -792,8 +797,8 @@ describe("Invalid input tests", () => {
   });
 
   test("submission_limit_per_day less than 1 or not a number", async () => {
-    let daily_submission_limit_input = wrapper.find(
-      "#submission-limit-per-day",
+    const daily_submission_limit_input = wrapper.find(
+      "[data-testid=submission_limit_per_day]",
     );
     await set_validated_input_text(daily_submission_limit_input, "");
     expect(
