@@ -310,6 +310,7 @@
                 <i
                   class="edit-timezone-icon fas fa-pencil-alt"
                   role="button"
+                  aria-label="edit timezone"
                   tabindex="0"
                   @click="timezone_input.focus()"
                 ></i>
