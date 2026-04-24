@@ -167,8 +167,8 @@
               Publish final grades
               <tooltip width="large" placement="top">
                 When the hard deadline has passed and scores are published,
-                students will see their final grade for the project on the submit
-                page.
+                students will see their final grade for the project on the
+                submit page.
               </tooltip>
             </label>
           </div>
@@ -329,11 +329,11 @@
               />
               Groups get more submissions than individuals
               <tooltip width="large" placement="top">
-                When unchecked, individuals and groups receive the same number of
-                submissions per day. When checked, the daily limit for a group is
-                multiplied by the number of users in that group. For example, if
-                the daily limit is 2, a group with 3 members would receive 6
-                submissions per day with this box checked.
+                When unchecked, individuals and groups receive the same number
+                of submissions per day. When checked, the daily limit for a
+                group is multiplied by the number of users in that group. For
+                example, if the daily limit is 2, a group with 3 members would
+                receive 6 submissions per day with this box checked.
               </tooltip>
             </label>
           </div>
@@ -413,8 +413,8 @@
               />
               Send score summary email
               <tooltip width="large" placement="top">
-                Students will receive a score-summary email when all non-deferred
-                test cases are finished grading.
+                Students will receive a score-summary email when all
+                non-deferred test cases are finished grading.
               </tooltip>
             </label>
           </div>
