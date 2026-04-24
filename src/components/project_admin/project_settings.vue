@@ -1,5 +1,5 @@
 <template>
-  <div :id="`project-settings-component-${label_uid}`">
+  <div id="project-settings-component" class="project-settings-component">
     <new-validated-form
       ref="project_settings_form"
       autocomplete="off"
@@ -8,10 +8,7 @@
       @submit="save_project_settings"
       @update:is_valid="state.settings_form_is_valid = $event"
     >
-      <div
-        :id="`project-name-container-${label_uid}`"
-        class="form-field-wrapper"
-      >
+      <div id="project-name-container" class="form-field-wrapper">
         <validated-text-input
           ref="project_name_input"
           v-model="state.project.name"
@@ -26,7 +23,7 @@
         <fieldset class="fieldset">
           <legend class="legend">Project Deadline</legend>
           <div class="form-field-wrapper">
-            <label class="label" :for="`soft-deadline-${label_uid}`">
+            <label class="label" for="soft-deadline">
               Soft Deadline
               <tooltip width="large" placement="top">
                 The deadline shown to students.
@@ -36,7 +33,7 @@
             <div>
               <input
                 type="datetime-local"
-                :id="`soft-deadline-${label_uid}`"
+                id="soft-deadline"
                 v-model="soft_closing_time_model"
               />
 
@@ -55,7 +52,7 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label" :for="`hard-deadline-${label_uid}`">
+            <label class="label" for="hard-deadline">
               Hard Deadline
               <tooltip width="large" placement="top">
                 The actual deadline. Submissions will not be accepted after this
@@ -67,7 +64,7 @@
             <div>
               <input
                 type="datetime-local"
-                :id="`hard-deadline-${label_uid}`"
+                id="hard-deadline"
                 v-model="closing_time_model"
               />
 
@@ -86,14 +83,11 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label" :for="`timezone-${label_uid}`">
-              Timezone
-            </label>
+            <label class="label" for="timezone"> Timezone </label>
             <div>
               <select
                 ref="timezone_input"
-                :id="`timezone-${label_uid}`"
-                data-testid="timezone"
+                id="timezone"
                 class="select"
                 v-model="timezone_model"
               >
@@ -239,10 +233,7 @@
         <fieldset class="fieldset">
           <legend class="legend">Grading Policy</legend>
           <div class="form-field-wrapper">
-            <label
-              class="label"
-              :for="`ultimate-submission-policy-${label_uid}`"
-            >
+            <label class="label" for="ultimate-submission-policy">
               Final graded submission policy
               <tooltip width="large" placement="top">
                 Use students' most recent or best submission for their final
@@ -251,8 +242,7 @@
             </label>
             <div>
               <select
-                :id="`ultimate-submission-policy-${label_uid}`"
-                data-testid="ultimate_submission_policy"
+                id="ultimate-submission-policy"
                 v-model="state.project.ultimate_submission_policy"
                 class="select"
               >
@@ -305,18 +295,15 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label
-              class="label"
-              :for="`submission-limit-reset-time-${label_uid}`"
-            >
+            <label class="label" for="submission-limit-reset-time">
               Reset submissions per day at:
             </label>
-            <div :id="`reset-time-picker-container-${label_uid}`">
+            <div id="reset-time-picker-container">
               <input
                 type="time"
                 ref="submission_limit_reset_time_picker"
                 v-model="state.project.submission_limit_reset_time"
-                :id="`submission-limit-reset-time-${label_uid}`"
+                id="submission-limit-reset-time"
               />
               <span class="display-timezone">
                 {{ state.project.timezone }}
@@ -472,7 +459,7 @@
 
       <div class="button-footer">
         <button
-          :id="`save-button-${label_uid}`"
+          id="save-button"
           class="save-button"
           type="submit"
           :disabled="!state.settings_form_is_valid || state.saving"
@@ -568,7 +555,6 @@ import {
   deep_copy,
   format_datetime_short,
   toggle,
-  generate_uid,
 } from "@/utils";
 import {
   is_not_empty,
@@ -722,10 +708,6 @@ const delete_project = () => {
     }
   });
 };
-
-// This only needs to be unique across instances of the component.
-// We combine it with unique id fragrments for each form input label.
-const label_uid = generate_uid();
 
 defineExpose({
   state,

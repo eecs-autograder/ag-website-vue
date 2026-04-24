@@ -222,7 +222,7 @@ describe("ProjectSettings tests", () => {
 
   test("ultimate_submission_policy binding", async () => {
     let ultimate_submission_policy_input = wrapper.find(
-      "[data-testid=ultimate_submission_policy]",
+      "#ultimate-submission-policy",
     );
 
     await ultimate_submission_policy_input.setValue(
@@ -264,7 +264,7 @@ describe("ProjectSettings tests", () => {
     await wrapper.vm.$nextTick();
 
     let ultimate_submission_policy_input = wrapper.find(
-      "[data-testid=ultimate_submission_policy]",
+      "#ultimate-submission-policy",
     );
 
     expect(
@@ -281,7 +281,7 @@ describe("ProjectSettings tests", () => {
     await wrapper.vm.$nextTick();
 
     let option_tags = wrapper
-      .find("[data-testid=ultimate_submission_policy]")
+      .find("#ultimate-submission-policy")
       .findAll("option");
     expect(option_tags.length).toEqual(2);
 
@@ -367,7 +367,7 @@ describe("ProjectSettings tests", () => {
 
   test("Timezone binding", async () => {
     assert_not_null(wrapper.vm.state.project);
-    let timezone_input = wrapper.find("[data-testid=timezone]");
+    let timezone_input = wrapper.find("#timezone");
 
     await timezone_input.setValue("US/Mountain");
     expect(wrapper.vm.state.project?.timezone).toEqual("US/Mountain");
@@ -398,7 +398,7 @@ describe("ProjectSettings tests", () => {
       .format();
     wrapper.vm.state.project.timezone = "UTC";
 
-    const timezone_input = wrapper.find("[data-testid=timezone]");
+    const timezone_input = wrapper.find("#timezone");
 
     const dt_local_fmt = "YYYY-MM-DD[T]HH:mm";
 
