@@ -20,30 +20,23 @@
       <template v-slot:footer>
         <div class="datetime-picker-container clearable-datetime-picker">
           <div class="label">Extension</div>
-          <div
-            data-testid="extension"
-            class="datetime-input"
-            @click="toggle_extension_visibility()"
-          >
-            {{ format_datetime(state.group.extended_due_date) }}
-            <i class="far fa-calendar-alt"></i>
+          <div>
+            <input
+              type="datetime-local"
+              data-testid="extension"
+              v-model="extension_model"
+            />
+            <button
+              type="button"
+              data-testid="revoke_extension"
+              class="clear-button"
+              @click.stop="state.group.extended_due_date = null"
+              :disabled="state.group.extended_due_date === null"
+            >
+              <i class="fas fa-times"></i>
+              <span class="clear-text">Revoke</span>
+            </button>
           </div>
-          <button
-            type="button"
-            data-testid="revoke_extension"
-            class="clear-button"
-            @click.stop="state.group.extended_due_date = null"
-            :disabled="state.group.extended_due_date === null"
-          >
-            <i class="fas fa-times"></i>
-            <span class="clear-text">Revoke</span>
-          </button>
-
-          <datetime-picker
-            v-model="state.group.extended_due_date"
-            ref="extension_datetime_picker"
-          >
-          </datetime-picker>
         </div>
 
         <div
@@ -131,10 +124,10 @@
 
 <script setup lang="ts">
 import { Course, Group, Project } from "ag-client-typescript";
-import { reactive, watch, ref } from "vue";
+import { reactive, watch, ref, computed } from "vue";
+import moment from "moment-timezone";
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from "@/exposed_component_types/api_errors_exposed";
-import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import GroupMembersForm from "@/components/group_members_form.vue";
 import LastSaved from "@/components/last_saved.vue";
 import Modal from "@/components/modal.vue";
@@ -152,7 +145,6 @@ const props = defineProps<PropTypes>();
 
 const api_errors = ref<APIErrorsExposed>();
 const delete_group_api_errors = ref<APIErrorsExposed>();
-const extension_datetime_picker = ref<InstanceType<typeof DatetimePicker>>();
 
 const state = reactive({
   group: null as Group | null,
@@ -160,6 +152,29 @@ const state = reactive({
   edit_group_form_is_valid: true,
   show_delete_group_modal: false,
   deleting: false,
+});
+
+const WALL_TIME_FORMAT = "YYYY-MM-DD[T]HH:mm";
+
+const extension_model = computed({
+  get(): string {
+    return state.group?.extended_due_date != null
+      ? moment
+          .parseZone(state.group.extended_due_date)
+          .tz(props.project.timezone)
+          .format(WALL_TIME_FORMAT)
+      : "";
+  },
+  set(wall_time: string) {
+    if (state.group) {
+      state.group.extended_due_date =
+        wall_time !== ""
+          ? moment
+              .tz(wall_time, WALL_TIME_FORMAT, props.project.timezone)
+              .format()
+          : null;
+    }
+  },
 });
 
 const update_group = () => {
@@ -184,12 +199,6 @@ const delete_group = () => {
       delete_group_api_errors.value?.show_errors_from_response(error);
     }
   });
-};
-
-const toggle_extension_visibility = () => {
-  if (extension_datetime_picker.value) {
-    extension_datetime_picker.value.toggle_visibility();
-  }
 };
 
 watch(
