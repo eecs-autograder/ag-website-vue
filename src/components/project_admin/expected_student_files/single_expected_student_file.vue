@@ -11,12 +11,22 @@
         <div v-show="!editing" class="icon-holder">
           <div class="delete-file"
                :title="'Delete ' + expected_student_file.pattern"
-               @click="d_show_delete_expected_student_file_modal = true">
+               :aria-label="'Delete ' + expected_student_file.pattern"
+               role="button"
+               tabindex=0
+               @click="d_show_delete_expected_student_file_modal = true"
+               @keydown.enter="d_show_delete_expected_student_file_modal = true"
+               @keydown.space.prevent="d_show_delete_expected_student_file_modal = true">
             <i class="fas fa-trash delete-file-icon"></i>
           </div>
           <div class="edit-file"
                :title="'Edit ' + expected_student_file.pattern"
-               @click="editing = true">
+               :aria-label="'Edit ' + expected_student_file.pattern"
+               role="button"
+               tabindex=0
+               @click="editing = true"
+               @keydown.enter="editing = true"
+               @keydown.space.prevent="editing = true">
             <i class="fas fa-edit edit-file-icon"></i>
           </div>
         </div>
@@ -60,7 +70,8 @@
            ref="delete_expected_student_file_modal"
            size="large"
            :include_closing_x="true"
-           click_outside_to_close>
+           click_outside_to_close
+           aria_label="Delete expected student file modal">
       <div class="modal-header">Confirm Delete</div>
       <div> Are you sure you want to delete
         <b class="file-to-delete">{{expected_student_file.pattern}}</b>? <br><br>
