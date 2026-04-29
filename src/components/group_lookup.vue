@@ -3,6 +3,7 @@
     <div class="group-lookup-search-bar">
       <dropdown-typeahead ref="group_typeahead"
                           placeholder_text="Enter a username"
+                          :aria_label="aria_label"
                           :choices="groups"
                           @item_selected="on_group_selected"
                           :filter_fn="group_filter_fn">
@@ -35,6 +36,9 @@ import { get_query_param } from '@/utils';
 export default class GroupLookup extends Vue implements Created {
   @Prop({required: true, type: Array})
   groups!: Group[];
+
+  @Prop({default: "Search for group by username", type: String})
+  aria_label!: string;
 
   // When true, emits an update_group_selected event containing
   // the group specified by the "current_student_lookup" query param.

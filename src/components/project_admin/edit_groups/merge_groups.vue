@@ -5,6 +5,7 @@
         <div class="label"> Group 1 </div>
         <group-lookup ref="group_lookup"
                       :groups="available_groups"
+                      aria_label="Search for Group 1 by username"
                       @update_group_selected="group_1 = $event;">
         </group-lookup>
         <div class="group-members" v-if="group_1 !== null">
@@ -19,6 +20,7 @@
         <div class="label"> Group 2 </div>
         <group-lookup ref="group_lookup"
                       :groups="available_groups"
+                      aria_label="Search for Group 2 by username"
                       @update_group_selected="group_2 = $event;">
         </group-lookup>
         <div class="group-members" v-if="group_2 !== null">

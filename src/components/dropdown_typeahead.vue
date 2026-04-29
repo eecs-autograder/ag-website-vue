@@ -7,6 +7,7 @@
         <input :class="typeahead_class"
                type=text
                :placeholder="placeholder_text"
+               :aria-label="aria_label"
                name="filtered_search"
                v-model="filter_text"
                @keydown="resume_search($event)">
@@ -51,6 +52,9 @@ export default class DropdownTypeahead extends Vue {
 
   @Prop({default: "search-field", type: String})
   typeahead_class!: string;
+
+  @Prop({default: "", type: String})
+  aria_label!: string;
 
   filter_text: string = "";
   private _filtered_choices: object[] = [];
