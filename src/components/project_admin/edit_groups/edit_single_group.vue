@@ -18,7 +18,7 @@
       :ignore_group_size_limits="true"
     >
       <template v-slot:footer>
-        <div class="datetime-picker-container clearable-datetime-picker">
+        <div class="extension-container clearable-datetime-picker">
           <div class="label">Extension</div>
           <div>
             <input
@@ -233,7 +233,7 @@ defineExpose({
   }
 }
 
-.datetime-picker-container {
+.extension-container {
   padding-top: 1rem;
 }
 

@@ -1,14 +1,6 @@
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 
-.flat-white-button:hover:enabled {
-    @include hover_state($pebble-medium, $pebble-medium);
-}
-
-.flat-white-button:disabled {
-    color: $stormy-gray-light;
-}
-
 .clearable-datetime-picker {
     .label {
         font-weight: bold;
