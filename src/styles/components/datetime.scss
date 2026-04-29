@@ -9,50 +9,10 @@
     color: $stormy-gray-light;
 }
 
-// USAGE for .clearable-datetime-picker
-// Note: replace *datetime* with a variable name
-// Note: The datetime-picker can be replaced with a time-picker
-//
-//  <div class="clearable-datetime-picker">
-//    <div class="label">Label</div>
-//    <div class="datetime-input"
-//         @click="$refs.*ref*.toggle_visibility()">
-//      {{format_datetime(*datetime*)}}
-//      <i class="far fa-calendar-alt"></i>
-//    </div>
-//    <button type="button" class="clear-button"
-//            @click.stop="*datetime* = null"
-//            :disabled="*datetime* === null">
-//      <i class="fas fa-times"></i>
-//      <span class="clear-text">Clear</span>
-//    </button>
-//
-//    <datetime-picker v-model="*datetime*"
-//                     ref="*ref*"></datetime-picker>
-//  </div>
-
 .clearable-datetime-picker {
     .label {
         font-weight: bold;
         vertical-align: top;
-    }
-
-    // TODO: delete once we remove DatetimePicker component
-    .datetime-input {
-        margin: 0 .25rem .25rem 0;
-        background-color: $white-gray;
-        border: 1px solid darken($white-gray, 2);
-        border-radius: 2px;
-        padding: .5rem;
-        display: inline-block;
-
-        i {
-            padding: 0 .25rem;
-        }
-    }
-
-    .datetime-input:hover {
-        cursor: pointer;
     }
 
     .clear-button {

@@ -20,10 +20,6 @@
               @click="d_current_tab ='context_menu'">
             Context Menu
           </div>
-          <div :class="['sidebar-item', {active: d_current_tab === 'datetime'}]"
-              @click="d_current_tab ='datetime'">
-            Datetime Picker
-          </div>
           <div :class="['sidebar-item', {active: d_current_tab === 'diff'}]"
               @click="d_current_tab ='diff'">
             Diff
@@ -86,7 +82,6 @@
         <ButtonDemo v-show="d_current_tab === 'buttons'"></ButtonDemo>
         <ColorPaletteDemo v-show="d_current_tab === 'colors'"></ColorPaletteDemo>
         <ContextMenuDemo v-show="d_current_tab === 'context_menu'"></ContextMenuDemo>
-        <DatetimePickerDemo v-show="d_current_tab === 'datetime'"></DatetimePickerDemo>
         <DiffDemo v-show="d_current_tab === 'diff'"></DiffDemo>
         <DropdownDemo v-show="d_current_tab === 'dropdown'"></DropdownDemo>
         <DropdownTypeaheadDemo v-show="d_current_tab === 'typeahead'"></DropdownTypeaheadDemo>
@@ -115,7 +110,6 @@ import ViewFile from '@/components/view_file/view_file.vue';
 import ButtonDemo from './button_demo.vue';
 import ColorPaletteDemo from './color_palette_demo.vue';
 import ContextMenuDemo from './context_menu_demo.vue';
-import DatetimePickerDemo from './datetime_picker_demo.vue';
 import DiffDemo from './diff_demo.vue';
 import DropdownDemo from './dropdown_demo.vue';
 import DropdownTypeaheadDemo from './dropdown_typeahead_demo.vue';
@@ -135,7 +129,6 @@ import NewValidatedFormDemo from './new_validated_form_demo/NewValidatedFormDemo
     ButtonDemo,
     ColorPaletteDemo,
     ContextMenuDemo,
-    DatetimePickerDemo,
     DiffDemo,
     Dropdown,
     DropdownDemo,
