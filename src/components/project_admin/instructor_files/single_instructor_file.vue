@@ -5,12 +5,16 @@
                       spellcheck="false"
                       ref="rename_form"
                       @submit="rename_file">
+        <label class="sr-only" :for="`new-file-name-${label_uuid}`">
+          New file name
+        </label>
         <validated-input ref="file_name"
                          v-model="new_file_name"
                          :validators="[is_not_empty]"
                          input_style="width: 200px;
                                      padding: 3px 5px;
                                      margin-right: 10px;"
+                         :input_id="`new-file-name-${label_uuid}`"
                          @input_validity_changed="new_name_is_valid = $event">
         </validated-input>
         <div class="edit-name-buttons">
@@ -30,6 +34,7 @@
     </div>
     <div v-else class="not-editing">
       <input class="select-checkbox"
+             aria_label="Select file for deletion"
              @click.stop
              :checked="selected_for_deletion"
              @change="$emit('selected_for_deletion', $event.target.checked)"
@@ -37,11 +42,28 @@
       <div class="file-info-actions">
         <div class="file-name">{{file.name}}</div>
         <i class="fas fa-pencil-alt edit-file-name"
-          @click.stop="new_file_name = file.name; editing = true;"></i>
+          role="button"
+          aria-label="Edit file name"
+          @click.stop="new_file_name = file.name; editing = true;"
+          @keydown.enter="new_file_name = file.name; editing = true;"
+          @keydown.space.prevent="new_file_name = file.name; editing = true;"
+          tabindex=0
+        ></i>
         <i class="fas fa-file-download download-file"
-          @click.stop="download_file"></i>
+          role="button"
+          aria-label="Download file"
+          @click.stop="download_file"
+          @keydown.enter="download_file"
+          @keydown.space.prevent="download_file"
+          tabindex=0
+        ></i>
         <i class="far fa-trash-alt delete-file"
+          role="button"
+          aria-label="Delete file"
           @click.stop="$emit('delete_requested')"
+          @keydown.enter="$emit('delete_requested')"
+          @keydown.space.prevent="$emit('delete_requested')"
+          tabindex=0
         ></i>
       </div>
     </div>
@@ -69,7 +91,7 @@ import {
   handle_global_errors_async,
   make_error_handler_func,
 } from '@/error_handling';
-import { format_datetime, toggle } from '@/utils';
+import { format_datetime, generate_uid, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -122,6 +144,12 @@ export default class SingleInstructorFile extends Vue {
       FileSaver.saveAs(new File([await file_content], this.file.name));
       this.d_download_progress = null;
     });
+  }
+
+  // This only needs to be unique across instances of the component.
+  // We combine it with unique id fragrments for each form input label.
+  get label_uuid() {
+    return generate_uid();
   }
 }
 
@@ -223,7 +251,7 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
 
 .display-timestamp {
   display: block;
-  color: hsl(220, 20%, 65%);
+  color: hsl(220, 20%, 45%);
   font-size: .875rem;
   margin-left: 1.75rem;
 }

@@ -14,7 +14,14 @@
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
-          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+          <span
+            class="sidebar-collapse-button"
+            role="button"
+            @click="d_collapsed = !d_collapsed"
+            @keydown.enter="d_collapsed = !d_collapsed"
+            @keydown.space.prevent="d_collapsed = !d_collapsed"
+            tabindex=0
+          >
             <i class="fas fa-bars"></i>
           </span>
           <span class="sidebar-header-text"
@@ -56,6 +63,7 @@
         @close="d_show_delete_modal = false"
         size="large"
         click_outside_to_close
+        aria_label="Delete file modal"
       >
         <div class="modal-header">Confirm Delete</div>
         <div>
