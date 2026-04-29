@@ -19,10 +19,11 @@
     >
       <template v-slot:footer>
         <div class="extension-container clearable-datetime-picker">
-          <div class="label">Extension</div>
+          <label class="label" for="extension-datetime">Extension</label>
           <div>
             <input
               type="datetime-local"
+              id="extension-datetime"
               data-testid="extension"
               v-model="extension_model"
             />
@@ -43,15 +44,13 @@
           id="bonus-submissions-container"
           class="form-field-wrapper extra-space"
         >
-          <label id="bonus-submissions-label" class="label">
-            Bonus Submissions
-          </label>
           <validated-int-input
             ref="bonus_submissions_remaining_input"
             v-model="state.group.bonus_submissions_remaining"
             :validators="[make_min_validator(0)]"
             input_style="width: 80px"
           >
+            <template v-slot:label>Bonus Submissions</template>
           </validated-int-input>
         </div>
         <APIErrors ref="api_errors"></APIErrors>
@@ -91,6 +90,7 @@
       :include_closing_x="!state.deleting"
       :click_outside_to_close="!state.deleting"
       ref="delete_group_modal"
+      aria_label="Delete group modal"
     >
       <div class="modal-header">Confirm Delete</div>
 
