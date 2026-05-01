@@ -94,6 +94,7 @@
           </button>
           <button
             class="modal-cancel-button"
+            ref="modal_cancel_button"
             @click="d_show_delete_modal = false"
           >
             Cancel
@@ -105,7 +106,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
@@ -172,12 +173,14 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     this.d_to_be_deleted = [];
     this.d_to_be_deleted.push(file);
     this.d_show_delete_modal = true;
+    this.$nextTick(() => this.$refs.modal_cancel_button.focus())
   }
 
   // Called when a user presses the batch delete button from this component
   request_batch_delete() {
     this.d_to_be_deleted = this.d_batch_to_be_deleted;
     this.d_show_delete_modal = true;
+    this.$nextTick(() => this.$refs.modal_cancel_button.focus())
   }
 
   @handle_api_errors_async(make_error_handler_func("delete_errors"))
