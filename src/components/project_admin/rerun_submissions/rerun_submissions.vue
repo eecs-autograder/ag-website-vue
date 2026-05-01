@@ -164,7 +164,7 @@
           <tr>
             <th scope="col">Started At</th>
             <th scope="col">Progress</th>
-            <th scope="col" aria-label="Actions"></th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
