@@ -5,7 +5,7 @@
     </div>
   </div>
   <div v-else id="rerun-submissions-component">
-    <div id="grades-can-change-header" class="step-header">0. Download Grades So Far</div>
+    <h2 id="grades-can-change-header" class="step-header">0. Download Grades So Far</h2>
     <div id="grades-can-change-msg">
       <div class="msg-spacing">
         <i class="fas fa-exclamation-triangle"></i>
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="step-header">1. Choose submissions</div>
+    <h2 class="step-header">1. Choose submissions</h2>
     <div class="checkbox-input-container">
       <label>
         <input
@@ -38,6 +38,7 @@
         </div>
         <group-lookup
           :groups="d_groups"
+          :aria_label="`Search for ${project.max_group_size > 1 ? 'group' : 'student'} by username`"
           @update_group_selected="d_selected_groups.insert($event)">
         </group-lookup>
       </div>
@@ -53,7 +54,7 @@
       </submission-selector>
     </div>
 
-    <div class="step-header">2. Choose test cases</div>
+    <h2 class="step-header">2. Choose test cases</h2>
     <div class="checkbox-input-container">
       <label>
         <input
@@ -105,7 +106,7 @@
     </div>
 
     <template v-if="d_mutation_test_suites.length !== 0" ref="choose_mutation_test_suites">
-      <div class="step-header">3. Choose mutation testing suites</div>
+      <h2 class="step-header">3. Choose mutation testing suites</h2>
       <div class="checkbox-input-container">
         <label>
           <input
@@ -135,7 +136,7 @@
       </div>
     </template>
 
-    <div class="step-header">4. Review and start rerun</div>
+    <h2 class="step-header">4. Review and start rerun</h2>
     <div class="summary-line">
       <span class="emphasize">{{num_submissions_to_rerun}}</span> submission(s)
     </div>
@@ -161,9 +162,9 @@
       <table class="rerun-table">
         <thead>
           <tr>
-            <th>Started At</th>
-            <th>Progress</th>
-            <th><!-- Cancel Button --></th>
+            <th scope="col">Started At</th>
+            <th scope="col">Progress</th>
+            <th scope="col" aria-label="Actions"></th>
           </tr>
         </thead>
         <tbody>

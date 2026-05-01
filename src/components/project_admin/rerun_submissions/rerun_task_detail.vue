@@ -14,9 +14,13 @@
       </template>
       <template v-else>
         {{task.progress}}%
-        <i v-if="task.progress !== 100"
-            @click="refresh_task(task)"
-            class="refresh-icon fas fa-sync-alt"></i>
+        <button v-if="task.progress !== 100"
+                type="button"
+                class="refresh-button"
+                aria-label="Refresh task progress"
+                @click="refresh_task(task)">
+          <i class="fas fa-sync-alt"></i>
+        </button>
       </template>
     </td>
     <td v-if="task.progress !== 100 && !task.has_error && !task.is_cancelled">
@@ -31,6 +35,7 @@
     <modal v-if="d_show_cancel_modal"
            size="large"
            ref="cancel_task_modal"
+           aria_label="Stop rerun confirmation"
            @close="d_show_cancel_modal = false"
            :click_outside_to_close="!d_cancelling"
            :include_closing_x="!d_cancelling">
@@ -107,8 +112,13 @@ export default class RerunTaskDetail extends Vue {
 @import '@/styles/forms.scss';
 @import '@/styles/modal.scss';
 
-.refresh-icon {
+.refresh-button {
+  background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
+  color: inherit;
+  font-size: inherit;
 }
 
 .progress-cell {

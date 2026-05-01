@@ -3,7 +3,13 @@
        for each submission. -->
 
   <div class="submission-selector">
-    <div class="header" @click="d_collapsed = !d_collapsed">
+    <div class="header"
+         role="button"
+         tabindex="0"
+         :aria-expanded="!d_collapsed"
+         @click="d_collapsed = !d_collapsed"
+         @keydown.enter="d_collapsed = !d_collapsed"
+         @keydown.space.prevent="d_collapsed = !d_collapsed">
       <i class="caret fas" :class="d_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
       <div class="member-names">
         <div class="member-name"

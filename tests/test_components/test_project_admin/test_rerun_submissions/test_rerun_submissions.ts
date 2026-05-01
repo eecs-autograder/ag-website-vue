@@ -123,17 +123,17 @@ describe('Rerun list tests', () => {
         await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun));
         expect(wrapper.find('.progress-cell').text()).toEqual('0%');
-        expect(wrapper.find('.refresh-icon').exists()).toBe(true);
+        expect(wrapper.find('.refresh-button').exists()).toBe(true);
 
         let updated = new ag_cli.RerunSubmissionTask(new_tasks[0]);
         updated.progress = 100;
         sinon.stub(ag_cli.RerunSubmissionTask, 'get_by_pk').withArgs(
             new_tasks[0].pk).resolves(updated);
-        await wrapper.find('.refresh-icon').trigger('click');
+        await wrapper.find('.refresh-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find('.progress-cell').text()).toEqual('100%');
-        expect(wrapper.find('.refresh-icon').exists()).toBe(false);
+        expect(wrapper.find('.refresh-button').exists()).toBe(false);
     });
 
     test('Task has error', async () => {
@@ -147,7 +147,7 @@ describe('Rerun list tests', () => {
         expect(wrapper.find('.progress-cell').text()).toContain('ERROR');
         expect(wrapper.find('.progress-cell').text()).toContain(
             `Rerun task ID: ${wrapper.vm.d_rerun_tasks[0].pk}`);
-        expect(wrapper.find('.refresh-icon').exists()).toBe(false);
+        expect(wrapper.find('.refresh-button').exists()).toBe(false);
     });
 });
 
