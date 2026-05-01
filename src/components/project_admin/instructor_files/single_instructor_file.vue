@@ -44,7 +44,7 @@
         <button class="edit-file-name"
           type="button"
           aria-label="Edit file name"
-          @click.stop="new_file_name = file.name; editing = true;"
+          @click.stop="begin_renaming_file"
         ><i class="fas fa-pencil-alt"></i></button>
         <button class="download-file"
           type="button"
@@ -117,6 +117,12 @@ export default class SingleInstructorFile extends Vue {
       await this.file.rename(this.new_file_name);
     }
     this.editing = false;
+  }
+
+  begin_renaming_file() {
+    this.editing = true;
+    this.new_file_name = this.file.name;
+    this.$nextTick(() => {(this.$refs.file_name as ValidatedInput).focus({select: true})})
   }
 
   cancel_renaming_file() {
