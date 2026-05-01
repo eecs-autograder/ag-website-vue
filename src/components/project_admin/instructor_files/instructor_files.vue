@@ -173,14 +173,14 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     this.d_to_be_deleted = [];
     this.d_to_be_deleted.push(file);
     this.d_show_delete_modal = true;
-    this.$nextTick(() => this.$refs.modal_cancel_button.focus())
+    this.$nextTick(() => (this.$refs.modal_cancel_button as HTMLElement).focus());
   }
 
   // Called when a user presses the batch delete button from this component
   request_batch_delete() {
     this.d_to_be_deleted = this.d_batch_to_be_deleted;
     this.d_show_delete_modal = true;
-    this.$nextTick(() => this.$refs.modal_cancel_button.focus())
+    this.$nextTick(() => (this.$refs.modal_cancel_button as HTMLElement).focus());
   }
 
   @handle_api_errors_async(make_error_handler_func("delete_errors"))

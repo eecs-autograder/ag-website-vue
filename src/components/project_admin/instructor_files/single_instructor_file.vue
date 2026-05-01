@@ -41,30 +41,21 @@
              type="checkbox" />
       <div class="file-info-actions">
         <div class="file-name">{{file.name}}</div>
-        <i class="fas fa-pencil-alt edit-file-name"
-          role="button"
+        <button class="edit-file-name"
+          type="button"
           aria-label="Edit file name"
           @click.stop="new_file_name = file.name; editing = true;"
-          @keydown.enter="new_file_name = file.name; editing = true;"
-          @keydown.space.prevent="new_file_name = file.name; editing = true;"
-          tabindex=0
-        ></i>
-        <i class="fas fa-file-download download-file"
-          role="button"
+        ><i class="fas fa-pencil-alt"></i></button>
+        <button class="download-file"
+          type="button"
           aria-label="Download file"
           @click.stop="download_file"
-          @keydown.enter="download_file"
-          @keydown.space.prevent="download_file"
-          tabindex=0
-        ></i>
-        <i class="far fa-trash-alt delete-file"
-          role="button"
+        ><i class="fas fa-file-download"></i></button>
+        <button class="delete-file"
+          type="button"
           aria-label="Delete file"
           @click.stop="$emit('delete_requested')"
-          @keydown.enter="$emit('delete_requested')"
-          @keydown.space.prevent="$emit('delete_requested')"
-          tabindex=0
-        ></i>
+        ><i class="far fa-trash-alt"></i></button>
       </div>
     </div>
     <div class="display-timestamp">
@@ -192,6 +183,7 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   .file-info-actions {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 90%;
 
     .file-name {
@@ -201,6 +193,11 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
     }
 
     .edit-file-name, .download-file, .delete-file {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: inherit;
       margin: 0 .375rem;
     }
 
