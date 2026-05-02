@@ -34,7 +34,7 @@
     </div>
     <div v-else class="not-editing">
       <input class="select-checkbox"
-             aria_label="Select file for deletion"
+             aria-label="Select file for deletion"
              @click.stop
              :checked="selected_for_deletion"
              @change="$emit('selected_for_deletion', $event.target.checked)"
@@ -172,6 +172,10 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   padding: .5rem .10rem;
   word-wrap: break-word;
   word-break: break-word;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .icon-holder {

@@ -3,7 +3,11 @@
        :style="{height: view_file_height, max_height: view_file_max_height}">
     <div v-if="d_loading" class="loading-container">
       <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
-      <i v-else class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"></i>
+      <i
+        v-else
+        class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"
+        aria-label="loading"
+      />
     </div>
     <div v-else-if="file_is_large && !d_show_anyway" class="large-file-message">
       <div class="text">This file is very large ({{d_file_contents.length}} bytes)</div>

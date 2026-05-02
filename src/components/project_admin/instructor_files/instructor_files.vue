@@ -16,6 +16,7 @@
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
           <span
             class="sidebar-collapse-button"
+            :aria-label="`${d_collapsed ? 'Open' : 'Close'} uploaded files sidebar`"
             role="button"
             @click="d_collapsed = !d_collapsed"
             @keydown.enter="d_collapsed = !d_collapsed"
@@ -41,7 +42,8 @@
             v-for="instructor_file of instructor_files"
             :key="instructor_file.pk"
             :file="instructor_file"
-            @click="view_file(instructor_file)"
+            tabindex="0"
+            @focus="view_file(instructor_file)"
             :selected_for_deletion="d_batch_to_be_deleted.some((f) => f.pk === instructor_file.pk)"
             @selected_for_deletion="toggle_file_for_batch_operation(instructor_file, $event)"
             @delete_requested="request_single_delete(instructor_file)"
