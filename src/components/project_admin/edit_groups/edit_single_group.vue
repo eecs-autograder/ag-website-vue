@@ -124,8 +124,8 @@
 
 <script setup lang="ts">
 import { Course, Group, Project } from "ag-client-typescript";
-import { reactive, watch, ref, computed } from "vue";
-import moment from "moment-timezone";
+import { reactive, watch, ref } from "vue";
+import { use_datetime_model } from "@/composables/use_datetime_model";
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from "@/exposed_component_types/api_errors_exposed";
 import GroupMembersForm from "@/components/group_members_form.vue";
@@ -154,28 +154,13 @@ const state = reactive({
   deleting: false,
 });
 
-const WALL_TIME_FORMAT = "YYYY-MM-DD[T]HH:mm";
-
-const extension_model = computed({
-  get(): string {
-    return state.group?.extended_due_date != null
-      ? moment
-          .parseZone(state.group.extended_due_date)
-          .tz(props.project.timezone)
-          .format(WALL_TIME_FORMAT)
-      : "";
+const extension_model = use_datetime_model(
+  () => state.group?.extended_due_date ?? null,
+  (v) => {
+    if (state.group) state.group.extended_due_date = v;
   },
-  set(wall_time: string) {
-    if (state.group) {
-      state.group.extended_due_date =
-        wall_time !== ""
-          ? moment
-              .tz(wall_time, WALL_TIME_FORMAT, props.project.timezone)
-              .format()
-          : null;
-    }
-  },
-});
+  () => props.project.timezone,
+);
 
 const update_group = () => {
   return toggle(state, "saving", async () => {

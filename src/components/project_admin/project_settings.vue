@@ -540,6 +540,11 @@ import { Project, UltimateSubmissionPolicy } from "ag-client-typescript";
 import { watch, reactive, computed, ref } from "vue";
 import { useRouter } from "vue-router/composables";
 import moment from "moment-timezone";
+import {
+  to_wall_time,
+  to_iso,
+  use_datetime_model,
+} from "@/composables/use_datetime_model";
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from "@/exposed_component_types/api_errors_exposed";
 import Modal from "@/components/modal.vue";
@@ -594,39 +599,19 @@ const timezones = computed(() => {
   return moment.tz.names();
 });
 
-class DatetimeConverter {
-  // This is the format that datetime-local inputs expect
-  static readonly WALL_TIME_FORMAT = "YYYY-MM-DD[T]HH:mm";
-
-  static to_wall_time(iso_datetime: string | null, zone: string) {
-    return iso_datetime !== null
-      ? moment
-          .parseZone(iso_datetime)
-          .tz(zone)
-          .format(DatetimeConverter.WALL_TIME_FORMAT)
-      : "";
-  }
-
-  static to_iso(wall_time: string, zone: string) {
-    return wall_time !== ""
-      ? moment.tz(wall_time, DatetimeConverter.WALL_TIME_FORMAT, zone).format()
-      : null;
-  }
-}
-
 const timezone_model = computed({
   get() {
     return state.project.timezone;
   },
   set(new_zone) {
-    const wall_soft_closing_time = DatetimeConverter.to_wall_time(
+    const wall_soft_closing_time = to_wall_time(
       state.project.soft_closing_time,
       state.project.timezone,
     );
 
     // closing_time is only undefined for students, who won't visit this page
     assert(state.project.closing_time !== undefined);
-    const wall_closing_time = DatetimeConverter.to_wall_time(
+    const wall_closing_time = to_wall_time(
       state.project.closing_time,
       state.project.timezone,
     );
@@ -636,49 +621,30 @@ const timezone_model = computed({
     // Update the underlying ISO time so that the wall times
     // in the form don't change when the timezone changes.
 
-    state.project.soft_closing_time = DatetimeConverter.to_iso(
-      wall_soft_closing_time,
-      new_zone,
-    );
-
-    state.project.closing_time = DatetimeConverter.to_iso(
-      wall_closing_time,
-      new_zone,
-    );
+    state.project.soft_closing_time = to_iso(wall_soft_closing_time, new_zone);
+    state.project.closing_time = to_iso(wall_closing_time, new_zone);
   },
 });
 
-const soft_closing_time_model = computed({
-  get() {
-    return DatetimeConverter.to_wall_time(
-      state.project.soft_closing_time,
-      state.project.timezone,
-    );
+const soft_closing_time_model = use_datetime_model(
+  () => state.project.soft_closing_time,
+  (v) => {
+    state.project.soft_closing_time = v;
   },
-  set(local_value) {
-    state.project.soft_closing_time = DatetimeConverter.to_iso(
-      local_value,
-      state.project.timezone,
-    );
-  },
-});
+  () => state.project.timezone,
+);
 
-const closing_time_model = computed({
-  get() {
+const closing_time_model = use_datetime_model(
+  () => {
     // closing_time is only undefined for students, who won't visit this page
     assert(state.project.closing_time !== undefined);
-    return DatetimeConverter.to_wall_time(
-      state.project.closing_time,
-      state.project.timezone,
-    );
+    return state.project.closing_time;
   },
-  set(local_value) {
-    state.project.closing_time = DatetimeConverter.to_iso(
-      local_value,
-      state.project.timezone,
-    );
+  (v) => {
+    state.project.closing_time = v;
   },
-});
+  () => state.project.timezone,
+);
 
 const save_project_settings = () => {
   return toggle(state, "saving", async () => {
