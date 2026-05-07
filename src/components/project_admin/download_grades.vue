@@ -93,7 +93,7 @@
           <div class="started-at">{{format_datetime_short(download.created_at)}}</div>
           <div class="file">
             <a v-if="download.progress === 100 && download.error_msg.length === 0"
-               href="#"
+               :href="`/api/download_tasks/${download.pk}/result/`"
                @click.prevent="download_task_result(download)"
                class="file-name"
                download
