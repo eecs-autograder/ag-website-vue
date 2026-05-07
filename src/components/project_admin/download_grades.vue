@@ -92,9 +92,13 @@
             :class="['download-row', {'even-row': index % 2 == 0}]">
           <div class="started-at">{{format_datetime_short(download.created_at)}}</div>
           <div class="file">
-            <a href="#" v-if="download.progress === 100 && download.error_msg.length === 0"
+            <a v-if="download.progress === 100 && download.error_msg.length === 0"
+               href="#"
                @click.prevent="download_task_result(download)"
-               class="file-name">{{get_filename(download)}}
+               class="file-name"
+               download
+            >
+              {{get_filename(download)}}
             </a>
             <template v-if="download.error_msg.length !== 0">ERROR</template>
           </div>
