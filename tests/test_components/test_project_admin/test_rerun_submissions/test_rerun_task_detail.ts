@@ -1,11 +1,9 @@
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
-import APIErrors from '@/components/api_errors.vue';
 import RerunTaskDetail from '@/components/project_admin/rerun_submissions/rerun_task_detail.vue';
 
 import { managed_mount } from '@/tests/setup';
-import { wait_until } from '@/tests/utils';
 
 let task: ag_cli.RerunSubmissionTask;
 let cancel_stub: sinon.SinonStub;
@@ -31,49 +29,17 @@ beforeEach(() => {
     cancel_stub = sinon.stub(task, 'cancel');
 });
 
-test('Cancel rerun', async () => {
-    cancel_stub.callsFake(() => {
-        task.is_cancelled = true;
-    });
-
+test('Cancel button emits request-cancel event', async () => {
     let wrapper = managed_mount(RerunTaskDetail, {
         propsData: {
             task: task
         }
     });
 
-    wrapper.findComponent({ref: 'show_stop_task_modal'}).trigger('click');
-    await wrapper.vm.$nextTick();
+    await wrapper.find('.cancel-button').trigger('click');
 
-    wrapper.find('[data-testid=stop_task_button]').trigger('click');
-    await wrapper.vm.$nextTick();
-    expect(await wait_until(wrapper, w => !w.vm.d_cancelling)).toBe(true);
-
-    expect(wrapper.find('.progress-cell').text()).toEqual('Cancelled');
-    expect(cancel_stub.calledOnce).toBe(true);
-    expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(false);
-});
-
-test('Cancel rerun API errors handled', async () => {
-    cancel_stub.rejects(new ag_cli.HttpError(403, 'noope'));
-
-    let wrapper = managed_mount(RerunTaskDetail, {
-        propsData: {
-            task: task
-        }
-    });
-
-    wrapper.findComponent({ref: 'show_stop_task_modal'}).trigger('click');
-    await wrapper.vm.$nextTick();
-
-    wrapper.find('[data-testid=stop_task_button]').trigger('click');
-    await wrapper.vm.$nextTick();
-    expect(await wait_until(wrapper, w => !w.vm.d_cancelling)).toBe(true);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(true);
-    let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-    expect(api_errors.state.api_errors.length).toBe(1);
+    expect(wrapper.emitted('request-cancel')).toBeTruthy();
+    expect(wrapper.emitted('request-cancel')![0][0]).toBe(task);
 });
 
 test('Cancel button hidden when task is done', () => {

@@ -13,7 +13,7 @@
         Cancelled
       </template>
       <template v-else>
-        {{task.progress}}%
+        <span class="progress-value">{{task.progress}}%</span>
         <button v-if="task.progress !== 100"
                 type="button"
                 class="refresh-button"
@@ -21,44 +21,14 @@
                 @click="refresh_task(task)">
           <i class="fas fa-sync-alt"></i>
         </button>
+        <button v-if="task.progress !== 100"
+                type="button"
+                class="orange-button cancel-button"
+                @click="$emit('request-cancel', task)">
+          Cancel
+        </button>
       </template>
     </td>
-    <td v-if="task.progress !== 100 && !task.has_error && !task.is_cancelled">
-      <button type="button"
-              ref="show_stop_task_modal"
-              class="orange-button cancel-button"
-              @click="d_show_cancel_modal = true">
-        Cancel
-      </button>
-    </td>
-
-    <modal v-if="d_show_cancel_modal"
-           size="large"
-           ref="cancel_task_modal"
-           aria_label="Stop rerun confirmation"
-           @close="d_show_cancel_modal = false"
-           :click_outside_to_close="!d_cancelling"
-           :include_closing_x="!d_cancelling">
-      <div class="modal-header">
-        Stop Rerun
-      </div>
-      <div class="modal-button-footer">
-        <button type="button"
-                data-testid="stop_task_button"
-                class="orange-button"
-                :disabled="d_cancelling"
-                @click="cancel_task">
-          Stop Task
-        </button>
-        <button type="button"
-                class="white-button"
-                :disabled="d_cancelling"
-                @click="d_show_cancel_modal = false">
-          Go Back
-        </button>
-      </div>
-      <APIErrors ref="api_errors"></APIErrors>
-    </modal>
   </tr>
 </template>
 
@@ -67,26 +37,19 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 import * as ag_cli from 'ag-client-typescript';
 
-import APIErrors from "@/components/api_errors.vue";
-import Modal from '@/components/modal.vue';
 import Tooltip from '@/components/tooltip.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
-import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
-import { format_datetime, safe_assign, toggle } from '@/utils';
+import { handle_global_errors_async } from '@/error_handling';
+import { format_datetime, safe_assign } from '@/utils';
 
 @Component({
   components: {
-    APIErrors,
-    Modal,
     Tooltip,
   }
 })
 export default class RerunTaskDetail extends Vue {
   @Prop({required: true, type: ag_cli.RerunSubmissionTask})
   task!: ag_cli.RerunSubmissionTask;
-
-  d_show_cancel_modal = false;
-  d_cancelling = false;
 
   readonly format_datetime = format_datetime;
   readonly SYSADMIN_CONTACT = SYSADMIN_CONTACT;
@@ -96,21 +59,12 @@ export default class RerunTaskDetail extends Vue {
     let refreshed = await ag_cli.RerunSubmissionTask.get_by_pk(task.pk);
     safe_assign(task, refreshed);
   }
-
-  @handle_api_errors_async(make_error_handler_func())
-  cancel_task() {
-    return toggle(this, 'd_cancelling', async () => {
-        await this.task.cancel();
-        this.d_show_cancel_modal = false;
-    });
-  }
 }
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
-@import '@/styles/modal.scss';
 
 .refresh-button {
   background: none;
@@ -119,14 +73,34 @@ export default class RerunTaskDetail extends Vue {
   cursor: pointer;
   color: inherit;
   font-size: inherit;
+  margin-left: 1rem
+}
+
+.started-at-cell,
+.progress-cell {
+  line-height: 1.75;
 }
 
 .progress-cell {
   margin-left: 1rem;
 }
 
+.progress-value {
+  display: inline-block;
+  text-align: right;
+
+  &::before {
+    content: '100%';
+    display: block;
+    max-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+}
+
 .orange-button.cancel-button {
   padding: .125rem .375rem;
   font-size: .875rem;
+  margin-left: 4rem;
 }
 </style>

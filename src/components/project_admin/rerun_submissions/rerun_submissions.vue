@@ -164,18 +164,46 @@
           <tr>
             <th scope="col">Started At</th>
             <th scope="col">Progress</th>
-            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
           <rerun-task-detail
             v-for="task of d_rerun_tasks"
             :task="task"
-            :key="task.pk">
+            :key="task.pk"
+            @request-cancel="on_request_cancel">
           </rerun-task-detail>
         </tbody>
       </table>
     </div>
+
+    <modal v-if="d_show_cancel_modal"
+           size="large"
+           ref="cancel_task_modal"
+           aria_label="Stop rerun confirmation"
+           @close="d_show_cancel_modal = false"
+           :click_outside_to_close="!d_cancelling"
+           :include_closing_x="!d_cancelling">
+      <div class="modal-header">
+        Stop Rerun
+      </div>
+      <div class="modal-button-footer">
+        <button type="button"
+                data-testid="stop_task_button"
+                class="orange-button"
+                :disabled="d_cancelling"
+                @click="cancel_task">
+          Stop Task
+        </button>
+        <button type="button"
+                class="white-button"
+                :disabled="d_cancelling"
+                @click="d_show_cancel_modal = false">
+          Go Back
+        </button>
+      </div>
+      <APIErrors ref="cancel_api_errors"></APIErrors>
+    </modal>
   </div>
 </template>
 
@@ -189,8 +217,9 @@ import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import CollapsibleContent from '@/components/CollapsibleContent.vue';
 import GroupLookup from '@/components/group_lookup.vue';
+import Modal from '@/components/modal.vue';
 import Tooltip from '@/components/tooltip.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { SafeMap } from '@/safe_map';
@@ -216,6 +245,7 @@ interface GroupWithSubmissions {
     APIErrors,
     Collapsible: CollapsibleContent,
     GroupLookup,
+    Modal,
     RerunTaskDetail,
     SubmissionSelector,
     Tooltip,
@@ -250,6 +280,10 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   d_starting_rerun = false;
   d_loading = true;
 
+  d_show_cancel_modal = false;
+  d_cancelling = false;
+  d_task_to_cancel: ag_cli.RerunSubmissionTask | null = null;
+
   @handle_global_errors_async
   async created() {
     await this.load_rerun_tasks();
@@ -283,6 +317,19 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 
   async load_rerun_tasks() {
     this.d_rerun_tasks = await ag_cli.RerunSubmissionTask.get_all_from_project(this.project.pk);
+  }
+
+  on_request_cancel(task: ag_cli.RerunSubmissionTask) {
+    this.d_task_to_cancel = task;
+    this.d_show_cancel_modal = true;
+  }
+
+  @handle_api_errors_async(make_error_handler_func('cancel_api_errors'))
+  cancel_task() {
+    return toggle(this, 'd_cancelling', async () => {
+      await this.d_task_to_cancel!.cancel();
+      this.d_show_cancel_modal = false;
+    });
   }
 
   @handle_api_errors_async(handle_start_rerun_error)
@@ -570,6 +617,7 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 @import '@/styles/section_header.scss';
 
 #rerun-submissions-component {
@@ -651,6 +699,7 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 
 .rerun-table {
   text-align: left;
+  table-layout: fixed;
   width: 100%;
   max-width: 550px;
 }
