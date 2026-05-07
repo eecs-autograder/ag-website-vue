@@ -92,8 +92,8 @@
             :class="['download-row', {'even-row': index % 2 == 0}]">
           <div class="started-at">{{format_datetime_short(download.created_at)}}</div>
           <div class="file">
-            <a v-if="download.progress === 100 && download.error_msg.length === 0"
-               @click="download_task_result(download)"
+            <a href="#" v-if="download.progress === 100 && download.error_msg.length === 0"
+               @click.prevent="download_task_result(download)"
                class="file-name">{{get_filename(download)}}
             </a>
             <template v-if="download.error_msg.length !== 0">ERROR</template>
@@ -375,7 +375,7 @@ $progress-column-width: 20%;
 }
 
 .file-name {
-  color: $ocean-blue;
+  color: darken($ocean-blue, 10%);
   word-break: break-word;
 }
 
