@@ -11,10 +11,20 @@
 
     <APIErrors ref="api_errors"></APIErrors>
 
-    <div class="sidebar-container">
+    <div id="uploaded-instructor-file-sidebar" class="sidebar-container">
       <div class="sidebar-menu">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
-          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+          <span
+            class="sidebar-collapse-button"
+            :aria-label="`${d_collapsed ? 'Open' : 'Close'} uploaded files sidebar`"
+            role="button"
+            @click="d_collapsed = !d_collapsed"
+            @keydown.enter="d_collapsed = !d_collapsed"
+            @keydown.space.prevent="d_collapsed = !d_collapsed"
+            aria-controls="uploaded-instructor-file-sidebar"
+            :aria-expanded="!d_collapsed"
+            tabindex=0
+          >
             <i class="fas fa-bars"></i>
           </span>
           <span class="sidebar-header-text"
@@ -34,7 +44,8 @@
             v-for="instructor_file of instructor_files"
             :key="instructor_file.pk"
             :file="instructor_file"
-            @click="view_file(instructor_file)"
+            tabindex="0"
+            @focus="view_file(instructor_file)"
             :selected_for_deletion="d_batch_to_be_deleted.some((f) => f.pk === instructor_file.pk)"
             @selected_for_deletion="toggle_file_for_batch_operation(instructor_file, $event)"
             @delete_requested="request_single_delete(instructor_file)"
@@ -56,6 +67,7 @@
         @close="d_show_delete_modal = false"
         size="large"
         click_outside_to_close
+        aria_label="Delete file modal"
       >
         <div class="modal-header">Confirm Delete</div>
         <div>
@@ -86,6 +98,7 @@
           </button>
           <button
             class="modal-cancel-button"
+            ref="modal_cancel_button"
             @click="d_show_delete_modal = false"
           >
             Cancel
@@ -97,7 +110,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { InstructorFile, InstructorFileObserver, Project } from 'ag-client-typescript';
 
@@ -164,12 +177,14 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     this.d_to_be_deleted = [];
     this.d_to_be_deleted.push(file);
     this.d_show_delete_modal = true;
+    this.$nextTick(() => (this.$refs.modal_cancel_button as HTMLElement).focus());
   }
 
   // Called when a user presses the batch delete button from this component
   request_batch_delete() {
     this.d_to_be_deleted = this.d_batch_to_be_deleted;
     this.d_show_delete_modal = true;
+    this.$nextTick(() => (this.$refs.modal_cancel_button as HTMLElement).focus());
   }
 
   @handle_api_errors_async(make_error_handler_func("delete_errors"))
