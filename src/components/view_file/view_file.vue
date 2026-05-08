@@ -7,6 +7,7 @@
         v-else
         class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"
         aria-label="loading"
+        role="img"
       />
     </div>
     <div v-else-if="file_is_large && !d_show_anyway" class="large-file-message">
