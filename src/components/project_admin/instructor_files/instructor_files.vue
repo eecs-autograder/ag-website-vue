@@ -11,7 +11,7 @@
 
     <APIErrors ref="api_errors"></APIErrors>
 
-    <div class="sidebar-container">
+    <div id="uploaded-instructor-file-sidebar" class="sidebar-container">
       <div class="sidebar-menu">
         <div :class="['sidebar-header', {'sidebar-header-closed': d_collapsed}]">
           <span
@@ -21,6 +21,8 @@
             @click="d_collapsed = !d_collapsed"
             @keydown.enter="d_collapsed = !d_collapsed"
             @keydown.space.prevent="d_collapsed = !d_collapsed"
+            aria-controls="uploaded-instructor-file-sidebar"
+            :aria-expanded="!d_collapsed"
             tabindex=0
           >
             <i class="fas fa-bars"></i>
