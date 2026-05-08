@@ -130,7 +130,7 @@ export default class ExpectedStudentFileForm extends Vue {
   }
 
   focus() {
-    (<HTMLElement> this.$refs.pattern).focus({select: true});
+    (<ValidatedInput> this.$refs.pattern).focus({select: true});
   }
 
   get wildcard_is_present() {
