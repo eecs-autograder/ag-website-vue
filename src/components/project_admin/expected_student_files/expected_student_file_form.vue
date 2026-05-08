@@ -7,7 +7,7 @@
 
     <div class="input-wrapper">
       <label class="input-label" :for="`filename-${label_uuid}`"> Filename </label>
-      <validated-input ref='pattern'
+      <validated-input ref="pattern"
                         v-model="d_expected_student_file.pattern"
                         :validators="[is_not_empty]"
                         :input_id="`filename-${label_uuid}`"
@@ -127,6 +127,10 @@ export default class ExpectedStudentFileForm extends Vue {
 
   created() {
     this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
+  }
+
+  focus() {
+    (<HTMLElement> this.$refs.pattern).focus({select: true});
   }
 
   get wildcard_is_present() {
