@@ -9,19 +9,20 @@
         </div>
 
         <div v-show="!editing" class="icon-holder">
-          <div class="delete-file"
-               :title="'Delete ' + expected_student_file.pattern"
-               @click="d_show_delete_expected_student_file_modal = true">
+          <button class="delete-file"
+                  :title="'Delete ' + expected_student_file.pattern"
+                  @click="show_delete_modal">
             <i class="fas fa-trash delete-file-icon"></i>
-          </div>
-          <div class="edit-file"
-               :title="'Edit ' + expected_student_file.pattern"
-               @click="editing = true">
+          </button>
+          <button class="edit-file"
+                  :title="'Edit ' + expected_student_file.pattern"
+                  @click="edit_expected_student_file"
+                  :aria-controls="`edit-single-file-form-${component_uuid}`"
+                  :aria-expanded="editing">
             <i class="fas fa-edit edit-file-icon"></i>
-          </div>
+          </button>
         </div>
       </div>
-
 
       <span v-if="wildcard_is_present">
         <div class="matches-label">
@@ -33,7 +34,11 @@
       </span>
     </div>
 
-    <div v-if="editing" :class="(editing) ? 'form-editing' : 'form-not-editing'">
+    <div
+      v-show="editing"
+      :id="`edit-single-file-form-${component_uuid}`"
+      :class="editing ? 'form-editing' : 'form-not-editing'"
+    >
       <expected-student-file-form ref="form"
                                   @submit="update_expected_student_file($event)"
                                   :expected_student_file="expected_student_file"
@@ -60,7 +65,8 @@
            ref="delete_expected_student_file_modal"
            size="large"
            :include_closing_x="true"
-           click_outside_to_close>
+           click_outside_to_close
+           aria_label="Delete expected student file modal">
       <div class="modal-header">Confirm Delete</div>
       <div> Are you sure you want to delete
         <b class="file-to-delete">{{expected_student_file.pattern}}</b>? <br><br>
@@ -75,6 +81,7 @@
                 @click="delete_expected_student_file"> Delete </button>
         <button class="modal-cancel-button"
                 type="button"
+                ref="modal_cancel_button"
                 @click="d_show_delete_expected_student_file_modal = false"> Cancel </button>
       </div>
     </modal>
@@ -92,7 +99,7 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
-import { safe_assign } from '@/utils';
+import { generate_uid, safe_assign } from '@/utils';
 
 @Component({
   components: {
@@ -160,6 +167,18 @@ export default class SingleExpectedStudentFile extends Vue {
     this.editing = false;
   }
 
+  async edit_expected_student_file() {
+    this.editing = true;
+    await this.$nextTick();
+    (<ExpectedStudentFileForm> this.$refs.form).focus();
+  }
+
+  async show_delete_modal() {
+    this.d_show_delete_expected_student_file_modal = true;
+    await this.$nextTick();
+    (<HTMLElement> this.$refs.modal_cancel_button).focus();
+  }
+
   @handle_global_errors_async
   async delete_expected_student_file() {
     try {
@@ -170,6 +189,10 @@ export default class SingleExpectedStudentFile extends Vue {
     finally {
       this.d_delete_pending = false;
     }
+  }
+
+  get component_uuid() {
+    return generate_uid();
   }
 }
 
@@ -252,6 +275,8 @@ export function handle_edit_expected_student_file_error(component: SingleExpecte
 }
 
 .edit-file, .delete-file {
+  background: none;
+
   border-radius: 3px;
   border: 2px solid transparent;
   color: hsl(212, 50%, 27%);

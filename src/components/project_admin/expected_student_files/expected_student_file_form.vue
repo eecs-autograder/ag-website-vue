@@ -6,10 +6,11 @@
                   @form_validity_changed="$emit('on_form_validity_changed', $event)">
 
     <div class="input-wrapper">
-      <label class="input-label"> Filename </label>
-      <validated-input ref='pattern'
+      <label class="input-label" :for="`filename-${label_uuid}`"> Filename </label>
+      <validated-input ref="pattern"
                         v-model="d_expected_student_file.pattern"
                         :validators="[is_not_empty]"
+                        :input_id="`filename-${label_uuid}`"
                         input_style="border-width: 1px; margin-top: 4px;">
       </validated-input>
     </div>
@@ -47,22 +48,24 @@
     <div v-if="!d_exact_match || wildcard_is_present"
           class="min-max-container">
       <div class="input-wrapper">
-        <label class="input-label"> Minimum number of matches </label>
+        <label class="input-label" :for="`min-matches-${label_uuid}`"> Minimum number of matches </label>
         <validated-input ref='min_num_matches'
                           v-model="d_expected_student_file.min_num_matches"
                           :validators="[is_not_empty,
                                         is_number,
                                         is_non_negative]"
+                          :input_id="`min-matches-${label_uuid}`"
                           input_style="width: 75px; border-width: 1px; margin-top: 4px;">
         </validated-input>
       </div>
 
       <div class="input-wrapper">
-        <label class="input-label"> Maximum number of matches </label>
+        <label class="input-label" :for="`max-matches-${label_uuid}`"> Maximum number of matches </label>
         <validated-input ref='max_num_matches'
                           v-model="d_expected_student_file.max_num_matches"
                           :validators="[is_not_empty,
                                         is_number]"
+                          :input_id="`max-matches-${label_uuid}`"
                           input_style="width: 75px; border-width: 1px; margin-top: 4px;">
         </validated-input>
       </div>
@@ -80,6 +83,7 @@ import { NewExpectedStudentFileData } from 'ag-client-typescript';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
+import { generate_uid } from '@/utils';
 import { is_non_negative, is_not_empty, is_number } from '@/validators';
 
 export class ExpectedStudentFileFormData implements NewExpectedStudentFileData {
@@ -117,8 +121,16 @@ export default class ExpectedStudentFileForm extends Vue {
   readonly is_not_empty = is_not_empty;
   readonly is_number = is_number;
 
+  get label_uuid() {
+    return generate_uid();
+  }
+
   created() {
     this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
+  }
+
+  focus() {
+    (<ValidatedInput> this.$refs.pattern).focus({select: true});
   }
 
   get wildcard_is_present() {
