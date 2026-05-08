@@ -172,10 +172,6 @@ export function handle_rename_file_error(component: SingleInstructorFile, error:
   padding: .5rem .10rem;
   word-wrap: break-word;
   word-break: break-word;
-
-  &:focus {
-    outline: none;
-  }
 }
 
 .icon-holder {
