@@ -14,24 +14,27 @@
                         @field_change="Object.assign(d_ag_test_suite, $event)"></suite-settings>
 
         <div class="form-field-wrapper">
-          <label class="label">Internal Admin Notes</label>
+          <label class="label" for="internal-admin-notes">Internal Admin Notes</label>
           <validated-input ref="internal_admin_notes"
+                           input_id="internal-admin-notes"
                            v-model="d_ag_test_suite.internal_admin_notes"
                            :num_rows="3"
                            :validators="[]"></validated-input>
         </div>
 
         <div class="form-field-wrapper">
-          <label class="label">Staff-only Description</label>
+          <label class="label" for="suite-staff-description">Staff-only Description</label>
           <validated-input ref="staff_description"
+                           input_id="suite-staff-description"
                            v-model="d_ag_test_suite.staff_description"
                            :num_rows="3"
                            :validators="[]"></validated-input>
         </div>
 
         <div class="form-field-wrapper">
-          <label class="label">Student-Facing Description</label>
+          <label class="label" for="suite-student-description">Student-Facing Description</label>
           <validated-input ref="student_description"
+                           input_id="suite-student-description"
                            v-model="d_ag_test_suite.student_description"
                            :num_rows="3"
                            :validators="[]"></validated-input>
@@ -41,7 +44,7 @@
           <legend class="legend"> Setup </legend>
 
           <div class="form-field-wrapper">
-            <label class="label">
+            <label class="label" for="setup-suite-cmd-name">
               Setup command label
               <tooltip width="large" placement="top">
                 What to call the setup command when displaying results.<br>
@@ -50,19 +53,21 @@
               </tooltip>
             </label>
             <validated-input ref="setup_suite_cmd_name"
+                             input_id="setup-suite-cmd-name"
                              v-model="d_ag_test_suite.setup_suite_cmd_name"
                              :validators="[]">
             </validated-input>
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label">
+            <label class="label" for="setup-suite-cmd">
               Setup command
               <tooltip width="large" placement="top">
                 Leave this field blank to specify no setup command.
               </tooltip>
             </label>
             <validated-input ref="setup_suite_cmd"
+                             input_id="setup-suite-cmd"
                              v-model="d_ag_test_suite.setup_suite_cmd"
                              :validators="[]">
             </validated-input>
