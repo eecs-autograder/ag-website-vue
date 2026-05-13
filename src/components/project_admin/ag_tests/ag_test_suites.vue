@@ -6,7 +6,7 @@
   </div>
   <div v-else id="ag-test-suites-component">
     <div class="sidebar-container">
-      <div class="sidebar-menu">
+      <nav class="sidebar-menu" aria-label="Test suites">
         <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
           <button type="button"
                   class="sidebar-collapse-button"
@@ -49,9 +49,13 @@
             </AGTestSuitePanel>
           </draggable>
         </div>
-      </div>
+      </nav>
 
-      <div id="viewing-window" class="body" :class="{'body-closed': d_collapsed}">
+      <div id="viewing-window"
+           class="body"
+           :class="{'body-closed': d_collapsed}"
+           :role="active_level_is_suite || active_level_is_command ? 'region' : null"
+           :aria-label="active_level_is_suite || active_level_is_command ? settings_region_label : null">
         <template v-if="d_active_ag_test_suite !== null">
           <AGTestSuiteSettings
             :ag_test_suite="d_active_ag_test_suite"
@@ -417,6 +421,10 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
       parent_ag_test_case = parent_ag_test_suite.ag_test_cases[num_cases - 1];
     }
     this.update_active_item(parent_ag_test_case!.ag_test_commands[command_index]);
+  }
+
+  get settings_region_label() {
+    return this.d_active_ag_test_suite !== null ? 'Suite settings' : 'Command settings';
   }
 
   get active_level_is_suite() {
