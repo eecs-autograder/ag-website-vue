@@ -417,7 +417,9 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
 }
 
 .ag-test-command.panel {
-  background: none;
+  &:not(.active) {
+    background: none;
+  }
   border: none;
   padding-top: 0;
   padding-right: 0;
