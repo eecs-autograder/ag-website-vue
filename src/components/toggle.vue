@@ -1,34 +1,25 @@
 <template>
   <div class="toggle-button-space">
-    <div
-      v-if="state.is_on"
-      class="active-option-style on-border"
-      :style="[{ backgroundColor: active_background_color }]"
+    <button
+      type="button"
+      class="on-border"
+      :class="state.is_on ? 'active-option-style' : 'inactive-option-style'"
+      :style="state.is_on ? { backgroundColor: active_background_color } : {}"
+      :aria-pressed="state.is_on"
+      @click="!state.is_on && toggle()"
     >
       <slot name="on"> </slot>
-    </div>
-    <div
-      v-else
-      @click="toggle()"
-      class="inactive-option-style on-border cursor-pointer"
-    >
-      <slot name="on"> </slot>
-    </div>
-
-    <div
-      v-if="state.is_on"
-      @click="toggle()"
-      class="inactive-option-style off-border"
+    </button>
+    <button
+      type="button"
+      class="off-border"
+      :class="!state.is_on ? 'active-option-style' : 'inactive-option-style'"
+      :style="!state.is_on ? { backgroundColor: active_background_color } : {}"
+      :aria-pressed="!state.is_on"
+      @click="state.is_on && toggle()"
     >
       <slot name="off"> </slot>
-    </div>
-    <div
-      v-else
-      class="active-option-style off-border"
-      :style="[{ backgroundColor: active_background_color }]"
-    >
-      <slot name="off"> </slot>
-    </div>
+    </button>
   </div>
 </template>
 
@@ -43,7 +34,7 @@ type PropTypes = {
 
 const props = withDefaults(defineProps<PropTypes>(), {
   value: false,
-  active_background_color: "hsl(208, 59%, 49%)",
+  active_background_color: "hsl(208, 59%, 44%)",
 });
 
 // Emits
@@ -92,11 +83,15 @@ defineExpose({
 .inactive-option-style {
   display: inline-block;
   padding: 0.5rem 0.75rem;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .active-option-style {
   box-shadow: 0 1px 1px $dark-gray;
   color: white;
+  cursor: default;
 }
 
 .inactive-option-style {
