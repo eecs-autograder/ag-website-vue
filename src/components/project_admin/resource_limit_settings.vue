@@ -14,9 +14,9 @@
 
   <div class="resource-limit-settings">
     <div class="form-field-wrapper">
-      <label class="label"> Time limit </label>
+      <label class="label" for="input-time-limit"> Time limit </label>
         <validated-input ref="time_limit"
-                          id="input-time-limit"
+                          input_id="input-time-limit"
                           v-model="d_resource_limits.time_limit"
                           @input="$emit('field_change', d_resource_limits)"
                           input_style="width: 150px;"
@@ -55,10 +55,10 @@
         </label>
       </div>
       <div v-if="d_resource_limits.use_virtual_memory_limit">
-        <label class="label">Virtual memory limit</label>
+        <label class="label" for="input-virtual-memory-limit">Virtual memory limit</label>
         <validated-input
           ref="virtual_memory_limit"
-          id="input-virtual-memory-limit"
+          input_id="input-virtual-memory-limit"
           :value="Math.floor(
             d_resource_limits.virtual_memory_limit / Math.pow(10, 6)
           )"
