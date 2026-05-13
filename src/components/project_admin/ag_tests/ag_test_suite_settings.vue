@@ -189,6 +189,7 @@
 
           <button type="submit"
                   class="sticky-save-button"
+                  aria-label="Save"
                   :disabled="!d_settings_form_is_valid || d_saving">
             <i v-if="d_num_api_errors === 0" class="far fa-save"></i>
             <i v-else class="fas fa-exclamation-triangle"></i>
