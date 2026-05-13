@@ -426,6 +426,7 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
   padding-bottom: 0;
   width: 100%;
   text-align: left;
+  font-family: inherit;
   color: inherit;
 }
 
