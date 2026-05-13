@@ -1,17 +1,24 @@
 <template>
   <div>
     <div class="panel level-0" :class="{'active': suite_is_active}"
-         @click="update_ag_test_suite_panel_when_clicked()">
+         tabindex="0"
+         :aria-expanded="is_open"
+         @click="update_ag_test_suite_panel_when_clicked()"
+         @keydown.enter="update_ag_test_suite_panel_when_clicked()"
+         @keydown.space.prevent="update_ag_test_suite_panel_when_clicked()">
       <div class="text">
         <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
         <span>{{ag_test_suite.name}}</span>
       </div>
 
       <div class="icons">
-        <i class="icon handle fas fa-arrows-alt"></i>
-        <i class="icon fas fa-plus"
-           @click.stop="open_new_ag_test_case_modal"
-           title="Add Test Case"></i>
+        <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
+        <button type="button"
+                class="icon add-ag-test-case-button"
+                aria-label="Add Test Case"
+                @click.stop="open_new_ag_test_case_modal">
+          <i class="fas fa-plus"></i>
+        </button>
       </div>
     </div>
 
@@ -44,10 +51,11 @@
                       @form_validity_changed="d_add_case_form_is_valid = $event">
 
         <div class="form-field-wrapper">
-          <label class="label"> Test name </label>
+          <label class="label" :for="`new-case-name-${label_uid}`"> Test name </label>
           <validated-input ref="new_case_name"
                            v-model="d_new_case_name"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           :input_id="`new-case-name-${label_uid}`">
           </validated-input>
         </div>
 
@@ -56,10 +64,11 @@
                   class="legend">{{format_ordinal_num(index)}}</legend>
 
           <div class="form-field-wrapper" v-if="d_new_commands.length > 1">
-            <label class="label"> Command name </label>
+            <label class="label" :for="`command-name-${label_uid}-${index}`"> Command name </label>
             <validated-input ref="command_name"
                              v-model="new_command.name"
                              :validators="[is_not_empty]"
+                             :input_id="`command-name-${label_uid}-${index}`"
                              input_style="width: 100%;
                                           min-width: 200px;
                                           max-width: 700px;">
@@ -74,7 +83,7 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label">
+            <label class="label" :for="`command-cmd-${label_uid}-${index}`">
               Command
               <tooltip width="medium" placement="top">
                 Can be any valid bash command.
@@ -83,6 +92,7 @@
             <validated-input ref="command"
                               v-model="new_command.cmd"
                               :validators="[is_not_empty]"
+                              :input_id="`command-cmd-${label_uid}-${index}`"
                               input_style="width: 100%;
                                            min-width: 200px;
                                            max-width: 700px;">
@@ -140,6 +150,7 @@ import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { generate_uid } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 export class NewCommandFields {
@@ -183,6 +194,10 @@ export default class AGTestSuitePanel extends Vue {
   d_new_commands: NewCommandFields[] = [new NewCommandFields({})];
 
   readonly is_not_empty = is_not_empty;
+
+  get label_uid() {
+    return generate_uid();
+  }
 
   @Watch('active_ag_test_command')
   on_active_ag_test_command_changed(new_active_ag_test_command: AGTestCommand,
@@ -357,6 +372,13 @@ function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: un
 
 .handle {
   cursor: grabbing;
+}
+
+.add-ag-test-case-button {
+  background: none;
+  border: none;
+  padding: 0 .25rem;
+  cursor: pointer;
 }
 
 .duplicate-ag-test-command-msg {
