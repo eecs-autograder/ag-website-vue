@@ -154,7 +154,7 @@ describe('AGTestCasePanel tests', () => {
 
     test('Case (closed and child command not active) is clicked on',
          async () => {
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
@@ -170,14 +170,14 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.vm.active_ag_test_command).toEqual(ag_command_green_2);
         expect(wrapper.vm.commands_are_visible).toBe(true);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
         expect(wrapper.vm.commands_are_visible).toBe(false);
         expect(wrapper.vm.active_ag_test_command).toEqual(ag_command_green_2);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
@@ -187,7 +187,7 @@ describe('AGTestCasePanel tests', () => {
 
     test('Case (open and child command not active) is clicked on',
          async () => {
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
@@ -205,7 +205,7 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.vm.commands_are_visible).toBe(true);
         expect(wrapper.vm.command_in_case_is_active).toBe(false);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_case_green);
@@ -214,7 +214,7 @@ describe('AGTestCasePanel tests', () => {
 
     test('Case (open and child command is active) is clicked on',
          async () => {
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
@@ -225,7 +225,7 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.vm.commands_are_visible).toBe(true);
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.commands_are_visible).toBe(false);
@@ -244,7 +244,7 @@ describe('AGTestCasePanel tests', () => {
     test('When a case that is active is clicked on again, it closes', async () => {
         expect(wrapper.vm.is_open).toBe(false);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_open).toBe(true);
@@ -256,7 +256,7 @@ describe('AGTestCasePanel tests', () => {
 
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
@@ -266,7 +266,7 @@ describe('AGTestCasePanel tests', () => {
 
     test('When a command is clicked on, an event is emitted',
          async () => {
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
@@ -660,7 +660,7 @@ test('Update test commands order', async () => {
                 active_ag_test_command: null,
             }
     });
-    wrapper.find('.panel').trigger('click');
+    wrapper.find('.panel-toggle').trigger('click');
     await wrapper.vm.$nextTick();
 
     wrapper.findComponent({ref: 'ag_test_command_order'}).vm.$emit('change');

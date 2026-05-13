@@ -1,17 +1,17 @@
 <template>
   <div>
     <div class="ag-test-case panel level-1"
-          :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}"
-          tabindex="0"
-          :aria-expanded="is_open"
-          @click="update_ag_test_case_panel_when_clicked"
-          @keydown.enter="update_ag_test_case_panel_when_clicked"
-          @keydown.space.prevent="update_ag_test_case_panel_when_clicked">
-      <div class="text">
-        <i v-if="ag_test_case.ag_test_commands.length > 1"
-          class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
-        <span>{{ag_test_case.name}}</span>
-      </div>
+          :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}">
+      <button type="button"
+              class="panel-toggle"
+              :aria-expanded="is_open"
+              @click="update_ag_test_case_panel_when_clicked">
+        <div class="text">
+          <i v-if="ag_test_case.ag_test_commands.length > 1"
+            class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+          <span>{{ag_test_case.name}}</span>
+        </div>
+      </button>
 
       <div class="icons">
         <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
@@ -67,22 +67,19 @@
                  @change="set_ag_test_command_order"
                  @end="$event.item.style.transform = 'none'"
                  handle=".handle">
-        <div class="ag-test-command panel level-2"
-             v-for="ag_test_command of ag_test_case.ag_test_commands"
-             :key="ag_test_command.pk"
-             :class="{'active': active_ag_test_command !== null
-                                 && active_ag_test_command.pk === ag_test_command.pk}"
-             tabindex="0"
-             @click="$emit('update_active_item', ag_test_command)"
-             @keydown.enter="$emit('update_active_item', ag_test_command)"
-             @keydown.space.prevent="$emit('update_active_item', ag_test_command)">
+        <button class="ag-test-command panel level-2"
+                v-for="ag_test_command of ag_test_case.ag_test_commands"
+                :key="ag_test_command.pk"
+                :class="{'active': active_ag_test_command !== null
+                                    && active_ag_test_command.pk === ag_test_command.pk}"
+                @click="$emit('update_active_item', ag_test_command)">
           <div class="text">
             <span>{{ag_test_command.name}}</span>
           </div>
           <div class="icons">
             <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
           </div>
-        </div>
+        </button>
       </draggable>
     </div>
 
@@ -403,6 +400,32 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
 }
 
 @include list-panels($indentation: $panel-indentation);
+
+.panel-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+}
+
+.ag-test-command.panel {
+  background: none;
+  border: none;
+  padding-top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+}
 
 .handle {
   cursor: grabbing;

@@ -56,7 +56,7 @@ describe('AGTestSuitePanel tests', () => {
     });
 
     test('Click on suite that is closed, inactive, child command is not active', async () => {
-        wrapper.findAll('.panel').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
@@ -66,7 +66,7 @@ describe('AGTestSuitePanel tests', () => {
     test('Click on suite that is open, inactive, child command is not active', async () => {
         let another_suite = data_ut.make_ag_test_suite(project.pk);
 
-        wrapper.findAll('.panel').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
@@ -77,7 +77,7 @@ describe('AGTestSuitePanel tests', () => {
         wrapper.setProps({active_ag_test_suite: another_suite});
         await wrapper.vm.$nextTick();
 
-        wrapper.findAll('.panel').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_suite);
@@ -85,7 +85,7 @@ describe('AGTestSuitePanel tests', () => {
     });
 
     test('Click on suite that is open, active, child command is not active', async () => {
-        wrapper.findAll('.panel').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item').length).toEqual(1);
@@ -95,7 +95,7 @@ describe('AGTestSuitePanel tests', () => {
 
         expect(wrapper.vm.d_cases_are_visible).toBe(true);
 
-        wrapper.findAll('.panel').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_cases_are_visible).toBe(false);
@@ -107,7 +107,7 @@ describe('AGTestSuitePanel tests', () => {
 
         expect(wrapper.vm.d_cases_are_visible).toBe(true);
 
-        wrapper.find('.panel').trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_suite);
@@ -124,7 +124,7 @@ describe('AGTestSuitePanel tests', () => {
     test('Clicking on inactive suite panel emits event', async () => {
         expect(wrapper.vm.active_ag_test_suite).toBeNull();
 
-        wrapper.find('.panel').trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item').length).toEqual(1);
@@ -522,7 +522,7 @@ test('Update test cases order', async () => {
             active_ag_test_command: null
         }
     });
-    await wrapper.find('.panel').trigger('click');
+    await wrapper.find('.panel-toggle').trigger('click');
 
     wrapper.findComponent({ref: 'ag_test_case_order'}).vm.$emit('change');
     await wrapper.vm.$nextTick();

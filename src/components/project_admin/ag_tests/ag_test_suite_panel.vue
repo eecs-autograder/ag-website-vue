@@ -1,15 +1,15 @@
 <template>
   <div>
-    <div class="panel level-0" :class="{'active': suite_is_active}"
-         tabindex="0"
-         :aria-expanded="is_open"
-         @click="update_ag_test_suite_panel_when_clicked()"
-         @keydown.enter="update_ag_test_suite_panel_when_clicked()"
-         @keydown.space.prevent="update_ag_test_suite_panel_when_clicked()">
-      <div class="text">
-        <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
-        <span>{{ag_test_suite.name}}</span>
-      </div>
+    <div class="panel level-0" :class="{'active': suite_is_active}">
+      <button type="button"
+              class="panel-toggle"
+              :aria-expanded="is_open"
+              @click="update_ag_test_suite_panel_when_clicked()">
+        <div class="text">
+          <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+          <span>{{ag_test_suite.name}}</span>
+        </div>
+      </button>
 
       <div class="icons">
         <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
@@ -368,6 +368,21 @@ function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: un
 
 .add-ag-test-command-button .fa-plus {
   padding-right: .25rem;
+}
+
+.panel-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
 }
 
 .handle {
