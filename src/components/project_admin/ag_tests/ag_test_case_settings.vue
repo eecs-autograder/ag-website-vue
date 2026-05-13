@@ -6,16 +6,18 @@
                   @form_validity_changed="d_settings_form_is_valid = $event">
 
     <div class="form-field-wrapper">
-      <label class="label"> Test name </label>
+      <label class="label" for="case-settings-name"> Test name </label>
       <validated-input ref="name"
+                       input_id="case-settings-name"
                        v-model="d_ag_test_case.name"
                        :validators="[is_not_empty]">
       </validated-input>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label"> Internal Admin Notes </label>
+      <label class="label" for="case-settings-internal-admin-notes"> Internal Admin Notes </label>
       <validated-input ref="internal_admin_notes"
+                       input_id="case-settings-internal-admin-notes"
                        v-model="d_ag_test_case.internal_admin_notes"
                        :num_rows=3
                        :validators="[]">
@@ -23,8 +25,9 @@
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label"> Staff-only description </label>
+      <label class="label" for="case-settings-staff-description"> Staff-only description </label>
       <validated-input ref="staff_description"
+                       input_id="case-settings-staff-description"
                        v-model="d_ag_test_case.staff_description"
                        :num_rows=3
                        :validators="[]">
@@ -32,8 +35,9 @@
     </div>
 
       <div class="form-field-wrapper">
-      <label class="label"> Student-Facing Description </label>
+      <label class="label" for="case-settings-student-description"> Student-Facing Description </label>
       <validated-input ref="student_description"
+                       input_id="case-settings-student-description"
                        v-model="d_ag_test_case.student_description"
                        :num_rows=3
                        :validators="[]">

@@ -13,8 +13,9 @@
 
   <div class="suite-settings">
     <div class="form-field-wrapper">
-      <label class="label"> Suite name </label>
+      <label class="label" for="suite-settings-name"> Suite name </label>
       <validated-input ref="suite_name"
+                       input_id="suite-settings-name"
                        v-model="d_suite.name"
                        @input="$emit('field_change', d_suite)"
                        :validators="[is_not_empty]">
