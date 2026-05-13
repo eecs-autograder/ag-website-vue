@@ -38,10 +38,11 @@
       <legend class="legend"> Grading Environment </legend>
 
       <div class="form-field-wrapper">
-        <label class="label"> Sandbox environment </label>
+        <label class="label" for="suite-sandbox-environment"> Sandbox environment </label>
 
 
-        <select-object :items="docker_images"
+        <select-object input_id="suite-sandbox-environment"
+                        :items="docker_images"
                         id_field="pk"
                         v-model="d_suite.sandbox_docker_image"
                         @change="$emit('field_change', d_suite)"

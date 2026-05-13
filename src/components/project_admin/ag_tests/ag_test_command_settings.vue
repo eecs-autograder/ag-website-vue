@@ -145,8 +145,9 @@
 
         <div v-if="d_ag_test_command.stdin_source === StdinSource.instructor_file"
              class="form-field-wrapper">
-          <label class="label"> File </label>
+          <label class="label" for="stdin-instructor-file"> File </label>
           <select-object ref="stdin_instructor_file"
+                         input_id="stdin-instructor-file"
                          :items="project.instructor_files"
                          v-model="d_ag_test_command.stdin_instructor_file"
                          id_field="pk">
@@ -278,8 +279,9 @@
                 <div v-if="d_ag_test_command.expected_stdout_source
                            === ExpectedOutputSource.instructor_file"
                      class="form-field-wrapper">
-                  <label class="label"> File </label>
+                  <label class="label" for="expected-stdout-instructor-file"> File </label>
                   <select-object ref="expected_stdout_instructor_file"
+                                input_id="expected-stdout-instructor-file"
                                 :items="project.instructor_files"
                                 v-model="d_ag_test_command.expected_stdout_instructor_file"
                                 id_field="pk">
@@ -372,8 +374,9 @@
                 <div v-if="d_ag_test_command.expected_stderr_source
                            === ExpectedOutputSource.instructor_file"
                      class="form-field-wrapper">
-                  <label class="label"> File </label>
+                  <label class="label" for="expected-stderr-instructor-file"> File </label>
                   <select-object ref="expected_stderr_instructor_file"
+                                input_id="expected-stderr-instructor-file"
                                 :items="project.instructor_files"
                                 v-model="d_ag_test_command.expected_stderr_instructor_file"
                                 id_field="pk">
