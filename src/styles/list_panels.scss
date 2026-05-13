@@ -55,6 +55,7 @@
 
         .icons {
             display: flex;
+            align-items: center;
             @if not $always-show-icons {
                 visibility: hidden;
             }

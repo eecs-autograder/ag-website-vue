@@ -50,7 +50,9 @@ describe('AGTestSuitePanel tests', () => {
             propsData: {
                 ag_test_suite: ag_suite,
                 active_ag_test_suite: null,
-                active_ag_test_command: null
+                active_ag_test_command: null,
+                index: 0,
+                suite_count: 2,
             }
         });
     });
@@ -506,6 +508,122 @@ describe('AGTestSuitePanel tests', () => {
     });
 });
 
+test('Move up button emits move_up event', async () => {
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 1,
+            suite_count: 3,
+        }
+    });
+    await wrapper.find('[aria-label="Move up"]').trigger('click');
+    expect(emitted(wrapper, 'move_up').length).toEqual(1);
+});
+
+test('Move down button emits move_down event', async () => {
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 1,
+            suite_count: 3,
+        }
+    });
+    await wrapper.find('[aria-label="Move down"]').trigger('click');
+    expect(emitted(wrapper, 'move_down').length).toEqual(1);
+});
+
+test('Move up button disabled when suite is first', async () => {
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 0,
+            suite_count: 3,
+        }
+    });
+    expect(
+        (wrapper.find('[aria-label="Move up"]').element as HTMLButtonElement).disabled
+    ).toBe(true);
+});
+
+test('Move down button disabled when suite is last', async () => {
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 2,
+            suite_count: 3,
+        }
+    });
+    expect(
+        (wrapper.find('[aria-label="Move down"]').element as HTMLButtonElement).disabled
+    ).toBe(true);
+});
+
+test('Move test case up', async () => {
+    let order_stub = sinon.stub(AGTestCase, 'update_order');
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let test_cases = [
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+    ];
+    suite.ag_test_cases = test_cases.slice();
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 0,
+            suite_count: 1,
+        }
+    });
+
+    await wrapper.vm.move_ag_test_case(1, -1);
+
+    expect(suite.ag_test_cases).toEqual([test_cases[1], test_cases[0], test_cases[2]]);
+    expect(order_stub.calledOnceWith(
+        suite.pk, [test_cases[1].pk, test_cases[0].pk, test_cases[2].pk]
+    )).toBe(true);
+});
+
+test('Move test case down', async () => {
+    let order_stub = sinon.stub(AGTestCase, 'update_order');
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let test_cases = [
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+    ];
+    suite.ag_test_cases = test_cases.slice();
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 0,
+            suite_count: 1,
+        }
+    });
+
+    await wrapper.vm.move_ag_test_case(1, 1);
+
+    expect(suite.ag_test_cases).toEqual([test_cases[0], test_cases[2], test_cases[1]]);
+    expect(order_stub.calledOnceWith(
+        suite.pk, [test_cases[0].pk, test_cases[2].pk, test_cases[1].pk]
+    )).toBe(true);
+});
+
 test('Update test cases order', async () => {
     let order_stub = sinon.stub(AGTestCase, 'update_order');
     let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
@@ -519,7 +637,9 @@ test('Update test cases order', async () => {
         propsData: {
             ag_test_suite: suite,
             active_ag_test_suite: null,
-            active_ag_test_command: null
+            active_ag_test_command: null,
+            index: 0,
+            suite_count: 1,
         }
     });
     await wrapper.find('.panel-toggle').trigger('click');

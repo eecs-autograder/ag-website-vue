@@ -314,6 +314,62 @@ describe('Deleting ag_test_suite', () => {
     });
 });
 
+test('Move suite up', async () => {
+    let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
+    let suites = [
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+    ];
+    get_all_suites_from_project.resolves(suites.slice());
+    let wrapper = make_wrapper();
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    await wrapper.vm.move_ag_test_suite(1, -1);
+
+    expect(wrapper.vm.d_ag_test_suites).toEqual([suites[1], suites[0], suites[2]]);
+    expect(order_stub.calledOnceWith(
+        project.pk, [suites[1].pk, suites[0].pk, suites[2].pk]
+    )).toBe(true);
+});
+
+test('Move suite down', async () => {
+    let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
+    let suites = [
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+    ];
+    get_all_suites_from_project.resolves(suites.slice());
+    let wrapper = make_wrapper();
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    await wrapper.vm.move_ag_test_suite(1, 1);
+
+    expect(wrapper.vm.d_ag_test_suites).toEqual([suites[0], suites[2], suites[1]]);
+    expect(order_stub.calledOnceWith(
+        project.pk, [suites[0].pk, suites[2].pk, suites[1].pk]
+    )).toBe(true);
+});
+
+test('Original order restored after failed move suite', async () => {
+    sinon.stub(ag_cli.AGTestSuite, 'update_order').rejects(
+        new ag_cli.HttpError(400, 'NOOOOOPE')
+    );
+    let suites = [
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+    ];
+    get_all_suites_from_project.resolves(suites.slice());
+    let wrapper = make_wrapper();
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    await wrapper.vm.move_ag_test_suite(0, 1);
+    await wrapper.vm.$nextTick();
+    expect(wrapper.vm.d_ag_test_suites).toEqual(suites);
+});
+
 test('Update suites order', async () => {
     let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
     let suites = [

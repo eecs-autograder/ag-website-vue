@@ -15,6 +15,20 @@
 
       <div class="icons">
         <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
+        <button type="button"
+                class="icon move-button"
+                aria-label="Move up"
+                :disabled="index === 0"
+                @click.stop="$emit('move_up')">
+          <i class="fas fa-arrow-up"></i>
+        </button>
+        <button type="button"
+                class="icon move-button"
+                aria-label="Move down"
+                :disabled="index === case_count - 1"
+                @click.stop="$emit('move_down')">
+          <i class="fas fa-arrow-down"></i>
+        </button>
         <div class="dropdown">
           <button type="button"
                   class="menu-icon-button icon"
@@ -67,19 +81,34 @@
                  @change="set_ag_test_command_order"
                  @end="$event.item.style.transform = 'none'"
                  handle=".handle">
-        <button class="ag-test-command panel level-2"
-                v-for="ag_test_command of ag_test_case.ag_test_commands"
-                :key="ag_test_command.pk"
-                :class="{'active': active_ag_test_command !== null
-                                    && active_ag_test_command.pk === ag_test_command.pk}"
-                @click="$emit('update_active_item', ag_test_command)">
-          <div class="text">
-            <span>{{ag_test_command.name}}</span>
-          </div>
+        <div class="ag-test-command panel level-2"
+             v-for="(ag_test_command, cmd_index) of ag_test_case.ag_test_commands"
+             :key="ag_test_command.pk"
+             :class="{'active': active_ag_test_command !== null
+                                 && active_ag_test_command.pk === ag_test_command.pk}">
+          <button type="button"
+                  class="panel-toggle"
+                  @click="$emit('update_active_item', ag_test_command)">
+            <div class="text">{{ag_test_command.name}}</div>
+          </button>
           <div class="icons">
             <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
+            <button type="button"
+                    class="icon move-button"
+                    aria-label="Move up"
+                    :disabled="cmd_index === 0"
+                    @click.stop="move_command(cmd_index, -1)">
+              <i class="fas fa-arrow-up"></i>
+            </button>
+            <button type="button"
+                    class="icon move-button"
+                    aria-label="Move down"
+                    :disabled="cmd_index === ag_test_case.ag_test_commands.length - 1"
+                    @click.stop="move_command(cmd_index, 1)">
+              <i class="fas fa-arrow-down"></i>
+            </button>
           </div>
-        </button>
+        </div>
       </draggable>
     </div>
 
@@ -239,6 +268,12 @@ export default class AGTestCasePanel extends Vue {
   @Prop({required: false, type: AGTestCommand})
   active_ag_test_command!: AGTestCommand | null;
 
+  @Prop({required: true, type: Number})
+  index!: number;
+
+  @Prop({required: true, type: Number})
+  case_count!: number;
+
   readonly is_not_empty = is_not_empty;
 
   get label_uid() {
@@ -354,6 +389,14 @@ export default class AGTestCasePanel extends Vue {
       this.ag_test_case.pk, this.ag_test_case.ag_test_commands.map(cmd => cmd.pk));
   }
 
+  @handle_global_errors_async
+  move_command(index: number, delta: number) {
+    const cmds = this.ag_test_case.ag_test_commands;
+    cmds.splice(index + delta, 0, cmds.splice(index, 1)[0]);
+    return AGTestCommand.update_order(
+      this.ag_test_case.pk, cmds.map(cmd => cmd.pk));
+  }
+
   @handle_api_errors_async(handle_add_ag_test_command_error)
   async add_ag_test_command() {
     try {
@@ -416,18 +459,17 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
   align-items: center;
 }
 
-.ag-test-command.panel {
-  &:not(.active) {
-    background: none;
-  }
+.move-button {
+  background: none;
   border: none;
-  padding-top: 0;
-  padding-right: 0;
-  padding-bottom: 0;
-  width: 100%;
-  text-align: left;
-  font-family: inherit;
+  padding: 0 .25rem;
+  cursor: pointer;
   color: inherit;
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
 }
 
 .handle {

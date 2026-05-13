@@ -35,12 +35,16 @@
                       @end="$event.item.style.transform = 'none'"
                       handle=".handle">
             <AGTestSuitePanel
-              v-for="ag_test_suite of d_ag_test_suites"
+              v-for="(ag_test_suite, index) of d_ag_test_suites"
               :key="ag_test_suite.pk"
               :ag_test_suite="ag_test_suite"
+              :index="index"
+              :suite_count="d_ag_test_suites.length"
               :active_ag_test_suite="d_active_ag_test_suite"
               :active_ag_test_command="d_active_ag_test_command"
-              @update_active_item="update_active_item($event)">
+              @update_active_item="update_active_item($event)"
+              @move_up="move_ag_test_suite(index, -1)"
+              @move_down="move_ag_test_suite(index, 1)">
             </AGTestSuitePanel>
           </draggable>
         </div>
@@ -269,6 +273,21 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     catch (e) {
       this.d_ag_test_suites = this.d_current_ag_test_suite_order;
       this.d_current_ag_test_suite_order = [];
+      throw e;
+    }
+  }
+
+  @handle_global_errors_async
+  async move_ag_test_suite(index: number, delta: number) {
+    const saved_order = this.d_ag_test_suites.slice();
+    this.d_ag_test_suites.splice(index + delta, 0, this.d_ag_test_suites.splice(index, 1)[0]);
+    try {
+      await AGTestSuite.update_order(
+        this.project.pk, this.d_ag_test_suites.map(suite => suite.pk)
+      );
+    }
+    catch (e) {
+      this.d_ag_test_suites = saved_order;
       throw e;
     }
   }

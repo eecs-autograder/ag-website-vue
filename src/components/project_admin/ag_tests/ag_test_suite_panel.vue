@@ -14,6 +14,20 @@
       <div class="icons">
         <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
         <button type="button"
+                class="icon move-button"
+                aria-label="Move up"
+                :disabled="index === 0"
+                @click.stop="$emit('move_up')">
+          <i class="fas fa-arrow-up"></i>
+        </button>
+        <button type="button"
+                class="icon move-button"
+                aria-label="Move down"
+                :disabled="index === suite_count - 1"
+                @click.stop="$emit('move_down')">
+          <i class="fas fa-arrow-down"></i>
+        </button>
+        <button type="button"
                 class="icon add-ag-test-case-button"
                 aria-label="Add Test Case"
                 @click.stop="open_new_ag_test_case_modal">
@@ -28,12 +42,16 @@
                  @change="set_ag_test_case_order"
                  @end="$event.item.style.transform = 'none'"
                  handle=".handle">
-        <AGTestCasePanel v-for="test_case of ag_test_suite.ag_test_cases"
+        <AGTestCasePanel v-for="(test_case, case_index) of ag_test_suite.ag_test_cases"
                    :key="test_case.pk"
                    :ag_test_case="test_case"
                    :ag_test_suite="ag_test_suite"
+                   :index="case_index"
+                   :case_count="ag_test_suite.ag_test_cases.length"
                    :active_ag_test_command="active_ag_test_command"
-                   @update_active_item="$emit('update_active_item', $event)">
+                   @update_active_item="$emit('update_active_item', $event)"
+                   @move_up="move_ag_test_case(case_index, -1)"
+                   @move_down="move_ag_test_case(case_index, 1)">
         </AGTestCasePanel>
       </draggable>
     </div>
@@ -185,6 +203,12 @@ export default class AGTestSuitePanel extends Vue {
   @Prop({required: true, type: AGTestSuite})
   ag_test_suite!: AGTestSuite;
 
+  @Prop({required: true, type: Number})
+  index!: number;
+
+  @Prop({required: true, type: Number})
+  suite_count!: number;
+
   d_show_new_ag_test_case_modal = false;
   d_add_case_form_is_valid = false;
   d_cases_are_visible = false;
@@ -289,6 +313,14 @@ export default class AGTestSuitePanel extends Vue {
       this.ag_test_suite.pk, this.ag_test_suite.ag_test_cases.map(test_case => test_case.pk));
   }
 
+  @handle_global_errors_async
+  move_ag_test_case(index: number, delta: number) {
+    const cases = this.ag_test_suite.ag_test_cases;
+    cases.splice(index + delta, 0, cases.splice(index, 1)[0]);
+    return AGTestCase.update_order(
+      this.ag_test_suite.pk, cases.map(c => c.pk));
+  }
+
   @handle_api_errors_async(handle_create_ag_test_case_error)
   async create_ag_test_case() {
     try {
@@ -389,11 +421,17 @@ function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: un
   cursor: grabbing;
 }
 
-.add-ag-test-case-button {
+.add-ag-test-case-button, .move-button {
   background: none;
   border: none;
   padding: 0 .25rem;
   cursor: pointer;
+  color: inherit;
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
 }
 
 .duplicate-ag-test-command-msg {
