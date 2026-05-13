@@ -1,16 +1,21 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
     </div>
   </div>
   <div v-else id="ag-test-suites-component">
     <div class="sidebar-container">
       <div class="sidebar-menu">
         <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
-          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+          <button type="button"
+                  class="sidebar-collapse-button"
+                  :aria-label="`${d_collapsed ? 'Open' : 'Close'} test suites sidebar`"
+                  :aria-expanded="!d_collapsed"
+                  aria-controls="test-suite-sidebar"
+                  @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars"></i>
-          </span>
+          </button>
           <template v-if="!d_collapsed">
             <span class="sidebar-header-text"> Suites </span>
             <button type="button"
@@ -22,7 +27,7 @@
           </template>
         </div>
 
-        <div class="sidebar-content" v-if="!d_collapsed">
+        <div class="sidebar-content" id="test-suite-sidebar" v-if="!d_collapsed">
           <draggable ref="ag_test_suite_order"
                       v-model="d_ag_test_suites"
                       @start="record_current_ag_test_suite_order"
@@ -88,10 +93,11 @@
                       @submit="add_ag_test_suite"
                       @form_validity_changed="d_add_ag_test_suite_form_is_valid = $event">
         <div class="ag-test-suite-name-container">
-          <label class="label"> Suite name </label>
+          <label class="label" for="new-ag-test-suite-name"> Suite name </label>
           <validated-input ref="new_ag_test_suite_name"
                             v-model="d_new_ag_test_suite_name"
-                            :validators="[is_not_empty]">
+                            :validators="[is_not_empty]"
+                            input_id="new-ag-test-suite-name">
           </validated-input>
         </div>
 
@@ -99,6 +105,7 @@
 
         <div class="modal-button-footer">
           <button class="modal-create-button"
+                  type="submit"
                   :disabled="!d_add_ag_test_suite_form_is_valid || d_adding_suite"> Add Suite
           </button>
         </div>
@@ -627,6 +634,12 @@ $border-color: $gray-blue-1;
   .sidebar-content {
     padding-top: .125rem;
   }
+}
+
+.sidebar-collapse-button {
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .body {
