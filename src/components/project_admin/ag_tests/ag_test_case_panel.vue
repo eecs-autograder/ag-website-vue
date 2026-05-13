@@ -2,7 +2,11 @@
   <div>
     <div class="ag-test-case panel level-1"
           :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}"
-          @click="update_ag_test_case_panel_when_clicked">
+          tabindex="0"
+          :aria-expanded="is_open"
+          @click="update_ag_test_case_panel_when_clicked"
+          @keydown.enter="update_ag_test_case_panel_when_clicked"
+          @keydown.space.prevent="update_ag_test_case_panel_when_clicked">
       <div class="text">
         <i v-if="ag_test_case.ag_test_commands.length > 1"
           class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
@@ -10,39 +14,48 @@
       </div>
 
       <div class="icons">
-        <i class="icon handle fas fa-arrows-alt"></i>
-        <div class="dropdown" @click.stop="$emit('update_active_item', ag_test_case)">
-          <i class="menu-icon icon fas fa-ellipsis-h"></i>
+        <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
+        <div class="dropdown">
+          <button type="button"
+                  class="menu-icon-button icon"
+                  aria-label="Test case options"
+                  @click.stop="$emit('update_active_item', ag_test_case)">
+            <i class="fas fa-ellipsis-h"></i>
+          </button>
           <div class="menu">
-            <div ref="add_ag_test_command_menu_item"
-                @click="open_new_ag_test_command_modal"
-                class="menu-item">
+            <button ref="add_ag_test_command_menu_item"
+                    type="button"
+                    @click="open_new_ag_test_command_modal"
+                    class="menu-item">
               <i class="fas fa-plus"></i>
               <span class="menu-item-text">Add command</span>
-            </div>
+            </button>
             <template>
               <div class="menu-divider"> </div>
-              <div ref="edit_ag_test_case_menu_item"
-                  @click="d_show_ag_test_case_settings_modal = true"
-                  class="menu-item">
+              <button ref="edit_ag_test_case_menu_item"
+                      type="button"
+                      @click="d_show_ag_test_case_settings_modal = true"
+                      class="menu-item">
                 <i class="fas fa-pencil-alt"></i>
                 <span class="menu-item-text">Advanced test settings</span>
-              </div>
+              </button>
             </template>
             <div class="menu-divider"> </div>
-            <div ref="clone_ag_test_case_menu_item"
-                @click="open_clone_ag_test_case_modal"
-                class="menu-item">
+            <button ref="clone_ag_test_case_menu_item"
+                    type="button"
+                    @click="open_clone_ag_test_case_modal"
+                    class="menu-item">
               <i class="far fa-copy"></i>
               <span class="menu-item-text"> Clone test case </span>
-            </div>
+            </button>
             <div class="menu-divider"> </div>
-            <div ref="delete_ag_test_case_menu_item"
-                @click="d_show_delete_ag_test_case_modal = true"
-                class="menu-item">
+            <button ref="delete_ag_test_case_menu_item"
+                    type="button"
+                    @click="d_show_delete_ag_test_case_modal = true"
+                    class="menu-item">
               <i class="fas fa-trash-alt"></i>
               <span class="delete-ag-test-case-label menu-item-text"> Delete test case </span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -59,12 +72,15 @@
              :key="ag_test_command.pk"
              :class="{'active': active_ag_test_command !== null
                                  && active_ag_test_command.pk === ag_test_command.pk}"
-             @click="$emit('update_active_item', ag_test_command)">
+             tabindex="0"
+             @click="$emit('update_active_item', ag_test_command)"
+             @keydown.enter="$emit('update_active_item', ag_test_command)"
+             @keydown.space.prevent="$emit('update_active_item', ag_test_command)">
           <div class="text">
             <span>{{ag_test_command.name}}</span>
           </div>
           <div class="icons">
-            <i class="icon handle fas fa-arrows-alt"></i>
+            <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
           </div>
         </div>
       </draggable>
@@ -82,17 +98,19 @@
                       @submit="add_ag_test_command"
                       @form_validity_changed="d_add_command_form_is_valid = $event">
         <div class="form-field-wrapper">
-          <label class="label"> Command name </label>
+          <label class="label" :for="`new-command-name-${label_uid}`"> Command name </label>
           <validated-input ref="new_ag_test_command_name"
                            v-model="d_new_command_name"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           :input_id="`new-command-name-${label_uid}`">
           </validated-input>
         </div>
         <div class="form-field-wrapper">
-          <label class="label">Command</label>
+          <label class="label" :for="`new-command-${label_uid}`">Command</label>
           <validated-input ref="new_ag_test_command"
                            v-model="d_new_command"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           :input_id="`new-command-${label_uid}`">
           </validated-input>
         </div>
 
@@ -100,6 +118,7 @@
 
         <div class="modal-button-footer">
           <button class="modal-create-button"
+                  type="submit"
                   :disabled="!d_add_command_form_is_valid || d_adding_command">
             Add Command
           </button>
@@ -120,10 +139,11 @@
                       @submit="clone_ag_test_case"
                       @form_validity_changed="d_clone_case_form_is_valid = $event">
         <div class="form-field-wrapper">
-          <label class="label">Case Name</label>
+          <label class="label" :for="`clone-case-name-${label_uid}`">Case Name</label>
           <validated-input ref="ag_test_case_clone_name"
                            v-model="d_cloned_case_name"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           :input_id="`clone-case-name-${label_uid}`">
           </validated-input>
         </div>
         <APIErrors ref="clone_case_api_errors"></APIErrors>
@@ -196,7 +216,7 @@ import {
   handle_global_errors_async,
   make_error_handler_func
 } from '@/error_handling';
-import { toggle } from '@/utils';
+import { generate_uid, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
@@ -223,6 +243,10 @@ export default class AGTestCasePanel extends Vue {
   active_ag_test_command!: AGTestCommand | null;
 
   readonly is_not_empty = is_not_empty;
+
+  get label_uid() {
+    return generate_uid();
+  }
 
   d_add_command_form_is_valid = false;
   d_clone_case_form_is_valid = true;
@@ -389,8 +413,22 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
   color: black;  // For when the case panel is active
   @include static-dropdown($open-on-hover: true, $orient-right: true);
 
+  .menu-icon-button {
+    background: none;
+    border: none;
+    padding: 0 .25rem;
+    cursor: pointer;
+    color: inherit;
+  }
+
   .menu-item {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
     padding: .375rem;
+    cursor: pointer;
+    color: inherit;
   }
 }
 
