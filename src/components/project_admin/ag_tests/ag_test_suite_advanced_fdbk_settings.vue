@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <collapsible-section>
+      <collapsible-section section_id="advanced-test-suite-feedback-settings">
         <template #header>
           Advanced Settings
         </template>

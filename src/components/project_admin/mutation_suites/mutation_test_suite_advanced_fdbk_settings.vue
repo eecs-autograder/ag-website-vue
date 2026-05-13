@@ -12,7 +12,7 @@
         </label>
       </div>
 
-      <collapsible-section>
+      <collapsible-section section_id="advanced-mutation-suite-feedback-settings">
         <template #header> Advanced Settings </template>
 
         <template #body>

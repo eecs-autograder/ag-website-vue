@@ -8,6 +8,7 @@ describe("CollapsibleSection", () => {
   let wrapper: Wrapper<Vue>;
   beforeEach(() => {
     wrapper = mount(CollapsibleSection, {
+      propsData: { section_id: "test" },
       slots: {
         header: "Foo",
         body: "Bar",
@@ -19,7 +20,9 @@ describe("CollapsibleSection", () => {
   });
 
   test("does not render body initially", () => {
-    expect(wrapper.html()).not.toContain("Bar");
+    expect(wrapper.find(".collapsible-section-body-slot").isVisible()).toBe(
+      false,
+    );
   });
 
   test("renders header and body after header is clicked", async () => {
@@ -32,6 +35,8 @@ describe("CollapsibleSection", () => {
     await find_collapsible_section_header(wrapper).trigger("click");
     await find_collapsible_section_header(wrapper).trigger("click");
     expect(wrapper.html()).toContain("Foo");
-    expect(wrapper.html()).not.toContain("Bar");
+    expect(wrapper.find(".collapsible-section-body-slot").isVisible()).toBe(
+      false,
+    );
   });
 });

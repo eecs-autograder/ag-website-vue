@@ -1,8 +1,11 @@
 <template>
   <div>
-    <div
+    <button
+      type="button"
       class="collapsible-section-label"
       data-testid="collapsible-section-header"
+      :aria-controls="`${section_id}-${component_uid}`"
+      :aria-expanded="is_open"
       @click="toggle_is_open"
     >
       <i v-if="is_open" class="fas fa-caret-down caret-down"></i>
@@ -11,9 +14,13 @@
       <div class="collapsible-section-header-slot">
         <slot name="header"></slot>
       </div>
-    </div>
+    </button>
 
-    <div v-if="is_open" class="collapsible-section-body-slot">
+    <div
+      v-show="is_open"
+      :id="`${section_id}-${component_uid}`"
+      class="collapsible-section-body-slot"
+    >
       <slot name="body"></slot>
     </div>
   </div>
@@ -21,8 +28,12 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { generate_uid } from "@/utils";
+
+const props = defineProps<{ section_id: string }>();
 
 const is_open = ref(false);
+const component_uid = generate_uid();
 
 function toggle_is_open() {
   is_open.value = !is_open.value;
@@ -42,6 +53,10 @@ function toggle_is_open() {
   box-sizing: border-box;
   font-size: 1rem;
   cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 0;
 
   .collapsible-section-header-slot {
     padding: 0 0.125rem;

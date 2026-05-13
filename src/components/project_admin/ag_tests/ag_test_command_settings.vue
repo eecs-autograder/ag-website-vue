@@ -571,7 +571,10 @@
                     <div slot="suffix" class="unit-of-measurement"> points </div>
                   </validated-input>
                 </div>
-                <collapsible-section data-testid="custom-scoring-advanced-settings">
+                <collapsible-section
+                  data-testid="custom-scoring-advanced-settings"
+                  section_id="custom-scoring-advanced-settings"
+                >
                   <template #header>
                     Advanced Settings
                   </template>

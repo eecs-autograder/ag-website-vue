@@ -950,7 +950,7 @@ describe('AGTestCommandSettings tests', () => {
         expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
 
         await enable_custom_scoring.setChecked(true);
-        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).isVisible()).toBe(false);
         expect(wrapper.findComponent({ref: 'custom_scoring_label'}).exists()).toBe(false);
 
         await click_custom_scoring_advanced_settings();
@@ -958,8 +958,8 @@ describe('AGTestCommandSettings tests', () => {
         expect(wrapper.find('#override-custom-scoring-label').exists()).toBe(true);
 
         await click_custom_scoring_advanced_settings();
-        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).exists()).toBe(false);
-        expect(wrapper.find('#override-custom-scoring-label').exists()).toBe(false);
+        expect(wrapper.findComponent({ref: 'custom_scoring_regex'}).isVisible()).toBe(false);
+        expect(wrapper.find('#override-custom-scoring-label').isVisible()).toBe(false);
 
         await click_custom_scoring_advanced_settings();
         await enable_custom_scoring.setChecked(false);
