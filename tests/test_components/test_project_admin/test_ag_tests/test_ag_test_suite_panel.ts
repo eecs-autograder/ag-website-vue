@@ -624,6 +624,88 @@ test('Move test case down', async () => {
     )).toBe(true);
 });
 
+test('Focus stays on move up button after moving case up to non-boundary position', async () => {
+    sinon.stub(AGTestCase, 'update_order');
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let test_cases = [
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+    ];
+    suite.ag_test_cases = test_cases.slice();
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 0,
+            suite_count: 1,
+        },
+        attachTo: document.body,
+    });
+    wrapper.find('.panel-toggle').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    await wrapper.vm.move_ag_test_case(2, -1);
+
+    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move up');
+});
+
+test('Focus falls back to move down when case moves to first position', async () => {
+    sinon.stub(AGTestCase, 'update_order');
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let test_cases = [
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+    ];
+    suite.ag_test_cases = test_cases.slice();
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 0,
+            suite_count: 1,
+        },
+        attachTo: document.body,
+    });
+    wrapper.find('.panel-toggle').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    await wrapper.vm.move_ag_test_case(1, -1);
+
+    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move down');
+});
+
+test('Focus falls back to move up when case moves to last position', async () => {
+    sinon.stub(AGTestCase, 'update_order');
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let test_cases = [
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+    ];
+    suite.ag_test_cases = test_cases.slice();
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 0,
+            suite_count: 1,
+        },
+        attachTo: document.body,
+    });
+    wrapper.find('.panel-toggle').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    await wrapper.vm.move_ag_test_case(1, 1);
+
+    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move up');
+});
+
 test('Update test cases order', async () => {
     let order_stub = sinon.stub(AGTestCase, 'update_order');
     let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);

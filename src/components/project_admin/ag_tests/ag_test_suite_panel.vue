@@ -13,14 +13,16 @@
 
       <div class="icons">
         <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
-        <button type="button"
+        <button ref="move_up_btn"
+                type="button"
                 class="icon move-button"
                 aria-label="Move up"
                 :disabled="index === 0"
                 @click.stop="$emit('move_up')">
           <i class="fas fa-arrow-up"></i>
         </button>
-        <button type="button"
+        <button ref="move_down_btn"
+                type="button"
                 class="icon move-button"
                 aria-label="Move down"
                 :disabled="index === suite_count - 1"
@@ -42,7 +44,8 @@
                  @change="set_ag_test_case_order"
                  @end="$event.item.style.transform = 'none'"
                  handle=".handle">
-        <AGTestCasePanel v-for="(test_case, case_index) of ag_test_suite.ag_test_cases"
+        <AGTestCasePanel ref="case_panels"
+                   v-for="(test_case, case_index) of ag_test_suite.ag_test_cases"
                    :key="test_case.pk"
                    :ag_test_case="test_case"
                    :ag_test_suite="ag_test_suite"
@@ -314,11 +317,22 @@ export default class AGTestSuitePanel extends Vue {
   }
 
   @handle_global_errors_async
-  move_ag_test_case(index: number, delta: number) {
+  async move_ag_test_case(index: number, delta: number) {
     const cases = this.ag_test_suite.ag_test_cases;
     cases.splice(index + delta, 0, cases.splice(index, 1)[0]);
-    return AGTestCase.update_order(
+    await AGTestCase.update_order(
       this.ag_test_suite.pk, cases.map(c => c.pk));
+    await this.$nextTick();
+    const panels = this.$refs.case_panels as AGTestCasePanel[];
+    panels.find(p => p.index === index + delta)?.focus_move_button(delta);
+  }
+
+  focus_move_button(delta: number) {
+    const at_end = delta < 0 ? this.index === 0 : this.index === this.suite_count - 1;
+    const target = at_end
+      ? (delta < 0 ? this.$refs.move_down_btn : this.$refs.move_up_btn)
+      : (delta < 0 ? this.$refs.move_up_btn : this.$refs.move_down_btn);
+    (target as HTMLButtonElement).focus();
   }
 
   @handle_api_errors_async(handle_create_ag_test_case_error)

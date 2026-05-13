@@ -15,14 +15,16 @@
 
       <div class="icons">
         <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
-        <button type="button"
+        <button ref="move_up_btn"
+                type="button"
                 class="icon move-button"
                 aria-label="Move up"
                 :disabled="index === 0"
                 @click.stop="$emit('move_up')">
           <i class="fas fa-arrow-up"></i>
         </button>
-        <button type="button"
+        <button ref="move_down_btn"
+                type="button"
                 class="icon move-button"
                 aria-label="Move down"
                 :disabled="index === case_count - 1"
@@ -93,14 +95,16 @@
           </button>
           <div class="icons">
             <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
-            <button type="button"
+            <button ref="cmd_move_up_buttons"
+                    type="button"
                     class="icon move-button"
                     aria-label="Move up"
                     :disabled="cmd_index === 0"
                     @click.stop="move_command(cmd_index, -1)">
               <i class="fas fa-arrow-up"></i>
             </button>
-            <button type="button"
+            <button ref="cmd_move_down_buttons"
+                    type="button"
                     class="icon move-button"
                     aria-label="Move down"
                     :disabled="cmd_index === ag_test_case.ag_test_commands.length - 1"
@@ -390,11 +394,29 @@ export default class AGTestCasePanel extends Vue {
   }
 
   @handle_global_errors_async
-  move_command(index: number, delta: number) {
+  async move_command(index: number, delta: number) {
     const cmds = this.ag_test_case.ag_test_commands;
     cmds.splice(index + delta, 0, cmds.splice(index, 1)[0]);
-    return AGTestCommand.update_order(
+    await AGTestCommand.update_order(
       this.ag_test_case.pk, cmds.map(cmd => cmd.pk));
+    await this.$nextTick();
+    const new_index = index + delta;
+    const up_btns = this.$refs.cmd_move_up_buttons as HTMLButtonElement[];
+    const down_btns = this.$refs.cmd_move_down_buttons as HTMLButtonElement[];
+    const at_end = delta < 0 ? new_index === 0 : new_index === cmds.length - 1;
+    if (!at_end) {
+      (delta < 0 ? up_btns[new_index] : down_btns[new_index])?.focus();
+    } else {
+      (delta < 0 ? down_btns[new_index] : up_btns[new_index])?.focus();
+    }
+  }
+
+  focus_move_button(delta: number) {
+    const at_end = delta < 0 ? this.index === 0 : this.index === this.case_count - 1;
+    const target = at_end
+      ? (delta < 0 ? this.$refs.move_down_btn : this.$refs.move_up_btn)
+      : (delta < 0 ? this.$refs.move_up_btn : this.$refs.move_down_btn);
+    (target as HTMLButtonElement).focus();
   }
 
   @handle_api_errors_async(handle_add_ag_test_command_error)
@@ -421,6 +443,7 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
   const api_errors = component.$refs.clone_case_api_errors as APIErrorsExposed | undefined;
   api_errors?.show_errors_from_response(error);
 }
+
 
 </script>
 

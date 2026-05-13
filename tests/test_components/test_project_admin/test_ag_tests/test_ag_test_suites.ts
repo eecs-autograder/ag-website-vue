@@ -370,6 +370,64 @@ test('Original order restored after failed move suite', async () => {
     expect(wrapper.vm.d_ag_test_suites).toEqual(suites);
 });
 
+test('Focus stays on move up button after moving suite up to non-boundary position', async () => {
+    sinon.stub(ag_cli.AGTestSuite, 'update_order');
+    let suites = [
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+    ];
+    get_all_suites_from_project.resolves(suites.slice());
+    let wrapper = managed_mount(AGTestSuites, {
+        propsData: {project},
+        attachTo: document.body,
+    });
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    await wrapper.vm.move_ag_test_suite(2, -1);
+
+    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move up');
+});
+
+test('Focus falls back to move down when suite moves to first position', async () => {
+    sinon.stub(ag_cli.AGTestSuite, 'update_order');
+    let suites = [
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+    ];
+    get_all_suites_from_project.resolves(suites.slice());
+    let wrapper = managed_mount(AGTestSuites, {
+        propsData: {project},
+        attachTo: document.body,
+    });
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    await wrapper.vm.move_ag_test_suite(1, -1);
+
+    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move down');
+});
+
+test('Focus falls back to move up when suite moves to last position', async () => {
+    sinon.stub(ag_cli.AGTestSuite, 'update_order');
+    let suites = [
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+        data_ut.make_ag_test_suite(project.pk),
+    ];
+    get_all_suites_from_project.resolves(suites.slice());
+    let wrapper = managed_mount(AGTestSuites, {
+        propsData: {project},
+        attachTo: document.body,
+    });
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    await wrapper.vm.move_ag_test_suite(1, 1);
+
+    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move up');
+});
+
 test('Update suites order', async () => {
     let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
     let suites = [

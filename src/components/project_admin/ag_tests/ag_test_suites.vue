@@ -35,6 +35,7 @@
                       @end="$event.item.style.transform = 'none'"
                       handle=".handle">
             <AGTestSuitePanel
+              ref="suite_panels"
               v-for="(ag_test_suite, index) of d_ag_test_suites"
               :key="ag_test_suite.pk"
               :ag_test_suite="ag_test_suite"
@@ -290,6 +291,9 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
       this.d_ag_test_suites = saved_order;
       throw e;
     }
+    await this.$nextTick();
+    const panels = this.$refs.suite_panels as AGTestSuitePanel[];
+    panels.find(p => p.index === index + delta)?.focus_move_button(delta);
   }
 
   get prev_ag_test_case_is_available() {
@@ -619,6 +623,7 @@ function handle_add_ag_test_suite_error(component: AGTestSuites, error: unknown)
   const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
   api_errors?.show_errors_from_response(error);
 }
+
 </script>
 
 <style scoped lang="scss">
