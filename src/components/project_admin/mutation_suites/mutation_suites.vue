@@ -6,12 +6,17 @@
   </div>
   <div v-else id="mutation-test-suites-component" class="scroll-container">
     <div class="sidebar-container">
-      <div id="mutation-test-suite-sidebar" class="sidebar-menu">
+      <nav id="mutation-test-suite-sidebar" class="sidebar-menu" aria-label="Mutation test suites">
         <div id="sidebar-header"
              class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
-          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+          <button type="button"
+                  class="sidebar-collapse-button"
+                  :aria-label="`${d_collapsed ? 'Open' : 'Close'} mutation test suites sidebar`"
+                  :aria-expanded="!d_collapsed"
+                  aria-controls="mutation-suite-sidebar-content"
+                  @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars"></i>
-          </span>
+          </button>
           <template v-if="!d_collapsed">
             <div class="sidebar-header-text"> Suites </div>
             <button type="button"
@@ -23,31 +28,43 @@
           </template>
         </div>
 
-        <div class="sidebar-content" v-if="!d_collapsed">
+        <div class="sidebar-content" id="mutation-suite-sidebar-content" v-if="!d_collapsed">
           <draggable ref="mutation_test_suite_order"
                       v-model="d_mutation_test_suites"
-                      @change="set_mutation_test_suite_order"
+                      @start="d_pre_drag_suite_order = d_mutation_test_suites.slice()"
+                      @change="suite_order_syncer.schedule(
+                                  d_mutation_test_suites, d_pre_drag_suite_order)"
                       @end="$event.item.style.transform = 'none'"
                       handle=".handle">
-            <div v-for="mutation_test_suite of d_mutation_test_suites"
+            <div v-for="(mutation_test_suite, suite_index) of d_mutation_test_suites"
                 class="mutation-test-suite-panel panel level-1"
                 :class="{
                   'active':
                     d_active_mutation_test_suite !== null
                     && d_active_mutation_test_suite.pk === mutation_test_suite.pk
                 }"
-                :key="mutation_test_suite.pk"
-                @click="set_active_mutation_test_suite(mutation_test_suite)">
-              <div class="text">{{mutation_test_suite.name}}</div>
+                :key="mutation_test_suite.pk">
+              <button type="button"
+                      class="panel-toggle"
+                      @click="set_active_mutation_test_suite(mutation_test_suite)">
+                <div class="text">{{mutation_test_suite.name}}</div>
+              </button>
               <div class="icons">
-                <i class="icon handle fas fa-arrows-alt"></i>
+                <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
+                <MoveButtons :index="suite_index"
+                             :count="d_mutation_test_suites.length"
+                             @move_up="move_mutation_test_suite(suite_index, -1)"
+                             @move_down="move_mutation_test_suite(suite_index, 1)" />
               </div>
             </div>
           </draggable>
         </div>
-      </div>
+      </nav>
 
-      <div class="body" :class="{'body-closed': d_collapsed}">
+      <div class="body"
+           :class="{'body-closed': d_collapsed}"
+           :role="d_active_mutation_test_suite !== null ? 'region' : null"
+           :aria-label="d_active_mutation_test_suite !== null ? 'Suite settings' : null">
         <div v-if="d_active_mutation_test_suite !== null">
           <validated-form id="mutation-test-suite-form"
                           autocomplete="off"
@@ -274,6 +291,7 @@ import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import LastSaved from "@/components/last_saved.vue";
 import Modal from '@/components/modal.vue';
+import MoveButtons from '@/components/MoveButtons.vue';
 import {
     FeedbackConfigLabel,
     FeedbackDescriptions,
@@ -287,7 +305,13 @@ import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import Tooltip from "@/components/tooltip.vue";
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
+import {
+    GlobalErrorsSubject,
+    handle_api_errors_async,
+    handle_global_errors_async,
+    make_error_handler_func
+} from '@/error_handling';
+import { OrderSyncer } from '@/order_syncer';
 import { SafeMap } from '@/safe_map';
 import { deep_copy, format_datetime, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -302,6 +326,7 @@ import FeedbackConfigPanel from '../feedback_config_panel/feedback_config_panel.
     FeedbackConfigPanel,
     LastSaved,
     Modal,
+    MoveButtons,
     MutationCommand,
     MutationCommands,
     MutationTestSuiteAdvancedFdbkSettings,
@@ -337,10 +362,25 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   d_show_new_mutation_test_suite_modal = false;
   d_show_delete_mutation_test_suite_modal = false;
 
+  // Snapshot of the order before a drag starts, passed to the syncer as the rollback target.
+  private d_pre_drag_suite_order: MutationTestSuite[] = [];
+
+  // Must be initialized in created(), not as a class property: arrow functions in class
+  // property initializers capture 'this' = vue-class-component's dummy instance, so
+  // accessing data properties like d_mutation_test_suites would mutate the dummy, not the vm.
+  private suite_order_syncer!: OrderSyncer<MutationTestSuite>;
+
   d_collapsed = false;
 
   @handle_global_errors_async
   async created() {
+    this.suite_order_syncer = new OrderSyncer<MutationTestSuite>(
+      (suites) => MutationTestSuite.update_order(this.project.pk, suites.map(s => s.pk)),
+      (saved) => {
+        this.d_mutation_test_suites.splice(0, this.d_mutation_test_suites.length, ...saved);
+      },
+      (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+    );
     MutationTestSuite.subscribe(this);
     InstructorFile.subscribe(this);
     ExpectedStudentFile.subscribe(this);
@@ -359,6 +399,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     MutationTestSuite.unsubscribe(this);
     InstructorFile.unsubscribe(this);
     ExpectedStudentFile.unsubscribe(this);
+    void this.suite_order_syncer.flush();
   }
 
   @handle_api_errors_async(handle_add_mutation_test_suite_error)
@@ -385,10 +426,11 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     });
   }
 
-  @handle_global_errors_async
-  set_mutation_test_suite_order() {
-    return MutationTestSuite.update_order(
-      this.project.pk, this.d_mutation_test_suites.map(suite => suite.pk));
+  move_mutation_test_suite(index: number, delta: number) {
+    const suites = this.d_mutation_test_suites;
+    const prev_order = suites.slice();
+    suites.splice(index + delta, 0, suites.splice(index, 1)[0]);
+    this.suite_order_syncer.schedule(suites, prev_order);
   }
 
   open_new_mutation_test_suite_modal() {
@@ -682,6 +724,27 @@ $border-color: $gray-blue-1;
 
 .handle {
   cursor: grabbing;
+}
+
+.sidebar-collapse-button {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.panel-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
 }
 
 .item-to-delete {
