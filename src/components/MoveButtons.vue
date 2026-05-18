@@ -26,6 +26,8 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from "vue";
 
+import { assert_not_null } from "@/utils";
+
 interface PropTypes {
   /** The 0-based position of this item in the list. */
   index: number;
@@ -69,26 +71,22 @@ watch(
     // so it doesn't steal focus after we set it.
     await nextTick();
     await nextTick();
-    const at_boundary =
-      move === PendingKeyboardMove.Up
-        ? props.index === 0
-        : props.index === props.count - 1;
-    const target = at_boundary
-      ? move === PendingKeyboardMove.Up
-        ? move_down_btn.value
-        : move_up_btn.value
-      : move === PendingKeyboardMove.Up
-        ? move_up_btn.value
-        : move_down_btn.value;
-    if (!target) return;
-    // On move-down, Vue's keyed-list diff physically relocates *this item's*
-    // DOM node, blurring the focused button. If the host hides controls until
-    // :focus-within (a common pattern), that rule un-applies the moment focus
-    // leaves, leaving the target inside a visibility:hidden subtree —
-    // .focus() then silently no-ops. visibility:visible on a descendant
-    // overrides an ancestor's visibility:hidden, so we briefly opt this one
-    // button out long enough for focus to land; once it does, :focus-within
-    // (if present) restores the ancestor visibility on its own.
+    const moved_up = move === PendingKeyboardMove.Up;
+    const at_boundary = moved_up
+      ? props.index === 0
+      : props.index === props.count - 1;
+    const same_direction_btn = moved_up
+      ? move_up_btn.value
+      : move_down_btn.value;
+    const opposite_direction_btn = moved_up
+      ? move_down_btn.value
+      : move_up_btn.value;
+    const target = at_boundary ? opposite_direction_btn : same_direction_btn;
+    assert_not_null(target);
+
+    // The button needs to be visible, or focus() will silently fail. Make sure
+    // it's visible and then return control of the visibility to it's parent's
+    // styling.
     target.style.visibility = "visible";
     target.focus();
     target.style.visibility = "";
