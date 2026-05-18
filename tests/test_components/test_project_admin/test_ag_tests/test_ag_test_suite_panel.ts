@@ -8,6 +8,7 @@ import {
     Project,
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
+import { vi } from 'vitest';
 
 import APIErrors from '@/components/api_errors.vue';
 import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_panel.vue';
@@ -571,6 +572,7 @@ test('Move down button disabled when suite is last', async () => {
 });
 
 test('Move test case up', async () => {
+    vi.useFakeTimers();
     let order_stub = sinon.stub(AGTestCase, 'update_order');
     let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
     let test_cases = [
@@ -589,15 +591,22 @@ test('Move test case up', async () => {
         }
     });
 
-    await wrapper.vm.move_ag_test_case(1, -1);
+    wrapper.find('.panel-toggle').trigger('click');
+    await wrapper.vm.$nextTick();
+    // [0] = suite move-up, [1] = case[0] move-up, [2] = case[1] move-up
+    wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
+    await wrapper.vm.$nextTick();
+    await vi.runAllTimersAsync();
 
     expect(suite.ag_test_cases).toEqual([test_cases[1], test_cases[0], test_cases[2]]);
     expect(order_stub.calledOnceWith(
         suite.pk, [test_cases[1].pk, test_cases[0].pk, test_cases[2].pk]
     )).toBe(true);
+    vi.useRealTimers();
 });
 
 test('Move test case down', async () => {
+    vi.useFakeTimers();
     let order_stub = sinon.stub(AGTestCase, 'update_order');
     let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
     let test_cases = [
@@ -616,12 +625,18 @@ test('Move test case down', async () => {
         }
     });
 
-    await wrapper.vm.move_ag_test_case(1, 1);
+    wrapper.find('.panel-toggle').trigger('click');
+    await wrapper.vm.$nextTick();
+    // [0] = suite move-down, [1] = case[0] move-down, [2] = case[1] move-down
+    wrapper.findAll('[aria-label="Move down"]').at(2).trigger('click');
+    await wrapper.vm.$nextTick();
+    await vi.runAllTimersAsync();
 
     expect(suite.ag_test_cases).toEqual([test_cases[0], test_cases[2], test_cases[1]]);
     expect(order_stub.calledOnceWith(
         suite.pk, [test_cases[0].pk, test_cases[2].pk, test_cases[1].pk]
     )).toBe(true);
+    vi.useRealTimers();
 });
 
 test('Focus stays on move up button after moving case up to non-boundary position', async () => {
@@ -647,9 +662,13 @@ test('Focus stays on move up button after moving case up to non-boundary positio
     wrapper.find('.panel-toggle').trigger('click');
     await wrapper.vm.$nextTick();
 
-    await wrapper.vm.move_ag_test_case(2, -1);
-
-    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move up');
+    // [0]=suite Move up, [1]=case[0] Move up (disabled), [2]=case[1], [3]=case[2]
+    wrapper.findAll('[aria-label="Move up"]').at(3).trigger('click');
+    // case[2] moves to DOM position 1.
+    const find_expected = () => wrapper.findAll('.ag-test-case').at(1)
+        .find('[aria-label="Move up"]').element;
+    await wait_until(wrapper, () => document.activeElement === find_expected());
+    expect(document.activeElement).toBe(find_expected());
 });
 
 test('Focus falls back to move down when case moves to first position', async () => {
@@ -674,9 +693,45 @@ test('Focus falls back to move down when case moves to first position', async ()
     wrapper.find('.panel-toggle').trigger('click');
     await wrapper.vm.$nextTick();
 
-    await wrapper.vm.move_ag_test_case(1, -1);
+    // [0]=suite Move up, [1]=case[0] Move up (disabled), [2]=case[1]
+    wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
+    // case[1] moves to DOM position 0 (first), so move-up is disabled — fallback to move-down.
+    const find_expected = () => wrapper.findAll('.ag-test-case').at(0)
+        .find('[aria-label="Move down"]').element;
+    await wait_until(wrapper, () => document.activeElement === find_expected());
+    expect(document.activeElement).toBe(find_expected());
+});
 
-    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move down');
+test('Focus stays on move down button after moving case down to non-boundary position', async () => {
+    sinon.stub(AGTestCase, 'update_order');
+    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+    let test_cases = [
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+        data_ut.make_ag_test_case(suite.pk),
+    ];
+    suite.ag_test_cases = test_cases.slice();
+    let wrapper = managed_mount(AGTestSuitePanel, {
+        propsData: {
+            ag_test_suite: suite,
+            active_ag_test_suite: null,
+            active_ag_test_command: null,
+            index: 0,
+            suite_count: 1,
+        },
+        attachTo: document.body,
+    });
+    wrapper.find('.panel-toggle').trigger('click');
+    await wrapper.vm.$nextTick();
+
+    // [0]=suite Move down (disabled, suite_count=1), [1]=case[0], [2]=case[1], [3]=case[2], [4]=case[3] (disabled)
+    wrapper.findAll('[aria-label="Move down"]').at(1).trigger('click');
+    // case[0] moves to DOM position 1 (non-boundary). Focus stays on move-down.
+    const find_expected = () => wrapper.findAll('.ag-test-case').at(1)
+        .find('[aria-label="Move down"]').element;
+    await wait_until(wrapper, () => document.activeElement === find_expected());
+    expect(document.activeElement).toBe(find_expected());
 });
 
 test('Focus falls back to move up when case moves to last position', async () => {
@@ -701,12 +756,17 @@ test('Focus falls back to move up when case moves to last position', async () =>
     wrapper.find('.panel-toggle').trigger('click');
     await wrapper.vm.$nextTick();
 
-    await wrapper.vm.move_ag_test_case(1, 1);
-
-    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move up');
+    // [0]=suite Move down (disabled), [1]=case[0], [2]=case[1], [3]=case[2] (disabled)
+    wrapper.findAll('[aria-label="Move down"]').at(2).trigger('click');
+    // case[1] moves to DOM position 2 (last), so move-down is disabled — fallback to move-up.
+    const find_expected = () => wrapper.findAll('.ag-test-case').at(2)
+        .find('[aria-label="Move up"]').element;
+    await wait_until(wrapper, () => document.activeElement === find_expected());
+    expect(document.activeElement).toBe(find_expected());
 });
 
 test('Update test cases order', async () => {
+    vi.useFakeTimers();
     let order_stub = sinon.stub(AGTestCase, 'update_order');
     let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
     let test_cases = [
@@ -714,7 +774,7 @@ test('Update test cases order', async () => {
         data_ut.make_ag_test_case(suite.pk),
         data_ut.make_ag_test_case(suite.pk),
     ];
-    suite.ag_test_cases = test_cases;
+    suite.ag_test_cases = test_cases.slice();
     let wrapper = managed_mount(AGTestSuitePanel, {
         propsData: {
             ag_test_suite: suite,
@@ -726,9 +786,15 @@ test('Update test cases order', async () => {
     });
     await wrapper.find('.panel-toggle').trigger('click');
 
-    wrapper.findComponent({ref: 'ag_test_case_order'}).vm.$emit('change');
-    await wrapper.vm.$nextTick();
+    const draggable = wrapper.findComponent({ref: 'ag_test_case_order'});
+    draggable.vm.$emit('start');
+    // Simulate vuedraggable mutating v-model on drop.
+    suite.ag_test_cases.reverse();
+    draggable.vm.$emit('change');
+    await vi.runAllTimersAsync();
+
     expect(
-        order_stub.calledOnceWith(suite.pk, test_cases.map(test_case => test_case.pk))
+        order_stub.calledOnceWith(suite.pk, [test_cases[2].pk, test_cases[1].pk, test_cases[0].pk])
     ).toBe(true);
+    vi.useRealTimers();
 });

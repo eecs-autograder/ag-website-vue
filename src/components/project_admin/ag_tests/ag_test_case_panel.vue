@@ -15,22 +15,10 @@
 
       <div class="icons">
         <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
-        <button ref="move_up_btn"
-                type="button"
-                class="icon move-button"
-                aria-label="Move up"
-                :disabled="index === 0"
-                @click.stop="$emit('move_up')">
-          <i class="fas fa-arrow-up"></i>
-        </button>
-        <button ref="move_down_btn"
-                type="button"
-                class="icon move-button"
-                aria-label="Move down"
-                :disabled="index === case_count - 1"
-                @click.stop="$emit('move_down')">
-          <i class="fas fa-arrow-down"></i>
-        </button>
+        <MoveButtons :index="index"
+                     :count="case_count"
+                     @move_up="$emit('move_up')"
+                     @move_down="$emit('move_down')" />
         <div class="dropdown">
           <button type="button"
                   class="menu-icon-button icon"
@@ -80,39 +68,22 @@
     <div class="commands-container" v-if="is_open && has_multiple_commands">
       <draggable ref="ag_test_command_order"
                  v-model="ag_test_case.ag_test_commands"
-                 @change="set_ag_test_command_order"
+                 @start="d_pre_drag_command_order = ag_test_case.ag_test_commands.slice()"
+                 @change="command_order_syncer.schedule(ag_test_case.ag_test_commands,
+                                                        d_pre_drag_command_order)"
                  @end="$event.item.style.transform = 'none'"
                  handle=".handle">
-        <div class="ag-test-command panel level-2"
-             v-for="(ag_test_command, cmd_index) of ag_test_case.ag_test_commands"
-             :key="ag_test_command.pk"
-             :class="{'active': active_ag_test_command !== null
-                                 && active_ag_test_command.pk === ag_test_command.pk}">
-          <button type="button"
-                  class="panel-toggle"
-                  @click="$emit('update_active_item', ag_test_command)">
-            <div class="text">{{ag_test_command.name}}</div>
-          </button>
-          <div class="icons">
-            <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
-            <button ref="cmd_move_up_buttons"
-                    type="button"
-                    class="icon move-button"
-                    aria-label="Move up"
-                    :disabled="cmd_index === 0"
-                    @click.stop="move_command(cmd_index, -1)">
-              <i class="fas fa-arrow-up"></i>
-            </button>
-            <button ref="cmd_move_down_buttons"
-                    type="button"
-                    class="icon move-button"
-                    aria-label="Move down"
-                    :disabled="cmd_index === ag_test_case.ag_test_commands.length - 1"
-                    @click.stop="move_command(cmd_index, 1)">
-              <i class="fas fa-arrow-down"></i>
-            </button>
-          </div>
-        </div>
+        <AGTestCommandPanel
+                   v-for="(ag_test_command, cmd_index) of ag_test_case.ag_test_commands"
+                   :key="ag_test_command.pk"
+                   :ag_test_command="ag_test_command"
+                   :active_ag_test_command="active_ag_test_command"
+                   :index="cmd_index"
+                   :command_count="ag_test_case.ag_test_commands.length"
+                   @update_active_item="$emit('update_active_item', $event)"
+                   @move_up="move_command(cmd_index, -1)"
+                   @move_down="move_command(cmd_index, 1)">
+        </AGTestCommandPanel>
       </draggable>
     </div>
 
@@ -238,14 +209,18 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 import Modal from '@/components/modal.vue';
+import MoveButtons from '@/components/MoveButtons.vue';
 import AGTestCaseSettings from '@/components/project_admin/ag_tests/ag_test_case_settings.vue';
+import AGTestCommandPanel from '@/components/project_admin/ag_tests/ag_test_command_panel.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import {
+  GlobalErrorsSubject,
   handle_api_errors_async,
   handle_global_errors_async,
   make_error_handler_func
 } from '@/error_handling';
+import { OrderSyncer } from '@/order_syncer';
 import { generate_uid, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -253,10 +228,12 @@ import { is_not_empty } from '@/validators';
   components: {
     APIErrors,
     AGTestCaseSettings,
+    AGTestCommandPanel,
     ContextMenu,
     ContextMenuItem,
     Draggable,
     Modal,
+    MoveButtons,
     ValidatedForm,
     ValidatedInput
   }
@@ -278,7 +255,24 @@ export default class AGTestCasePanel extends Vue {
   @Prop({required: true, type: Number})
   case_count!: number;
 
+  // Snapshot of the order before a drag starts, passed to the syncer as the rollback target.
+  private d_pre_drag_command_order: AGTestCommand[] = [];
+
   readonly is_not_empty = is_not_empty;
+
+  private command_order_syncer = new OrderSyncer<AGTestCommand>(
+    (cmds) => AGTestCommand.update_order(this.ag_test_case.pk, cmds.map(cmd => cmd.pk)),
+    (saved) => {
+      this.ag_test_case.ag_test_commands.splice(
+        0, this.ag_test_case.ag_test_commands.length, ...saved
+      );
+    },
+    (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+  );
+
+  beforeDestroy() {
+    void this.command_order_syncer.flush();
+  }
 
   get label_uid() {
     return generate_uid();
@@ -387,36 +381,11 @@ export default class AGTestCasePanel extends Vue {
     }
   }
 
-  @handle_global_errors_async
-  set_ag_test_command_order() {
-    return AGTestCommand.update_order(
-      this.ag_test_case.pk, this.ag_test_case.ag_test_commands.map(cmd => cmd.pk));
-  }
-
-  @handle_global_errors_async
-  async move_command(index: number, delta: number) {
+  move_command(index: number, delta: number) {
     const cmds = this.ag_test_case.ag_test_commands;
+    const prev_order = cmds.slice();
     cmds.splice(index + delta, 0, cmds.splice(index, 1)[0]);
-    await AGTestCommand.update_order(
-      this.ag_test_case.pk, cmds.map(cmd => cmd.pk));
-    await this.$nextTick();
-    const new_index = index + delta;
-    const up_btns = this.$refs.cmd_move_up_buttons as HTMLButtonElement[];
-    const down_btns = this.$refs.cmd_move_down_buttons as HTMLButtonElement[];
-    const at_end = delta < 0 ? new_index === 0 : new_index === cmds.length - 1;
-    if (!at_end) {
-      (delta < 0 ? up_btns[new_index] : down_btns[new_index])?.focus();
-    } else {
-      (delta < 0 ? down_btns[new_index] : up_btns[new_index])?.focus();
-    }
-  }
-
-  focus_move_button(delta: number) {
-    const at_end = delta < 0 ? this.index === 0 : this.index === this.case_count - 1;
-    const target = at_end
-      ? (delta < 0 ? this.$refs.move_down_btn : this.$refs.move_up_btn)
-      : (delta < 0 ? this.$refs.move_up_btn : this.$refs.move_down_btn);
-    (target as HTMLButtonElement).focus();
+    this.command_order_syncer.schedule(cmds, prev_order);
   }
 
   @handle_api_errors_async(handle_add_ag_test_command_error)
@@ -480,19 +449,6 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
   font-family: inherit;
   display: flex;
   align-items: center;
-}
-
-.move-button {
-  background: none;
-  border: none;
-  padding: 0 .25rem;
-  cursor: pointer;
-  color: inherit;
-
-  &:disabled {
-    opacity: 0.3;
-    cursor: default;
-  }
 }
 
 .handle {

@@ -13,22 +13,10 @@
 
       <div class="icons">
         <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
-        <button ref="move_up_btn"
-                type="button"
-                class="icon move-button"
-                aria-label="Move up"
-                :disabled="index === 0"
-                @click.stop="$emit('move_up')">
-          <i class="fas fa-arrow-up"></i>
-        </button>
-        <button ref="move_down_btn"
-                type="button"
-                class="icon move-button"
-                aria-label="Move down"
-                :disabled="index === suite_count - 1"
-                @click.stop="$emit('move_down')">
-          <i class="fas fa-arrow-down"></i>
-        </button>
+        <MoveButtons :index="index"
+                     :count="suite_count"
+                     @move_up="$emit('move_up')"
+                     @move_down="$emit('move_down')" />
         <button type="button"
                 class="icon add-ag-test-case-button"
                 aria-label="Add Test Case"
@@ -41,10 +29,12 @@
     <div v-if="is_open">
       <draggable ref="ag_test_case_order"
                  v-model="ag_test_suite.ag_test_cases"
-                 @change="set_ag_test_case_order"
+                 @start="d_pre_drag_case_order = ag_test_suite.ag_test_cases.slice()"
+                 @change="case_order_syncer.schedule(ag_test_suite.ag_test_cases,
+                                                     d_pre_drag_case_order)"
                  @end="$event.item.style.transform = 'none'"
                  handle=".handle">
-        <AGTestCasePanel ref="case_panels"
+        <AGTestCasePanel
                    v-for="(test_case, case_index) of ag_test_suite.ag_test_cases"
                    :key="test_case.pk"
                    :ag_test_case="test_case"
@@ -166,11 +156,17 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
+import MoveButtons from '@/components/MoveButtons.vue';
 import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import {
+  GlobalErrorsSubject,
+  handle_api_errors_async,
+  handle_global_errors_async
+} from '@/error_handling';
+import { OrderSyncer } from '@/order_syncer';
 import { generate_uid } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -190,6 +186,7 @@ export class NewCommandFields {
     APIErrors,
     Draggable,
     Modal,
+    MoveButtons,
     Tooltip,
     ValidatedForm,
     ValidatedInput
@@ -212,6 +209,9 @@ export default class AGTestSuitePanel extends Vue {
   @Prop({required: true, type: Number})
   suite_count!: number;
 
+  // Snapshot of the order before a drag starts, passed to the syncer as the rollback target.
+  private d_pre_drag_case_order: AGTestCase[] = [];
+
   d_show_new_ag_test_case_modal = false;
   d_add_case_form_is_valid = false;
   d_cases_are_visible = false;
@@ -221,6 +221,20 @@ export default class AGTestSuitePanel extends Vue {
   d_new_commands: NewCommandFields[] = [new NewCommandFields({})];
 
   readonly is_not_empty = is_not_empty;
+
+  private case_order_syncer = new OrderSyncer<AGTestCase>(
+    (cases) => AGTestCase.update_order(this.ag_test_suite.pk, cases.map(c => c.pk)),
+    (saved) => {
+      this.ag_test_suite.ag_test_cases.splice(
+        0, this.ag_test_suite.ag_test_cases.length, ...saved
+      );
+    },
+    (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+  );
+
+  beforeDestroy() {
+    void this.case_order_syncer.flush();
+  }
 
   get label_uid() {
     return generate_uid();
@@ -310,29 +324,11 @@ export default class AGTestSuitePanel extends Vue {
     return "";
   }
 
-  @handle_global_errors_async
-  set_ag_test_case_order() {
-    return AGTestCase.update_order(
-      this.ag_test_suite.pk, this.ag_test_suite.ag_test_cases.map(test_case => test_case.pk));
-  }
-
-  @handle_global_errors_async
-  async move_ag_test_case(index: number, delta: number) {
+  move_ag_test_case(index: number, delta: number) {
     const cases = this.ag_test_suite.ag_test_cases;
+    const prev_order = cases.slice();
     cases.splice(index + delta, 0, cases.splice(index, 1)[0]);
-    await AGTestCase.update_order(
-      this.ag_test_suite.pk, cases.map(c => c.pk));
-    await this.$nextTick();
-    const panels = this.$refs.case_panels as AGTestCasePanel[];
-    panels.find(p => p.index === index + delta)?.focus_move_button(delta);
-  }
-
-  focus_move_button(delta: number) {
-    const at_end = delta < 0 ? this.index === 0 : this.index === this.suite_count - 1;
-    const target = at_end
-      ? (delta < 0 ? this.$refs.move_down_btn : this.$refs.move_up_btn)
-      : (delta < 0 ? this.$refs.move_up_btn : this.$refs.move_down_btn);
-    (target as HTMLButtonElement).focus();
+    this.case_order_syncer.schedule(cases, prev_order);
   }
 
   @handle_api_errors_async(handle_create_ag_test_case_error)
@@ -435,7 +431,7 @@ function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: un
   cursor: grabbing;
 }
 
-.add-ag-test-case-button, .move-button {
+.add-ag-test-case-button {
   background: none;
   border: none;
   padding: 0 .25rem;

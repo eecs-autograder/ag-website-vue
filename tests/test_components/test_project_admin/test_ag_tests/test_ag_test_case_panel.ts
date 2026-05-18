@@ -8,6 +8,7 @@ import {
     Project,
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
+import { vi } from 'vitest';
 
 import APIErrors from '@/components/api_errors.vue';
 import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
@@ -714,6 +715,7 @@ test('Case move down button disabled when case is last', async () => {
 });
 
 test('Move command up', async () => {
+    vi.useFakeTimers();
     let order_stub = sinon.stub(AGTestCommand, 'update_order');
     let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
     let test_case = data_ut.make_ag_test_case(suite.pk);
@@ -733,15 +735,22 @@ test('Move command up', async () => {
         }
     });
 
-    await wrapper.vm.move_command(1, -1);
+    wrapper.find('.panel-toggle').trigger('click');
+    await wrapper.vm.$nextTick();
+    // [0] = case move-up, [1] = cmd[0] move-up, [2] = cmd[1] move-up
+    wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
+    await wrapper.vm.$nextTick();
+    await vi.runAllTimersAsync();
 
     expect(test_case.ag_test_commands).toEqual([cmds[1], cmds[0], cmds[2]]);
     expect(order_stub.calledOnceWith(
         test_case.pk, [cmds[1].pk, cmds[0].pk, cmds[2].pk]
     )).toBe(true);
+    vi.useRealTimers();
 });
 
 test('Move command down', async () => {
+    vi.useFakeTimers();
     let order_stub = sinon.stub(AGTestCommand, 'update_order');
     let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
     let test_case = data_ut.make_ag_test_case(suite.pk);
@@ -761,12 +770,18 @@ test('Move command down', async () => {
         }
     });
 
-    await wrapper.vm.move_command(1, 1);
+    wrapper.find('.panel-toggle').trigger('click');
+    await wrapper.vm.$nextTick();
+    // [0] = case move-down, [1] = cmd[0] move-down, [2] = cmd[1] move-down
+    wrapper.findAll('[aria-label="Move down"]').at(2).trigger('click');
+    await wrapper.vm.$nextTick();
+    await vi.runAllTimersAsync();
 
     expect(test_case.ag_test_commands).toEqual([cmds[0], cmds[2], cmds[1]]);
     expect(order_stub.calledOnceWith(
         test_case.pk, [cmds[0].pk, cmds[2].pk, cmds[1].pk]
     )).toBe(true);
+    vi.useRealTimers();
 });
 
 test('Focus stays on move up button after moving command up to non-boundary position', async () => {
@@ -792,8 +807,13 @@ test('Focus stays on move up button after moving command up to non-boundary posi
     });
     wrapper.find('.panel-toggle').trigger('click');
     await wrapper.vm.$nextTick();
-    await wrapper.vm.move_command(2, -1);
-    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move up');
+    // [0]=case Move up, [1]=cmd[0] Move up (disabled), [2]=cmd[1], [3]=cmd[2]
+    wrapper.findAll('[aria-label="Move up"]').at(3).trigger('click');
+    // The moved command (originally cmd[2]) should now be at DOM position 1.
+    const find_expected = () => wrapper.findAll('.ag-test-command').at(1)
+        .find('[aria-label="Move up"]').element;
+    await wait_until(wrapper, () => document.activeElement === find_expected());
+    expect(document.activeElement).toBe(find_expected());
 });
 
 test('Focus falls back to move down when command moves to first position', async () => {
@@ -818,8 +838,13 @@ test('Focus falls back to move down when command moves to first position', async
     });
     wrapper.find('.panel-toggle').trigger('click');
     await wrapper.vm.$nextTick();
-    await wrapper.vm.move_command(1, -1);
-    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move down');
+    // [0]=case Move up, [1]=cmd[0] Move up (disabled), [2]=cmd[1]
+    wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
+    // The moved command (originally cmd[1]) is now at DOM position 0; move-up is disabled.
+    const find_expected = () => wrapper.findAll('.ag-test-command').at(0)
+        .find('[aria-label="Move down"]').element;
+    await wait_until(wrapper, () => document.activeElement === find_expected());
+    expect(document.activeElement).toBe(find_expected());
 });
 
 test('Focus falls back to move up when command moves to last position', async () => {
@@ -844,11 +869,17 @@ test('Focus falls back to move up when command moves to last position', async ()
     });
     wrapper.find('.panel-toggle').trigger('click');
     await wrapper.vm.$nextTick();
-    await wrapper.vm.move_command(1, 1);
-    expect(document.activeElement!.getAttribute('aria-label')).toBe('Move up');
+    // [0]=case Move down (disabled), [1]=cmd[0], [2]=cmd[1], [3]=cmd[2] (disabled)
+    wrapper.findAll('[aria-label="Move down"]').at(2).trigger('click');
+    // The moved command (originally cmd[1]) is now at DOM position 2; move-down is disabled.
+    const find_expected = () => wrapper.findAll('.ag-test-command').at(2)
+        .find('[aria-label="Move up"]').element;
+    await wait_until(wrapper, () => document.activeElement === find_expected());
+    expect(document.activeElement).toBe(find_expected());
 });
 
 test('Update test commands order', async () => {
+    vi.useFakeTimers();
     let order_stub = sinon.stub(AGTestCommand, 'update_order');
     let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
     let test_case = data_ut.make_ag_test_case(suite.pk);
@@ -858,7 +889,7 @@ test('Update test commands order', async () => {
         data_ut.make_ag_test_command(test_case.pk),
         data_ut.make_ag_test_command(test_case.pk),
     ];
-    test_case.ag_test_commands = cmds;
+    test_case.ag_test_commands = cmds.slice();
 
     let wrapper = managed_mount(AGTestCasePanel, {
             propsData: {
@@ -872,9 +903,15 @@ test('Update test commands order', async () => {
     wrapper.find('.panel-toggle').trigger('click');
     await wrapper.vm.$nextTick();
 
-    wrapper.findComponent({ref: 'ag_test_command_order'}).vm.$emit('change');
-    await wrapper.vm.$nextTick();
+    const draggable = wrapper.findComponent({ref: 'ag_test_command_order'});
+    draggable.vm.$emit('start');
+    // Simulate vuedraggable mutating v-model on drop.
+    test_case.ag_test_commands.reverse();
+    draggable.vm.$emit('change');
+    await vi.runAllTimersAsync();
+
     expect(
-        order_stub.calledOnceWith(test_case.pk, cmds.map(cmd => cmd.pk))
+        order_stub.calledOnceWith(test_case.pk, [cmds[2].pk, cmds[1].pk, cmds[0].pk])
     ).toBe(true);
+    vi.useRealTimers();
 });

@@ -12,7 +12,11 @@ npx eslint \
     'src/components/CollapsibleSection.vue' \
     'tests/test_components/test_collapsible_section.ts' \
     'src/components/project_admin/project_settings.vue' \
-    'src/components/CollapsibleContent.vue'
+    'src/components/CollapsibleContent.vue' \
+    'src/order_syncer.ts' \
+    'tests/test_order_syncer.ts' \
+    'src/components/MoveButtons.vue' \
+    'src/components/project_admin/ag_tests/ag_test_command_panel.vue'
 
 npx prettier --check --no-editorconfig \
     '*.js' \
@@ -40,6 +44,10 @@ npx prettier --check --no-editorconfig \
     'src/components/project_admin/edit_groups/edit_single_group.vue' \
     'src/components/project_admin/project_settings.vue' \
     'tests/test_components/test_project_admin/test_project_settings.ts' \
-    'src/components/CollapsibleContent.vue'
+    'src/components/CollapsibleContent.vue' \
+    'src/order_syncer.ts' \
+    'tests/test_order_syncer.ts' \
+    'src/components/MoveButtons.vue' \
+    'src/components/project_admin/ag_tests/ag_test_command_panel.vue'
 
 ./check_subscribe_unsubscribe.py 'src/**/*.vue'

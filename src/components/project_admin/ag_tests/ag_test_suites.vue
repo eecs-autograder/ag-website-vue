@@ -30,12 +30,11 @@
         <div class="sidebar-content" id="test-suite-sidebar" v-if="!d_collapsed">
           <draggable ref="ag_test_suite_order"
                       v-model="d_ag_test_suites"
-                      @start="record_current_ag_test_suite_order"
-                      @change="set_ag_test_suite_order"
+                      @start="d_pre_drag_suite_order = d_ag_test_suites.slice()"
+                      @change="suite_order_syncer.schedule(d_ag_test_suites, d_pre_drag_suite_order)"
                       @end="$event.item.style.transform = 'none'"
                       handle=".handle">
             <AGTestSuitePanel
-              ref="suite_panels"
               v-for="(ag_test_suite, index) of d_ag_test_suites"
               :key="ag_test_suite.pk"
               :ag_test_suite="ag_test_suite"
@@ -150,7 +149,12 @@ import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_
 import AGTestSuiteSettings from '@/components/project_admin/ag_tests/ag_test_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import {
+  GlobalErrorsSubject,
+  handle_api_errors_async,
+  handle_global_errors_async
+} from '@/error_handling';
+import { OrderSyncer } from '@/order_syncer';
 import { deep_copy } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -193,13 +197,23 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
 
   d_loading = true;
   d_ag_test_suites: AGTestSuite[] = [];
-  // For rolling back re-ordering if an error occurs.
-  private d_current_ag_test_suite_order: AGTestSuite[] = [];
+  // Snapshot of the order before a drag starts, passed to the syncer as the rollback target.
+  private d_pre_drag_suite_order: AGTestSuite[] = [];
+
+  // Must be initialized in created(), not as a class property: arrow functions in class
+  // property initializers capture 'this' = vue-class-component's dummy instance, so
+  // accessing data properties like d_ag_test_suites would mutate the dummy, not the vm.
+  private suite_order_syncer!: OrderSyncer<AGTestSuite>;
 
   d_collapsed = false;
 
   @handle_global_errors_async
   async created() {
+    this.suite_order_syncer = new OrderSyncer<AGTestSuite>(
+      (suites) => AGTestSuite.update_order(this.project.pk, suites.map(s => s.pk)),
+      (saved) => { this.d_ag_test_suites.splice(0, this.d_ag_test_suites.length, ...saved); },
+      (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+    );
     AGTestSuite.subscribe(this);
     AGTestCase.subscribe(this);
     AGTestCommand.subscribe(this);
@@ -215,6 +229,7 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     AGTestCommand.unsubscribe(this);
     InstructorFile.unsubscribe(this);
     ExpectedStudentFile.unsubscribe(this);
+    void this.suite_order_syncer.flush();
   }
 
   get parent_ag_test_case(): AGTestCase | null {
@@ -264,40 +279,11 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     });
   }
 
-  record_current_ag_test_suite_order() {
-    this.d_current_ag_test_suite_order = this.d_ag_test_suites.slice();
-  }
-
-  @handle_global_errors_async
-  async set_ag_test_suite_order() {
-    try {
-      await AGTestSuite.update_order(
-        this.project.pk, this.d_ag_test_suites.map(suite => suite.pk)
-      );
-    }
-    catch (e) {
-      this.d_ag_test_suites = this.d_current_ag_test_suite_order;
-      this.d_current_ag_test_suite_order = [];
-      throw e;
-    }
-  }
-
-  @handle_global_errors_async
-  async move_ag_test_suite(index: number, delta: number) {
-    const saved_order = this.d_ag_test_suites.slice();
-    this.d_ag_test_suites.splice(index + delta, 0, this.d_ag_test_suites.splice(index, 1)[0]);
-    try {
-      await AGTestSuite.update_order(
-        this.project.pk, this.d_ag_test_suites.map(suite => suite.pk)
-      );
-    }
-    catch (e) {
-      this.d_ag_test_suites = saved_order;
-      throw e;
-    }
-    await this.$nextTick();
-    const panels = this.$refs.suite_panels as AGTestSuitePanel[];
-    panels.find(p => p.index === index + delta)?.focus_move_button(delta);
+  move_ag_test_suite(index: number, delta: number) {
+    const suites = this.d_ag_test_suites;
+    const prev_order = suites.slice();
+    suites.splice(index + delta, 0, suites.splice(index, 1)[0]);
+    this.suite_order_syncer.schedule(suites, prev_order);
   }
 
   get prev_ag_test_case_is_available() {
