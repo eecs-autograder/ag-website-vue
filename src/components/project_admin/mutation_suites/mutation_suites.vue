@@ -685,7 +685,7 @@ $border-color: $gray-blue-1;
 }
 
 .item-to-delete {
-  color: $ocean-blue;
+  color: darken($ocean-blue, 10%);
 }
 
 .sticky-save-button {
