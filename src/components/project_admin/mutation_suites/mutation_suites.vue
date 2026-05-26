@@ -251,8 +251,9 @@
           @submit="add_mutation_test_suite"
           @form_validity_changed="d_add_mutation_test_suite_form_is_valid = $event">
           <div class="mutation-test-suite-name-container">
-            <label class="label"> Suite name </label>
+            <label class="label" for="new-mutation-test-suite-name"> Suite name </label>
             <validated-input ref="new_mutation_test_suite_name"
+                              input_id="new-mutation-test-suite-name"
                               v-model="d_new_mutation_test_suite_name"
                               :validators="[is_not_empty]">
             </validated-input>

@@ -5,9 +5,9 @@
     </div>
     <div class="command-content">
       <div class="form-field-wrapper" v-if="include_command_name_input">
-        <label class="label"> Name </label>
+        <label class="label" :for="`mutation-command-name-${label_uid}`"> Name </label>
         <validated-input ref="name"
-                         id="name"
+                         :input_id="`mutation-command-name-${label_uid}`"
                          v-model="d_ag_command.name"
                          :validators="[is_not_empty]"
                          input_style="width: 100%"
@@ -16,9 +16,9 @@
       </div>
 
       <div class="form-field-wrapper">
-        <label class="label"> Command </label>
+        <label class="label" :for="`mutation-command-cmd-${label_uid}`"> Command </label>
         <validated-input ref="cmd"
-                         id="cmd"
+                         :input_id="`mutation-command-cmd-${label_uid}`"
                          v-model="d_ag_command.cmd"
                          :validators="[is_not_empty]"
                          input_style="width: 100%"
@@ -48,6 +48,7 @@ import { AGCommand } from 'ag-client-typescript';
 
 import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 import ValidatedInput, { ValidatorResponse } from "@/components/validated_input.vue";
+import { generate_uid } from '@/utils';
 import {
     is_integer,
     is_non_negative,
@@ -72,6 +73,10 @@ export default class MutationCommand extends Vue {
 
   d_is_open = false;
   d_ag_command: AGCommand | null = null;
+
+  get label_uid() {
+    return generate_uid();
+  }
 
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
