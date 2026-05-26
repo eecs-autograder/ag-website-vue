@@ -84,29 +84,29 @@ describe('BuggyImplementation tests', () => {
         await override_max_points_checkbox.setChecked(true);
         expect(wrapper.vm.d_override_max_points).toEqual(true);
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(true);
-        expect(wrapper.findAll('#max-points').length).toEqual(1);
+        expect(wrapper.findAll('#mutation-suite-max-points').length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(0);
         expect(wrapper.emitted('input')?.length).toEqual(1);
 
         await override_max_points_checkbox.setChecked(false);
         expect(wrapper.vm.d_override_max_points).toEqual(false);
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(false);
-        expect(wrapper.findAll('#max-points').length).toEqual(0);
+        expect(wrapper.findAll('#mutation-suite-max-points').length).toEqual(0);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toBeNull();
         expect(wrapper.emitted('input')?.length).toEqual(2);
 
         await override_max_points_checkbox.setChecked(true);
         expect(wrapper.vm.d_override_max_points).toEqual(true);
         expect(checkbox_is_checked(override_max_points_checkbox)).toEqual(true);
-        expect(wrapper.findAll('#max-points').length).toEqual(1);
+        expect(wrapper.findAll('#mutation-suite-max-points').length).toEqual(1);
         expect(wrapper.vm.d_mutation_test_suite!.max_points).toEqual(0);
         expect(wrapper.emitted('input')?.length).toEqual(3);
 
         await set_data(wrapper, {d_override_max_points: true});
-        expect(wrapper.findAll('#max-points').length).toEqual(1);
+        expect(wrapper.findAll('#mutation-suite-max-points').length).toEqual(1);
 
         await set_data(wrapper, {d_override_max_points: false});
-        expect(wrapper.findAll('#max-points').length).toEqual(0);
+        expect(wrapper.findAll('#mutation-suite-max-points').length).toEqual(0);
     });
 
     test('max_points binding', async () => {

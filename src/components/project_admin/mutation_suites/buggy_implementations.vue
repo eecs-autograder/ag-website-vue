@@ -31,9 +31,9 @@
 
     <div v-if="d_override_max_points"
          class="form-field-wrapper">
-      <label class="label" for="max-points"> Max points </label>
+      <label class="label" for="mutation-suite-max-points"> Max points </label>
       <validated-input ref="max_points"
-                       input_id="max-points"
+                       input_id="mutation-suite-max-points"
                        v-model="d_mutation_test_suite.max_points"
                        :validators="[
                            is_not_empty,
