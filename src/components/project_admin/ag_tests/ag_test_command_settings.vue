@@ -787,7 +787,7 @@
 
     <!--------------------------- Danger Zone --------------------------------------->
 
-    <div class="danger-zone-container">
+    <div class="danger-zone-container" role="region" aria-label="Delete">
       <div class="danger-text">
         {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Command'}}:
         <span>
@@ -804,6 +804,7 @@
               @close="d_show_delete_ag_test_command_modal = false"
               ref="delete_ag_test_command_modal"
               size="large"
+              aria_label="Confirm delete"
               click_outside_to_close>
         <div class="modal-header">
           Confirm Delete

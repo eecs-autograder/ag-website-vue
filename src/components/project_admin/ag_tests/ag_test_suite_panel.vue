@@ -53,6 +53,7 @@
            @close="d_show_new_ag_test_case_modal = false"
            ref="new_ag_test_case_modal"
            click_outside_to_close
+           aria_label="New test case"
            size="large">
       <div class="modal-header"> New Test Case </div>
       <validated-form ref="create_ag_test_case_form"

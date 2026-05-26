@@ -204,7 +204,7 @@
 
       <!--------------------------- Danger Zone --------------------------------------->
 
-      <div class="danger-zone-container">
+      <div class="danger-zone-container" role="region" aria-label="Delete test suite">
         <div class="danger-text">
           Delete Test Suite: <span>{{d_ag_test_suite.name}}</span>
         </div>
@@ -218,6 +218,7 @@
                 @close="d_show_delete_ag_test_suite_modal = false"
                 ref="delete_ag_test_suite_modal"
                 size="large"
+                aria_label="Confirm delete"
                 click_outside_to_close>
           <div class="modal-header">
             Confirm Delete

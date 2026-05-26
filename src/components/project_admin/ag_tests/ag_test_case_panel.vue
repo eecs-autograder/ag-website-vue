@@ -91,6 +91,7 @@
            @close="d_show_new_ag_test_command_modal = false"
            ref="new_ag_test_command_modal"
            click_outside_to_close
+           aria_label="Add command"
            size="medium">
       <div class="modal-header"> Add Command </div>
       <validated-form ref="add_ag_test_command_form"
@@ -132,6 +133,7 @@
            ref="clone_ag_test_case_modal"
            size="large"
            click_outside_to_close
+           :aria_label="`Clone ${ag_test_case.name}`"
            include_closing_x>
       <div class="modal-header">Clone "{{ag_test_case.name}}"</div>
       <validated-form ref="clone_ag_test_case_form"
@@ -163,6 +165,7 @@
            @close="d_show_delete_ag_test_case_modal = false"
            ref="delete_ag_test_case_modal"
            size="large"
+           aria_label="Delete test case"
            click_outside_to_close>
       <div class="modal-header">
         Delete "{{ag_test_case.name}}"
@@ -188,6 +191,7 @@
            @close="d_show_ag_test_case_settings_modal = false"
            ref="ag_test_case_settings_modal"
            size="large"
+           aria_label="Advanced test case settings"
            click_outside_to_close>
       <div class="modal-header">
         Advanced Test Case Settings

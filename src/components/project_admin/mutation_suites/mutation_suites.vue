@@ -179,7 +179,7 @@
           </validated-form>
 
           <!-------------------- Danger Zone --------------------------->
-          <div class="danger-zone-container">
+          <div class="danger-zone-container" role="region" aria-label="Delete suite">
             <div class="danger-text">
               Delete Test Suite: <span>{{d_active_mutation_test_suite.name}}</span>
             </div>

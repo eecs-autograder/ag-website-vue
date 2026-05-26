@@ -93,6 +93,7 @@
             @close="d_show_new_ag_test_suite_modal = false"
             ref="new_ag_test_suite_modal"
             click_outside_to_close
+            aria_label="New suite"
             size="medium">
       <div class="modal-header"> New Suite </div>
       <validated-form id="add-ag-test-suite-form"
