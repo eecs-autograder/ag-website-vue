@@ -26,14 +26,19 @@
         </validated-input>
       </div>
 
-      <div class="resource-limits-label" @click="toggle_is_open">
-        <i v-if="d_is_open" class="fas fa-caret-down caret-down"></i>
-        <i v-else class="fas fa-caret-right caret-right"></i>
+      <button type="button"
+              class="resource-limits-label"
+              :aria-expanded="d_is_open"
+              :aria-controls="`resource-limits-${label_uid}`"
+              @click="toggle_is_open">
+        <i v-if="d_is_open" class="fas fa-caret-down caret-down" aria-hidden="true"></i>
+        <i v-else class="fas fa-caret-right caret-right" aria-hidden="true"></i>
         <span class="header-text"> Resource Limits </span>
-      </div>
+      </button>
 
       <resource-limit-settings
-        v-if="d_is_open"
+        v-show="d_is_open"
+        :id="`resource-limits-${label_uid}`"
         :resource_limits="d_ag_command"
         @field_change="Object.assign(d_ag_command, $event); $emit('input', d_ag_command)">
       </resource-limit-settings>
@@ -124,8 +129,16 @@ export default class MutationCommand extends Vue {
 .resource-limits-label {
   @include collapsible-section-header($pad-text: true, $line-color: $stormy-gray-light);
 
-  margin-bottom: .5rem;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
   font-size: .875rem;
+  margin-bottom: .5rem;
+  padding: 0;
+  width: 100%;
+  text-align: left;
 }
 
 .unit-of-measurement {

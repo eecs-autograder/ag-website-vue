@@ -182,6 +182,7 @@
 
                 <button type="submit"
                         class="sticky-save-button"
+                        aria-label="Save"
                         :disabled="!d_settings_form_is_valid || d_saving">
                   <i v-if="d_num_save_api_errors === 0" class="far fa-save"></i>
                   <i v-else class="fas fa-exclamation-triangle"></i>
@@ -215,6 +216,7 @@
             @close="d_show_delete_mutation_test_suite_modal = false"
             ref="delete_mutation_test_suite_modal"
             size="large"
+            aria_label="Confirm delete suite"
             click_outside_to_close>
       <div class="modal-header"> Confirm Delete </div>
       <div class="modal-body" v-if="d_active_mutation_test_suite !== null">
@@ -241,6 +243,7 @@
             @close="d_show_new_mutation_test_suite_modal = false"
             ref="new_mutation_test_suite_modal"
             click_outside_to_close
+            aria_label="New suite"
             size="medium">
       <div class="modal-header"> New Suite </div>
       <div class="modal-body">
