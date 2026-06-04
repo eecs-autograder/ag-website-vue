@@ -78,6 +78,14 @@ export function* zip<T1, T2>(iterable1: IterableType<T1>,
     }
 }
 
+export function arrays_equal<T>(left: ReadonlyArray<T>, right: ReadonlyArray<T>) {
+    if (left.length !== right.length) {
+        return false;
+    }
+
+    return left.every((value, index) => value === right[index]);
+}
+
 export function* chain<T>(...iterables: IterableType<T>[]): IterableIterator<T> {
     for (let iterable of iterables) {
         for (let item of iterable) {

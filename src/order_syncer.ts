@@ -1,3 +1,5 @@
+import { arrays_equal, assert_not_null } from "./utils";
+
 /**
  * Debounced syncer for "items are now in this order" updates. Coalesces rapid
  * reorders into a single API call, rolls back the UI on failure, and skips the
@@ -18,11 +20,10 @@
  */
 export class OrderSyncer<T> {
   private debounce_timer: ReturnType<typeof setTimeout> | null = null;
-  private saved_order: T[] | null = null;
-  private pending_items: T[] | null = null;
+  private order: {pending: T[], saved: T[]} | null = null;
 
   /**
-   * @param update_fn   Called with the final order when the debounce expires.
+   * @param save_fn     Called with the final order when the debounce expires.
    * @param on_rollback Called with the saved order if `update_fn` rejects, so
    *                    the consumer can restore the UI.
    * @param on_error    Called with the error after `on_rollback`. {@link flush}
@@ -30,7 +31,7 @@ export class OrderSyncer<T> {
    * @param delay       Debounce window in milliseconds.
    */
   constructor(
-    private readonly update_fn: (items: T[]) => Promise<unknown>,
+    private readonly save_fn: (new_order: T[]) => Promise<unknown>,
     private readonly on_rollback: (saved_order: T[]) => void,
     private readonly on_error: (error: unknown) => void,
     private readonly delay = 500,
@@ -39,18 +40,24 @@ export class OrderSyncer<T> {
   /**
      * Queues an order update and (re)starts the debounce timer.
      *
-     * @param items       The new order to sync to the server when the debounce
+     * @param new_order   The new order to sync to the server when the debounce
                           expires.
-     * @param saved_order Order to roll back to on failure. Only takes effect on the
+     * @param current_order Order to roll back to on failure. Only takes effect on the
      *                    first call of a batch — once set, it stays locked until the
      *                    next flush completes. Must be a snapshot taken *before* the
      *                    mutation that produced `items`.
      */
-  schedule(items: T[], saved_order: T[]): void {
-    if (this.saved_order === null) {
-      this.saved_order = saved_order;
+  schedule(new_order: T[], current_order: T[]): void {
+    if (this.order === null) {
+        this.order = {
+            pending: new_order,
+            saved: current_order,
+        };
     }
-    this.pending_items = items.slice();
+    else {
+        this.order.pending = new_order.slice();
+    }
+
     if (this.debounce_timer !== null) {
       clearTimeout(this.debounce_timer);
     }
@@ -69,20 +76,25 @@ export class OrderSyncer<T> {
       clearTimeout(this.debounce_timer);
       this.debounce_timer = null;
     }
-    if (this.pending_items === null) {
+
+    if (this.order === null) {
+        return;
+    }
+
+    if (arrays_equal(this.order.pending, this.order.saved)
+    ) {
+      this.order = null;
       return;
     }
-    const items = this.pending_items;
-    const rollback = this.saved_order!;
-    this.pending_items = null;
-    this.saved_order = null;
-    if (items.every((item, i) => item === rollback[i])) {
-      return;
-    }
+
+    const pending_order = this.order.pending;
+    const saved_order = this.order.saved;
+    this.order = null;
+
     try {
-      await this.update_fn(items);
+      await this.save_fn(pending_order);
     } catch (e) {
-      this.on_rollback(rollback);
+      this.on_rollback(saved_order);
       this.on_error(e);
     }
   }
