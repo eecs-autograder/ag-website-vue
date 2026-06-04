@@ -2,6 +2,14 @@ import { vi } from "vitest";
 
 import { OrderSyncer } from "@/order_syncer";
 
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("OrderSyncer debounce", () => {
   afterEach(() => {
     vi.useRealTimers();
@@ -45,7 +53,7 @@ describe("OrderSyncer debounce", () => {
 
     const original = ["a", "b", "c"];
     syncer.schedule(["b", "a", "c"], original);
-    syncer.schedule(["b", "c", "a"], original);
+    syncer.schedule(["b", "c", "a"], ["b", "c", "a"]);
 
     await vi.runAllTimersAsync();
 
@@ -72,26 +80,6 @@ describe("OrderSyncer debounce", () => {
     expect(on_error).toHaveBeenCalledTimes(1);
     expect(on_error).toHaveBeenCalledWith(error);
     expect(calls).toEqual(["rollback", "error"]);
-  });
-
-  test("after a successful flush, the next schedule uses the new state as its rollback target", async () => {
-    vi.useFakeTimers();
-    const update_fn = vi
-      .fn()
-      .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce(new Error("fail"));
-    const on_rollback = vi.fn();
-    const syncer = new OrderSyncer(update_fn, on_rollback, vi.fn());
-
-    syncer.schedule(["b", "a", "c"], ["a", "b", "c"]);
-    await vi.runAllTimersAsync();
-
-    const post_first_move = ["b", "a", "c"];
-    syncer.schedule(["b", "c", "a"], post_first_move);
-    await vi.runAllTimersAsync();
-
-    expect(on_rollback).toHaveBeenCalledTimes(1);
-    expect(on_rollback).toHaveBeenCalledWith(post_first_move);
   });
 
   test("flush() with nothing pending does not call update_fn", async () => {
@@ -131,5 +119,95 @@ describe("OrderSyncer debounce", () => {
 
     await vi.runAllTimersAsync();
     expect(update_fn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("OrderSyncer flush, save, rollback combinations; state always reset after flush", () => {
+  test("first flush saves new order, second flush saves new order", async () => {
+    const first_flush_new_order = ["b", "a", "c"];
+    const first_flush_current_order = ["a", "b", "c"];
+    const second_flush_new_order = ["b", "c", "a"];
+    const second_flush_current_order = ["c", "a", "b"];
+
+    const save_fn = vi.fn().mockResolvedValue(undefined);
+    const on_rollback = vi.fn();
+    const syncer = new OrderSyncer(save_fn, on_rollback, vi.fn());
+
+    syncer.schedule(first_flush_new_order, first_flush_current_order);
+    await vi.runAllTimersAsync();
+
+    expect(save_fn).toHaveBeenCalledWith(first_flush_new_order);
+
+    syncer.schedule(second_flush_new_order, second_flush_current_order);
+    await vi.runAllTimersAsync();
+
+    expect(save_fn).toHaveBeenCalledWith(second_flush_new_order);
+  });
+
+  test("first flush saves new order, second flush rolls back", async () => {
+    const first_flush_new_order = ["b", "a", "c"];
+    const first_flush_current_order = ["a", "b", "c"];
+    const second_flush_new_order = ["b", "c", "a"];
+    const second_flush_current_order = ["c", "a", "b"];
+
+    const save_fn = vi.fn().mockResolvedValueOnce(undefined);
+    const on_rollback = vi.fn();
+    const syncer = new OrderSyncer(save_fn, on_rollback, vi.fn());
+
+    syncer.schedule(first_flush_new_order, first_flush_current_order);
+    await vi.runAllTimersAsync();
+
+    expect(save_fn).toHaveBeenCalledWith(first_flush_new_order);
+
+    save_fn.mockRejectedValueOnce(new Error("fail"));
+    syncer.schedule(second_flush_new_order, second_flush_current_order);
+    await vi.runAllTimersAsync();
+
+    expect(on_rollback).toHaveBeenCalledTimes(1);
+    expect(on_rollback).toHaveBeenCalledWith(second_flush_current_order);
+  });
+
+  test("first flush saves same order (no-op), second flush saves new order", async () => {
+    const first_flush_new_order = ["b", "a", "c"];
+    const first_flush_current_order = first_flush_new_order;
+    const second_flush_new_order = ["b", "c", "a"];
+    const second_flush_current_order = ["c", "a", "b"];
+
+    const save_fn = vi.fn().mockResolvedValue(undefined);
+    const on_rollback = vi.fn();
+    const syncer = new OrderSyncer(save_fn, on_rollback, vi.fn());
+
+    syncer.schedule(first_flush_new_order, first_flush_current_order);
+    await vi.runAllTimersAsync();
+
+    expect(save_fn).not.toHaveBeenCalledWith(first_flush_new_order);
+
+    syncer.schedule(second_flush_new_order, second_flush_current_order);
+    await vi.runAllTimersAsync();
+
+    expect(save_fn).toHaveBeenCalledWith(second_flush_new_order);
+  });
+
+  test("first flush saves same order (no-op), second flush rolls back", async () => {
+    const first_flush_new_order = ["b", "a", "c"];
+    const first_flush_current_order = first_flush_new_order;
+    const second_flush_new_order = ["b", "c", "a"];
+    const second_flush_current_order = ["c", "a", "b"];
+
+    const save_fn = vi.fn();
+    const on_rollback = vi.fn();
+    const syncer = new OrderSyncer(save_fn, on_rollback, vi.fn());
+
+    syncer.schedule(first_flush_new_order, first_flush_current_order);
+    await vi.runAllTimersAsync();
+
+    expect(save_fn).not.toHaveBeenCalledWith(first_flush_new_order);
+
+    save_fn.mockRejectedValueOnce(new Error("fail"));
+    syncer.schedule(second_flush_new_order, second_flush_current_order);
+    await vi.runAllTimersAsync();
+
+    expect(on_rollback).toHaveBeenCalledTimes(1);
+    expect(on_rollback).toHaveBeenCalledWith(second_flush_current_order);
   });
 });
