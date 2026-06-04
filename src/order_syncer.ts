@@ -1,4 +1,4 @@
-import { arrays_equal, assert_not_null } from "./utils";
+import { arrays_equal } from "./utils";
 
 /**
  * Debounced syncer for "items are now in this order" updates. Coalesces rapid
