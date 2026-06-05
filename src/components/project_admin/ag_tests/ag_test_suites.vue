@@ -230,7 +230,7 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     AGTestCommand.unsubscribe(this);
     InstructorFile.unsubscribe(this);
     ExpectedStudentFile.unsubscribe(this);
-    void this.suite_order_syncer.flush();
+    this.suite_order_syncer.flush();
   }
 
   get parent_ag_test_case(): AGTestCase | null {

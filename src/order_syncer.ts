@@ -1,4 +1,4 @@
-import { arrays_equal } from "./utils";
+import { arrays_equal, SafePromise } from "./utils";
 
 /**
  * Debounced syncer for "items are now in this order" updates. Coalesces rapid
@@ -38,15 +38,15 @@ export class OrderSyncer<T> {
   ) {}
 
   /**
-     * Queues an order update and (re)starts the debounce timer.
-     *
-     * @param new_order   The new order to sync to the server when the debounce
-                          expires.
-     * @param current_order Order to roll back to on failure. Only takes effect on the
-     *                    first call of a batch — once set, it stays locked until the
-     *                    next flush completes. Must be a snapshot taken *before* the
-     *                    mutation that produced `items`.
-     */
+   * Queues an order update and (re)starts the debounce timer.
+   *
+   * @param new_order   The new order to sync to the server when the debounce
+                        expires.
+   * @param current_order Order to roll back to on failure. Only takes effect on the
+   *                    first call of a batch — once set, it stays locked until the
+   *                    next flush completes. Must be a snapshot taken *before* the
+   *                    mutation that produced `items`.
+   */
   schedule(new_order: T[], current_order: T[]): void {
     if (this.order === null) {
         this.order = {
@@ -62,16 +62,21 @@ export class OrderSyncer<T> {
       clearTimeout(this.debounce_timer);
     }
     this.debounce_timer = setTimeout(() => {
-      void this.flush();
+      this.flush();
     }, this.delay);
   }
 
   /**
    * Cancels the debounce and runs the pending update immediately. No-op if
-   * nothing is pending. Safe to call from `beforeDestroy()` to drain in-flight
-   * work.
+   * nothing is pending.
+   *
+   * @returns An empty promise that can be awaited or safely ignored.
    */
-  async flush(): Promise<void> {
+  flush(): SafePromise<void> {
+    return this._flush() as SafePromise<void>;
+  }
+
+  private async _flush(): Promise<void> {
     if (this.debounce_timer !== null) {
       clearTimeout(this.debounce_timer);
       this.debounce_timer = null;

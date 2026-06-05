@@ -275,7 +275,7 @@ export default class AGTestCasePanel extends Vue {
   );
 
   beforeDestroy() {
-    void this.command_order_syncer.flush();
+    this.command_order_syncer.flush();
   }
 
   get label_uid() {

@@ -234,7 +234,7 @@ export default class AGTestSuitePanel extends Vue {
   );
 
   beforeDestroy() {
-    void this.case_order_syncer.flush();
+    this.case_order_syncer.flush();
   }
 
   get label_uid() {

@@ -229,3 +229,13 @@ let next_uid = 0
 export function generate_uid() {
     return next_uid++;
 }
+
+declare const _safe_promise_brand: unique symbol;
+
+/**
+ * A promise that handles its own errors internally and is safe to float.
+ * Still awaitable when the caller needs to sequence work.
+ */
+export interface SafePromise<T> extends Promise<T> {
+  readonly [_safe_promise_brand]: never;
+}
