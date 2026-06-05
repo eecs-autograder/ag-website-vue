@@ -233,8 +233,10 @@ export function generate_uid() {
 declare const _safe_promise_brand: unique symbol;
 
 /**
- * A promise that handles its own errors internally and is safe to float.
- * Still awaitable when the caller needs to sequence work.
+ * SafePromises that are not awaited will not raise an ESLint error.
+ * Promises should only be casted to SafePromise if they are guaranteed to
+ * resolve.
+ * https://typescript-eslint.io/rules/no-floating-promises/
  */
 export interface SafePromise<T> extends Promise<T> {
   readonly [_safe_promise_brand]: never;
