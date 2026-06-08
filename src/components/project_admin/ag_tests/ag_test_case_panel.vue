@@ -3,7 +3,7 @@
     <div class="ag-test-case panel level-1"
           :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}">
       <button type="button"
-              class="panel-toggle"
+              class="panel-toggle unstyled-button"
               :aria-controls="has_multiple_commands ? `commands-container-${label_uid}` : ''"
               :aria-expanded="is_open"
               @click="update_ag_test_case_panel_when_clicked">
@@ -448,14 +448,7 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
 @include list-panels($indentation: $panel-indentation);
 
 .panel-toggle {
-  background: none;
-  border: none;
-  padding: 0;
   text-align: left;
-  cursor: pointer;
-  color: inherit;
-  font-size: inherit;
-  font-family: inherit;
 }
 
 .handle {

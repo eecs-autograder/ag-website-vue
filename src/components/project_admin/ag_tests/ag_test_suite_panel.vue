@@ -2,7 +2,7 @@
   <div>
     <div class="panel level-0" :class="{'active': suite_is_active}">
       <button type="button"
-              class="panel-toggle"
+              class="panel-toggle unstyled-button"
               :aria-expanded="is_open"
               :aria-controls="`cases-container-${label_uid}`"
               @click="update_ag_test_suite_panel_when_clicked()">
@@ -416,18 +416,7 @@ function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: un
 }
 
 .panel-toggle {
-  background: none;
-  border: none;
-  padding: 0;
-  flex: 1;
-  min-width: 0;
   text-align: left;
-  cursor: pointer;
-  color: inherit;
-  font-size: inherit;
-  font-family: inherit;
-  display: flex;
-  align-items: center;
 }
 
 .handle {
