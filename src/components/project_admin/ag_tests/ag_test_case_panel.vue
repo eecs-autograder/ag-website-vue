@@ -444,15 +444,11 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
   background: none;
   border: none;
   padding: 0;
-  flex: 1;
-  min-width: 0;
   text-align: left;
   cursor: pointer;
   color: inherit;
   font-size: inherit;
   font-family: inherit;
-  display: flex;
-  align-items: center;
 }
 
 .handle {
