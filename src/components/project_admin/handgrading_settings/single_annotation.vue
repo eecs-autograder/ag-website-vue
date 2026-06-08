@@ -4,11 +4,19 @@
       <div class="header row">
         <span class="short-description">{{d_annotation.short_description}}</span>
         <span class="header-icons">
-          <i class="fas fa-arrows-alt handle"></i>
-          <i class="edit-icon fas fa-pencil-alt"
-             @click="d_edit_mode = true"></i>
-          <i class="delete-icon fas fa-trash-alt"
-             @click="d_delete_modal_is_open = true"></i>
+          <i class="fas fa-arrows-alt handle" aria-hidden="true"></i>
+          <button type="button"
+                  class="edit-annotation-button"
+                  aria-label="Edit annotation"
+                  @click="d_edit_mode = true">
+            <i class="edit-icon fas fa-pencil-alt" aria-hidden="true"></i>
+          </button>
+          <button type="button"
+                  class="delete-annotation-button"
+                  aria-label="Delete annotation"
+                  @click="d_delete_modal_is_open = true">
+            <i class="delete-icon fas fa-trash-alt" aria-hidden="true"></i>
+          </button>
         </span>
       </div>
       <div class="deduction row">
@@ -166,27 +174,35 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
 
 .header-icons {
   display: flex;
+  align-items: center;
+
+  .handle {
+    cursor: grabbing;
+    padding: 0 .25rem;
+  }
+
+  .edit-annotation-button, .delete-annotation-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0 .25rem;
+  }
 
   .edit-icon {
     color: darken($gray-blue-2, 15%);
+  }
+
+  .edit-annotation-button:hover .edit-icon {
+    color: darken($gray-blue-2, 8%);
   }
 
   .delete-icon {
     color: lighten($cherry, 10%);
   }
 
-  .handle, .edit-icon, .delete-icon {
-    padding: 0 .25rem;
-  }
-
-  .edit-icon:hover {
-    color: darken($gray-blue-2, 8%);
-    cursor: pointer;
-  }
-
-  .delete-icon:hover {
+  .delete-annotation-button:hover .delete-icon {
     color: lighten($cherry, 17%);
-    cursor: pointer;
   }
 }
 

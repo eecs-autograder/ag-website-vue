@@ -318,9 +318,9 @@ describe('Handgrading settings tests', () => {
 
     test('Points style binding', () => {
         expect_html_element_has_value(
-            wrapper.find('#points-style'), PointsStyle.start_at_zero_and_add);
+            wrapper.find('#handgrading-points-style'), PointsStyle.start_at_zero_and_add);
 
-        wrapper.find('#points-style').setValue(PointsStyle.start_at_max_and_subtract);
+        wrapper.find('#handgrading-points-style').setValue(PointsStyle.start_at_max_and_subtract);
 
         expect(
             wrapper.vm.d_handgrading_rubric!.points_style
@@ -333,10 +333,10 @@ describe('Handgrading settings tests', () => {
         ).toEqual(PointsStyle.start_at_zero_and_add);
 
         expect(wrapper.vm.d_handgrading_rubric!.max_points).toBeNull();
-        expect(get_validated_input_text(wrapper.find('#max-points'))).toEqual('');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
+        expect(get_validated_input_text(wrapper.findComponent({ref: 'max_points'}))).toEqual('');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(true);
 
-        set_validated_input_text(wrapper.find('#max-points'), '42');
+        set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '42');
         expect(wrapper.vm.d_handgrading_rubric!.max_points).toEqual(42);
     });
 
@@ -350,22 +350,22 @@ describe('Handgrading settings tests', () => {
 
         wrapper.vm.d_handgrading_rubric!.points_style = PointsStyle.start_at_max_and_subtract;
         await wrapper.vm.$nextTick();
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
 
-        await wrapper.find('#points-style').setValue(PointsStyle.start_at_zero_and_add);
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
+        await wrapper.find('#handgrading-points-style').setValue(PointsStyle.start_at_zero_and_add);
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(true);
 
-        await wrapper.find('#points-style').setValue(PointsStyle.start_at_max_and_subtract);
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        await wrapper.find('#handgrading-points-style').setValue(PointsStyle.start_at_max_and_subtract);
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
 
-        await set_validated_input_text(wrapper.find('#max-points'), '1');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
+        await set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '1');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(true);
 
-        await set_validated_input_text(wrapper.find('#max-points'), '0');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        await set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '0');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
 
-        await set_validated_input_text(wrapper.find('#max-points'), '-1');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        await set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '-1');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
     });
 
     test('Handgraders can leave comments binding', () => {
@@ -389,8 +389,8 @@ describe('Handgrading settings tests', () => {
     });
 
     test('Save button disabled when invalid', async () => {
-        await set_validated_input_text(wrapper.find('#max-points'), '-1');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        await set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '-1');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
         expect(wrapper.find('[data-testid=save_rubric_button]').element).toBeDisabled();
     });
 

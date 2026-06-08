@@ -108,9 +108,9 @@
             </div>
 
             <div class="form-field-wrapper extra-space">
-              <label for="points-style" class="label">Points style</label> <br>
+              <label for="handgrading-points-style" class="label">Points style</label> <br>
               <select v-model="d_handgrading_rubric.points_style"
-                      id="points-style"
+                      id="handgrading-points-style"
                       class="select">
                 <option :value="PointsStyle.start_at_zero_and_add">
                   Start at 0 and add
@@ -122,13 +122,13 @@
             </div>
 
             <div id="max-points-container" class="form-field-wrapper extra-space">
-              <label class="label">
+              <label class="label" for="handgrading-max-points">
                 {{d_handgrading_rubric.points_style === PointsStyle.start_at_max_and_subtract
                     ? 'Max points' : 'Override max points'}}
               </label>
 
               <validated-input
-                id="max-points"
+                input_id="handgrading-max-points"
                 ref="max_points"
                 v-model="d_handgrading_rubric.max_points"
                 input_style="width: 150px;"
@@ -235,6 +235,7 @@
     </template>
 
     <modal ref="create_criterion_modal" size="large" click_outside_to_close
+           aria_label="Add checkbox"
            v-if="d_create_criterion_modal_is_open"
            @close="d_create_criterion_modal_is_open = false">
       <div class="modal-header">New Checkbox</div>
@@ -254,6 +255,7 @@
     </modal>
 
     <modal ref="create_annotation_modal" size="large" click_outside_to_close
+           aria_label="Add annotation"
            v-if="d_create_annotation_modal_is_open"
            @close="d_create_annotation_modal_is_open = false">
       <div class="modal-header">New Annotation</div>
