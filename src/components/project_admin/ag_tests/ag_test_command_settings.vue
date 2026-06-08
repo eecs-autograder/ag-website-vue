@@ -7,11 +7,11 @@
           class="unstyled-button"
           @click="d_new_test_name = ag_test_case.name;
                   d_editing_test_name = !d_editing_test_name"
+          aria-label="Edit test name"
         >
           <i
             ref="toggle_name_edit"
             class="fas fa-pencil-alt"
-            aria-label="Edit test name"
           ></i>
         </button>
       </template>

@@ -90,6 +90,7 @@
               <div slot="suffix" class="remove-ag-test-command-suffix">
                 <button class="remove-ag-test-command-button"
                         type="button"
+                        aria-label="Remove command"
                         @click="remove_command(index)">
                   <i class="fas fa-times remove-ag-test-command-icon"></i>
                 </button>
