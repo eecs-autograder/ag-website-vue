@@ -20,7 +20,7 @@ import { arrays_equal, SafePromise } from "./utils";
  */
 export class OrderSyncer<T> {
   private debounce_timer: ReturnType<typeof setTimeout> | null = null;
-  private order: {pending: T[], saved: T[]} | null = null;
+  private order: { pending: T[]; saved: T[] } | null = null;
 
   /**
    * @param save_fn     Called with the final order when the debounce expires.
@@ -49,20 +49,28 @@ export class OrderSyncer<T> {
    */
   schedule(new_order: T[], current_order: T[]): void {
     if (this.order === null) {
-        this.order = {
-            pending: new_order,
-            saved: current_order,
-        };
-    }
-    else {
-        this.order.pending = new_order.slice();
+      this.order = {
+        pending: new_order,
+        saved: current_order,
+      };
+    } else {
+      this.order.pending = new_order.slice();
     }
 
     if (this.debounce_timer !== null) {
       clearTimeout(this.debounce_timer);
     }
     this.debounce_timer = setTimeout(() => {
-      this.flush();
+      // TODO: Remove the void operator once we can upgrade typescript-eslint
+      // and add the AllowKnownSafePromises to the no-floating-promises rule.
+      // https://typescript-eslint.io/rules/no-floating-promises/#allowforknownsafepromises
+      //
+      // Once this config option is set, we should also set `ignoreVoid: false`
+      // https://typescript-eslint.io/rules/no-floating-promises/#ignorevoid
+      //
+      // Public functions that return promises that are guaranteed to resolve should
+      // cast to SafePromise and not be async (they can still be awaited).
+      void this.flush();
     }, this.delay);
   }
 
@@ -83,11 +91,10 @@ export class OrderSyncer<T> {
     }
 
     if (this.order === null) {
-        return;
+      return;
     }
 
-    if (arrays_equal(this.order.pending, this.order.saved)
-    ) {
+    if (arrays_equal(this.order.pending, this.order.saved)) {
       this.order = null;
       return;
     }
