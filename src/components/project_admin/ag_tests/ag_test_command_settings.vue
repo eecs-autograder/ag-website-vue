@@ -3,10 +3,17 @@
     <div class="test-name-wrapper">
       <template v-if="!d_editing_test_name">
         <div class="test-name">{{ag_test_case.name}}</div>
-        <i @click="d_new_test_name = ag_test_case.name;
-                   d_editing_test_name = !d_editing_test_name"
-           ref="toggle_name_edit"
-           class="fas fa-pencil-alt"></i>
+        <button
+          class="unstyled-button"
+          @click="d_new_test_name = ag_test_case.name;
+                  d_editing_test_name = !d_editing_test_name"
+        >
+          <i
+            ref="toggle_name_edit"
+            class="fas fa-pencil-alt"
+            aria-label="Edit test name"
+          ></i>
+        </button>
       </template>
       <template v-else>
         <validated-form ref="ag_test_case_name_form" @submit="save_ag_test_case"
