@@ -168,7 +168,6 @@ import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.
 import {
   GlobalErrorsSubject,
   handle_api_errors_async,
-  handle_global_errors_async
 } from '@/error_handling';
 import { OrderSyncer } from '@/order_syncer';
 import { generate_uid } from '@/utils';
