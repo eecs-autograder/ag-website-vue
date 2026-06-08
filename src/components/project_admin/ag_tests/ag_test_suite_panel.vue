@@ -4,6 +4,7 @@
       <button type="button"
               class="panel-toggle"
               :aria-expanded="is_open"
+              :aria-controls="`cases-container-${label_uid}`"
               @click="update_ag_test_suite_panel_when_clicked()">
         <div class="text">
           <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
@@ -26,27 +27,29 @@
       </div>
     </div>
 
-    <div v-if="is_open">
-      <draggable ref="ag_test_case_order"
-                 v-model="ag_test_suite.ag_test_cases"
-                 @start="d_pre_drag_case_order = ag_test_suite.ag_test_cases.slice()"
-                 @change="case_order_syncer.schedule(ag_test_suite.ag_test_cases,
-                                                     d_pre_drag_case_order)"
-                 @end="$event.item.style.transform = 'none'"
-                 handle=".handle">
-        <AGTestCasePanel
-                   v-for="(test_case, case_index) of ag_test_suite.ag_test_cases"
-                   :key="test_case.pk"
-                   :ag_test_case="test_case"
-                   :ag_test_suite="ag_test_suite"
-                   :index="case_index"
-                   :case_count="ag_test_suite.ag_test_cases.length"
-                   :active_ag_test_command="active_ag_test_command"
-                   @update_active_item="$emit('update_active_item', $event)"
-                   @move_up="move_ag_test_case(case_index, -1)"
-                   @move_down="move_ag_test_case(case_index, 1)">
-        </AGTestCasePanel>
-      </draggable>
+    <div v-show="is_open" :id="`cases-container-${label_uid}`">
+      <div v-if="is_open">
+        <draggable ref="ag_test_case_order"
+                  v-model="ag_test_suite.ag_test_cases"
+                  @start="d_pre_drag_case_order = ag_test_suite.ag_test_cases.slice()"
+                  @change="case_order_syncer.schedule(ag_test_suite.ag_test_cases,
+                                                      d_pre_drag_case_order)"
+                  @end="$event.item.style.transform = 'none'"
+                  handle=".handle">
+          <AGTestCasePanel
+                    v-for="(test_case, case_index) of ag_test_suite.ag_test_cases"
+                    :key="test_case.pk"
+                    :ag_test_case="test_case"
+                    :ag_test_suite="ag_test_suite"
+                    :index="case_index"
+                    :case_count="ag_test_suite.ag_test_cases.length"
+                    :active_ag_test_command="active_ag_test_command"
+                    @update_active_item="$emit('update_active_item', $event)"
+                    @move_up="move_ag_test_case(case_index, -1)"
+                    @move_down="move_ag_test_case(case_index, 1)">
+          </AGTestCasePanel>
+        </draggable>
+      </div>
     </div>
 
     <modal v-if="d_show_new_ag_test_case_modal"
