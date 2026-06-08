@@ -945,6 +945,7 @@ export default class AGTestCommandSettings extends Vue {
   @Watch('ag_test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
     this.d_ag_test_command = deep_copy(new_test_command, AGTestCommand);
+    this.d_editing_test_name = false;
   }
 
   async created() {
