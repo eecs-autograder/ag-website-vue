@@ -192,13 +192,18 @@
           </div>
           <draggable ref="criteria_order"
                      v-model="d_handgrading_rubric.criteria"
-                     @change="set_criteria_order"
+                     @start="d_pre_drag_criteria_order = d_handgrading_rubric.criteria.slice()"
+                     @change="criteria_order_syncer.schedule(d_handgrading_rubric.criteria, d_pre_drag_criteria_order)"
                      @end="$event.item.style.transform = 'none'"
                      handle=".handle" ghost-class="ghost">
             <single-criterion v-for="(criterion, index) of d_handgrading_rubric.criteria"
                               :key="criterion.pk"
                               :class="{'criterion-border': index !== 0}"
-                              :criterion="criterion"></single-criterion>
+                              :criterion="criterion"
+                              :index="index"
+                              :count="d_handgrading_rubric.criteria.length"
+                              @move_up="move_criterion(index, -1)"
+                              @move_down="move_criterion(index, 1)"></single-criterion>
           </draggable>
         </div>
 
@@ -222,13 +227,18 @@
           </div>
           <draggable ref="annotation_order"
                      v-model="d_handgrading_rubric.annotations"
-                     @change="set_annotations_order"
+                     @start="d_pre_drag_annotations_order = d_handgrading_rubric.annotations.slice()"
+                     @change="annotations_order_syncer.schedule(d_handgrading_rubric.annotations, d_pre_drag_annotations_order)"
                      @end="$event.item.style.transform = 'none'"
                      handle=".handle" ghost-class="ghost">
             <single-annotation v-for="(annotation, index) of d_handgrading_rubric.annotations"
                                :key="annotation.pk"
                                :class="{'criterion-border': index !== 0}"
-                               :annotation="annotation"></single-annotation>
+                               :annotation="annotation"
+                               :index="index"
+                               :count="d_handgrading_rubric.annotations.length"
+                               @move_up="move_annotation(index, -1)"
+                               @move_down="move_annotation(index, 1)"></single-annotation>
           </draggable>
         </div>
       </div>
@@ -306,7 +316,12 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import {
+  GlobalErrorsSubject,
+  handle_api_errors_async,
+  handle_global_errors_async,
+} from '@/error_handling';
+import { OrderSyncer } from '@/order_syncer';
 import { BeforeDestroy, Created, Mounted } from "@/lifecycle";
 import { assert_not_null, deep_copy, format_datetime } from "@/utils";
 import {
@@ -374,6 +389,14 @@ export default class HandgradingSettings extends Vue implements Created,
   d_create_annotation_form_is_valid = false;
   d_create_annotation_modal_is_open = false;
 
+  private d_pre_drag_criteria_order: Criterion[] = [];
+  private d_pre_drag_annotations_order: Annotation[] = [];
+
+  // Must be initialized in created(), not as class properties: arrow functions in class
+  // property initializers capture 'this' = vue-class-component's dummy instance.
+  private criteria_order_syncer!: OrderSyncer<Criterion>;
+  private annotations_order_syncer!: OrderSyncer<Annotation>;
+
   readonly is_not_empty = is_not_empty;
   readonly is_number = is_number;
   readonly is_integer = is_integer;
@@ -408,6 +431,24 @@ export default class HandgradingSettings extends Vue implements Created,
 
   @handle_global_errors_async
   async created() {
+    this.criteria_order_syncer = new OrderSyncer<Criterion>(
+      (criteria) => Criterion.update_order(
+        this.d_handgrading_rubric!.pk, criteria.map(c => c.pk)),
+      (saved) => {
+        this.d_handgrading_rubric!.criteria.splice(
+          0, this.d_handgrading_rubric!.criteria.length, ...saved);
+      },
+      (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+    );
+    this.annotations_order_syncer = new OrderSyncer<Annotation>(
+      (annotations) => Annotation.update_order(
+        this.d_handgrading_rubric!.pk, annotations.map(a => a.pk)),
+      (saved) => {
+        this.d_handgrading_rubric!.annotations.splice(
+          0, this.d_handgrading_rubric!.annotations.length, ...saved);
+      },
+      (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+    );
     Criterion.subscribe(this);
     Annotation.subscribe(this);
 
@@ -429,6 +470,8 @@ export default class HandgradingSettings extends Vue implements Created,
   beforeDestroy() {
     Annotation.unsubscribe(this);
     Criterion.unsubscribe(this);
+    this.criteria_order_syncer.flush();
+    this.annotations_order_syncer.flush();
   }
 
   @Watch('d_handgrading_rubric.points_style')
@@ -511,12 +554,11 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
-  @handle_global_errors_async
-  set_criteria_order() {
-    return Criterion.update_order(
-      this.d_handgrading_rubric!.pk,
-      this.d_handgrading_rubric!.criteria.map(criterion => criterion.pk)
-    );
+  move_criterion(index: number, delta: number) {
+    const criteria = this.d_handgrading_rubric!.criteria;
+    const prev_order = criteria.slice();
+    criteria.splice(index + delta, 0, criteria.splice(index, 1)[0]);
+    this.criteria_order_syncer.schedule(criteria, prev_order);
   }
 
   update_criteria_order_changed(criterion_list: number[], handgrading_rubric_pk: number): void {
@@ -568,12 +610,11 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
-  @handle_global_errors_async
-  set_annotations_order() {
-    return Annotation.update_order(
-      this.d_handgrading_rubric!.pk,
-      this.d_handgrading_rubric!.annotations.map(annotation => annotation.pk)
-    );
+  move_annotation(index: number, delta: number) {
+    const annotations = this.d_handgrading_rubric!.annotations;
+    const prev_order = annotations.slice();
+    annotations.splice(index + delta, 0, annotations.splice(index, 1)[0]);
+    this.annotations_order_syncer.schedule(annotations, prev_order);
   }
 
   update_annotations_order_changed(annotation_list: number[],

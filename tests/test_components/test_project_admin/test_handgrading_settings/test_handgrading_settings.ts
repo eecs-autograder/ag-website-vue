@@ -526,12 +526,55 @@ describe('Criteria and annotation tests', () => {
     });
 
     test('Change criteria order', async () => {
+        vi.useFakeTimers();
         let order_stub = sinon.stub(Criterion, 'update_order');
-        wrapper.findComponent({ref: "criteria_order"}).vm.$emit('change');
-        await wrapper.vm.$nextTick();
+        const original_pks = rubric.criteria.map(c => c.pk);
+        const draggable = wrapper.findComponent({ref: "criteria_order"});
+        draggable.vm.$emit('start');
+        wrapper.vm.d_handgrading_rubric!.criteria.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
         expect(
-            order_stub.calledOnceWith(rubric.pk, rubric.criteria.map(item => item.pk))
+            order_stub.calledOnceWith(rubric.pk, [...original_pks].reverse())
         ).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Criteria order rolled back on failed request', async () => {
+        vi.useFakeTimers();
+        sinon.stub(Criterion, 'update_order').rejects(new HttpError(400, 'bad'));
+        const original_criteria = rubric.criteria.slice();
+        const draggable = wrapper.findComponent({ref: "criteria_order"});
+        draggable.vm.$emit('start');
+        wrapper.vm.d_handgrading_rubric!.criteria.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual(original_criteria);
+        vi.useRealTimers();
+    });
+
+    test('Move criterion up', async () => {
+        vi.useFakeTimers();
+        const order_stub = sinon.stub(Criterion, 'update_order');
+        const original = rubric.criteria.slice();
+        wrapper.find('#criteria-column').findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual([original[1], original[0]]);
+        expect(order_stub.calledOnceWith(rubric.pk, [original[1].pk, original[0].pk])).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Move criterion down', async () => {
+        vi.useFakeTimers();
+        const order_stub = sinon.stub(Criterion, 'update_order');
+        const original = rubric.criteria.slice();
+        wrapper.find('#criteria-column').findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual([original[1], original[0]]);
+        expect(order_stub.calledOnceWith(rubric.pk, [original[1].pk, original[0].pk])).toBe(true);
+        vi.useRealTimers();
     });
 
     test('Create annotation', async () => {
@@ -610,12 +653,55 @@ describe('Criteria and annotation tests', () => {
     });
 
     test('Change annotation order', async () => {
+        vi.useFakeTimers();
         let order_stub = sinon.stub(Annotation, 'update_order');
-        wrapper.findComponent({ref: "annotation_order"}).vm.$emit('change');
-        await wrapper.vm.$nextTick();
+        const original_pks = rubric.annotations.map(a => a.pk);
+        const draggable = wrapper.findComponent({ref: "annotation_order"});
+        draggable.vm.$emit('start');
+        wrapper.vm.d_handgrading_rubric!.annotations.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
         expect(
-            order_stub.calledOnceWith(rubric.pk, rubric.annotations.map(item => item.pk))
+            order_stub.calledOnceWith(rubric.pk, [...original_pks].reverse())
         ).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Annotation order rolled back on failed request', async () => {
+        vi.useFakeTimers();
+        sinon.stub(Annotation, 'update_order').rejects(new HttpError(400, 'bad'));
+        const original_annotations = rubric.annotations.slice();
+        const draggable = wrapper.findComponent({ref: "annotation_order"});
+        draggable.vm.$emit('start');
+        wrapper.vm.d_handgrading_rubric!.annotations.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual(original_annotations);
+        vi.useRealTimers();
+    });
+
+    test('Move annotation up', async () => {
+        vi.useFakeTimers();
+        const order_stub = sinon.stub(Annotation, 'update_order');
+        const original = rubric.annotations.slice();
+        wrapper.find('#annotations-column').findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual([original[1], original[0]]);
+        expect(order_stub.calledOnceWith(rubric.pk, [original[1].pk, original[0].pk])).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Move annotation down', async () => {
+        vi.useFakeTimers();
+        const order_stub = sinon.stub(Annotation, 'update_order');
+        const original = rubric.annotations.slice();
+        wrapper.find('#annotations-column').findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual([original[1], original[0]]);
+        expect(order_stub.calledOnceWith(rubric.pk, [original[1].pk, original[0].pk])).toBe(true);
+        vi.useRealTimers();
     });
 
     test('Observer updates from other rubric ignored', () => {

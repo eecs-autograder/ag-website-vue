@@ -5,6 +5,10 @@
         <span class="short-description">{{d_annotation.short_description}}</span>
         <span class="header-icons">
           <i class="fas fa-arrows-alt handle" aria-hidden="true"></i>
+          <MoveButtons :index="index"
+                       :count="count"
+                       @move_up="$emit('move_up')"
+                       @move_down="$emit('move_down')" />
           <button type="button"
                   class="edit-annotation-button"
                   aria-label="Edit annotation"
@@ -71,6 +75,7 @@ import { Annotation } from "ag-client-typescript";
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from "@/components/modal.vue";
+import MoveButtons from "@/components/MoveButtons.vue";
 import AnnotationForm, { AnnotationFormData } from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 import { handle_api_errors_async } from '@/error_handling';
 import { deep_copy, format_datetime, safe_assign } from "@/utils";
@@ -79,12 +84,19 @@ import { deep_copy, format_datetime, safe_assign } from "@/utils";
   components: {
     APIErrors,
     AnnotationForm,
-    Modal
+    Modal,
+    MoveButtons,
   }
 })
 export default class SingleAnnotation extends Vue {
   @Prop({type: Annotation})
   annotation!: Annotation;
+
+  @Prop({required: true, type: Number})
+  index!: number;
+
+  @Prop({required: true, type: Number})
+  count!: number;
 
   d_annotation: Annotation = new Annotation({
     pk: 0,

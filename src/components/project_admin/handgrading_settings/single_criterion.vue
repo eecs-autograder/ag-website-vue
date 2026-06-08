@@ -5,6 +5,10 @@
         <span class="short-description">{{d_criterion.short_description}}</span>
         <span class="header-icons">
           <i class="fas fa-arrows-alt handle" aria-hidden="true"></i>
+          <MoveButtons :index="index"
+                       :count="count"
+                       @move_up="$emit('move_up')"
+                       @move_down="$emit('move_down')" />
           <button type="button"
                   class="edit-criterion-button"
                   aria-label="Edit criterion"
@@ -68,6 +72,7 @@ import { Criterion } from "ag-client-typescript";
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from "@/components/modal.vue";
+import MoveButtons from "@/components/MoveButtons.vue";
 import CriterionForm, { CriterionFormData } from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import { handle_api_errors_async } from '@/error_handling';
 import { deep_copy, format_datetime, safe_assign } from "@/utils";
@@ -76,12 +81,19 @@ import { deep_copy, format_datetime, safe_assign } from "@/utils";
   components: {
     APIErrors,
     CriterionForm,
-    Modal
+    Modal,
+    MoveButtons,
   }
 })
 export default class SingleCriterion extends Vue {
   @Prop({type: Criterion})
   criterion!: Criterion;
+
+  @Prop({required: true, type: Number})
+  index!: number;
+
+  @Prop({required: true, type: Number})
+  count!: number;
 
   d_criterion: Criterion = new Criterion({
     pk: 0,
