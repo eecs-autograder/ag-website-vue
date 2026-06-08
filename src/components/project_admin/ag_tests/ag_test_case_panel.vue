@@ -4,6 +4,7 @@
           :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}">
       <button type="button"
               class="panel-toggle"
+              :aria-controls="has_multiple_commands ? `commands-container-${label_uid}` : ''"
               :aria-expanded="is_open"
               @click="update_ag_test_case_panel_when_clicked">
         <div class="text">
@@ -65,7 +66,9 @@
       </div>
     </div>
 
-    <div class="commands-container" v-if="is_open && has_multiple_commands">
+    <div :id="`commands-container-${label_uid}`"
+         class="commands-container"
+         v-if="is_open && has_multiple_commands">
       <draggable ref="ag_test_command_order"
                  v-model="ag_test_case.ag_test_commands"
                  @start="d_pre_drag_command_order = ag_test_case.ag_test_commands.slice()"
