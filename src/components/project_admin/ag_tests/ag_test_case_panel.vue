@@ -71,27 +71,25 @@
       class="commands-container"
       v-show="is_open && has_multiple_commands"
     >
-      <div v-if="is_open && has_multiple_commands">
-        <draggable ref="ag_test_command_order"
-                  v-model="ag_test_case.ag_test_commands"
-                  @start="d_pre_drag_command_order = ag_test_case.ag_test_commands.slice()"
-                  @change="command_order_syncer.schedule(ag_test_case.ag_test_commands,
-                                                          d_pre_drag_command_order)"
-                  @end="$event.item.style.transform = 'none'"
-                  handle=".handle">
-          <AGTestCommandPanel
-                    v-for="(ag_test_command, cmd_index) of ag_test_case.ag_test_commands"
-                    :key="ag_test_command.pk"
-                    :ag_test_command="ag_test_command"
-                    :active_ag_test_command="active_ag_test_command"
-                    :index="cmd_index"
-                    :command_count="ag_test_case.ag_test_commands.length"
-                    @update_active_item="$emit('update_active_item', $event)"
-                    @move_up="move_command(cmd_index, -1)"
-                    @move_down="move_command(cmd_index, 1)">
-          </AGTestCommandPanel>
-        </draggable>
-      </div>
+      <draggable ref="ag_test_command_order"
+                v-model="ag_test_case.ag_test_commands"
+                @start="d_pre_drag_command_order = ag_test_case.ag_test_commands.slice()"
+                @change="command_order_syncer.schedule(ag_test_case.ag_test_commands,
+                                                        d_pre_drag_command_order)"
+                @end="$event.item.style.transform = 'none'"
+                handle=".handle">
+        <AGTestCommandPanel
+                  v-for="(ag_test_command, cmd_index) of ag_test_case.ag_test_commands"
+                  :key="ag_test_command.pk"
+                  :ag_test_command="ag_test_command"
+                  :active_ag_test_command="active_ag_test_command"
+                  :index="cmd_index"
+                  :command_count="ag_test_case.ag_test_commands.length"
+                  @update_active_item="$emit('update_active_item', $event)"
+                  @move_up="move_command(cmd_index, -1)"
+                  @move_down="move_command(cmd_index, 1)">
+        </AGTestCommandPanel>
+      </draggable>
     </div>
 
     <modal v-if="d_show_new_ag_test_command_modal"
