@@ -664,7 +664,7 @@ test('Focus stays on move up button after moving case up to non-boundary positio
 
     // [0]=suite Move up, [1]=case[0] Move up (disabled), [2]=case[1], [3]=case[2]
     wrapper.findAll('[aria-label="Move up"]').at(3).trigger('click');
-    // case[2] moves to DOM position 1.
+    // case[2] moves to DOM position 1 among test cases.
     const find_expected = () => wrapper.findAll('.ag-test-case').at(1)
         .find('[aria-label="Move up"]').element;
     await wait_until(wrapper, () => document.activeElement === find_expected());
@@ -695,7 +695,8 @@ test('Focus falls back to move down when case moves to first position', async ()
 
     // [0]=suite Move up, [1]=case[0] Move up (disabled), [2]=case[1]
     wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
-    // case[1] moves to DOM position 0 (first), so move-up is disabled — fallback to move-down.
+    // case[1] moves to DOM position 0 (first) among test cases,
+    // so move-up is disabled — fallback to move-down.
     const find_expected = () => wrapper.findAll('.ag-test-case').at(0)
         .find('[aria-label="Move down"]').element;
     await wait_until(wrapper, () => document.activeElement === find_expected());
@@ -727,7 +728,8 @@ test('Focus stays on move down button after moving case down to non-boundary pos
 
     // [0]=suite Move down (disabled, suite_count=1), [1]=case[0], [2]=case[1], [3]=case[2], [4]=case[3] (disabled)
     wrapper.findAll('[aria-label="Move down"]').at(1).trigger('click');
-    // case[0] moves to DOM position 1 (non-boundary). Focus stays on move-down.
+    // case[0] moves to DOM position 1 (non-boundary) among test cases.
+    // Focus stays on move-down.
     const find_expected = () => wrapper.findAll('.ag-test-case').at(1)
         .find('[aria-label="Move down"]').element;
     await wait_until(wrapper, () => document.activeElement === find_expected());
@@ -758,43 +760,52 @@ test('Focus falls back to move up when case moves to last position', async () =>
 
     // [0]=suite Move down (disabled), [1]=case[0], [2]=case[1], [3]=case[2] (disabled)
     wrapper.findAll('[aria-label="Move down"]').at(2).trigger('click');
-    // case[1] moves to DOM position 2 (last), so move-down is disabled — fallback to move-up.
+    // case[1] moves to DOM position 2 (last) among test cases,
+    // so move-down is disabled — fallback to move-up.
     const find_expected = () => wrapper.findAll('.ag-test-case').at(2)
         .find('[aria-label="Move up"]').element;
     await wait_until(wrapper, () => document.activeElement === find_expected());
     expect(document.activeElement).toBe(find_expected());
 });
 
-test('Update test cases order', async () => {
-    vi.useFakeTimers();
-    let order_stub = sinon.stub(AGTestCase, 'update_order');
-    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
-    let test_cases = [
-        data_ut.make_ag_test_case(suite.pk),
-        data_ut.make_ag_test_case(suite.pk),
-        data_ut.make_ag_test_case(suite.pk),
-    ];
-    suite.ag_test_cases = test_cases.slice();
-    let wrapper = managed_mount(AGTestSuitePanel, {
-        propsData: {
-            ag_test_suite: suite,
-            active_ag_test_suite: null,
-            active_ag_test_command: null,
-            index: 0,
-            suite_count: 1,
-        }
+describe('Drag and drop test cases order', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
     });
-    await wrapper.find('.panel-toggle').trigger('click');
 
-    const draggable = wrapper.findComponent({ref: 'ag_test_case_order'});
-    draggable.vm.$emit('start');
-    // Simulate vuedraggable mutating v-model on drop.
-    suite.ag_test_cases.reverse();
-    draggable.vm.$emit('change');
-    await vi.runAllTimersAsync();
+    afterEach(() => {
+        vi.useRealTimers();
+    });
 
-    expect(
-        order_stub.calledOnceWith(suite.pk, [test_cases[2].pk, test_cases[1].pk, test_cases[0].pk])
-    ).toBe(true);
-    vi.useRealTimers();
+    test('Update test cases order', async () => {
+        let order_stub = sinon.stub(AGTestCase, 'update_order');
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_cases = [
+            data_ut.make_ag_test_case(suite.pk),
+            data_ut.make_ag_test_case(suite.pk),
+            data_ut.make_ag_test_case(suite.pk),
+        ];
+        suite.ag_test_cases = test_cases.slice();
+        let wrapper = managed_mount(AGTestSuitePanel, {
+            propsData: {
+                ag_test_suite: suite,
+                active_ag_test_suite: null,
+                active_ag_test_command: null,
+                index: 0,
+                suite_count: 1,
+            }
+        });
+        await wrapper.find('.panel-toggle').trigger('click');
+
+        const draggable = wrapper.findComponent({ref: 'ag_test_case_order'});
+        draggable.vm.$emit('start');
+        // Simulate vuedraggable mutating v-model on drop.
+        suite.ag_test_cases.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
+
+        expect(
+            order_stub.calledOnceWith(suite.pk, [test_cases[2].pk, test_cases[1].pk, test_cases[0].pk])
+        ).toBe(true);
+    });
 });
