@@ -88,7 +88,7 @@
                      {'odd-buggy-implementation-row': index % 2 !== 0}]">
         <span class="buggy-implementation-name">{{buggy_name}}</span>
         <button type="button"
-                class="remove-buggy-impl-name-container"
+                class="unstyled-button remove-buggy-impl-name-container"
                 :aria-label="`Remove ${buggy_name}`"
                 @click="remove_buggy_implementation_name(index)">
           <i class="fas fa-times remove-buggy-impl-name-icon" aria-hidden="true"></i>
@@ -227,12 +227,6 @@ $periwinkle: hsl(220, 30%, 56%);
   align-items: flex-start;
 
   .remove-buggy-impl-name-container {
-    background: none;
-    border: none;
-    color: inherit;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: inherit;
     padding: 0 .25rem;
   }
 

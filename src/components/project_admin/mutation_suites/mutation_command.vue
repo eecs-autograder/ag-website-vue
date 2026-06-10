@@ -27,7 +27,7 @@
       </div>
 
       <button type="button"
-              class="resource-limits-label"
+              class="unstyled-button resource-limits-label"
               :aria-expanded="d_is_open"
               :aria-controls="`resource-limits-${label_uid}`"
               @click="toggle_is_open">
@@ -129,14 +129,8 @@ export default class MutationCommand extends Vue {
 .resource-limits-label {
   @include collapsible-section-header($pad-text: true, $line-color: $stormy-gray-light);
 
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  font-family: inherit;
   font-size: .875rem;
   margin-bottom: .5rem;
-  padding: 0;
   width: 100%;
   text-align: left;
 }

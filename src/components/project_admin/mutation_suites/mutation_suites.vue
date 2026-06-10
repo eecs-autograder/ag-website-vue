@@ -10,7 +10,7 @@
         <div id="sidebar-header"
              class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
           <button type="button"
-                  class="sidebar-collapse-button"
+                  class="unstyled-button sidebar-collapse-button"
                   :aria-label="`${d_collapsed ? 'Open' : 'Close'} mutation test suites sidebar`"
                   :aria-expanded="!d_collapsed"
                   aria-controls="mutation-suite-sidebar-content"
@@ -45,7 +45,7 @@
                 }"
                 :key="mutation_test_suite.pk">
               <button type="button"
-                      class="panel-toggle"
+                      class="unstyled-button panel-toggle"
                       @click="set_active_mutation_test_suite(mutation_test_suite)">
                 <div class="text">{{mutation_test_suite.name}}</div>
               </button>
@@ -730,23 +730,10 @@ $border-color: $gray-blue-1;
   cursor: grabbing;
 }
 
-.sidebar-collapse-button {
-  background: none;
-  border: none;
-  padding: 0;
-}
-
 .panel-toggle {
-  background: none;
-  border: none;
-  padding: 0;
   flex: 1;
   min-width: 0;
   text-align: left;
-  cursor: pointer;
-  color: inherit;
-  font-size: inherit;
-  font-family: inherit;
   display: flex;
   align-items: center;
 }
