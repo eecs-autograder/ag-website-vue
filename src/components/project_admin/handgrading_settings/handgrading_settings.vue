@@ -15,7 +15,8 @@
                 id="new-rubric-button"
                 @click="create_new_rubric"
                 :disabled="d_new_rubric_request_pending">
-          <i v-if="d_new_rubric_request_pending" class="fa fa-spinner fa-pulse"></i>
+          <i v-if="d_new_rubric_request_pending"
+             class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
           <template v-else>New Handgrading Rubric</template>
         </button>
       </div>
@@ -24,7 +25,7 @@
         <div id="import-flow-container">
           <div id="select-import-from-course" class="select-container form-field-wrapper">
             <div v-if="d_courses_is_admin_for === null" class="loading">
-              <i class="fa fa-spinner fa-pulse"></i>
+              <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
             </div>
             <template v-else>
               <div><label class="label">Course</label></div>
@@ -44,7 +45,7 @@
               <label class="label">Project</label>
             </div>
             <div v-if="d_loading_projects" class="loading">
-              <i class="fa fa-spinner fa-pulse"></i>
+              <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
             </div>
             <template v-else-if="d_selected_course_projects !== null">
               <select-object ref="project_to_import_from"
@@ -63,7 +64,8 @@
                     class="green-button"
                     :disabled="d_project_to_import_from === null"
                     @click="import_rubric">
-              <i v-if="d_import_request_pending" class="fa fa-spinner fa-pulse"></i>
+              <i v-if="d_import_request_pending"
+                 class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
               <template v-else>Import</template>
             </button>
           </div>
