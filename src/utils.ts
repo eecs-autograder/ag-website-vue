@@ -78,6 +78,14 @@ export function* zip<T1, T2>(iterable1: IterableType<T1>,
     }
 }
 
+export function arrays_equal<T>(left: ReadonlyArray<T>, right: ReadonlyArray<T>) {
+    if (left.length !== right.length) {
+        return false;
+    }
+
+    return left.every((value, index) => value === right[index]);
+}
+
 export function* chain<T>(...iterables: IterableType<T>[]): IterableIterator<T> {
     for (let iterable of iterables) {
         for (let item of iterable) {
@@ -220,4 +228,16 @@ export function blob_to_string(blob: Promise<Blob>): Promise<string> {
 let next_uid = 0
 export function generate_uid() {
     return next_uid++;
+}
+
+declare const _safe_promise_brand: unique symbol;
+
+/**
+ * SafePromises that are not awaited will not raise an ESLint error.
+ * Promises should only be casted to SafePromise if they are guaranteed to
+ * resolve.
+ * https://typescript-eslint.io/rules/no-floating-promises/
+ */
+export interface SafePromise<T> extends Promise<T> {
+  readonly [_safe_promise_brand]: never;
 }

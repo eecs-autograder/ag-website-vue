@@ -483,7 +483,7 @@ describe('MutationSuites tests', () => {
                 .bugs_exposed_fdbk_level
         ).toEqual(BugsExposedFeedbackLevel.exposed_bug_names);
 
-        wrapper.find('[data-testid=bugs_exposed_fdbk_level]').setValue(
+        feedback_settings.find('[data-testid=bugs_exposed_fdbk_level]').setValue(
             BugsExposedFeedbackLevel.num_bugs_exposed
         );
         expect(
@@ -497,7 +497,7 @@ describe('MutationSuites tests', () => {
                 .show_invalid_test_names
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_invalid_test_names]').setChecked(true);
+        feedback_settings.find('[data-testid=show_invalid_test_names]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_invalid_test_names
@@ -508,7 +508,7 @@ describe('MutationSuites tests', () => {
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.show_points
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_points]').setChecked(true);
+        feedback_settings.find('[data-testid=show_points]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config.show_points
         ).toBe(true);
@@ -519,7 +519,7 @@ describe('MutationSuites tests', () => {
                 .show_setup_return_code
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_setup_return_code]').setChecked(true);
+        feedback_settings.find('[data-testid=show_setup_return_code]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_setup_return_code
@@ -531,7 +531,7 @@ describe('MutationSuites tests', () => {
                 .show_setup_stdout
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_setup_stdout]').setChecked(true);
+        feedback_settings.find('[data-testid=show_setup_stdout]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_setup_stdout
@@ -543,7 +543,7 @@ describe('MutationSuites tests', () => {
                 .show_setup_stderr
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_setup_stderr]').setChecked(true);
+        feedback_settings.find('[data-testid=show_setup_stderr]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_setup_stderr
@@ -555,7 +555,7 @@ describe('MutationSuites tests', () => {
                 .show_get_test_names_return_code
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_test_name_discovery_return_code]').setChecked(true);
+        feedback_settings.find('[data-testid=show_test_name_discovery_return_code]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_get_test_names_return_code
@@ -567,7 +567,7 @@ describe('MutationSuites tests', () => {
                 .show_get_test_names_stdout
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_test_name_discovery_stdout]').setChecked(true);
+        feedback_settings.find('[data-testid=show_test_name_discovery_stdout]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_get_test_names_stdout
@@ -579,7 +579,7 @@ describe('MutationSuites tests', () => {
                 .show_get_test_names_stderr
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_test_name_discovery_stderr]').setChecked(true);
+        feedback_settings.find('[data-testid=show_test_name_discovery_stderr]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_get_test_names_stderr
@@ -591,7 +591,7 @@ describe('MutationSuites tests', () => {
                 .show_validity_check_stdout
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_validity_check_stdout]').setChecked(true);
+        feedback_settings.find('[data-testid=show_validity_check_stdout]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_validity_check_stdout
@@ -603,7 +603,7 @@ describe('MutationSuites tests', () => {
                 .show_validity_check_stderr
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_validity_check_stderr]').setChecked(true);
+        feedback_settings.find('[data-testid=show_validity_check_stderr]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_validity_check_stderr
@@ -615,7 +615,7 @@ describe('MutationSuites tests', () => {
                 .show_grade_buggy_impls_stdout
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_grade_buggy_impls_stdout]').setChecked(true);
+        feedback_settings.find('[data-testid=show_grade_buggy_impls_stdout]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_grade_buggy_impls_stdout
@@ -627,7 +627,7 @@ describe('MutationSuites tests', () => {
                 .show_grade_buggy_impls_stderr
         ).toBe(false);
 
-        wrapper.find('[data-testid=show_grade_buggy_impls_stderr]').setChecked(true);
+        feedback_settings.find('[data-testid=show_grade_buggy_impls_stderr]').setChecked(true);
         expect(
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_validity_check_stderr

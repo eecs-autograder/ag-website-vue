@@ -31,7 +31,7 @@ $panel-indentation: 1.25rem;
 // Modal Related ***********************************************************
 
 .item-to-delete {
-    color: $ocean-blue;
+    color: darken($ocean-blue, 10%);
 }
 
 .modal-create-button {

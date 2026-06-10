@@ -1,32 +1,51 @@
 <template>
   <div>
-    <div class="panel level-0" :class="{'active': suite_is_active}"
-         @click="update_ag_test_suite_panel_when_clicked()">
-      <div class="text">
-        <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
-        <span>{{ag_test_suite.name}}</span>
-      </div>
+    <div class="panel level-0" :class="{'active': suite_is_active}">
+      <button type="button"
+              class="panel-toggle unstyled-button"
+              :aria-expanded="is_open"
+              :aria-controls="`cases-container-${label_uid}`"
+              @click="update_ag_test_suite_panel_when_clicked()">
+        <div class="text">
+          <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+          <span>{{ag_test_suite.name}}</span>
+        </div>
+      </button>
 
       <div class="icons">
-        <i class="icon handle fas fa-arrows-alt"></i>
-        <i class="icon fas fa-plus"
-           @click.stop="open_new_ag_test_case_modal"
-           title="Add Test Case"></i>
+        <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
+        <MoveButtons :index="index"
+                     :count="suite_count"
+                     @move_up="$emit('move_up')"
+                     @move_down="$emit('move_down')" />
+        <button type="button"
+                class="icon add-ag-test-case-button"
+                aria-label="Add Test Case"
+                @click.stop="open_new_ag_test_case_modal">
+          <i class="fas fa-plus"></i>
+        </button>
       </div>
     </div>
 
-    <div v-if="is_open">
+    <div v-show="is_open" :id="`cases-container-${label_uid}`">
       <draggable ref="ag_test_case_order"
-                 v-model="ag_test_suite.ag_test_cases"
-                 @change="set_ag_test_case_order"
-                 @end="$event.item.style.transform = 'none'"
-                 handle=".handle">
-        <AGTestCasePanel v-for="test_case of ag_test_suite.ag_test_cases"
-                   :key="test_case.pk"
-                   :ag_test_case="test_case"
-                   :ag_test_suite="ag_test_suite"
-                   :active_ag_test_command="active_ag_test_command"
-                   @update_active_item="$emit('update_active_item', $event)">
+                v-model="ag_test_suite.ag_test_cases"
+                @start="d_pre_drag_case_order = ag_test_suite.ag_test_cases.slice()"
+                @change="case_order_syncer.schedule(ag_test_suite.ag_test_cases,
+                                                    d_pre_drag_case_order)"
+                @end="$event.item.style.transform = 'none'"
+                handle=".handle">
+        <AGTestCasePanel
+                  v-for="(test_case, case_index) of ag_test_suite.ag_test_cases"
+                  :key="test_case.pk"
+                  :ag_test_case="test_case"
+                  :ag_test_suite="ag_test_suite"
+                  :index="case_index"
+                  :case_count="ag_test_suite.ag_test_cases.length"
+                  :active_ag_test_command="active_ag_test_command"
+                  @update_active_item="$emit('update_active_item', $event)"
+                  @move_up="move_ag_test_case(case_index, -1)"
+                  @move_down="move_ag_test_case(case_index, 1)">
         </AGTestCasePanel>
       </draggable>
     </div>
@@ -35,6 +54,7 @@
            @close="d_show_new_ag_test_case_modal = false"
            ref="new_ag_test_case_modal"
            click_outside_to_close
+           aria_label="New test case"
            size="large">
       <div class="modal-header"> New Test Case </div>
       <validated-form ref="create_ag_test_case_form"
@@ -44,10 +64,11 @@
                       @form_validity_changed="d_add_case_form_is_valid = $event">
 
         <div class="form-field-wrapper">
-          <label class="label"> Test name </label>
+          <label class="label" :for="`new-case-name-${label_uid}`"> Test name </label>
           <validated-input ref="new_case_name"
                            v-model="d_new_case_name"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           :input_id="`new-case-name-${label_uid}`">
           </validated-input>
         </div>
 
@@ -56,16 +77,18 @@
                   class="legend">{{format_ordinal_num(index)}}</legend>
 
           <div class="form-field-wrapper" v-if="d_new_commands.length > 1">
-            <label class="label"> Command name </label>
+            <label class="label" :for="`command-name-${label_uid}-${index}`"> Command name </label>
             <validated-input ref="command_name"
                              v-model="new_command.name"
                              :validators="[is_not_empty]"
+                             :input_id="`command-name-${label_uid}-${index}`"
                              input_style="width: 100%;
                                           min-width: 200px;
                                           max-width: 700px;">
               <div slot="suffix" class="remove-ag-test-command-suffix">
                 <button class="remove-ag-test-command-button"
                         type="button"
+                        aria-label="Remove command"
                         @click="remove_command(index)">
                   <i class="fas fa-times remove-ag-test-command-icon"></i>
                 </button>
@@ -74,7 +97,7 @@
           </div>
 
           <div class="form-field-wrapper">
-            <label class="label">
+            <label class="label" :for="`command-cmd-${label_uid}-${index}`">
               Command
               <tooltip width="medium" placement="top">
                 Can be any valid bash command.
@@ -83,6 +106,7 @@
             <validated-input ref="command"
                               v-model="new_command.cmd"
                               :validators="[is_not_empty]"
+                              :input_id="`command-cmd-${label_uid}-${index}`"
                               input_style="width: 100%;
                                            min-width: 200px;
                                            max-width: 700px;">
@@ -135,11 +159,17 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
+import MoveButtons from '@/components/MoveButtons.vue';
 import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import {
+  GlobalErrorsSubject,
+  handle_api_errors_async,
+} from '@/error_handling';
+import { OrderSyncer } from '@/order_syncer';
+import { generate_uid } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 export class NewCommandFields {
@@ -158,6 +188,7 @@ export class NewCommandFields {
     APIErrors,
     Draggable,
     Modal,
+    MoveButtons,
     Tooltip,
     ValidatedForm,
     ValidatedInput
@@ -174,6 +205,15 @@ export default class AGTestSuitePanel extends Vue {
   @Prop({required: true, type: AGTestSuite})
   ag_test_suite!: AGTestSuite;
 
+  @Prop({required: true, type: Number})
+  index!: number;
+
+  @Prop({required: true, type: Number})
+  suite_count!: number;
+
+  // Snapshot of the order before a drag starts, passed to the syncer as the rollback target.
+  private d_pre_drag_case_order: AGTestCase[] = [];
+
   d_show_new_ag_test_case_modal = false;
   d_add_case_form_is_valid = false;
   d_cases_are_visible = false;
@@ -183,6 +223,24 @@ export default class AGTestSuitePanel extends Vue {
   d_new_commands: NewCommandFields[] = [new NewCommandFields({})];
 
   readonly is_not_empty = is_not_empty;
+
+  private case_order_syncer = new OrderSyncer<AGTestCase>(
+    (cases) => AGTestCase.update_order(this.ag_test_suite.pk, cases.map(c => c.pk)),
+    (saved) => {
+      this.ag_test_suite.ag_test_cases.splice(
+        0, this.ag_test_suite.ag_test_cases.length, ...saved
+      );
+    },
+    (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+  );
+
+  beforeDestroy() {
+    this.case_order_syncer.flush();
+  }
+
+  get label_uid() {
+    return generate_uid();
+  }
 
   @Watch('active_ag_test_command')
   on_active_ag_test_command_changed(new_active_ag_test_command: AGTestCommand,
@@ -268,10 +326,11 @@ export default class AGTestSuitePanel extends Vue {
     return "";
   }
 
-  @handle_global_errors_async
-  set_ag_test_case_order() {
-    return AGTestCase.update_order(
-      this.ag_test_suite.pk, this.ag_test_suite.ag_test_cases.map(test_case => test_case.pk));
+  move_ag_test_case(index: number, delta: number) {
+    const cases = this.ag_test_suite.ag_test_cases;
+    const prev_order = cases.slice();
+    cases.splice(index + delta, 0, cases.splice(index, 1)[0]);
+    this.case_order_syncer.schedule(cases, prev_order);
   }
 
   @handle_api_errors_async(handle_create_ag_test_case_error)
@@ -355,8 +414,25 @@ function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: un
   padding-right: .25rem;
 }
 
+.panel-toggle {
+  text-align: left;
+}
+
 .handle {
   cursor: grabbing;
+}
+
+.add-ag-test-case-button {
+  background: none;
+  border: none;
+  padding: 0 .25rem;
+  cursor: pointer;
+  color: inherit;
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
 }
 
 .duplicate-ag-test-command-msg {

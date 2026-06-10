@@ -2,6 +2,7 @@ import { Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
+import { vi } from 'vitest';
 
 import APIErrors from '@/components/api_errors.vue';
 import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_panel.vue';
@@ -314,45 +315,193 @@ describe('Deleting ag_test_suite', () => {
     });
 });
 
-test('Update suites order', async () => {
-    let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
-    let suites = [
-        data_ut.make_ag_test_suite(project.pk),
-        data_ut.make_ag_test_suite(project.pk),
-    ];
-    get_all_suites_from_project.resolves(suites);
-    let wrapper = make_wrapper();
-    expect(await wait_for_load(wrapper)).toBe(true);
+describe('Alter suite order', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+    });
 
-    wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('change');
-    await wrapper.vm.$nextTick();
-    expect(
-        order_stub.calledOnceWith(project.pk, suites.map(suite => suite.pk))
-    ).toBe(true);
-});
+    afterEach(() => {
+        vi.useRealTimers();
+    });
 
-test('Original order restored after bad update suites order request', async () => {
-    sinon.stub(ag_cli.AGTestSuite, 'update_order').rejects(
-        new ag_cli.HttpError(400, 'NOOOOOPE')
-    );
-    let suites = [
-        data_ut.make_ag_test_suite(project.pk),
-        data_ut.make_ag_test_suite(project.pk),
-    ];
-    get_all_suites_from_project.resolves(suites.slice());
-    let wrapper = make_wrapper();
-    expect(await wait_for_load(wrapper)).toBe(true);
+    test('Move suite up', async () => {
+        let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
+        let suites = [
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+        ];
+        get_all_suites_from_project.resolves(suites.slice());
+        let wrapper = make_wrapper();
+        expect(await wait_for_load(wrapper)).toBe(true);
 
-    wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('start');
-    await wrapper.vm.$nextTick();
+        wrapper.findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
 
-    wrapper.vm.d_ag_test_suites = wrapper.vm.d_ag_test_suites.reverse();
-    await wrapper.vm.$nextTick();
+        expect(wrapper.vm.d_ag_test_suites).toEqual([suites[1], suites[0], suites[2]]);
+        expect(order_stub.calledOnceWith(
+            project.pk, [suites[1].pk, suites[0].pk, suites[2].pk]
+        )).toBe(true);
+    });
 
-    wrapper.findComponent({ref: 'ag_test_suite_order'}).vm.$emit('change');
-    await wrapper.vm.$nextTick();
-    await wrapper.vm.$nextTick();
-    expect(wrapper.vm.d_ag_test_suites).toEqual(suites);
+    test('Move suite down', async () => {
+        let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
+        let suites = [
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+        ];
+        get_all_suites_from_project.resolves(suites.slice());
+        let wrapper = make_wrapper();
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        wrapper.findAll('[aria-label="Move down"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        expect(wrapper.vm.d_ag_test_suites).toEqual([suites[0], suites[2], suites[1]]);
+        expect(order_stub.calledOnceWith(
+            project.pk, [suites[0].pk, suites[2].pk, suites[1].pk]
+        )).toBe(true);
+    });
+
+    test('Original order restored after failed move suite from move button', async () => {
+        sinon.stub(ag_cli.AGTestSuite, 'update_order').rejects(
+            new ag_cli.HttpError(400, 'NOOOOOPE')
+        );
+        let suites = [
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+        ];
+        get_all_suites_from_project.resolves(suites.slice());
+        let wrapper = make_wrapper();
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        wrapper.findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        expect(wrapper.vm.d_ag_test_suites).toEqual(suites);
+    });
+
+    test('Focus stays on move up button after moving suite up to non-boundary position', async () => {
+        sinon.stub(ag_cli.AGTestSuite, 'update_order');
+        let suites = [
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+        ];
+        get_all_suites_from_project.resolves(suites.slice());
+        let wrapper = managed_mount(AGTestSuites, {
+            propsData: {project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // suites[2] is the 3rd "Move up" button (suites[0] is disabled)
+        wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
+        // suites[2] moves to DOM position 1.
+        const find_expected = () => wrapper.findAll('.panel.level-0').at(1)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move down when suite moves to first position', async () => {
+        sinon.stub(ag_cli.AGTestSuite, 'update_order');
+        let suites = [
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+        ];
+        get_all_suites_from_project.resolves(suites.slice());
+        let wrapper = managed_mount(AGTestSuites, {
+            propsData: {project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // suites[1] is the 2nd "Move up" button (suites[0] is disabled)
+        wrapper.findAll('[aria-label="Move up"]').at(1).trigger('click');
+        // suites[1] moves to DOM position 0 (first), so move-up is disabled — fallback to move-down.
+        const find_expected = () => wrapper.findAll('.panel.level-0').at(0)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move up when suite moves to last position', async () => {
+        sinon.stub(ag_cli.AGTestSuite, 'update_order');
+        let suites = [
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+        ];
+        get_all_suites_from_project.resolves(suites.slice());
+        let wrapper = managed_mount(AGTestSuites, {
+            propsData: {project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // suites[1] is the 2nd "Move down" button (suites[2] is disabled)
+        wrapper.findAll('[aria-label="Move down"]').at(1).trigger('click');
+        // suites[1] moves to DOM position 2 (last), so move-down is disabled — fallback to move-up.
+        const find_expected = () => wrapper.findAll('.panel.level-0').at(2)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Update suites order drag-n-drop', async () => {
+        let order_stub = sinon.stub(ag_cli.AGTestSuite, 'update_order');
+        let suites = [
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+        ];
+        get_all_suites_from_project.resolves(suites.slice());
+        let wrapper = make_wrapper();
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        const draggable = wrapper.findComponent({ref: 'ag_test_suite_order'});
+        draggable.vm.$emit('start');
+        // Simulate vuedraggable mutating v-model on drop.
+        wrapper.vm.d_ag_test_suites.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
+
+        expect(
+            order_stub.calledOnceWith(project.pk, [suites[1].pk, suites[0].pk])
+        ).toBe(true);
+    });
+
+    test('Original order restored after bad update suites order request', async () => {
+        sinon.stub(ag_cli.AGTestSuite, 'update_order').rejects(
+            new ag_cli.HttpError(400, 'NOOOOOPE')
+        );
+        let suites = [
+            data_ut.make_ag_test_suite(project.pk),
+            data_ut.make_ag_test_suite(project.pk),
+        ];
+        get_all_suites_from_project.resolves(suites.slice());
+        let wrapper = make_wrapper();
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        const draggable = wrapper.findComponent({ref: 'ag_test_suite_order'});
+        draggable.vm.$emit('start');
+        await wrapper.vm.$nextTick();
+
+        wrapper.vm.d_ag_test_suites.reverse();
+        await wrapper.vm.$nextTick();
+
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
+
+        expect(wrapper.vm.d_ag_test_suites).toEqual(suites);
+    });
 });
 
 describe('InstructorFile and ExpectedStudentFile observer tests', () => {

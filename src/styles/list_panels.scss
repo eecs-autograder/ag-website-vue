@@ -55,6 +55,7 @@
 
         .icons {
             display: flex;
+            align-items: center;
             @if not $always-show-icons {
                 visibility: hidden;
             }
@@ -62,7 +63,8 @@
         }
 
         @if not $always-show-icons {
-            &:hover {
+            &:hover,
+            &:focus-within {
                 .icons {
                     visibility: visible;
                 }
@@ -72,10 +74,6 @@
         &.active {
             background-color: $active-color;
             color: $active-text-color;
-
-            .icons {
-                visibility: visible;
-            }
         }
     }
 }

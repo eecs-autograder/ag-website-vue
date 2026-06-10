@@ -3,18 +3,26 @@
     <div class="test-name-wrapper">
       <template v-if="!d_editing_test_name">
         <div class="test-name">{{ag_test_case.name}}</div>
-        <i @click="d_new_test_name = ag_test_case.name;
-                   d_editing_test_name = !d_editing_test_name"
-           ref="toggle_name_edit"
-           class="fas fa-pencil-alt"></i>
+        <button
+          class="unstyled-button"
+          @click="d_new_test_name = ag_test_case.name;
+                  d_editing_test_name = !d_editing_test_name"
+          aria-label="Edit test name"
+        >
+          <i
+            ref="toggle_name_edit"
+            class="fas fa-pencil-alt"
+          ></i>
+        </button>
       </template>
       <template v-else>
         <validated-form ref="ag_test_case_name_form" @submit="save_ag_test_case"
                         @form_validity_changed="d_name_form_valid = $event">
-          <label class="label"> Test Name </label>
+          <label class="label" for="test-case-name"> Test Name </label>
           <validated-input ref="test_case_name"
                            v-model="d_new_test_name"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           input_id="test-case-name">
           <template slot="suffix">
           <div class="name-form-buttons">
             <button type="submit" class="green-button" :disabled="d_saving || !d_name_form_valid">
@@ -39,23 +47,23 @@
 
       <div v-if="!case_has_exactly_one_command"
            class="form-field-wrapper">
-        <label class="label"> Command Name </label>
+        <label class="label" for="input-name"> Command Name </label>
         <validated-input ref="command_name"
-                         id="input-name"
+                         input_id="input-name"
                          v-model="d_ag_test_command.name"
                          :validators="[is_not_empty]">
         </validated-input>
       </div>
 
       <div class="form-field-wrapper">
-        <label class="label">
+        <label class="label" for="input-cmd">
           Command
           <tooltip width="large" placement="right">
             Can be any valid bash command.
           </tooltip>
         </label>
         <validated-input ref="cmd"
-                         id="input-cmd"
+                         input_id="input-cmd"
                          v-model="d_ag_test_command.cmd"
                          :num_rows="2"
                          :validators="[is_not_empty]">
@@ -63,11 +71,11 @@
       </div>
 
       <div class="form-field-wrapper">
-        <label class="label">
+        <label class="label" for="input-internal-admin-notes">
           Staff-Only Description
         </label>
         <validated-input ref="internal_admin_notes"
-                         id="input-internal-admin-notes"
+                         input_id="input-internal-admin-notes"
                          v-model="d_ag_test_command.internal_admin_notes"
                          :num_rows="2"
                          :validators="[]">
@@ -75,11 +83,11 @@
       </div>
 
       <div class="form-field-wrapper">
-        <label class="label">
+        <label class="label" for="input-staff-description">
           Staff-Only Description
         </label>
         <validated-input ref="staff_description"
-                         id="input-staff-description"
+                         input_id="input-staff-description"
                          v-model="d_ag_test_command.staff_description"
                          :num_rows="2"
                          :validators="[]">
@@ -87,11 +95,11 @@
       </div>
 
       <div class="form-field-wrapper">
-        <label class="label">
+        <label class="label" for="input-student-description">
           Student-Facing Description
         </label>
         <validated-input ref="student_description"
-                         id="input-student-description"
+                         input_id="input-student-description"
                          v-model="d_ag_test_command.student_description"
                          :num_rows="2"
                          :validators="[]">
@@ -99,11 +107,11 @@
       </div>
 
       <div class="form-field-wrapper">
-        <label class="label">
+        <label class="label" for="input-student-on-fail-description">
           Student-Facing Description (On Failure Only)
         </label>
         <validated-input ref="student_on_fail_description"
-                         id="input-student-on-faildescription"
+                         input_id="input-student-on-fail-description"
                          v-model="d_ag_test_command.student_on_fail_description"
                          :num_rows="2"
                          :validators="[]">
@@ -113,7 +121,7 @@
       <fieldset class="fieldset">
         <legend class="legend"> Stdin </legend>
         <div class="form-field-wrapper">
-          <label class="label"> Stdin source </label>
+          <label class="label" for="stdin-source"> Stdin source </label>
           <br>
           <select id="stdin-source"
                   v-model="d_ag_test_command.stdin_source"
@@ -132,8 +140,9 @@
 
         <div v-if="d_ag_test_command.stdin_source === StdinSource.text"
              class="form-field-wrapper">
-          <label class="label"> Stdin text </label>
+          <label class="label" for="stdin-text"> Stdin text </label>
           <validated-input ref="stdin_text"
+                           input_id="stdin-text"
                            placeholder="Enter the stdin input here."
                            :num_rows="5"
                            v-model="d_ag_test_command.stdin_text"
@@ -143,8 +152,9 @@
 
         <div v-if="d_ag_test_command.stdin_source === StdinSource.instructor_file"
              class="form-field-wrapper">
-          <label class="label"> File </label>
+          <label class="label" for="stdin-instructor-file"> File </label>
           <select-object ref="stdin_instructor_file"
+                         input_id="stdin-instructor-file"
                          :items="project.instructor_files"
                          v-model="d_ag_test_command.stdin_instructor_file"
                          id_field="pk">
@@ -166,7 +176,7 @@
             </div>
             <div class="body">
               <div class="form-field-wrapper">
-                <label class="label"> Expected Return Code </label>
+                <label class="label" for="expected-return-code"> Expected Return Code </label>
                 <div class="dropdown">
                   <select id="expected-return-code"
                           v-model="d_ag_test_command.expected_return_code"
@@ -187,8 +197,9 @@
               <div v-if="d_ag_test_command.expected_return_code !== ExpectedReturnCode.none"
                    class="form-field-wrapper correct-incorrect-points-wrapper">
                 <div class="form-field-wrapper">
-                  <label class="label"> Correct return code </label>
+                  <label class="label" for="points-for-correct-return-code"> Correct return code </label>
                   <validated-input ref="points_for_correct_return_code"
+                                    input_id="points-for-correct-return-code"
                                     v-model="d_ag_test_command.points_for_correct_return_code"
                                     :validators="[
                                       is_not_empty,
@@ -202,8 +213,9 @@
                 </div>
 
                 <div class="form-field-wrapper">
-                  <label class="label"> Wrong return code </label>
+                  <label class="label" for="deduction-for-wrong-return-code"> Wrong return code </label>
                   <validated-input ref="deduction_for_wrong_return_code"
+                                    input_id="deduction-for-wrong-return-code"
                                     v-model="
                                     d_ag_test_command.deduction_for_wrong_return_code"
                                     :validators="[
@@ -232,7 +244,7 @@
               <fieldset class="fieldset">
                 <legend class="legend"> Stdout </legend>
                 <div class="form-field-wrapper">
-                  <label class="label"> Check stdout against: </label>
+                  <label class="label" for="expected-stdout-source"> Check stdout against: </label>
                   <br>
                   <select id="expected-stdout-source"
                           v-model="d_ag_test_command.expected_stdout_source"
@@ -261,8 +273,9 @@
 
                 <div v-if="d_ag_test_command.expected_stdout_source === ExpectedOutputSource.text"
                       class="form-field-wrapper">
-                  <label class="label"> Expected stdout text: </label>
+                  <label class="label" for="expected-stdout-text"> Expected stdout text: </label>
                   <validated-input ref="expected_stdout_text"
+                                   input_id="expected-stdout-text"
                                    placeholder="Enter the expected stdout output here."
                                    v-model="d_ag_test_command.expected_stdout_text"
                                    :num_rows="5"
@@ -273,8 +286,9 @@
                 <div v-if="d_ag_test_command.expected_stdout_source
                            === ExpectedOutputSource.instructor_file"
                      class="form-field-wrapper">
-                  <label class="label"> File </label>
+                  <label class="label" for="expected-stdout-instructor-file"> File </label>
                   <select-object ref="expected_stdout_instructor_file"
+                                input_id="expected-stdout-instructor-file"
                                 :items="project.instructor_files"
                                 v-model="d_ag_test_command.expected_stdout_instructor_file"
                                 id_field="pk">
@@ -288,8 +302,9 @@
                 <div v-if="d_ag_test_command.expected_stdout_source !== ExpectedOutputSource.none"
                       class="form-field-wrapper correct-incorrect-points-wrapper">
                   <div class="form-field-wrapper">
-                    <label class="label"> Correct stdout </label>
+                    <label class="label" for="points-for-correct-stdout"> Correct stdout </label>
                     <validated-input ref="points_for_correct_stdout"
+                                      input_id="points-for-correct-stdout"
                                       v-model="d_ag_test_command.points_for_correct_stdout"
                                       :validators="[
                                         is_not_empty,
@@ -303,8 +318,9 @@
                   </div>
 
                   <div class="form-field-wrapper">
-                    <label class="label"> Wrong stdout</label>
+                    <label class="label" for="deduction-for-wrong-stdout"> Wrong stdout</label>
                     <validated-input ref="deduction_for_wrong_stdout"
+                                      input_id="deduction-for-wrong-stdout"
                                       v-model="d_ag_test_command.deduction_for_wrong_stdout"
                                       :validators="[
                                         is_not_empty,
@@ -323,7 +339,7 @@
               <fieldset class="fieldset">
                 <legend class="legend"> Stderr </legend>
                 <div class="form-field-wrapper">
-                  <label class="label"> Check stderr against: </label>
+                  <label class="label" for="expected-stderr-source"> Check stderr against: </label>
                   <br>
                   <select id="expected-stderr-source"
                           v-model="d_ag_test_command.expected_stderr_source"
@@ -352,8 +368,9 @@
 
                 <div v-if="d_ag_test_command.expected_stderr_source === ExpectedOutputSource.text"
                      class="form-field-wrapper">
-                  <label class="label"> Expected stderr text </label>
+                  <label class="label" for="expected-stderr-text"> Expected stderr text </label>
                   <validated-input ref="expected_stderr_text"
+                                   input_id="expected-stderr-text"
                                    placeholder="Enter the expected stderr output here."
                                    v-model="d_ag_test_command.expected_stderr_text"
                                    :num_rows="5"
@@ -364,8 +381,9 @@
                 <div v-if="d_ag_test_command.expected_stderr_source
                            === ExpectedOutputSource.instructor_file"
                      class="form-field-wrapper">
-                  <label class="label"> File </label>
+                  <label class="label" for="expected-stderr-instructor-file"> File </label>
                   <select-object ref="expected_stderr_instructor_file"
+                                input_id="expected-stderr-instructor-file"
                                 :items="project.instructor_files"
                                 v-model="d_ag_test_command.expected_stderr_instructor_file"
                                 id_field="pk">
@@ -380,8 +398,9 @@
                             !== ExpectedOutputSource.none"
                       class="form-field-wrapper correct-incorrect-points-wrapper">
                   <div class="form-field-wrapper">
-                    <label class="label"> Correct stderr </label>
+                    <label class="label" for="points-for-correct-stderr"> Correct stderr </label>
                     <validated-input ref="points_for_correct_stderr"
+                                     input_id="points-for-correct-stderr"
                                      v-model="d_ag_test_command.points_for_correct_stderr"
                                      :validators="[
                                        is_not_empty,
@@ -395,8 +414,9 @@
                   </div>
 
                   <div class="form-field-wrapper">
-                    <label class="label">  Wrong stderr </label>
+                    <label class="label" for="deduction-for-wrong-stderr"> Wrong stderr </label>
                     <validated-input ref="deduction_for_wrong_stderr"
+                                     input_id="deduction-for-wrong-stderr"
                                      v-model="d_ag_test_command.deduction_for_wrong_stderr"
                                      :validators="[
                                        is_not_empty,
@@ -515,7 +535,7 @@
 
                 <div class="form-field-wrapper">
 
-                  <label class="label"> Parse score from: </label>
+                  <label class="label" for="custom-scoring-source"> Parse score from: </label>
                   <br>
                   <select id="custom-scoring-source"
                           v-model="d_ag_test_command.custom_scoring_source"
@@ -544,8 +564,9 @@
                 </div>
 
                 <div class="form-field-wrapper correct-incorrect-points-wrapper">
-                  <label class="label"> Max custom scoring points </label>
+                  <label class="label" for="max-custom-scoring-points"> Max custom scoring points </label>
                   <validated-input ref="max_custom_scoring_points"
+                                   input_id="max-custom-scoring-points"
                                    v-model="d_ag_test_command.max_points_for_custom_scoring"
                                    :validators="[
                                      is_not_empty,
@@ -557,7 +578,10 @@
                     <div slot="suffix" class="unit-of-measurement"> points </div>
                   </validated-input>
                 </div>
-                <collapsible-section data-testid="custom-scoring-advanced-settings">
+                <collapsible-section
+                  data-testid="custom-scoring-advanced-settings"
+                  section_id="custom-scoring-advanced-settings"
+                >
                   <template #header>
                     Advanced Settings
                   </template>
@@ -586,8 +610,9 @@
                     </div>
 
                     <div class="form-field-wrapper" v-if="override_custom_scoring_label">
-                      <label class="label"> Custom scoring label </label>
+                      <label class="label" for="custom-scoring-label"> Custom scoring label </label>
                       <validated-input ref="custom_scoring_label"
+                                       input_id="custom-scoring-label"
                                        v-model="d_ag_test_command.custom_scoring_label"
                                        :validators="[is_not_empty]" />
                     </div>
@@ -604,8 +629,9 @@
                     </div>
 
                     <div class="form-field-wrapper">
-                      <label class="label"> Custom scoring regex </label>
+                      <label class="label" for="custom-scoring-regex"> Custom scoring regex </label>
                       <validated-input ref="custom_scoring_regex"
+                                       input_id="custom-scoring-regex"
                                        v-model="d_ag_test_command.custom_scoring_regex"
                                        :validators="[is_not_empty, is_valid_regex]" />
                     </div>
@@ -750,6 +776,7 @@
 
         <button type="submit"
                 class="sticky-save-button"
+                aria-label="Save"
                 :disabled="!d_settings_form_is_valid || d_saving">
           <i v-if="d_num_api_errors === 0" class="far fa-save"></i>
           <i v-else class="fas fa-exclamation-triangle"></i>
@@ -767,7 +794,7 @@
 
     <!--------------------------- Danger Zone --------------------------------------->
 
-    <div class="danger-zone-container">
+    <div class="danger-zone-container" role="region" aria-label="Delete">
       <div class="danger-text">
         {{case_has_exactly_one_command ? 'Delete Test Case' : 'Delete Command'}}:
         <span>
@@ -784,6 +811,7 @@
               @close="d_show_delete_ag_test_command_modal = false"
               ref="delete_ag_test_command_modal"
               size="large"
+              aria_label="Confirm delete"
               click_outside_to_close>
         <div class="modal-header">
           Confirm Delete
@@ -924,6 +952,7 @@ export default class AGTestCommandSettings extends Vue {
   @Watch('ag_test_command')
   on_test_command_change(new_test_command: AGTestCommand, old_test_command: AGTestCommand) {
     this.d_ag_test_command = deep_copy(new_test_command, AGTestCommand);
+    this.d_editing_test_name = false;
   }
 
   async created() {

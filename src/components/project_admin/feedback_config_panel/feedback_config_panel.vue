@@ -11,6 +11,7 @@
            data-testid="preset_selection">
         <span class="preset-label">Preset:</span>
         <select class="select"
+                aria-label="Feedback preset"
                 v-model="d_selected_preset_name"
                 @change="change_preset">
           <option hidden>Custom</option>

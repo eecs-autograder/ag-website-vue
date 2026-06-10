@@ -1,16 +1,21 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
     </div>
   </div>
   <div v-else id="ag-test-suites-component">
     <div class="sidebar-container">
-      <div class="sidebar-menu">
+      <nav class="sidebar-menu" aria-label="Test suites">
         <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
-          <span class="sidebar-collapse-button" @click="d_collapsed = !d_collapsed">
+          <button type="button"
+                  class="sidebar-collapse-button"
+                  :aria-label="`${d_collapsed ? 'Open' : 'Close'} test suites sidebar`"
+                  :aria-expanded="!d_collapsed"
+                  aria-controls="test-suite-sidebar"
+                  @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars"></i>
-          </span>
+          </button>
           <template v-if="!d_collapsed">
             <span class="sidebar-header-text"> Suites </span>
             <button type="button"
@@ -22,26 +27,34 @@
           </template>
         </div>
 
-        <div class="sidebar-content" v-if="!d_collapsed">
+        <div class="sidebar-content" id="test-suite-sidebar" v-if="!d_collapsed">
           <draggable ref="ag_test_suite_order"
                       v-model="d_ag_test_suites"
-                      @start="record_current_ag_test_suite_order"
-                      @change="set_ag_test_suite_order"
+                      @start="d_pre_drag_suite_order = d_ag_test_suites.slice()"
+                      @change="suite_order_syncer.schedule(d_ag_test_suites, d_pre_drag_suite_order)"
                       @end="$event.item.style.transform = 'none'"
                       handle=".handle">
             <AGTestSuitePanel
-              v-for="ag_test_suite of d_ag_test_suites"
+              v-for="(ag_test_suite, index) of d_ag_test_suites"
               :key="ag_test_suite.pk"
               :ag_test_suite="ag_test_suite"
+              :index="index"
+              :suite_count="d_ag_test_suites.length"
               :active_ag_test_suite="d_active_ag_test_suite"
               :active_ag_test_command="d_active_ag_test_command"
-              @update_active_item="update_active_item($event)">
+              @update_active_item="update_active_item($event)"
+              @move_up="move_ag_test_suite(index, -1)"
+              @move_down="move_ag_test_suite(index, 1)">
             </AGTestSuitePanel>
           </draggable>
         </div>
-      </div>
+      </nav>
 
-      <div id="viewing-window" class="body" :class="{'body-closed': d_collapsed}">
+      <div id="viewing-window"
+           class="body"
+           :class="{'body-closed': d_collapsed}"
+           :role="active_level_is_suite || active_level_is_command ? 'region' : null"
+           :aria-label="active_level_is_suite || active_level_is_command ? settings_region_label : null">
         <template v-if="d_active_ag_test_suite !== null">
           <AGTestSuiteSettings
             :ag_test_suite="d_active_ag_test_suite"
@@ -80,6 +93,7 @@
             @close="d_show_new_ag_test_suite_modal = false"
             ref="new_ag_test_suite_modal"
             click_outside_to_close
+            aria_label="New suite"
             size="medium">
       <div class="modal-header"> New Suite </div>
       <validated-form id="add-ag-test-suite-form"
@@ -88,10 +102,11 @@
                       @submit="add_ag_test_suite"
                       @form_validity_changed="d_add_ag_test_suite_form_is_valid = $event">
         <div class="ag-test-suite-name-container">
-          <label class="label"> Suite name </label>
+          <label class="label" for="new-ag-test-suite-name"> Suite name </label>
           <validated-input ref="new_ag_test_suite_name"
                             v-model="d_new_ag_test_suite_name"
-                            :validators="[is_not_empty]">
+                            :validators="[is_not_empty]"
+                            input_id="new-ag-test-suite-name">
           </validated-input>
         </div>
 
@@ -99,6 +114,7 @@
 
         <div class="modal-button-footer">
           <button class="modal-create-button"
+                  type="submit"
                   :disabled="!d_add_ag_test_suite_form_is_valid || d_adding_suite"> Add Suite
           </button>
         </div>
@@ -134,7 +150,12 @@ import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_
 import AGTestSuiteSettings from '@/components/project_admin/ag_tests/ag_test_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import {
+  GlobalErrorsSubject,
+  handle_api_errors_async,
+  handle_global_errors_async
+} from '@/error_handling';
+import { OrderSyncer } from '@/order_syncer';
 import { deep_copy } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -177,13 +198,23 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
 
   d_loading = true;
   d_ag_test_suites: AGTestSuite[] = [];
-  // For rolling back re-ordering if an error occurs.
-  private d_current_ag_test_suite_order: AGTestSuite[] = [];
+  // Snapshot of the order before a drag starts, passed to the syncer as the rollback target.
+  private d_pre_drag_suite_order: AGTestSuite[] = [];
+
+  // Must be initialized in created(), not as a class property: arrow functions in class
+  // property initializers capture 'this' = vue-class-component's dummy instance, so
+  // accessing data properties like d_ag_test_suites would mutate the dummy, not the vm.
+  private suite_order_syncer!: OrderSyncer<AGTestSuite>;
 
   d_collapsed = false;
 
   @handle_global_errors_async
   async created() {
+    this.suite_order_syncer = new OrderSyncer<AGTestSuite>(
+      (suites) => AGTestSuite.update_order(this.project.pk, suites.map(s => s.pk)),
+      (saved) => { this.d_ag_test_suites.splice(0, this.d_ag_test_suites.length, ...saved); },
+      (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+    );
     AGTestSuite.subscribe(this);
     AGTestCase.subscribe(this);
     AGTestCommand.subscribe(this);
@@ -199,6 +230,7 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     AGTestCommand.unsubscribe(this);
     InstructorFile.unsubscribe(this);
     ExpectedStudentFile.unsubscribe(this);
+    this.suite_order_syncer.flush();
   }
 
   get parent_ag_test_case(): AGTestCase | null {
@@ -248,22 +280,11 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     });
   }
 
-  record_current_ag_test_suite_order() {
-    this.d_current_ag_test_suite_order = this.d_ag_test_suites.slice();
-  }
-
-  @handle_global_errors_async
-  async set_ag_test_suite_order() {
-    try {
-      await AGTestSuite.update_order(
-        this.project.pk, this.d_ag_test_suites.map(suite => suite.pk)
-      );
-    }
-    catch (e) {
-      this.d_ag_test_suites = this.d_current_ag_test_suite_order;
-      this.d_current_ag_test_suite_order = [];
-      throw e;
-    }
+  move_ag_test_suite(index: number, delta: number) {
+    const suites = this.d_ag_test_suites;
+    const prev_order = suites.slice();
+    suites.splice(index + delta, 0, suites.splice(index, 1)[0]);
+    this.suite_order_syncer.schedule(suites, prev_order);
   }
 
   get prev_ag_test_case_is_available() {
@@ -387,6 +408,10 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
       parent_ag_test_case = parent_ag_test_suite.ag_test_cases[num_cases - 1];
     }
     this.update_active_item(parent_ag_test_case!.ag_test_commands[command_index]);
+  }
+
+  get settings_region_label() {
+    return this.d_active_ag_test_suite !== null ? 'Suite settings' : 'Command settings';
   }
 
   get active_level_is_suite() {
@@ -593,6 +618,7 @@ function handle_add_ag_test_suite_error(component: AGTestSuites, error: unknown)
   const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
   api_errors?.show_errors_from_response(error);
 }
+
 </script>
 
 <style scoped lang="scss">
@@ -627,6 +653,12 @@ $border-color: $gray-blue-1;
   .sidebar-content {
     padding-top: .125rem;
   }
+}
+
+.sidebar-collapse-button {
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .body {

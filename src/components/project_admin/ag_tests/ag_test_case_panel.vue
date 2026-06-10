@@ -1,72 +1,94 @@
 <template>
   <div>
     <div class="ag-test-case panel level-1"
-          :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}"
-          @click="update_ag_test_case_panel_when_clicked">
-      <div class="text">
-        <i v-if="ag_test_case.ag_test_commands.length > 1"
-          class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
-        <span>{{ag_test_case.name}}</span>
-      </div>
+          :class="{'active': command_in_case_is_active && (!is_open || !has_multiple_commands)}">
+      <button type="button"
+              class="panel-toggle unstyled-button"
+              :aria-controls="has_multiple_commands ? `commands-container-${label_uid}` : ''"
+              :aria-expanded="is_open"
+              @click="update_ag_test_case_panel_when_clicked">
+        <div class="text">
+          <i v-if="ag_test_case.ag_test_commands.length > 1"
+            class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+          <span>{{ag_test_case.name}}</span>
+        </div>
+      </button>
 
       <div class="icons">
-        <i class="icon handle fas fa-arrows-alt"></i>
-        <div class="dropdown" @click.stop="$emit('update_active_item', ag_test_case)">
-          <i class="menu-icon icon fas fa-ellipsis-h"></i>
+        <i class="icon handle fas fa-arrows-alt" aria-hidden="true"></i>
+        <MoveButtons :index="index"
+                     :count="case_count"
+                     @move_up="$emit('move_up')"
+                     @move_down="$emit('move_down')" />
+        <div class="dropdown">
+          <button type="button"
+                  class="menu-icon-button icon"
+                  aria-label="Test case options"
+                  @click.stop="$emit('update_active_item', ag_test_case)">
+            <i class="fas fa-ellipsis-h"></i>
+          </button>
           <div class="menu">
-            <div ref="add_ag_test_command_menu_item"
-                @click="open_new_ag_test_command_modal"
-                class="menu-item">
+            <button ref="add_ag_test_command_menu_item"
+                    type="button"
+                    @click="open_new_ag_test_command_modal"
+                    class="menu-item">
               <i class="fas fa-plus"></i>
               <span class="menu-item-text">Add command</span>
-            </div>
+            </button>
             <template>
               <div class="menu-divider"> </div>
-              <div ref="edit_ag_test_case_menu_item"
-                  @click="d_show_ag_test_case_settings_modal = true"
-                  class="menu-item">
+              <button ref="edit_ag_test_case_menu_item"
+                      type="button"
+                      @click="d_show_ag_test_case_settings_modal = true"
+                      class="menu-item">
                 <i class="fas fa-pencil-alt"></i>
                 <span class="menu-item-text">Advanced test settings</span>
-              </div>
+              </button>
             </template>
             <div class="menu-divider"> </div>
-            <div ref="clone_ag_test_case_menu_item"
-                @click="open_clone_ag_test_case_modal"
-                class="menu-item">
+            <button ref="clone_ag_test_case_menu_item"
+                    type="button"
+                    @click="open_clone_ag_test_case_modal"
+                    class="menu-item">
               <i class="far fa-copy"></i>
               <span class="menu-item-text"> Clone test case </span>
-            </div>
+            </button>
             <div class="menu-divider"> </div>
-            <div ref="delete_ag_test_case_menu_item"
-                @click="d_show_delete_ag_test_case_modal = true"
-                class="menu-item">
+            <button ref="delete_ag_test_case_menu_item"
+                    type="button"
+                    @click="d_show_delete_ag_test_case_modal = true"
+                    class="menu-item">
               <i class="fas fa-trash-alt"></i>
               <span class="delete-ag-test-case-label menu-item-text"> Delete test case </span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="commands-container" v-if="is_open && has_multiple_commands">
+    <div
+      :id="`commands-container-${label_uid}`"
+      class="commands-container"
+      v-show="is_open && has_multiple_commands"
+    >
       <draggable ref="ag_test_command_order"
-                 v-model="ag_test_case.ag_test_commands"
-                 @change="set_ag_test_command_order"
-                 @end="$event.item.style.transform = 'none'"
-                 handle=".handle">
-        <div class="ag-test-command panel level-2"
-             v-for="ag_test_command of ag_test_case.ag_test_commands"
-             :key="ag_test_command.pk"
-             :class="{'active': active_ag_test_command !== null
-                                 && active_ag_test_command.pk === ag_test_command.pk}"
-             @click="$emit('update_active_item', ag_test_command)">
-          <div class="text">
-            <span>{{ag_test_command.name}}</span>
-          </div>
-          <div class="icons">
-            <i class="icon handle fas fa-arrows-alt"></i>
-          </div>
-        </div>
+                v-model="ag_test_case.ag_test_commands"
+                @start="d_pre_drag_command_order = ag_test_case.ag_test_commands.slice()"
+                @change="command_order_syncer.schedule(ag_test_case.ag_test_commands,
+                                                        d_pre_drag_command_order)"
+                @end="$event.item.style.transform = 'none'"
+                handle=".handle">
+        <AGTestCommandPanel
+                  v-for="(ag_test_command, cmd_index) of ag_test_case.ag_test_commands"
+                  :key="ag_test_command.pk"
+                  :ag_test_command="ag_test_command"
+                  :active_ag_test_command="active_ag_test_command"
+                  :index="cmd_index"
+                  :command_count="ag_test_case.ag_test_commands.length"
+                  @update_active_item="$emit('update_active_item', $event)"
+                  @move_up="move_command(cmd_index, -1)"
+                  @move_down="move_command(cmd_index, 1)">
+        </AGTestCommandPanel>
       </draggable>
     </div>
 
@@ -74,6 +96,7 @@
            @close="d_show_new_ag_test_command_modal = false"
            ref="new_ag_test_command_modal"
            click_outside_to_close
+           aria_label="Add command"
            size="medium">
       <div class="modal-header"> Add Command </div>
       <validated-form ref="add_ag_test_command_form"
@@ -82,17 +105,19 @@
                       @submit="add_ag_test_command"
                       @form_validity_changed="d_add_command_form_is_valid = $event">
         <div class="form-field-wrapper">
-          <label class="label"> Command name </label>
+          <label class="label" :for="`new-command-name-${label_uid}`"> Command name </label>
           <validated-input ref="new_ag_test_command_name"
                            v-model="d_new_command_name"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           :input_id="`new-command-name-${label_uid}`">
           </validated-input>
         </div>
         <div class="form-field-wrapper">
-          <label class="label">Command</label>
+          <label class="label" :for="`new-command-${label_uid}`">Command</label>
           <validated-input ref="new_ag_test_command"
                            v-model="d_new_command"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           :input_id="`new-command-${label_uid}`">
           </validated-input>
         </div>
 
@@ -100,6 +125,7 @@
 
         <div class="modal-button-footer">
           <button class="modal-create-button"
+                  type="submit"
                   :disabled="!d_add_command_form_is_valid || d_adding_command">
             Add Command
           </button>
@@ -112,6 +138,7 @@
            ref="clone_ag_test_case_modal"
            size="large"
            click_outside_to_close
+           :aria_label="`Clone ${ag_test_case.name}`"
            include_closing_x>
       <div class="modal-header">Clone "{{ag_test_case.name}}"</div>
       <validated-form ref="clone_ag_test_case_form"
@@ -120,10 +147,11 @@
                       @submit="clone_ag_test_case"
                       @form_validity_changed="d_clone_case_form_is_valid = $event">
         <div class="form-field-wrapper">
-          <label class="label">Case Name</label>
+          <label class="label" :for="`clone-case-name-${label_uid}`">Case Name</label>
           <validated-input ref="ag_test_case_clone_name"
                            v-model="d_cloned_case_name"
-                           :validators="[is_not_empty]">
+                           :validators="[is_not_empty]"
+                           :input_id="`clone-case-name-${label_uid}`">
           </validated-input>
         </div>
         <APIErrors ref="clone_case_api_errors"></APIErrors>
@@ -142,6 +170,7 @@
            @close="d_show_delete_ag_test_case_modal = false"
            ref="delete_ag_test_case_modal"
            size="large"
+           aria_label="Delete test case"
            click_outside_to_close>
       <div class="modal-header">
         Delete "{{ag_test_case.name}}"
@@ -167,6 +196,7 @@
            @close="d_show_ag_test_case_settings_modal = false"
            ref="ag_test_case_settings_modal"
            size="large"
+           aria_label="Advanced test case settings"
            click_outside_to_close>
       <div class="modal-header">
         Advanced Test Case Settings
@@ -188,25 +218,31 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 import Modal from '@/components/modal.vue';
+import MoveButtons from '@/components/MoveButtons.vue';
 import AGTestCaseSettings from '@/components/project_admin/ag_tests/ag_test_case_settings.vue';
+import AGTestCommandPanel from '@/components/project_admin/ag_tests/ag_test_command_panel.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 import {
+  GlobalErrorsSubject,
   handle_api_errors_async,
   handle_global_errors_async,
   make_error_handler_func
 } from '@/error_handling';
-import { toggle } from '@/utils';
+import { OrderSyncer } from '@/order_syncer';
+import { generate_uid, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
 @Component({
   components: {
     APIErrors,
     AGTestCaseSettings,
+    AGTestCommandPanel,
     ContextMenu,
     ContextMenuItem,
     Draggable,
     Modal,
+    MoveButtons,
     ValidatedForm,
     ValidatedInput
   }
@@ -222,7 +258,34 @@ export default class AGTestCasePanel extends Vue {
   @Prop({required: false, type: AGTestCommand})
   active_ag_test_command!: AGTestCommand | null;
 
+  @Prop({required: true, type: Number})
+  index!: number;
+
+  @Prop({required: true, type: Number})
+  case_count!: number;
+
+  // Snapshot of the order before a drag starts, passed to the syncer as the rollback target.
+  private d_pre_drag_command_order: AGTestCommand[] = [];
+
   readonly is_not_empty = is_not_empty;
+
+  private command_order_syncer = new OrderSyncer<AGTestCommand>(
+    (cmds) => AGTestCommand.update_order(this.ag_test_case.pk, cmds.map(cmd => cmd.pk)),
+    (saved) => {
+      this.ag_test_case.ag_test_commands.splice(
+        0, this.ag_test_case.ag_test_commands.length, ...saved
+      );
+    },
+    (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+  );
+
+  beforeDestroy() {
+    this.command_order_syncer.flush();
+  }
+
+  get label_uid() {
+    return generate_uid();
+  }
 
   d_add_command_form_is_valid = false;
   d_clone_case_form_is_valid = true;
@@ -327,10 +390,11 @@ export default class AGTestCasePanel extends Vue {
     }
   }
 
-  @handle_global_errors_async
-  set_ag_test_command_order() {
-    return AGTestCommand.update_order(
-      this.ag_test_case.pk, this.ag_test_case.ag_test_commands.map(cmd => cmd.pk));
+  move_command(index: number, delta: number) {
+    const cmds = this.ag_test_case.ag_test_commands;
+    const prev_order = cmds.slice();
+    cmds.splice(index + delta, 0, cmds.splice(index, 1)[0]);
+    this.command_order_syncer.schedule(cmds, prev_order);
   }
 
   @handle_api_errors_async(handle_add_ag_test_command_error)
@@ -358,6 +422,7 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
   api_errors?.show_errors_from_response(error);
 }
 
+
 </script>
 
 <style scoped lang="scss">
@@ -380,6 +445,10 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
 
 @include list-panels($indentation: $panel-indentation);
 
+.panel-toggle {
+  text-align: left;
+}
+
 .handle {
   cursor: grabbing;
 }
@@ -389,8 +458,22 @@ function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unkn
   color: black;  // For when the case panel is active
   @include static-dropdown($open-on-hover: true, $orient-right: true);
 
+  .menu-icon-button {
+    background: none;
+    border: none;
+    padding: 0 .25rem;
+    cursor: pointer;
+    color: inherit;
+  }
+
   .menu-item {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
     padding: .375rem;
+    cursor: pointer;
+    color: inherit;
   }
 }
 

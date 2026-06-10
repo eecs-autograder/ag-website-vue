@@ -8,6 +8,7 @@ import {
     Project,
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
+import { vi } from 'vitest';
 
 import APIErrors from '@/components/api_errors.vue';
 import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
@@ -75,7 +76,9 @@ describe('commands_are_visible getter', () => {
                 ag_test_case: ag_case_green,
                 ag_test_suite: ag_suite_colors,
                 active_ag_test_case: null,
-                active_ag_test_command: ag_command_green_2
+                active_ag_test_command: ag_command_green_2,
+                index: 0,
+                case_count: 2,
             }
         });
 
@@ -88,7 +91,9 @@ describe('commands_are_visible getter', () => {
                 ag_test_case: ag_case_green,
                 ag_test_suite: ag_suite_colors,
                 active_ag_test_case: null,
-                active_ag_test_command: ag_command_yellow_1
+                active_ag_test_command: ag_command_yellow_1,
+                index: 0,
+                case_count: 2,
             }
         });
 
@@ -139,7 +144,9 @@ describe('AGTestCasePanel tests', () => {
                 ag_test_case: ag_case_green,
                 ag_test_suite: ag_suite_colors,
                 active_ag_test_case: null,
-                active_ag_test_command: null
+                active_ag_test_command: null,
+                index: 0,
+                case_count: 2,
             }
         });
     });
@@ -154,7 +161,7 @@ describe('AGTestCasePanel tests', () => {
 
     test('Case (closed and child command not active) is clicked on',
          async () => {
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
@@ -170,14 +177,14 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.vm.active_ag_test_command).toEqual(ag_command_green_2);
         expect(wrapper.vm.commands_are_visible).toBe(true);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
         expect(wrapper.vm.commands_are_visible).toBe(false);
         expect(wrapper.vm.active_ag_test_command).toEqual(ag_command_green_2);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
@@ -187,7 +194,7 @@ describe('AGTestCasePanel tests', () => {
 
     test('Case (open and child command not active) is clicked on',
          async () => {
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
@@ -205,7 +212,7 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.vm.commands_are_visible).toBe(true);
         expect(wrapper.vm.command_in_case_is_active).toBe(false);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_case_green);
@@ -214,7 +221,7 @@ describe('AGTestCasePanel tests', () => {
 
     test('Case (open and child command is active) is clicked on',
          async () => {
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
@@ -225,7 +232,7 @@ describe('AGTestCasePanel tests', () => {
         expect(wrapper.vm.commands_are_visible).toBe(true);
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.commands_are_visible).toBe(false);
@@ -244,7 +251,7 @@ describe('AGTestCasePanel tests', () => {
     test('When a case that is active is clicked on again, it closes', async () => {
         expect(wrapper.vm.is_open).toBe(false);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.is_open).toBe(true);
@@ -256,7 +263,7 @@ describe('AGTestCasePanel tests', () => {
 
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
 
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.command_in_case_is_active).toBe(true);
@@ -266,13 +273,13 @@ describe('AGTestCasePanel tests', () => {
 
     test('When a command is clicked on, an event is emitted',
          async () => {
-        wrapper.findAll('.ag-test-case').at(0).trigger('click');
+        wrapper.find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[0][0]).toEqual(ag_case_green);
         expect(wrapper.vm.commands_are_visible).toBe(true);
 
-        wrapper.findAll('.ag-test-command').at(1).trigger('click');
+        wrapper.findAll('.ag-test-command').at(1).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(emitted(wrapper, 'update_active_item')[1][0]).toEqual(ag_command_green_2);
@@ -641,31 +648,291 @@ describe('AGTestCasePanel tests', () => {
     });
 });
 
-test('Update test commands order', async () => {
-    let order_stub = sinon.stub(AGTestCommand, 'update_order');
-    let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
-    let test_case = data_ut.make_ag_test_case(suite.pk);
-    suite.ag_test_cases = [test_case];
-    let cmds = [
-        data_ut.make_ag_test_command(test_case.pk),
-        data_ut.make_ag_test_command(test_case.pk),
-        data_ut.make_ag_test_command(test_case.pk),
-    ];
-    test_case.ag_test_commands = cmds;
+describe('Move up and down buttons', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+    });
 
-    let wrapper = managed_mount(AGTestCasePanel, {
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    test('Case move up button emits move_up event', async () => {
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let wrapper = managed_mount(AGTestCasePanel, {
             propsData: {
                 ag_test_case: test_case,
                 ag_test_suite: suite,
                 active_ag_test_command: null,
+                index: 1,
+                case_count: 3,
             }
+        });
+        await wrapper.find('[aria-label="Move up"]').trigger('click');
+        expect(emitted(wrapper, 'move_up').length).toEqual(1);
     });
-    wrapper.find('.panel').trigger('click');
-    await wrapper.vm.$nextTick();
 
-    wrapper.findComponent({ref: 'ag_test_command_order'}).vm.$emit('change');
-    await wrapper.vm.$nextTick();
-    expect(
-        order_stub.calledOnceWith(test_case.pk, cmds.map(cmd => cmd.pk))
-    ).toBe(true);
+    test('Case move down button emits move_down event', async () => {
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let wrapper = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+                index: 1,
+                case_count: 3,
+            }
+        });
+        await wrapper.find('[aria-label="Move down"]').trigger('click');
+        expect(emitted(wrapper, 'move_down').length).toEqual(1);
+    });
+
+    test('Case move up button disabled when case is first', async () => {
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let wrapper = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+                index: 0,
+                case_count: 3,
+            }
+        });
+        expect(
+            (wrapper.find('[aria-label="Move up"]').element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
+    test('Case move down button disabled when case is last', async () => {
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let wrapper = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+                index: 2,
+                case_count: 3,
+            }
+        });
+        expect(
+            (wrapper.find('[aria-label="Move down"]').element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
+    test('Move command up', async () => {
+        vi.useFakeTimers();
+        let order_stub = sinon.stub(AGTestCommand, 'update_order');
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let cmds = [
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+        ];
+        test_case.ag_test_commands = cmds.slice();
+        let wrapper = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+                index: 0,
+                case_count: 1,
+            }
+        });
+
+        wrapper.find('.panel-toggle').trigger('click');
+        await wrapper.vm.$nextTick();
+        // [0] = case move-up, [1] = cmd[0] move-up, [2] = cmd[1] move-up
+        wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        expect(test_case.ag_test_commands).toEqual([cmds[1], cmds[0], cmds[2]]);
+        expect(order_stub.calledOnceWith(
+            test_case.pk, [cmds[1].pk, cmds[0].pk, cmds[2].pk]
+        )).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Move command down', async () => {
+        vi.useFakeTimers();
+        let order_stub = sinon.stub(AGTestCommand, 'update_order');
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let cmds = [
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+        ];
+        test_case.ag_test_commands = cmds.slice();
+        let wrapper = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+                index: 0,
+                case_count: 1,
+            }
+        });
+
+        wrapper.find('.panel-toggle').trigger('click');
+        await wrapper.vm.$nextTick();
+        // [0] = case move-down, [1] = cmd[0] move-down, [2] = cmd[1] move-down
+        wrapper.findAll('[aria-label="Move down"]').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        expect(test_case.ag_test_commands).toEqual([cmds[0], cmds[2], cmds[1]]);
+        expect(order_stub.calledOnceWith(
+            test_case.pk, [cmds[0].pk, cmds[2].pk, cmds[1].pk]
+        )).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Focus stays on move up button after moving command up to non-boundary position', async () => {
+        sinon.stub(AGTestCommand, 'update_order');
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let cmds = [
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+        ];
+        test_case.ag_test_commands = cmds.slice();
+        let wrapper = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+                index: 0,
+                case_count: 1,
+            },
+            attachTo: document.body,
+        });
+        wrapper.find('.panel-toggle').trigger('click');
+        await wrapper.vm.$nextTick();
+        // [0]=case Move up, [1]=cmd[0] Move up (disabled), [2]=cmd[1], [3]=cmd[2]
+        wrapper.findAll('[aria-label="Move up"]').at(3).trigger('click');
+        // The moved command (originally cmd[2]) should now be at index 1
+        // among commands in the DOM.
+        const find_expected = () => wrapper.findAll('.ag-test-command').at(1)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move down when command moves to first position', async () => {
+        sinon.stub(AGTestCommand, 'update_order');
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let cmds = [
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+        ];
+        test_case.ag_test_commands = cmds.slice();
+        let wrapper = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+                index: 0,
+                case_count: 1,
+            },
+            attachTo: document.body,
+        });
+        wrapper.find('.panel-toggle').trigger('click');
+        await wrapper.vm.$nextTick();
+        // [0]=case Move up, [1]=cmd[0] Move up (disabled), [2]=cmd[1]
+        wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
+        // The moved command (originally cmd[1]) should now be at index 0
+        // among commands in the DOM; move-up is disabled.
+        const find_expected = () => wrapper.findAll('.ag-test-command').at(0)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move up when command moves to last position', async () => {
+        sinon.stub(AGTestCommand, 'update_order');
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        let cmds = [
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+        ];
+        test_case.ag_test_commands = cmds.slice();
+        let wrapper = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: test_case,
+                ag_test_suite: suite,
+                active_ag_test_command: null,
+                index: 0,
+                case_count: 1,
+            },
+            attachTo: document.body,
+        });
+        wrapper.find('.panel-toggle').trigger('click');
+        await wrapper.vm.$nextTick();
+        // [0]=case Move down (disabled), [1]=cmd[0], [2]=cmd[1], [3]=cmd[2] (disabled)
+        wrapper.findAll('[aria-label="Move down"]').at(2).trigger('click');
+        // The moved command (originally cmd[1]) is now at index 2 among
+        // commands in the DOM; move-down is disabled.
+        const find_expected = () => wrapper.findAll('.ag-test-command').at(2)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+});
+
+describe('Drag and drop test commands order', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    test('Update test commands order', async () => {
+        let order_stub = sinon.stub(AGTestCommand, 'update_order');
+        let suite = data_ut.make_ag_test_suite(data_ut.make_project(data_ut.make_course().pk).pk);
+        let test_case = data_ut.make_ag_test_case(suite.pk);
+        suite.ag_test_cases = [test_case];
+        let cmds = [
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+            data_ut.make_ag_test_command(test_case.pk),
+        ];
+        test_case.ag_test_commands = cmds.slice();
+
+        let wrapper = managed_mount(AGTestCasePanel, {
+                propsData: {
+                    ag_test_case: test_case,
+                    ag_test_suite: suite,
+                    active_ag_test_command: null,
+                    index: 0,
+                    case_count: 1,
+                }
+        });
+        wrapper.find('.panel-toggle').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        const draggable = wrapper.findComponent({ref: 'ag_test_command_order'});
+        draggable.vm.$emit('start');
+        // Simulate vuedraggable mutating v-model on drop.
+        test_case.ag_test_commands.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
+
+        expect(
+            order_stub.calledOnceWith(test_case.pk, [cmds[2].pk, cmds[1].pk, cmds[0].pk])
+        ).toBe(true);
+    });
 });

@@ -13,8 +13,9 @@
 
   <div class="suite-settings">
     <div class="form-field-wrapper">
-      <label class="label"> Suite name </label>
+      <label class="label" for="suite-settings-name"> Suite name </label>
       <validated-input ref="suite_name"
+                       input_id="suite-settings-name"
                        v-model="d_suite.name"
                        @input="$emit('field_change', d_suite)"
                        :validators="[is_not_empty]">
@@ -37,10 +38,11 @@
       <legend class="legend"> Grading Environment </legend>
 
       <div class="form-field-wrapper">
-        <label class="label"> Sandbox environment </label>
+        <label class="label" for="suite-sandbox-environment"> Sandbox environment </label>
 
 
-        <select-object :items="docker_images"
+        <select-object input_id="suite-sandbox-environment"
+                        :items="docker_images"
                         id_field="pk"
                         v-model="d_suite.sandbox_docker_image"
                         @change="$emit('field_change', d_suite)"
