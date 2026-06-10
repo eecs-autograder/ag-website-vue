@@ -28,11 +28,12 @@
               <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
             </div>
             <template v-else>
-              <div><label class="label">Course</label></div>
+              <div><label class="label" for="import-from-course">Course</label></div>
               <select-object :items="d_courses_is_admin_for"
                              ref="course_to_import_from"
                              v-model="d_course_to_import_from"
                              @change="load_projects_to_import_from"
+                             input_id="import-from-course"
                              id_field="pk">
                 <template v-slot:option-text="{item}">
                   {{item.name}} {{item.semester}} {{item.year}}
@@ -42,7 +43,7 @@
           </div>
           <div id="select-import-from-project" class="select-container form-field-wrapper">
             <div v-if="d_course_to_import_from !== null">
-              <label class="label">Project</label>
+              <label class="label" for="import-from-project">Project</label>
             </div>
             <div v-if="d_loading_projects" class="loading">
               <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
@@ -50,6 +51,7 @@
             <template v-else-if="d_selected_course_projects !== null">
               <select-object ref="project_to_import_from"
                              :items="d_selected_course_projects"
+                             input_id="import-from-project"
                              id_field="pk"
                              v-model="d_project_to_import_from">
                 <option selected disabled :value="null">-- Select a Project --</option>
