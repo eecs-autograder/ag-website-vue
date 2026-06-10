@@ -704,6 +704,56 @@ describe('Criteria and annotation tests', () => {
         vi.useRealTimers();
     });
 
+    test('Criterion order rolled back on failed move button request', async () => {
+        vi.useFakeTimers();
+        sinon.stub(Criterion, 'update_order').rejects(new HttpError(400, 'bad'));
+        const original_criteria = rubric.criteria.slice();
+        wrapper.find('#criteria-column').findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual(original_criteria);
+        vi.useRealTimers();
+    });
+
+    test('Annotation order rolled back on failed move button request', async () => {
+        vi.useFakeTimers();
+        sinon.stub(Annotation, 'update_order').rejects(new HttpError(400, 'bad'));
+        const original_annotations = rubric.annotations.slice();
+        wrapper.find('#annotations-column').findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual(original_annotations);
+        vi.useRealTimers();
+    });
+
+    test('Criterion move up disabled when first', () => {
+        const move_ups = wrapper.find('#criteria-column').findAll('[aria-label="Move up"]');
+        expect(
+            (move_ups.at(0).element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
+    test('Criterion move down disabled when last', () => {
+        const move_downs = wrapper.find('#criteria-column').findAll('[aria-label="Move down"]');
+        expect(
+            (move_downs.at(move_downs.length - 1).element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
+    test('Annotation move up disabled when first', () => {
+        const move_ups = wrapper.find('#annotations-column').findAll('[aria-label="Move up"]');
+        expect(
+            (move_ups.at(0).element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
+    test('Annotation move down disabled when last', () => {
+        const move_downs = wrapper.find('#annotations-column').findAll('[aria-label="Move down"]');
+        expect(
+            (move_downs.at(move_downs.length - 1).element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
     test('Observer updates from other rubric ignored', () => {
         let original_rubric = deep_copy(wrapper.vm.d_handgrading_rubric!, HandgradingRubric);
 
@@ -719,5 +769,124 @@ describe('Criteria and annotation tests', () => {
         Annotation.notify_annotation_deleted(other_annotation);
 
         expect(wrapper.vm.d_handgrading_rubric).toEqual(original_rubric);
+    });
+});
+
+describe('Move button focus management', () => {
+    let rubric: HandgradingRubric;
+    let wrapper: Wrapper<HandgradingSettings>;
+
+    beforeEach(async () => {
+        vi.useFakeTimers();
+        current_project.has_handgrading_rubric = true;
+        rubric = new HandgradingRubric({
+            pk: 3,
+            project: current_project.pk,
+            last_modified: '',
+            points_style: PointsStyle.start_at_zero_and_add,
+            max_points: null,
+            show_grades_and_rubric_to_students: false,
+            show_only_applied_rubric_to_students: false,
+            handgraders_can_leave_comments: false,
+            handgraders_can_adjust_points: false,
+            criteria: [],
+            annotations: []
+        });
+        rubric.criteria = [
+            data_ut.make_criterion(rubric.pk),
+            data_ut.make_criterion(rubric.pk),
+            data_ut.make_criterion(rubric.pk),
+        ];
+        rubric.annotations = [
+            data_ut.make_annotation(rubric.pk),
+            data_ut.make_annotation(rubric.pk),
+            data_ut.make_annotation(rubric.pk),
+        ];
+
+        sinon.stub(HandgradingRubric, 'get_from_project').returns(Promise.resolve(rubric));
+        sinon.stub(Criterion, 'update_order');
+        sinon.stub(Annotation, 'update_order');
+
+        wrapper = managed_mount(HandgradingSettings, {
+            propsData: {
+                course: course,
+                project: current_project
+            },
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    test('Focus stays on move up after moving criterion up to non-boundary', async () => {
+        // criteria[2] is the 3rd "Move up" button (criteria[0] is disabled)
+        wrapper.find('#criteria-column').findAll('[aria-label="Move up"]').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(1)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move down when criterion moves to first position', async () => {
+        // criteria[1] is the 2nd "Move up" button (criteria[0] is disabled)
+        wrapper.find('#criteria-column').findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(0)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move up when criterion moves to last position', async () => {
+        // criteria[1] is the 2nd "Move down" button (criteria[2] is disabled)
+        wrapper.find('#criteria-column').findAll('[aria-label="Move down"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(2)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus stays on move up after moving annotation up to non-boundary', async () => {
+        wrapper.find('#annotations-column').findAll('[aria-label="Move up"]').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleAnnotation'}).at(1)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move down when annotation moves to first position', async () => {
+        wrapper.find('#annotations-column').findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleAnnotation'}).at(0)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move up when annotation moves to last position', async () => {
+        wrapper.find('#annotations-column').findAll('[aria-label="Move down"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleAnnotation'}).at(2)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
     });
 });
