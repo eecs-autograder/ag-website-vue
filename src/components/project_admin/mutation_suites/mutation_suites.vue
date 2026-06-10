@@ -28,7 +28,7 @@
           </template>
         </div>
 
-        <div class="sidebar-content" id="mutation-suite-sidebar-content" v-if="!d_collapsed">
+        <div class="sidebar-content" id="mutation-suite-sidebar-content" v-show="!d_collapsed">
           <draggable ref="mutation_test_suite_order"
                       v-model="d_mutation_test_suites"
                       @start="d_pre_drag_suite_order = d_mutation_test_suites.slice()"
