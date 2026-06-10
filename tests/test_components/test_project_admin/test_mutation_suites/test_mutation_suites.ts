@@ -93,95 +93,95 @@ describe('MutationSuites tests', () => {
         expect(await wait_for_load(wrapper)).toBe(true);
     });
 
-    test('Update mutation test suites order', async () => {
-        vi.useFakeTimers();
-        let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
+    describe('Alter suite order', () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+        });
 
-        const draggable = wrapper.findComponent({ref: 'mutation_test_suite_order'});
-        draggable.vm.$emit('start');
-        // Simulate vuedraggable mutating v-model on drop.
-        wrapper.vm.d_mutation_test_suites.reverse();
-        draggable.vm.$emit('change');
-        await vi.runAllTimersAsync();
+        afterEach(() => {
+            vi.useRealTimers();
+        });
 
-        expect(order_stub.calledOnceWith(project.pk, [
-            mutation_test_suite_3.pk,
-            mutation_test_suite_2.pk,
-            mutation_test_suite_1.pk,
-        ])).toBe(true);
-        vi.useRealTimers();
-    });
+        test('Update mutation test suites order', async () => {
+            let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
 
-    test('Original order restored after bad update suites order request', async () => {
-        vi.useFakeTimers();
-        sinon.stub(ag_cli.MutationTestSuite, 'update_order').rejects(
-            new HttpError(400, 'NOOOOOPE')
-        );
+            const draggable = wrapper.findComponent({ref: 'mutation_test_suite_order'});
+            draggable.vm.$emit('start');
+            // Simulate vuedraggable mutating v-model on drop.
+            wrapper.vm.d_mutation_test_suites.reverse();
+            draggable.vm.$emit('change');
+            await vi.runAllTimersAsync();
 
-        const draggable = wrapper.findComponent({ref: 'mutation_test_suite_order'});
-        draggable.vm.$emit('start');
-        await wrapper.vm.$nextTick();
+            expect(order_stub.calledOnceWith(project.pk, [
+                mutation_test_suite_3.pk,
+                mutation_test_suite_2.pk,
+                mutation_test_suite_1.pk,
+            ])).toBe(true);
+        });
 
-        wrapper.vm.d_mutation_test_suites.reverse();
-        await wrapper.vm.$nextTick();
+        test('Original order restored after bad update suites order request', async () => {
+            sinon.stub(ag_cli.MutationTestSuite, 'update_order').rejects(
+                new HttpError(400, 'NOOOOOPE')
+            );
 
-        draggable.vm.$emit('change');
-        await vi.runAllTimersAsync();
+            const draggable = wrapper.findComponent({ref: 'mutation_test_suite_order'});
+            draggable.vm.$emit('start');
+            await wrapper.vm.$nextTick();
 
-        expect(wrapper.vm.d_mutation_test_suites).toEqual([
-            mutation_test_suite_1, mutation_test_suite_2, mutation_test_suite_3,
-        ]);
-        vi.useRealTimers();
-    });
+            wrapper.vm.d_mutation_test_suites.reverse();
+            await wrapper.vm.$nextTick();
 
-    test('Move suite up', async () => {
-        vi.useFakeTimers();
-        let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
+            draggable.vm.$emit('change');
+            await vi.runAllTimersAsync();
 
-        wrapper.findAll('[aria-label="Move up"]').at(1).trigger('click');
-        await wrapper.vm.$nextTick();
-        await vi.runAllTimersAsync();
+            expect(wrapper.vm.d_mutation_test_suites).toEqual([
+                mutation_test_suite_1, mutation_test_suite_2, mutation_test_suite_3,
+            ]);
+        });
 
-        expect(wrapper.vm.d_mutation_test_suites).toEqual([
-            mutation_test_suite_2, mutation_test_suite_1, mutation_test_suite_3,
-        ]);
-        expect(order_stub.calledOnceWith(project.pk, [
-            mutation_test_suite_2.pk, mutation_test_suite_1.pk, mutation_test_suite_3.pk,
-        ])).toBe(true);
-        vi.useRealTimers();
-    });
+        test('Move suite up', async () => {
+            let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
 
-    test('Move suite down', async () => {
-        vi.useFakeTimers();
-        let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
+            wrapper.findAll('[aria-label="Move up"]').at(1).trigger('click');
+            await wrapper.vm.$nextTick();
+            await vi.runAllTimersAsync();
 
-        wrapper.findAll('[aria-label="Move down"]').at(1).trigger('click');
-        await wrapper.vm.$nextTick();
-        await vi.runAllTimersAsync();
+            expect(wrapper.vm.d_mutation_test_suites).toEqual([
+                mutation_test_suite_2, mutation_test_suite_1, mutation_test_suite_3,
+            ]);
+            expect(order_stub.calledOnceWith(project.pk, [
+                mutation_test_suite_2.pk, mutation_test_suite_1.pk, mutation_test_suite_3.pk,
+            ])).toBe(true);
+        });
 
-        expect(wrapper.vm.d_mutation_test_suites).toEqual([
-            mutation_test_suite_1, mutation_test_suite_3, mutation_test_suite_2,
-        ]);
-        expect(order_stub.calledOnceWith(project.pk, [
-            mutation_test_suite_1.pk, mutation_test_suite_3.pk, mutation_test_suite_2.pk,
-        ])).toBe(true);
-        vi.useRealTimers();
-    });
+        test('Move suite down', async () => {
+            let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
 
-    test('Original order restored after failed move suite', async () => {
-        vi.useFakeTimers();
-        sinon.stub(ag_cli.MutationTestSuite, 'update_order').rejects(
-            new HttpError(400, 'NOOOOOPE')
-        );
+            wrapper.findAll('[aria-label="Move down"]').at(1).trigger('click');
+            await wrapper.vm.$nextTick();
+            await vi.runAllTimersAsync();
 
-        wrapper.findAll('[aria-label="Move down"]').at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-        await vi.runAllTimersAsync();
+            expect(wrapper.vm.d_mutation_test_suites).toEqual([
+                mutation_test_suite_1, mutation_test_suite_3, mutation_test_suite_2,
+            ]);
+            expect(order_stub.calledOnceWith(project.pk, [
+                mutation_test_suite_1.pk, mutation_test_suite_3.pk, mutation_test_suite_2.pk,
+            ])).toBe(true);
+        });
 
-        expect(wrapper.vm.d_mutation_test_suites).toEqual([
-            mutation_test_suite_1, mutation_test_suite_2, mutation_test_suite_3,
-        ]);
-        vi.useRealTimers();
+        test('Original order restored after failed move suite', async () => {
+            sinon.stub(ag_cli.MutationTestSuite, 'update_order').rejects(
+                new HttpError(400, 'NOOOOOPE')
+            );
+
+            wrapper.findAll('[aria-label="Move down"]').at(0).trigger('click');
+            await wrapper.vm.$nextTick();
+            await vi.runAllTimersAsync();
+
+            expect(wrapper.vm.d_mutation_test_suites).toEqual([
+                mutation_test_suite_1, mutation_test_suite_2, mutation_test_suite_3,
+            ]);
+        });
     });
 
     test('Clicking on a mutation test suite makes it the active_mutation_test_suite ',
@@ -714,6 +714,42 @@ describe('MutationSuites tests', () => {
     });
 });
 
+test('Move up button disabled for first suite', async () => {
+    sinon.stub(ag_cli.SandboxDockerImage, 'get_images').resolves([]);
+    let project = data_ut.make_project(data_ut.make_course().pk);
+    sinon.stub(MutationTestSuite, 'get_all_from_project').resolves([
+        data_ut.make_mutation_test_suite(project.pk),
+        data_ut.make_mutation_test_suite(project.pk),
+    ]);
+    let wrapper = managed_mount(MutationSuites, {propsData: {project}});
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    expect(
+        (wrapper.findAll('[aria-label="Move up"]').at(0).element as HTMLButtonElement).disabled
+    ).toBe(true);
+    expect(
+        (wrapper.findAll('[aria-label="Move up"]').at(1).element as HTMLButtonElement).disabled
+    ).toBe(false);
+});
+
+test('Move down button disabled for last suite', async () => {
+    sinon.stub(ag_cli.SandboxDockerImage, 'get_images').resolves([]);
+    let project = data_ut.make_project(data_ut.make_course().pk);
+    sinon.stub(MutationTestSuite, 'get_all_from_project').resolves([
+        data_ut.make_mutation_test_suite(project.pk),
+        data_ut.make_mutation_test_suite(project.pk),
+    ]);
+    let wrapper = managed_mount(MutationSuites, {propsData: {project}});
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    expect(
+        (wrapper.findAll('[aria-label="Move down"]').at(0).element as HTMLButtonElement).disabled
+    ).toBe(false);
+    expect(
+        (wrapper.findAll('[aria-label="Move down"]').at(1).element as HTMLButtonElement).disabled
+    ).toBe(true);
+});
+
 describe('Move suite focus management', () => {
     let project: Project;
     let suites: MutationTestSuite[];
@@ -759,6 +795,23 @@ describe('Move suite focus management', () => {
         wrapper.findAll('[aria-label="Move up"]').at(1).trigger('click');
         // suites[1] moves to DOM position 0 (first), so move-up is disabled — fallback to move-down.
         const find_expected = () => wrapper.findAll('.mutation-test-suite-panel').at(0)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus stays on move down button after moving suite down to non-boundary position',
+         async () => {
+        let wrapper = managed_mount(MutationSuites, {
+            propsData: {project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // suites[0] is the 1st "Move down" button (suites[3] is disabled)
+        wrapper.findAll('[aria-label="Move down"]').at(0).trigger('click');
+        // suites[0] moves to DOM position 1 (non-boundary) — focus stays on move-down.
+        const find_expected = () => wrapper.findAll('.mutation-test-suite-panel').at(1)
             .find('[aria-label="Move down"]').element;
         await wait_until(wrapper, () => document.activeElement === find_expected());
         expect(document.activeElement).toBe(find_expected());
