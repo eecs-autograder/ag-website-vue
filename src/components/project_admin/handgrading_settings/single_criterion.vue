@@ -44,7 +44,7 @@
     </criterion-form>
 
     <modal ref="delete_criterion_modal" size="large" click_outside_to_close
-           aria-label="delete-criterion-modal"
+           aria_label="Confirm delete criterion"
            v-if="d_delete_modal_is_open"
            @close="d_delete_modal_is_open = false">
       <div class="modal-header">Confirm Delete</div>

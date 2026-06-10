@@ -47,6 +47,7 @@
     </annotation-form>
 
     <modal ref="delete_annotation_modal" size="large" click_outside_to_close
+           aria_label="Confirm delete annotation"
            v-if="d_delete_modal_is_open"
            @close="d_delete_modal_is_open = false">
       <div class="modal-header">Confirm Delete</div>
