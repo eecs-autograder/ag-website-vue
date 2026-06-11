@@ -16,7 +16,8 @@ npx eslint \
     'src/order_syncer.ts' \
     'tests/test_order_syncer.ts' \
     'src/components/MoveButtons.vue' \
-    'src/components/project_admin/ag_tests/ag_test_command_panel.vue'
+    'src/components/project_admin/ag_tests/ag_test_command_panel.vue' \
+    'src/components/context_menu/context_menu.vue'
 
 npx prettier --check --no-editorconfig \
     '*.js' \
@@ -48,6 +49,7 @@ npx prettier --check --no-editorconfig \
     'src/order_syncer.ts' \
     'tests/test_order_syncer.ts' \
     'src/components/MoveButtons.vue' \
-    'src/components/project_admin/ag_tests/ag_test_command_panel.vue'
+    'src/components/project_admin/ag_tests/ag_test_command_panel.vue' \
+    'src/components/context_menu/context_menu.vue'
 
 ./check_subscribe_unsubscribe.py 'src/**/*.vue'
