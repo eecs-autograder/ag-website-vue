@@ -1,20 +1,20 @@
 <template>
   <table class="stats-table">
-    <tr><td class="stat-name">Count</td> <td class="stat-value">{{values.length}}</td></tr>
+    <tr><th scope="row" class="stat-name">Count</th> <td class="stat-value">{{values.length}}</td></tr>
     <template v-if="values.length !== 0">
-      <tr><td class="stat-name">Min</td> <td class="stat-value">{{to_precision(min)}}</td></tr>
-      <tr><td class="stat-name">Q1</td> <td class="stat-value">{{to_precision(q1)}}</td></tr>
+      <tr><th scope="row" class="stat-name">Min</th> <td class="stat-value">{{to_precision(min)}}</td></tr>
+      <tr><th scope="row" class="stat-name">Q1</th> <td class="stat-value">{{to_precision(q1)}}</td></tr>
       <tr>
-        <td class="stat-name">Median</td>
+        <th scope="row" class="stat-name">Median</th>
         <td class="stat-value">{{median}}</td>
       </tr>
-      <tr><td class="stat-name">Q3</td> <td class="stat-value">{{to_precision(q3)}}</td></tr>
-      <tr><td class="stat-name">Max</td> <td class="stat-value">{{to_precision(max)}}</td></tr>
+      <tr><th scope="row" class="stat-name">Q3</th> <td class="stat-value">{{to_precision(q3)}}</td></tr>
+      <tr><th scope="row" class="stat-name">Max</th> <td class="stat-value">{{to_precision(max)}}</td></tr>
       <tr>
-        <td class="stat-name">Mean</td> <td class="stat-value">{{to_precision(mean)}}</td>
+        <th scope="row" class="stat-name">Mean</th> <td class="stat-value">{{to_precision(mean)}}</td>
       </tr>
       <tr>
-        <td class="stat-name">Stdev</td> <td class="stat-value">{{to_precision(stdev)}}</td>
+        <th scope="row" class="stat-name">Stdev</th> <td class="stat-value">{{to_precision(stdev)}}</td>
       </tr>
     </template>
   </table>
@@ -110,7 +110,7 @@ export default class DescriptiveStatsTable extends Vue {
   border-collapse: collapse;
   font-size: .875rem;
 
-  td {
+  th, td {
     border: 1px solid $pebble-dark;
     padding: .375rem;
   }

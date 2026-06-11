@@ -24,8 +24,10 @@
       </div>
     </div>
     <template v-if="use_v_if">
-      <div v-if="state.is_open" data-testid="collapsible_body" :id="body_id">
-        <slot></slot>
+      <div v-show="state.is_open" data-testid="collapsible_body" :id="body_id">
+        <div v-if="state.is_open">
+          <slot></slot>
+        </div>
       </div>
     </template>
     <template v-else>

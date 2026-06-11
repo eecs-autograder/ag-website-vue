@@ -1,7 +1,7 @@
 <template>
   <!-- See https://www.chartjs.org/docs/latest/configuration/responsive.html#important-note -->
   <div style="position: relative; height: 70vh">
-    <canvas ref="submissions_over_time_canvas"></canvas>
+    <canvas ref="submissions_over_time_canvas" role="img" aria-label="Submission score histogram"></canvas>
   </div>
 </template>
 
