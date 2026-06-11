@@ -1,35 +1,39 @@
 <template>
-  <div class="context-menu-option"
-       :class="{'hoverable-item': !disabled, 'disabled-item': disabled}"
-       @click.stop="handle_click">
+  <div
+    class="context-menu-option"
+    :class="{ 'hoverable-item': !disabled, 'disabled-item': disabled }"
+    @click.stop="handle_click"
+  >
     <slot></slot>
   </div>
 </template>
 
-<script lang="ts">
-  import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+interface PropTypes {
+  disabled?: boolean;
+}
 
-  import ContextMenu from '@/components/context_menu/context_menu.vue';
+const props = withDefaults(defineProps<PropTypes>(), {
+  disabled: false,
+});
 
-  @Component
-  export default class ContextMenuItem extends Vue {
-    @Prop({default: false, type: Boolean})
-    disabled!: boolean;
+const emit = defineEmits<{
+  click: [];
+}>();
 
-    handle_click(event: Event) {
-      if (!this.disabled) {
-        this.$emit('click');
-      }
-    }
+function handle_click() {
+  if (!props.disabled) {
+    emit("click");
   }
+}
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 .context-menu-option {
   color: black;
-  padding: .375rem .75rem;
+  padding: 0.375rem 0.75rem;
 }
 
 .hoverable-item:hover {
@@ -37,8 +41,8 @@
   cursor: pointer;
 }
 
-.disabled-item, .disabled-item:hover {
+.disabled-item,
+.disabled-item:hover {
   color: $baking-pan;
 }
-
 </style>
