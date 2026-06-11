@@ -1,76 +1,86 @@
 <template>
-  <div tabindex="-1"
-       ref="context_menu"
-       class="context-menu-container"
-       @blur="hide_context_menu"
-       @keydown.esc="hide_context_menu"
-       v-show="is_open">
+  <div
+    ref="root"
+    tabindex="-1"
+    class="context-menu-container"
+    v-show="is_open"
+    @blur="hide_context_menu"
+    @keydown.esc="hide_context_menu"
+  >
     <slot></slot>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { nextTick, ref, watch } from "vue";
 
 interface MenuCoordinates {
   x: number;
   y: number;
 }
 
-@Component({})
-export default class ContextMenu extends Vue {
-  @Prop({required: true})
-  coordinates!: MenuCoordinates;
+const props = defineProps<{
+  /** Page coordinates where the menu should open. */
+  coordinates: MenuCoordinates;
+  is_open: boolean;
+}>();
 
-  @Prop({required: true, type: Boolean})
-  is_open!: boolean;
+const emit = defineEmits<{
+  close: [];
+}>();
 
-  hide_context_menu() {
-    this.$emit('close');
-  }
+const root = ref<HTMLElement | null>(null);
 
-  @Watch('is_open')
-  is_open_changed(new_value: boolean, old_value: boolean) {
-    if (!this.is_open) {
-      this.$emit('close');
+function hide_context_menu() {
+  emit("close");
+}
+
+watch(
+  () => props.is_open,
+  () => {
+    if (!props.is_open) {
+      emit("close");
     }
 
-    this.$nextTick(() => {
-      (<HTMLElement> this.$el).style.left = "0px";
-      (<HTMLElement> this.$el).style.top = "0px";
-      let height = (<HTMLElement> this.$el).clientHeight;
-      let width = (<HTMLElement> this.$el).clientWidth;
-
-      let right_edge: number = this.coordinates.x + width;
-      let bottom_edge: number = this.coordinates.y + height;
-
-      if ((right_edge) > document.body.clientWidth) {
-        this.coordinates.x = (this.coordinates.x - width) - 5;
+    nextTick(() => {
+      const el = root.value;
+      if (el === null) {
+        return;
       }
 
-      if ((bottom_edge) > document.body.clientHeight) {
-        this.coordinates.y = (this.coordinates.y - height) - 5;
+      el.style.left = "0px";
+      el.style.top = "0px";
+      const height = el.clientHeight;
+      const width = el.clientWidth;
+
+      let left = props.coordinates.x;
+      let top = props.coordinates.y;
+      if (left + width > document.body.clientWidth) {
+        left = left - width - 5;
+      }
+      if (top + height > document.body.clientHeight) {
+        top = top - height - 5;
       }
 
-      (<HTMLElement> this.$el).style.left = this.coordinates.x + "px";
-      (<HTMLElement> this.$el).style.top = this.coordinates.y + "px";
+      el.style.left = `${left}px`;
+      el.style.top = `${top}px`;
 
       // focus must be applied after the element is visible for the ESC
       // key to work
-      (<HTMLElement> this.$el).focus();
+      el.focus();
     });
-  }
-}
+  },
+);
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 .context-menu-container {
   background-color: white;
   border: 1px solid lighten($baking-pan, 50%);
   border-radius: 2px;
-  box-shadow: 0 0 15px opacify(lighten($baking-pan, 50%), .2);
+  box-shadow: 0 0 15px opacify(lighten($baking-pan, 50%), 0.2);
   position: absolute;
   z-index: 1;
 
@@ -81,5 +91,4 @@ export default class ContextMenu extends Vue {
 .context-menu-container:focus {
   outline: none;
 }
-
 </style>
