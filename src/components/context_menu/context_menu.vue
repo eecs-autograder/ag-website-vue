@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 interface MenuCoordinates {
   x: number;
@@ -37,39 +37,38 @@ function hide_context_menu() {
 
 watch(
   () => props.is_open,
-  () => {
-    if (!props.is_open) {
-      emit("close");
+  (is_open) => {
+    if (!is_open) {
+      return;
     }
 
-    nextTick(() => {
-      const el = root.value;
-      if (el === null) {
-        return;
-      }
+    const el = root.value;
+    if (el === null) {
+      return;
+    }
 
-      el.style.left = "0px";
-      el.style.top = "0px";
-      const height = el.clientHeight;
-      const width = el.clientWidth;
+    el.style.left = "0px";
+    el.style.top = "0px";
+    const height = el.clientHeight;
+    const width = el.clientWidth;
 
-      let left = props.coordinates.x;
-      let top = props.coordinates.y;
-      if (left + width > document.body.clientWidth) {
-        left = left - width - 5;
-      }
-      if (top + height > document.body.clientHeight) {
-        top = top - height - 5;
-      }
+    let left = props.coordinates.x;
+    let top = props.coordinates.y;
+    if (left + width > document.body.clientWidth) {
+      left = left - width - 5;
+    }
+    if (top + height > document.body.clientHeight) {
+      top = top - height - 5;
+    }
 
-      el.style.left = `${left}px`;
-      el.style.top = `${top}px`;
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
 
-      // focus must be applied after the element is visible for the ESC
-      // key to work
-      el.focus();
-    });
+    // focus must be applied after the element is visible for the ESC
+    // key to work
+    el.focus();
   },
+  { flush: "post" },
 );
 </script>
 
