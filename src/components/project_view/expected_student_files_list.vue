@@ -5,54 +5,60 @@
       role="button"
       tabindex="0"
       aria-controls="expected-files-to-submit-list"
-      @click="d_show = !d_show"
-      @keydown.enter="d_show = !d_show"
-      @keydown.space.prevent="d_show = !d_show"
-    >What files should I submit?</div>
-    <ul id="expected-files-to-submit-list" class="file-list" v-show="d_show">
-      <li v-for="item of expected_student_files" :key="item.pk" class="file-list-item">
-        - <span class="filename">{{item.pattern}}</span>
-        <span class="num-matches" v-if="item.min_num_matches !== 1 || item.max_num_matches !== 1">
-          ({{item.min_num_matches}}-{{item.max_num_matches}} matches)
+      @click="show = !show"
+      @keydown.enter="show = !show"
+      @keydown.space.prevent="show = !show"
+    >
+      What files should I submit?
+    </div>
+    <ul id="expected-files-to-submit-list" class="file-list" v-show="show">
+      <li
+        v-for="item of expected_student_files"
+        :key="item.pk"
+        class="file-list-item"
+      >
+        - <span class="filename">{{ item.pattern }}</span>
+        <span
+          class="num-matches"
+          v-if="item.min_num_matches !== 1 || item.max_num_matches !== 1"
+        >
+          ({{ item.min_num_matches }}-{{ item.max_num_matches }} matches)
         </span>
       </li>
     </ul>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref } from "vue";
 
-import { ExpectedStudentFile } from 'ag-client-typescript';
+import { ExpectedStudentFile } from "ag-client-typescript";
 
-@Component
-export default class ExpectedStudentFilesList extends Vue {
-  @Prop({required: true, type: Array})
-  expected_student_files!: ExpectedStudentFile[];
+defineProps<{
+  expected_student_files: ExpectedStudentFile[];
+}>();
 
-  d_show = false;
-}
+const show = ref(false);
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 * {
   box-sizing: border-box;
 }
 
-
 .expected-student-files-list {
-  margin: .875rem 0;
+  margin: 0.875rem 0;
 }
 
 .file-list {
-  margin: .25rem 0;
+  margin: 0.25rem 0;
   padding-inline-start: 1rem;
 }
 
 .file-list-item {
-  font-size: .95em;
+  font-size: 0.95em;
   display: block;
 }
 
@@ -72,5 +78,4 @@ export default class ExpectedStudentFilesList extends Vue {
     color: darken($ocean-blue, 20%);
   }
 }
-
 </style>
