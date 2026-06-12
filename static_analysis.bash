@@ -20,6 +20,7 @@ lint_paths=(
     'src/components/project_admin/edit_groups/edit_single_group.vue'
     'src/components/project_admin/project_settings.vue'
     'src/components/project_admin/rerun_submissions/rerun_select_suite.vue'
+    'src/components/select_object.vue'
     'src/components/toggle.vue'
     'src/components/tooltip.vue'
     'src/components/validated_input/**/*.vue'
