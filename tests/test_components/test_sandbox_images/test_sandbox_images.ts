@@ -73,9 +73,19 @@ test('Build tasks displayed in sidebar sections', async () => {
     expect(panel_has_status(full_history_panels.at(3), ag_cli.BuildImageStatus.queued));
 });
 
+const STATUS_ARIA_LABELS: Record<ag_cli.BuildImageStatus, string> = {
+    [ag_cli.BuildImageStatus.queued]: 'Queued',
+    [ag_cli.BuildImageStatus.in_progress]: 'In progress',
+    [ag_cli.BuildImageStatus.done]: 'Done',
+    [ag_cli.BuildImageStatus.failed]: 'Failed',
+    [ag_cli.BuildImageStatus.image_invalid]: 'Image invalid',
+    [ag_cli.BuildImageStatus.cancelled]: 'Cancelled',
+    [ag_cli.BuildImageStatus.internal_error]: 'Internal error',
+};
+
 function panel_has_status<T extends Vue>(panel: Wrapper<T>, status: ag_cli.BuildImageStatus) {
-    let status_icon = <BuildImageStatusIcon> panel.findComponent(BuildImageStatusIcon).vm;
-    return status_icon.status === status;
+    let status_icon = panel.findComponent(BuildImageStatusIcon);
+    return status_icon.attributes('aria-label') === STATUS_ARIA_LABELS[status];
 }
 
 test('Course not null images and build tasks loaded from course', async () => {
