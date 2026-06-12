@@ -381,7 +381,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     this.suite_order_syncer = new OrderSyncer<MutationTestSuite>(
       (suites) => MutationTestSuite.update_order(this.project.pk, suites.map(s => s.pk)),
       (saved) => {
-        this.d_mutation_test_suites.splice(0, this.d_mutation_test_suites.length, ...saved);
+        this.d_mutation_test_suites = saved.slice();
       },
       (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
     );
