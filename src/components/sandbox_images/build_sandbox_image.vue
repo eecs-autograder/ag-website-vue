@@ -35,6 +35,7 @@ import {
 import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import FileUpload from '@/components/file_upload.vue';
+import { FileUploadExposed } from '@/exposed_component_types/file_upload_exposed';
 import ProgressBar from '@/components/progress_bar.vue';
 import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { toggle } from '@/utils';
@@ -77,7 +78,7 @@ export default class BuildSandboxImage extends Vue {
           files, this.course?.pk  ?? null, progress_listener);
       }
 
-      (<FileUpload> this.$refs.file_upload).clear_files();
+      (this.$refs.file_upload as FileUploadExposed).clear_files();
       this.$emit('new_build_task', build_task);
     });
   }
