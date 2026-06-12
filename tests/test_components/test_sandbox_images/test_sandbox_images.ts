@@ -45,10 +45,10 @@ test('Build tasks displayed in sidebar sections', async () => {
     let in_progress_panels = wrapper.findAllComponents({ref: 'in_progress_build_panel'});
     expect(in_progress_panels.length).toEqual(2);
     expect(in_progress_panels.at(0).text()).toContain(image.display_name);
-    expect(panel_has_status(in_progress_panels.at(0), ag_cli.BuildImageStatus.queued));
+    expect(panel_has_status(in_progress_panels.at(0), ag_cli.BuildImageStatus.in_progress)).toBe(true);
 
     expect(in_progress_panels.at(1).text()).toContain('New Image');
-    expect(panel_has_status(in_progress_panels.at(1), ag_cli.BuildImageStatus.in_progress));
+    expect(panel_has_status(in_progress_panels.at(1), ag_cli.BuildImageStatus.queued)).toBe(true);
 
     let image_panels = wrapper.findAllComponents({ref: 'image_panel'});
     expect(image_panels.length).toEqual(2);
@@ -58,19 +58,19 @@ test('Build tasks displayed in sidebar sections', async () => {
     await image_panels.at(1).trigger('click');
     let image_history_panels = wrapper.findAllComponents({ref: 'image_build_history_panel'});
     expect(image_history_panels.length).toEqual(2);
-    expect(panel_has_status(image_history_panels.at(0), ag_cli.BuildImageStatus.done));
-    expect(panel_has_status(image_history_panels.at(1), ag_cli.BuildImageStatus.in_progress));
+    expect(panel_has_status(image_history_panels.at(0), ag_cli.BuildImageStatus.done)).toBe(true);
+    expect(panel_has_status(image_history_panels.at(1), ag_cli.BuildImageStatus.in_progress)).toBe(true);
 
     let full_history_panels = wrapper.findAllComponents({ref: 'full_build_history_panel'});
     expect(full_history_panels.length).toEqual(4);
     expect(full_history_panels.at(0).text()).toContain(image.display_name);
-    expect(panel_has_status(full_history_panels.at(0), ag_cli.BuildImageStatus.done));
+    expect(panel_has_status(full_history_panels.at(0), ag_cli.BuildImageStatus.done)).toBe(true);
     expect(full_history_panels.at(1).text()).toContain(image.display_name);
-    expect(panel_has_status(full_history_panels.at(1), ag_cli.BuildImageStatus.in_progress));
+    expect(panel_has_status(full_history_panels.at(1), ag_cli.BuildImageStatus.in_progress)).toBe(true);
     expect(full_history_panels.at(2).text()).toContain('New Image');
-    expect(panel_has_status(full_history_panels.at(2), ag_cli.BuildImageStatus.failed));
+    expect(panel_has_status(full_history_panels.at(2), ag_cli.BuildImageStatus.failed)).toBe(true);
     expect(full_history_panels.at(3).text()).toContain('New Image');
-    expect(panel_has_status(full_history_panels.at(3), ag_cli.BuildImageStatus.queued));
+    expect(panel_has_status(full_history_panels.at(3), ag_cli.BuildImageStatus.queued)).toBe(true);
 });
 
 const STATUS_ARIA_LABELS: Record<ag_cli.BuildImageStatus, string> = {
