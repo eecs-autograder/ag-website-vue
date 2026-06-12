@@ -1,16 +1,14 @@
 <template>
   <div class="expected-student-files-list">
-    <div
-      class="show-all"
-      role="button"
-      tabindex="0"
+    <button
+      type="button"
+      class="show-all unstyled-button"
+      :aria-expanded="show"
       aria-controls="expected-files-to-submit-list"
       @click="show = !show"
-      @keydown.enter="show = !show"
-      @keydown.space.prevent="show = !show"
     >
       What files should I submit?
-    </div>
+    </button>
     <ul id="expected-files-to-submit-list" class="file-list" v-show="show">
       <li
         v-for="item of expected_student_files"
@@ -42,6 +40,7 @@ const show = ref(false);
 </script>
 
 <style scoped lang="scss">
+@import "@/styles/button_styles.scss";
 @import "@/styles/colors.scss";
 
 * {
@@ -71,7 +70,6 @@ const show = ref(false);
 }
 
 .show-all {
-  cursor: pointer;
   color: darken($ocean-blue, 10%);
 
   &:hover {
