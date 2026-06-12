@@ -9,7 +9,7 @@ import * as sinon from 'sinon';
 import BatchSelect from "@/components/batch_select.vue";
 
 import { managed_mount } from '@/tests/setup';
-import { emitted } from '@/tests/utils';
+import { emitted, wait_until } from '@/tests/utils';
 
 
 interface TestObj {
@@ -39,6 +39,7 @@ let selected: TestObj[] = [obj1];
                      @input="on_input($event)"
                      v-slot="{ item }"
                      ref="batch_select"
+                     aria_label="test"
                  >
                      {{ item.value }}
                  </batch-select>
@@ -175,5 +176,70 @@ describe('BatchSelect', () => {
        await wrapper.vm.$nextTick();
 
        expect(batch_select_wrapper.vm.d_selected_items).toEqual([obj3]);
+    });
+
+    test("Selected elements have aria-selected=true", async () => {
+
+    });
+});
+
+describe('Focus and keyboard navigation', () => {
+    let wrapper: Wrapper<WrapperComponent>;
+    let batch_select_wrapper: Wrapper<BatchSelect>;
+
+    beforeEach(() => {
+        wrapper = managed_mount(WrapperComponent);
+        batch_select_wrapper = wrapper.findComponent({ref: 'batch_select'}) as Wrapper<BatchSelect>;
+    });
+
+    test("Focuses on first element on open", async () => {
+        await wrapper.find('[aria-label="Open batch select"]').trigger('click');
+        expect(
+            await wait_until(
+                wrapper,
+                (w) => document.activeElement === (<HTMLElement> w.findAll('[role="option"]').at(0).element)
+            )
+        ).toBe(true);
+    });
+
+    test.only("Focuses on first element when focus enters list and none selected -- all visible", async () => {
+        await wrapper.find('[aria-label="Open batch select"]').trigger('click');
+        (<HTMLElement> wrapper.find('[role=listbox]').element).focus();
+        await wrapper.vm.$nextTick();
+        console.log(batch_select_wrapper.html());
+        expect(
+            await wait_until(
+                wrapper,
+                (w) => document.activeElement === (<HTMLElement> w.findAll('[role="option"]').at(0).element)
+            )
+        ).toBe(true);
+    });
+
+    test("Focuses on first visible element when focus enters list and none selected", async () => {
+        fail();
+    });
+
+    test("Focuses on first selected element when focus enters list and some selected -- all visible", async () => {
+        fail();
+    });
+
+    test("Focuses on first selected visible element when focus enters list and some selected", async () => {
+        fail();
+    });
+
+    test("Does nothing when focus enters but no elements exist", async () => {
+        fail();
+    });
+
+    test("Does nothing when focus enters but no visible elements", async () => {
+        fail();
+    });
+
+    test("Arrow keys transfer focus between items", async () => {
+        fail();
+    });
+
+    test("Arrow keys skip filtered items", async () => {
+        fail();
     });
 });
