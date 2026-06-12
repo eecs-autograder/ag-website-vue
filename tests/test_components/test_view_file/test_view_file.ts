@@ -4,6 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import hljs, { AutoHighlightResult } from 'highlight.js';
 import * as sinon from 'sinon';
 
+import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -409,7 +410,7 @@ describe('ViewFile handgrading tests', () => {
 
             await wrapper.vm.$nextTick();
 
-            wrapper.findAllComponents({name: 'ContextMenuItem'}).at(0).trigger('click');
+            wrapper.findAllComponents(ContextMenuItem).at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
@@ -457,7 +458,7 @@ describe('ViewFile handgrading tests', () => {
 
             await wrapper.vm.$nextTick();
 
-            wrapper.findAllComponents({name: 'ContextMenuItem'}).at(0).trigger('click');
+            wrapper.findAllComponents(ContextMenuItem).at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
@@ -511,7 +512,7 @@ describe('ViewFile handgrading tests', () => {
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
-        wrapper.findAllComponents({name: 'ContextMenuItem'}).at(2).trigger('click');
+        wrapper.findAllComponents(ContextMenuItem).at(2).trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.findComponent({ref: 'comment_text'}).setValue(text);
@@ -556,7 +557,7 @@ describe('ViewFile handgrading tests', () => {
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAllComponents({name: 'ContextMenuItem'}).length).toEqual(2);
+        expect(wrapper.findAllComponents(ContextMenuItem).length).toEqual(2);
     });
 
     test('Delete applied annotation', async () => {
