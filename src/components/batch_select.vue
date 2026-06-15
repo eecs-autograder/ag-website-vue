@@ -27,7 +27,9 @@
             class="batch-select-card-grid"
             ref="listbox_element"
             role="listbox"
+            aria-multiselectable="true"
             aria-orientation="horizontal"
+            :aria-activedescendant="active_option_id"
             @keydown.left.prevent.stop="focus_prev"
             @keydown.right.prevent.stop="focus_next"
             @keydown.up.prevent.stop="focus_prev"
@@ -40,12 +42,12 @@
             <li class="batch-select-card"
                 v-for="(item, index) of batch_filtered_items"
                 :key="item.pk"
+                :id="option_id(index)"
                 :class="{
                   selected: item_is_selected(item),
                   'active-descendant': d_current_focus_index === index,
                 }"
-                :aria-selected="item_is_selected(item)"
-                :aria-activedescendant="d_current_focus_index === index ? 'true' : undefined"
+                :aria-selected="item_is_selected(item) ? 'true' : 'false'"
                 @click="batch_toggle_select(item)"
                 ref="batch_select_option"
                 role="option"
@@ -75,7 +77,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import _ from 'lodash';
 
 import Modal from '@/components/modal.vue';
-import { assert_not_null } from '@/utils';
+import { assert_not_null, generate_uid } from '@/utils';
 
 // types for function props
 type Comparator = (lhs: unknown, rhs: unknown) => boolean;
@@ -124,6 +126,9 @@ export default class BatchSelect extends Vue {
   }
 
   focus_enter() {
+    if (this.batch_filtered_items.length === 0) {
+      return;
+    }
     const first_selected_index = this.batch_filtered_items.findIndex((item) => this.item_is_selected(item));
     this.focus_index(first_selected_index === -1 ? 0 : first_selected_index);
   }
@@ -139,11 +144,6 @@ export default class BatchSelect extends Vue {
   }
 
   focus_index(index: number) {
-    const options = this.$el.getElementsByClassName('batch-select-card');
-    console.log(options);
-    // if (options.length !== 0) {
-    //   (<HTMLElement> options[index]).focus();
-    // }
     this.d_current_focus_index = index;
   }
 
@@ -177,6 +177,22 @@ export default class BatchSelect extends Vue {
 
   item_is_selected(item: unknown) {
     return this.d_selected_items.some((el) => this.are_items_equal(el, item))
+  }
+
+  get component_uid() {
+    return generate_uid();
+  }
+
+  option_id(index: number) {
+    return `batch-option-${this.component_uid}-${index}`;
+  }
+
+  get active_option_id() {
+    if (this.d_current_focus_index === null
+        || this.d_current_focus_index >= this.batch_filtered_items.length) {
+      return undefined;
+    }
+    return this.option_id(this.d_current_focus_index);
   }
 
   // Call when user clicks the "confirm" button.
