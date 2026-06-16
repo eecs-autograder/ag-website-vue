@@ -105,6 +105,7 @@ export default class MutationCommand extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/section_header.scss';
 
