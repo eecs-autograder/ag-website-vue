@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 
 interface MenuCoordinates {
   x: number;
@@ -20,7 +20,6 @@ interface MenuCoordinates {
 }
 
 const props = defineProps<{
-  /** Page coordinates where the menu should open. */
   coordinates: MenuCoordinates;
   is_open: boolean;
 }>();
@@ -42,33 +41,35 @@ watch(
       return;
     }
 
-    const el = root.value;
-    if (el === null) {
-      return;
-    }
+    // Wait for v-show to make the element visible before measuring and
+    // focusing it: focus() is a no-op on a `display: none` element, and the
+    // ESC-to-close handler needs the element focused.
+    nextTick(() => {
+      const el = root.value;
+      if (el === null) {
+        return;
+      }
 
-    el.style.left = "0px";
-    el.style.top = "0px";
-    const height = el.clientHeight;
-    const width = el.clientWidth;
+      el.style.left = "0px";
+      el.style.top = "0px";
+      const height = el.clientHeight;
+      const width = el.clientWidth;
 
-    let left = props.coordinates.x;
-    let top = props.coordinates.y;
-    if (left + width > document.body.clientWidth) {
-      left = left - width - 5;
-    }
-    if (top + height > document.body.clientHeight) {
-      top = top - height - 5;
-    }
+      let left = props.coordinates.x;
+      let top = props.coordinates.y;
+      if (left + width > document.body.clientWidth) {
+        left = left - width - 5;
+      }
+      if (top + height > document.body.clientHeight) {
+        top = top - height - 5;
+      }
 
-    el.style.left = `${left}px`;
-    el.style.top = `${top}px`;
+      el.style.left = `${left}px`;
+      el.style.top = `${top}px`;
 
-    // focus must be applied after the element is visible for the ESC
-    // key to work
-    el.focus();
+      el.focus();
+    });
   },
-  { flush: "post" },
 );
 </script>
 

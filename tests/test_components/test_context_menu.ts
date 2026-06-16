@@ -8,7 +8,7 @@ import * as sinon from 'sinon';
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from '@/components/context_menu/context_menu_item.vue';
 
-import { emitted } from '@/tests/utils';
+import { emitted, wait_until } from '@/tests/utils';
 
 
 @Component({
@@ -224,6 +224,26 @@ describe('ContextMenu tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(context_menu_wrapper.isVisible()).toBe(false);
+
+        wrapper.destroy();
+    });
+
+    // Regression: focus() is a no-op on a hidden element, so the menu must be
+    // visible by the time it's focused, else ESC-to-close never works.
+    test("Menu is visible at the moment it is focused on open", async () => {
+        let wrapper = mount(WrapperComponent);
+        let container = <HTMLElement> wrapper.find('.context-menu-container').element;
+
+        let display_when_focused: string | null = null;
+        let focus_stub = sinon.stub(container, 'focus').callsFake(() => {
+            display_when_focused = window.getComputedStyle(container).display;
+        });
+
+        wrapper.find('.context-menu-area').trigger('click');
+        await wait_until(wrapper, () => focus_stub.called);
+
+        expect(focus_stub.called).toBe(true);
+        expect(display_when_focused).not.toEqual('none');
 
         wrapper.destroy();
     });
