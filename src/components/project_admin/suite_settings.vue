@@ -321,7 +321,8 @@ export default class SuiteSettings extends Vue {
   padding: 0 .25rem;
 }
 
-.remove-file-icon-container:hover {
+.remove-file-icon-container:hover,
+.remove-file-icon-container:focus-visible {
   .remove-file {
     color: hsl(220, 20%, 55%);
   }
