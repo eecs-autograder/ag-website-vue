@@ -246,6 +246,7 @@ describe('Focus and keyboard navigation', () => {
 
             const listbox = wrapper.find('[role=listbox]');
             (listbox.element as HTMLElement).blur();
+            expect(await wait_until(wrapper, (w) => active_descendant(w) === undefined)).toBe(true);
             (listbox.element as HTMLElement).focus();
 
             expect(await wait_until(wrapper, obj3_is_only_visible_option_and_active)).toBe(true);
@@ -416,6 +417,7 @@ describe('Focus and keyboard navigation', () => {
 
             const listbox = wrapper.find('[role=listbox]');
             (listbox.element as HTMLElement).blur();
+            expect(await wait_until(wrapper, (w) => active_descendant(w) === undefined)).toBe(true);
             (listbox.element as HTMLElement).focus();
 
             // obj3 is now the first selected item still visible, so focus skips to it.
@@ -429,24 +431,30 @@ describe('Focus and keyboard navigation', () => {
         });
 
         test("Falls back to the first visible item when no selected item is visible", async () => {
-            await wrapper.find('[aria-label="Open batch select"]').trigger('click');
-            expect(await wait_until(wrapper, (w) => active_option_is(w, 1))).toBe(true);
+            // Mark the first object as selected, but then we'll filter it out.
+            // Make sure the focused element is the first visible one,
+            // not coincidentally the first option.
+            await wrapper.setData({selected: [obj1]});
 
-            // Hide obj2 and obj3 (the selected items); only obj1 (unselected) remains.
-            await wrapper.find('[aria-label="Filter"]').setValue('ab');
+            await wrapper.find('[aria-label="Open batch select"]').trigger('click');
+            expect(await wait_until(wrapper, (w) => active_option_is(w, 0))).toBe(true);
+
+            // Hide obj1 (the selected item); only obj2 and obj3 (unselected) remain.
+            await wrapper.find('[aria-label="Filter"]').setValue('c');
 
             const listbox = wrapper.find('[role=listbox]');
             (listbox.element as HTMLElement).blur();
+            expect(await wait_until(wrapper, (w) => active_descendant(w) === undefined)).toBe(true);
             (listbox.element as HTMLElement).focus();
 
             // No selected item is visible, so focus falls back to the first item.
-            const obj1_is_only_visible_option_and_active = (w: Wrapper<Vue>) => {
+            const obj2_is_only_visible_option_and_active = (w: Wrapper<Vue>) => {
                 const opts = visible_options(w);
-                return opts.length === 1
-                    && opts.at(0).text() === obj1.value
+                return opts.length === 2
+                    && opts.at(0).text() === obj2.value
                     && active_option_is(w, 0);
             };
-            expect(await wait_until(wrapper, obj1_is_only_visible_option_and_active)).toBe(true);
+            expect(await wait_until(wrapper, obj2_is_only_visible_option_and_active)).toBe(true);
         });
     });
 
