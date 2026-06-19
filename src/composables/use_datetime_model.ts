@@ -37,17 +37,17 @@ export function to_iso(wall_time: string, timezone: string): string | null {
  * @param set_iso - Writes back an ISO datetime value (or null to clear it).
  * @param get_timezone - Returns the IANA timezone name to use for conversion.
  */
-export function use_datetime_model(
+export function use_datetime_model(args: {
   get_iso: () => string | null,
   set_iso: (value: string | null) => void,
   get_timezone: () => string,
-) {
+}) {
   return computed({
     get(): string {
-      return to_wall_time(get_iso(), get_timezone());
+      return to_wall_time(args.get_iso(), args.get_timezone());
     },
     set(wall_time: string) {
-      set_iso(to_iso(wall_time, get_timezone()));
+      args.set_iso(to_iso(wall_time, args.get_timezone()));
     },
   });
 }

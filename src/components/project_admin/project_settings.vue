@@ -626,25 +626,25 @@ const timezone_model = computed({
   },
 });
 
-const soft_closing_time_model = use_datetime_model(
-  () => state.project.soft_closing_time,
-  (v) => {
+const soft_closing_time_model = use_datetime_model({
+  get_iso: () => state.project.soft_closing_time,
+  set_iso: (v) => {
     state.project.soft_closing_time = v;
   },
-  () => state.project.timezone,
-);
+  get_timezone: () => state.project.timezone,
+});
 
-const closing_time_model = use_datetime_model(
-  () => {
+const closing_time_model = use_datetime_model({
+  get_iso: () => {
     // closing_time is only undefined for students, who won't visit this page
     assert(state.project.closing_time !== undefined);
     return state.project.closing_time;
   },
-  (v) => {
+  set_iso: (v) => {
     state.project.closing_time = v;
   },
-  () => state.project.timezone,
-);
+  get_timezone: () => state.project.timezone,
+});
 
 const save_project_settings = () => {
   return toggle(state, "saving", async () => {

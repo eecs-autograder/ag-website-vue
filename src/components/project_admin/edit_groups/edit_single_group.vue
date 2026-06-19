@@ -154,13 +154,13 @@ const state = reactive({
   deleting: false,
 });
 
-const extension_model = use_datetime_model(
-  () => state.group?.extended_due_date ?? null,
-  (v) => {
+const extension_model = use_datetime_model({
+  get_iso: () => state.group?.extended_due_date ?? null,
+  set_iso: (v) => {
     if (state.group) state.group.extended_due_date = v;
   },
-  () => props.project.timezone,
-);
+  get_timezone: () => props.project.timezone,
+});
 
 const update_group = () => {
   return toggle(state, "saving", async () => {
