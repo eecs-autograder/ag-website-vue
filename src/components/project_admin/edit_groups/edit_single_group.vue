@@ -18,47 +18,39 @@
       :ignore_group_size_limits="true"
     >
       <template v-slot:footer>
-        <div class="datetime-picker-container clearable-datetime-picker">
-          <div class="label">Extension</div>
-          <div
-            data-testid="extension"
-            class="datetime-input"
-            @click="toggle_extension_visibility()"
-          >
-            {{ format_datetime(state.group.extended_due_date) }}
-            <i class="far fa-calendar-alt"></i>
+        <div class="extension-container clearable-datetime-picker">
+          <label class="label" for="extension-datetime">Extension</label>
+          <div>
+            <input
+              type="datetime-local"
+              id="extension-datetime"
+              data-testid="extension"
+              v-model="extension_model"
+            />
+            <button
+              type="button"
+              data-testid="revoke_extension"
+              class="clear-button"
+              @click.stop="state.group.extended_due_date = null"
+              :disabled="state.group.extended_due_date === null"
+            >
+              <i class="fas fa-times"></i>
+              <span class="clear-text">Revoke</span>
+            </button>
           </div>
-          <button
-            type="button"
-            data-testid="revoke_extension"
-            class="clear-button"
-            @click.stop="state.group.extended_due_date = null"
-            :disabled="state.group.extended_due_date === null"
-          >
-            <i class="fas fa-times"></i>
-            <span class="clear-text">Revoke</span>
-          </button>
-
-          <datetime-picker
-            v-model="state.group.extended_due_date"
-            ref="extension_datetime_picker"
-          >
-          </datetime-picker>
         </div>
 
         <div
           id="bonus-submissions-container"
           class="form-field-wrapper extra-space"
         >
-          <label id="bonus-submissions-label" class="label">
-            Bonus Submissions
-          </label>
           <validated-int-input
             ref="bonus_submissions_remaining_input"
             v-model="state.group.bonus_submissions_remaining"
             :validators="[make_min_validator(0)]"
             input_style="width: 80px"
           >
+            <template v-slot:label>Bonus Submissions</template>
           </validated-int-input>
         </div>
         <APIErrors ref="api_errors"></APIErrors>
@@ -98,6 +90,7 @@
       :include_closing_x="!state.deleting"
       :click_outside_to_close="!state.deleting"
       ref="delete_group_modal"
+      aria_label="Delete group modal"
     >
       <div class="modal-header">Confirm Delete</div>
 
@@ -132,9 +125,9 @@
 <script setup lang="ts">
 import { Course, Group, Project } from "ag-client-typescript";
 import { reactive, watch, ref } from "vue";
+import { use_datetime_model } from "@/composables/use_datetime_model";
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from "@/exposed_component_types/api_errors_exposed";
-import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import GroupMembersForm from "@/components/group_members_form.vue";
 import LastSaved from "@/components/last_saved.vue";
 import Modal from "@/components/modal.vue";
@@ -152,7 +145,6 @@ const props = defineProps<PropTypes>();
 
 const api_errors = ref<APIErrorsExposed>();
 const delete_group_api_errors = ref<APIErrorsExposed>();
-const extension_datetime_picker = ref<InstanceType<typeof DatetimePicker>>();
 
 const state = reactive({
   group: null as Group | null,
@@ -160,6 +152,14 @@ const state = reactive({
   edit_group_form_is_valid: true,
   show_delete_group_modal: false,
   deleting: false,
+});
+
+const extension_model = use_datetime_model({
+  get_iso: () => state.group?.extended_due_date ?? null,
+  set_iso: (v) => {
+    if (state.group) state.group.extended_due_date = v;
+  },
+  get_timezone: () => props.project.timezone,
 });
 
 const update_group = () => {
@@ -184,12 +184,6 @@ const delete_group = () => {
       delete_group_api_errors.value?.show_errors_from_response(error);
     }
   });
-};
-
-const toggle_extension_visibility = () => {
-  if (extension_datetime_picker.value) {
-    extension_datetime_picker.value.toggle_visibility();
-  }
 };
 
 watch(
@@ -224,7 +218,7 @@ defineExpose({
   }
 }
 
-.datetime-picker-container {
+.extension-container {
   padding-top: 1rem;
 }
 

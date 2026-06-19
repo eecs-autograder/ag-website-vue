@@ -16,6 +16,7 @@
           ref="username_input"
           @input="$emit('input', state.usernames)"
         >
+          <template v-slot:label>{{ `Member ${index + 1} username` }}</template>
           <button
             slot="suffix"
             class="remove-member-button"

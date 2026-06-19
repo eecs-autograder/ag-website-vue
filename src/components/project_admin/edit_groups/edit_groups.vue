@@ -20,8 +20,7 @@
     <div class="extensions-container">
       <table class="extensions-table">
         <tr>
-          <th class="section-title">Extensions Granted</th>
-          <th> </th>
+          <th class="section-title" colspan="2">Extensions Granted</th>
         </tr>
         <tr v-for="(group, index) of groups_with_extensions"
             :class="index % 2 === 0 ? 'even-row' : 'odd-row'"
@@ -46,7 +45,8 @@
            @close="d_show_create_group_modal = false"
            ref="create_group_modal"
            click_outside_to_close
-           size="large">
+           size="large"
+           aria_label="Create new group modal">
       <div class="modal-header"> Create New Group </div>
       <create-single-group :course="course" :project="project"></create-single-group>
     </modal>
@@ -55,7 +55,8 @@
            @close="d_show_merge_groups_modal = false"
            ref="merge_groups_modal"
            click_outside_to_close
-           size="large">
+           size="large"
+           aria_label="Merge groups modal">
       <div class="modal-header">Merge Groups</div>
       <merge-groups :project="project"
                     :groups="groups_by_members.data"

@@ -6,11 +6,8 @@ import {
     HttpError,
     Project,
 } from 'ag-client-typescript';
-// @ts-ignore
-import moment from 'moment-timezone';
 import * as sinon from "sinon";
 
-import DatetimePicker from "@/components/datetime/datetime_picker.vue";
 import EditSingleGroup from '@/components/project_admin/edit_groups/edit_single_group.vue';
 import { assert_not_null } from '@/utils';
 
@@ -98,33 +95,12 @@ describe('EditSingleGroup tests', () => {
         expect(submit.attributes('disabled')).toBeDefined();
     });
 
-    test('Clicking extension display opens datetime picker', () => {
-        let extension_display = wrapper.find('[data-testid=extension]');
-        let picker
-            = <Wrapper<DatetimePicker>> wrapper.findComponent({ref: 'extension_datetime_picker'});
-
-        expect(picker.vm.is_visible).toEqual(false);
-
-        extension_display.trigger('click');
-        expect(picker.vm.is_visible).toEqual(true);
-    });
-
-    test('Revoking and granting extension', async () => {
-        expect(wrapper.vm.d_group?.extended_due_date).not.toBeNull();
+    test('Revoking extension', async () => {
+        expect(wrapper.vm.state.group?.extended_due_date).not.toBeNull();
 
         let revoke_button = wrapper.find('[data-testid=revoke_extension]');
         await revoke_button.trigger('click');
         expect(wrapper.vm.state.group?.extended_due_date).toBeNull();
-
-        let picker
-            = <Wrapper<DatetimePicker>> wrapper.findComponent({ref: 'extension_datetime_picker'});
-        picker.vm.toggle_visibility();
-        expect(picker.vm.is_visible).toEqual(true);
-
-        let now = moment();
-        picker.vm.set_date_and_time(now.format());
-        picker.vm.update_time_selected();
-        expect(moment(wrapper.vm.state.group?.extended_due_date).format()).toEqual(now.format());
     });
 
     test('API errors displayed on submit', async () => {
