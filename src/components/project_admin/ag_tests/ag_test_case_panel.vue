@@ -272,9 +272,7 @@ export default class AGTestCasePanel extends Vue {
   private command_order_syncer = new OrderSyncer<AGTestCommand>(
     (cmds) => AGTestCommand.update_order(this.ag_test_case.pk, cmds.map(cmd => cmd.pk)),
     (saved) => {
-      this.ag_test_case.ag_test_commands.splice(
-        0, this.ag_test_case.ag_test_commands.length, ...saved
-      );
+      this.ag_test_case.ag_test_commands = saved.slice();
     },
     (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
   );

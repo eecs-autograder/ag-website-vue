@@ -9,6 +9,7 @@ import {
 // tslint:disable-next-line:no-duplicate-imports
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from "sinon";
+import { vi } from 'vitest';
 
 import APIErrors from '@/components/api_errors.vue';
 import BuggyImplementations from '@/components/project_admin/mutation_suites/buggy_implementations.vue';
@@ -92,34 +93,112 @@ describe('MutationSuites tests', () => {
         expect(await wait_for_load(wrapper)).toBe(true);
     });
 
-    test('Update mutation test suites order', async () => {
-        let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
-        wrapper.findComponent({ref: 'mutation_test_suite_order'}).vm.$emit('change');
-        await wrapper.vm.$nextTick();
-        expect(
-            order_stub.calledOnceWith(project.pk, [
-                mutation_test_suite_1.pk,
-                mutation_test_suite_2.pk,
+    describe('Alter suite order', () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        test('Update mutation test suites order', async () => {
+            let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
+
+            const draggable = wrapper.findComponent({ref: 'mutation_test_suite_order'});
+            draggable.vm.$emit('start');
+            // Simulate vuedraggable mutating v-model on drop.
+            wrapper.vm.d_mutation_test_suites.reverse();
+            draggable.vm.$emit('change');
+            await vi.runAllTimersAsync();
+
+            expect(order_stub.calledOnceWith(project.pk, [
                 mutation_test_suite_3.pk,
-            ])
-        ).toBe(true);
+                mutation_test_suite_2.pk,
+                mutation_test_suite_1.pk,
+            ])).toBe(true);
+        });
+
+        test('Original order restored after bad update suites order request', async () => {
+            sinon.stub(ag_cli.MutationTestSuite, 'update_order').rejects(
+                new HttpError(400, 'NOOOOOPE')
+            );
+
+            const draggable = wrapper.findComponent({ref: 'mutation_test_suite_order'});
+            draggable.vm.$emit('start');
+            await wrapper.vm.$nextTick();
+
+            wrapper.vm.d_mutation_test_suites.reverse();
+            await wrapper.vm.$nextTick();
+
+            draggable.vm.$emit('change');
+            await vi.runAllTimersAsync();
+
+            expect(wrapper.vm.d_mutation_test_suites).toEqual([
+                mutation_test_suite_1, mutation_test_suite_2, mutation_test_suite_3,
+            ]);
+        });
+
+        test('Move suite up', async () => {
+            let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
+
+            wrapper.findAll('[aria-label="Move up"]').at(1).trigger('click');
+            await wrapper.vm.$nextTick();
+            await vi.runAllTimersAsync();
+
+            expect(wrapper.vm.d_mutation_test_suites).toEqual([
+                mutation_test_suite_2, mutation_test_suite_1, mutation_test_suite_3,
+            ]);
+            expect(order_stub.calledOnceWith(project.pk, [
+                mutation_test_suite_2.pk, mutation_test_suite_1.pk, mutation_test_suite_3.pk,
+            ])).toBe(true);
+        });
+
+        test('Move suite down', async () => {
+            let order_stub = sinon.stub(ag_cli.MutationTestSuite, 'update_order');
+
+            wrapper.findAll('[aria-label="Move down"]').at(1).trigger('click');
+            await wrapper.vm.$nextTick();
+            await vi.runAllTimersAsync();
+
+            expect(wrapper.vm.d_mutation_test_suites).toEqual([
+                mutation_test_suite_1, mutation_test_suite_3, mutation_test_suite_2,
+            ]);
+            expect(order_stub.calledOnceWith(project.pk, [
+                mutation_test_suite_1.pk, mutation_test_suite_3.pk, mutation_test_suite_2.pk,
+            ])).toBe(true);
+        });
+
+        test('Original order restored after failed move suite', async () => {
+            sinon.stub(ag_cli.MutationTestSuite, 'update_order').rejects(
+                new HttpError(400, 'NOOOOOPE')
+            );
+
+            wrapper.findAll('[aria-label="Move down"]').at(0).trigger('click');
+            await wrapper.vm.$nextTick();
+            await vi.runAllTimersAsync();
+
+            expect(wrapper.vm.d_mutation_test_suites).toEqual([
+                mutation_test_suite_1, mutation_test_suite_2, mutation_test_suite_3,
+            ]);
+        });
     });
 
     test('Clicking on a mutation test suite makes it the active_mutation_test_suite ',
          async () => {
         expect(wrapper.vm.d_mutation_test_suites.length).toEqual(3);
 
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
 
-        wrapper.findAll('.mutation-test-suite-panel').at(0).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(0).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_1);
 
-        wrapper.findAll('.mutation-test-suite-panel').at(0).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(0).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_1);
@@ -223,7 +302,7 @@ describe('MutationSuites tests', () => {
     });
 
     test('save mutation_test_suite - successful', async () => {
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         let save_stub = sinon.stub(wrapper.vm.d_active_mutation_test_suite!, 'save');
@@ -240,7 +319,7 @@ describe('MutationSuites tests', () => {
 
     test('save mutation_test_suite - unsuccessful', async () => {
         Element.prototype.scrollIntoView = () => {};
-        await wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        await wrapper.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle').trigger('click');
 
         let save_stub = sinon.stub(wrapper.vm.d_active_mutation_test_suite!, 'save').returns(
             Promise.reject(
@@ -272,7 +351,7 @@ describe('MutationSuites tests', () => {
             }
         );
 
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
@@ -307,7 +386,7 @@ describe('MutationSuites tests', () => {
     test('delete_mutation_test_suite - cancel deletion', async () => {
         let delete_stub = sinon.stub(mutation_test_suite_2, 'delete');
 
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_2);
@@ -339,7 +418,7 @@ describe('MutationSuites tests', () => {
     test('API errors handled on delete', async () => {
         sinon.stub(mutation_test_suite_2, 'delete').rejects(new HttpError(403, 'errar'));
 
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.find('.delete-mutation-test-suite-button').trigger('click');
@@ -367,7 +446,7 @@ describe('MutationSuites tests', () => {
             = 200000;
         updated_mutation_test_suite_1.grade_buggy_impl_command.virtual_memory_limit = 6000000;
 
-        wrapper.findAll('.mutation-test-suite-panel').at(0).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(0).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_1);
@@ -394,7 +473,7 @@ describe('MutationSuites tests', () => {
             = 200000;
         updated_mutation_test_suite_3.grade_buggy_impl_command.virtual_memory_limit = 6000000;
 
-        wrapper.findAll('.mutation-test-suite-panel').at(0).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(0).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_active_mutation_test_suite).toEqual(mutation_test_suite_1);
@@ -444,7 +523,7 @@ describe('MutationSuites tests', () => {
     });
 
     test('Commands - d_active_mutation_test_suite binding',  async () => {
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         let mutation_commands = find_by_name<MutationCommands>(wrapper, 'MutationCommands');
@@ -459,7 +538,7 @@ describe('MutationSuites tests', () => {
     });
 
     test('Edit Feedback Settings - d_active_mutation_test_suite binding', async () => {
-        wrapper.findAll('.mutation-test-suite-panel').at(1).trigger('click');
+        wrapper.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle').trigger('click');
         await wrapper.vm.$nextTick();
 
         // visible
@@ -632,6 +711,126 @@ describe('MutationSuites tests', () => {
             wrapper.vm.d_active_mutation_test_suite!.past_limit_submission_fdbk_config
                 .show_validity_check_stderr
         ).toBe(true);
+    });
+});
+
+test('Move up button disabled for first suite', async () => {
+    sinon.stub(ag_cli.SandboxDockerImage, 'get_images').resolves([]);
+    let project = data_ut.make_project(data_ut.make_course().pk);
+    sinon.stub(MutationTestSuite, 'get_all_from_project').resolves([
+        data_ut.make_mutation_test_suite(project.pk),
+        data_ut.make_mutation_test_suite(project.pk),
+    ]);
+    let wrapper = managed_mount(MutationSuites, {propsData: {project}});
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    expect(
+        (wrapper.findAll('[aria-label="Move up"]').at(0).element as HTMLButtonElement).disabled
+    ).toBe(true);
+    expect(
+        (wrapper.findAll('[aria-label="Move up"]').at(1).element as HTMLButtonElement).disabled
+    ).toBe(false);
+});
+
+test('Move down button disabled for last suite', async () => {
+    sinon.stub(ag_cli.SandboxDockerImage, 'get_images').resolves([]);
+    let project = data_ut.make_project(data_ut.make_course().pk);
+    sinon.stub(MutationTestSuite, 'get_all_from_project').resolves([
+        data_ut.make_mutation_test_suite(project.pk),
+        data_ut.make_mutation_test_suite(project.pk),
+    ]);
+    let wrapper = managed_mount(MutationSuites, {propsData: {project}});
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    expect(
+        (wrapper.findAll('[aria-label="Move down"]').at(0).element as HTMLButtonElement).disabled
+    ).toBe(false);
+    expect(
+        (wrapper.findAll('[aria-label="Move down"]').at(1).element as HTMLButtonElement).disabled
+    ).toBe(true);
+});
+
+describe('Move suite focus management', () => {
+    let project: Project;
+    let suites: MutationTestSuite[];
+
+    beforeEach(() => {
+        sinon.stub(ag_cli.SandboxDockerImage, 'get_images').resolves([]);
+        project = data_ut.make_project(data_ut.make_course().pk);
+        suites = [
+            data_ut.make_mutation_test_suite(project.pk),
+            data_ut.make_mutation_test_suite(project.pk),
+            data_ut.make_mutation_test_suite(project.pk),
+            data_ut.make_mutation_test_suite(project.pk),
+        ];
+        sinon.stub(MutationTestSuite, 'get_all_from_project').resolves(suites.slice());
+        sinon.stub(ag_cli.MutationTestSuite, 'update_order');
+    });
+
+    test('Focus stays on move up button after moving suite up to non-boundary position',
+         async () => {
+        let wrapper = managed_mount(MutationSuites, {
+            propsData: {project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // suites[2] is the 3rd "Move up" button (suites[0] is disabled)
+        wrapper.findAll('[aria-label="Move up"]').at(2).trigger('click');
+        // suites[2] moves to DOM position 1.
+        const find_expected = () => wrapper.findAll('.mutation-test-suite-panel').at(1)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move down when suite moves to first position', async () => {
+        let wrapper = managed_mount(MutationSuites, {
+            propsData: {project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // suites[1] is the 2nd "Move up" button (suites[0] is disabled)
+        wrapper.findAll('[aria-label="Move up"]').at(1).trigger('click');
+        // suites[1] moves to DOM position 0 (first), so move-up is disabled — fallback to move-down.
+        const find_expected = () => wrapper.findAll('.mutation-test-suite-panel').at(0)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus stays on move down button after moving suite down to non-boundary position',
+         async () => {
+        let wrapper = managed_mount(MutationSuites, {
+            propsData: {project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // suites[0] is the 1st "Move down" button (suites[3] is disabled)
+        wrapper.findAll('[aria-label="Move down"]').at(0).trigger('click');
+        // suites[0] moves to DOM position 1 (non-boundary) — focus stays on move-down.
+        const find_expected = () => wrapper.findAll('.mutation-test-suite-panel').at(1)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move up when suite moves to last position', async () => {
+        let wrapper = managed_mount(MutationSuites, {
+            propsData: {project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        // suites[2] is the 3rd "Move down" button (suites[3] is disabled)
+        wrapper.findAll('[aria-label="Move down"]').at(2).trigger('click');
+        // suites[2] moves to DOM position 3 (last), so move-down is disabled — fallback to move-up.
+        const find_expected = () => wrapper.findAll('.mutation-test-suite-panel').at(3)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
     });
 });
 

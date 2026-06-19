@@ -227,9 +227,7 @@ export default class AGTestSuitePanel extends Vue {
   private case_order_syncer = new OrderSyncer<AGTestCase>(
     (cases) => AGTestCase.update_order(this.ag_test_suite.pk, cases.map(c => c.pk)),
     (saved) => {
-      this.ag_test_suite.ag_test_cases.splice(
-        0, this.ag_test_suite.ag_test_cases.length, ...saved
-      );
+      this.ag_test_suite.ag_test_cases = saved.slice();
     },
     (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
   );

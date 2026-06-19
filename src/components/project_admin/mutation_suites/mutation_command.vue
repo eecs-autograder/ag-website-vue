@@ -5,9 +5,9 @@
     </div>
     <div class="command-content">
       <div class="form-field-wrapper" v-if="include_command_name_input">
-        <label class="label"> Name </label>
+        <label class="label" :for="`mutation-command-name-${label_uid}`"> Name </label>
         <validated-input ref="name"
-                         id="name"
+                         :input_id="`mutation-command-name-${label_uid}`"
                          v-model="d_ag_command.name"
                          :validators="[is_not_empty]"
                          input_style="width: 100%"
@@ -16,9 +16,9 @@
       </div>
 
       <div class="form-field-wrapper">
-        <label class="label"> Command </label>
+        <label class="label" :for="`mutation-command-cmd-${label_uid}`"> Command </label>
         <validated-input ref="cmd"
-                         id="cmd"
+                         :input_id="`mutation-command-cmd-${label_uid}`"
                          v-model="d_ag_command.cmd"
                          :validators="[is_not_empty]"
                          input_style="width: 100%"
@@ -26,14 +26,19 @@
         </validated-input>
       </div>
 
-      <div class="resource-limits-label" @click="toggle_is_open">
-        <i v-if="d_is_open" class="fas fa-caret-down caret-down"></i>
-        <i v-else class="fas fa-caret-right caret-right"></i>
+      <button type="button"
+              class="unstyled-button resource-limits-label"
+              :aria-expanded="d_is_open"
+              :aria-controls="`resource-limits-${label_uid}`"
+              @click="toggle_is_open">
+        <i v-if="d_is_open" class="fas fa-caret-down caret-down" aria-hidden="true"></i>
+        <i v-else class="fas fa-caret-right caret-right" aria-hidden="true"></i>
         <span class="header-text"> Resource Limits </span>
-      </div>
+      </button>
 
       <resource-limit-settings
-        v-if="d_is_open"
+        v-show="d_is_open"
+        :id="`resource-limits-${label_uid}`"
         :resource_limits="d_ag_command"
         @field_change="Object.assign(d_ag_command, $event); $emit('input', d_ag_command)">
       </resource-limit-settings>
@@ -48,6 +53,7 @@ import { AGCommand } from 'ag-client-typescript';
 
 import ResourceLimitSettings from '@/components/project_admin/resource_limit_settings.vue';
 import ValidatedInput, { ValidatorResponse } from "@/components/validated_input.vue";
+import { generate_uid } from '@/utils';
 import {
     is_integer,
     is_non_negative,
@@ -73,6 +79,10 @@ export default class MutationCommand extends Vue {
   d_is_open = false;
   d_ag_command: AGCommand | null = null;
 
+  get label_uid() {
+    return generate_uid();
+  }
+
   readonly is_not_empty = is_not_empty;
   readonly is_integer = is_integer;
   readonly is_non_negative = is_non_negative;
@@ -95,6 +105,7 @@ export default class MutationCommand extends Vue {
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/section_header.scss';
 
@@ -119,8 +130,10 @@ export default class MutationCommand extends Vue {
 .resource-limits-label {
   @include collapsible-section-header($pad-text: true, $line-color: $stormy-gray-light);
 
-  margin-bottom: .5rem;
   font-size: .875rem;
+  margin-bottom: .5rem;
+  width: 100%;
+  text-align: left;
 }
 
 .unit-of-measurement {

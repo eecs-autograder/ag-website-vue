@@ -9,7 +9,7 @@ import { arrays_equal, SafePromise } from "./utils";
  * ```ts
  * const syncer = new OrderSyncer(
  *     items => MyEntity.update_order(parent_pk, items.map(i => i.pk)),
- *     saved => { this.items.splice(0, this.items.length, ...saved); },
+ *     saved => { this.items = saved.slice(); },
  *     err => GlobalErrorsSubject.get_instance().report_error(err),
  * );
  * // Each time the order changes:

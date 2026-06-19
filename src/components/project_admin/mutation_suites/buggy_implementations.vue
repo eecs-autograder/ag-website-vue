@@ -2,9 +2,9 @@
   <div id="buggy-implementations-component"
        v-if="d_mutation_test_suite !== null">
     <div class="form-field-wrapper">
-      <label class="label"> Points per exposed bug </label>
+      <label class="label" for="points-per-exposed-bug"> Points per exposed bug </label>
       <validated-input ref="points_per_exposed_bug"
-                       id="points-per-exposed-bug"
+                       input_id="points-per-exposed-bug"
                        v-model="d_mutation_test_suite.points_per_exposed_bug"
                        :validators="[
                            is_not_empty,
@@ -31,9 +31,9 @@
 
     <div v-if="d_override_max_points"
          class="form-field-wrapper">
-      <label class="label"> Max points </label>
+      <label class="label" for="mutation-suite-max-points"> Max points </label>
       <validated-input ref="max_points"
-                       id="max-points"
+                       input_id="mutation-suite-max-points"
                        v-model="d_mutation_test_suite.max_points"
                        :validators="[
                            is_not_empty,
@@ -47,9 +47,9 @@
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label"> Max num student tests </label>
+      <label class="label" for="max-num-student-tests"> Max num student tests </label>
       <validated-input ref="max_num_student_tests"
-                       id="max-num-student-tests"
+                       input_id="max-num-student-tests"
                        v-model="d_mutation_test_suite.max_num_student_tests"
                        :validators="[
                            is_not_empty,
@@ -63,9 +63,10 @@
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label"> Buggy Implementation Names </label>
+      <label class="label" for="buggy-impl-names-input"> Buggy Implementation Names </label>
       <div class="buggy-implementation-names-input-container">
-        <textarea ref="buggy_impl_names_input"
+        <textarea id="buggy-impl-names-input"
+                  ref="buggy_impl_names_input"
                   class="input"
                   @keydown.enter="add_buggy_implementation_names"
                   v-model="d_buggy_impl_names_text">
@@ -86,11 +87,12 @@
            :class="['buggy-implementation-row',
                      {'odd-buggy-implementation-row': index % 2 !== 0}]">
         <span class="buggy-implementation-name">{{buggy_name}}</span>
-        <div class="remove-buggy-impl-name-container"
-             @click="remove_buggy_implementation_name(index)"
-             :title="`Remove ${buggy_name}`">
-          <i class="fas fa-times remove-buggy-impl-name-icon"></i>
-        </div>
+        <button type="button"
+                class="unstyled-button remove-buggy-impl-name-container"
+                :aria-label="`Remove ${buggy_name}`"
+                @click="remove_buggy_implementation_name(index)">
+          <i class="fas fa-times remove-buggy-impl-name-icon" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -225,7 +227,6 @@ $periwinkle: hsl(220, 30%, 56%);
   align-items: flex-start;
 
   .remove-buggy-impl-name-container {
-    cursor: pointer;
     padding: 0 .25rem;
   }
 

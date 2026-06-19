@@ -97,6 +97,7 @@
                       :are_items_equal="are_files_equal"
                       :filter_fn="instructor_file_filter_fn"
                       @input="$emit('field_change', d_suite)"
+                      aria_label="Batch select instructor files needed"
                       v-slot="{ item }">
           {{ item.name }}
         </batch-select>
@@ -106,11 +107,12 @@
         <div v-for="(file, index) of d_suite.instructor_files_needed"
               :class="['file', {'odd-index': index % 2 !== 0}]">
           <span class="file-name"> {{file.name}} </span>
-          <div class="remove-file-icon-container"
-               @click="d_suite.instructor_files_needed.splice(index, 1);
-                       $emit('field_change', d_suite)">
+          <button class="remove-file-icon-container unstyled-button"
+                  aria-label="Remove instructor file"
+                  @click="d_suite.instructor_files_needed.splice(index, 1);
+                          $emit('field_change', d_suite)">
             <span><i class="fas fa-times remove-file"></i></span>
-          </div>
+      </button>
         </div>
       </div>
 
@@ -135,6 +137,7 @@
                       :are_items_equal="are_files_equal"
                       :filter_fn="expected_student_file_filter_fn"
                       @input="$emit('field_change', d_suite)"
+                      aria_label="Batch select student files needed"
                       v-slot="{ item }">
           {{ item.pattern }}
         </batch-select>
@@ -144,11 +147,12 @@
         <div v-for="(file, index) of d_suite.student_files_needed"
              :class="['file', {'odd-index': index % 2 !== 0}]">
           <span class="file-name"> {{file.pattern}} </span>
-          <div class="remove-file-icon-container"
-               @click="d_suite.student_files_needed.splice(index, 1);
-                       $emit('field_change', d_suite)">
+          <button class="remove-file-icon-container unstyled-button"
+                  aria-label="Remove student file"
+                  @click="d_suite.student_files_needed.splice(index, 1);
+                         $emit('field_change', d_suite)">
             <span><i class="fas fa-times remove-file"></i></span>
-          </div>
+          </button>
         </div>
       </div>
     </fieldset>
@@ -314,12 +318,11 @@ export default class SuiteSettings extends Vue {
 }
 
 .remove-file-icon-container {
-  display: inline-block;
   padding: 0 .25rem;
 }
 
-.remove-file-icon-container:hover {
-  cursor: pointer;
+.remove-file-icon-container:hover,
+.remove-file-icon-container:focus-visible {
   .remove-file {
     color: hsl(220, 20%, 55%);
   }

@@ -212,7 +212,7 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
   async created() {
     this.suite_order_syncer = new OrderSyncer<AGTestSuite>(
       (suites) => AGTestSuite.update_order(this.project.pk, suites.map(s => s.pk)),
-      (saved) => { this.d_ag_test_suites.splice(0, this.d_ag_test_suites.length, ...saved); },
+      (saved) => { this.d_ag_test_suites = saved.slice(); },
       (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
     );
     AGTestSuite.subscribe(this);
