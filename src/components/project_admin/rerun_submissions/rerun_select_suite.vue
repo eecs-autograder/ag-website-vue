@@ -13,7 +13,7 @@
       </label>
       <button
         type="button"
-        class="white-button toggle-tests-button"
+        class="flat-white-button toggle-tests-button"
         :aria-expanded="is_open"
         :aria-controls="`select-test-cases-${component_uid}`"
         @click="is_open = !is_open"
@@ -91,7 +91,7 @@ const is_open = ref(false);
 
 .ag-test-case-checkbox-wrapper {
   margin: 0.25rem 0;
-  margin-left: 2.5rem;
+  margin-left: 2rem;
 
   white-space: nowrap;
 }
