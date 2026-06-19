@@ -74,35 +74,18 @@
           but leave all its tests unchecked.
         </tooltip>
       </div>
-      <collapsible class="ag-test-suite-collapsible"
-                   v-for="ag_test_suite of d_ag_test_suites">
-        <template v-slot:header_text>
-          <div class="unpadded-checkbox-container ag-test-suite-header">
-            <label>
-              <input
-                type="checkbox"
-                class="checkbox"
-                data-testid="ag_test_suite_checkbox"
-                :checked="d_selected_test_cases_by_suite_pk.has(ag_test_suite.pk)"
-                @change="toggle_ag_test_suite_selected(ag_test_suite)"
-                @click.stop/>
-              {{ag_test_suite.name}}
-            </label>
-          </div>
-        </template>
-        <div class="unpadded-checkbox-container ag-test-case-checkbox-wrapper"
-            v-for="ag_test_case of ag_test_suite.ag_test_cases">
-          <label>
-            <input
-              type="checkbox"
-              class="checkbox"
-              data-testid="ag_test_case_checkbox"
-              :checked="ag_test_case_is_checked(ag_test_case)"
-              @change="toggle_ag_test_case_selected(ag_test_case)"/>
-            {{ag_test_case.name}}
-          </label>
-        </div>
-      </collapsible>
+
+      <rerun-select-suite
+        v-for="ag_test_suite of d_ag_test_suites"
+        :key="ag_test_suite.pk"
+        :ag_test_suite="ag_test_suite"
+        :suite_is_selected="d_selected_test_cases_by_suite_pk.has(ag_test_suite.pk)"
+        :selected_test_case_pks="d_selected_test_cases_by_suite_pk.get(ag_test_suite.pk, new Set())"
+        is_open_text="Hide tests"
+        is_closed_text="Show tests"
+        @ag_test_suite_selected="toggle_ag_test_suite_selected"
+        @ag_test_case_selected="toggle_ag_test_case_selected">
+      </rerun-select-suite>
     </div>
 
     <template v-if="d_mutation_test_suites.length !== 0" ref="choose_mutation_test_suites">
@@ -215,7 +198,6 @@ import * as ag_cli from 'ag-client-typescript';
 import { ArraySet, member_names_less, pk_less, pk_more } from '@/array_set';
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
-import CollapsibleContent from '@/components/CollapsibleContent.vue';
 import GroupLookup from '@/components/group_lookup.vue';
 import Modal from '@/components/modal.vue';
 import Tooltip from '@/components/tooltip.vue';
@@ -232,6 +214,7 @@ import {
   update_changed_ag_test_case,
 } from '../suite_observer_utils';
 
+import RerunSelectSuite from './rerun_select_suite.vue';
 import RerunTaskDetail from './rerun_task_detail.vue';
 import SubmissionSelector from './submission_selector.vue';
 
@@ -243,9 +226,9 @@ interface GroupWithSubmissions {
 @Component({
   components: {
     APIErrors,
-    Collapsible: CollapsibleContent,
     GroupLookup,
     Modal,
+    RerunSelectSuite,
     RerunTaskDetail,
     SubmissionSelector,
     Tooltip,
@@ -409,12 +392,6 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
     }
 
     this.d_selected_test_cases_by_suite_pk = copy;
-  }
-
-  ag_test_case_is_checked(ag_test_case: ag_cli.AGTestCase) {
-    let ag_test_case_pks = this.d_selected_test_cases_by_suite_pk.get(
-      ag_test_case.ag_test_suite, new Set());
-    return ag_test_case_pks.has(ag_test_case.pk);
   }
 
   toggle_mutation_test_suite_selected(mutation_test_suite: ag_cli.MutationTestSuite) {
@@ -666,27 +643,6 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 
 .choose-ag-test-suites-wrapper {
   max-width: 500px;
-}
-
-.ag-test-suite-collapsible {
-  margin: .5rem 0;
-}
-
-.ag-test-suite-header {
-  width: 100%;
-  margin-left: .25rem;
-  @include section-header(
-    $with-left-divider: false, $line-spacing: .25rem, $line-color: $pebble-dark
-  );
-
-  white-space: nowrap;
-}
-
-.ag-test-case-checkbox-wrapper {
-  margin: .25rem 0;
-  margin-left: 2.5rem;
-
-  white-space: nowrap;
 }
 
 .button-footer {
