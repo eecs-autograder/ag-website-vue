@@ -11,7 +11,7 @@
              @close="d_show_batch_select_modal = false"
              size="large"
              click_outside_to_close
-             :aria-label="aria_label">
+             :aria_label="aria_label">
         <div class="modal-header">
           Select Items ({{ d_selected_items.length }} out of
           {{ choices.length }} items selected)
@@ -30,6 +30,7 @@
             aria-multiselectable="true"
             aria-orientation="horizontal"
             :aria-activedescendant="active_option_id"
+            aria-label="Select Files"
             @keydown.left.prevent.stop="focus_prev"
             @keydown.right.prevent.stop="focus_next"
             @keydown.up.prevent.stop="focus_prev"
