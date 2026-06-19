@@ -439,8 +439,7 @@ export default class HandgradingSettings extends Vue implements Created,
       (criteria) => Criterion.update_order(
         this.d_handgrading_rubric!.pk, criteria.map(c => c.pk)),
       (saved) => {
-        this.d_handgrading_rubric!.criteria.splice(
-          0, this.d_handgrading_rubric!.criteria.length, ...saved);
+        this.d_handgrading_rubric!.criteria = saved.slice();
       },
       (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
     );
@@ -448,8 +447,7 @@ export default class HandgradingSettings extends Vue implements Created,
       (annotations) => Annotation.update_order(
         this.d_handgrading_rubric!.pk, annotations.map(a => a.pk)),
       (saved) => {
-        this.d_handgrading_rubric!.annotations.splice(
-          0, this.d_handgrading_rubric!.annotations.length, ...saved);
+        this.d_handgrading_rubric!.annotations = saved.slice();
       },
       (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
     );
