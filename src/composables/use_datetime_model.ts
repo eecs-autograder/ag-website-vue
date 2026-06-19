@@ -38,9 +38,9 @@ export function to_iso(wall_time: string, timezone: string): string | null {
  * @param get_timezone - Returns the IANA timezone name to use for conversion.
  */
 export function use_datetime_model(args: {
-  get_iso: () => string | null,
-  set_iso: (value: string | null) => void,
-  get_timezone: () => string,
+  get_iso: () => string | null;
+  set_iso: (value: string | null) => void;
+  get_timezone: () => string;
 }) {
   return computed({
     get(): string {
