@@ -1,7 +1,7 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
     </div>
   </div>
   <div v-else
@@ -15,7 +15,8 @@
                 id="new-rubric-button"
                 @click="create_new_rubric"
                 :disabled="d_new_rubric_request_pending">
-          <i v-if="d_new_rubric_request_pending" class="fa fa-spinner fa-pulse"></i>
+          <i v-if="d_new_rubric_request_pending"
+             class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
           <template v-else>New Handgrading Rubric</template>
         </button>
       </div>
@@ -24,14 +25,15 @@
         <div id="import-flow-container">
           <div id="select-import-from-course" class="select-container form-field-wrapper">
             <div v-if="d_courses_is_admin_for === null" class="loading">
-              <i class="fa fa-spinner fa-pulse"></i>
+              <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
             </div>
             <template v-else>
-              <div><label class="label">Course</label></div>
+              <div><label class="label" for="import-from-course">Course</label></div>
               <select-object :items="d_courses_is_admin_for"
                              ref="course_to_import_from"
                              v-model="d_course_to_import_from"
                              @change="load_projects_to_import_from"
+                             input_id="import-from-course"
                              id_field="pk">
                 <template v-slot:option-text="{item}">
                   {{item.name}} {{item.semester}} {{item.year}}
@@ -41,14 +43,15 @@
           </div>
           <div id="select-import-from-project" class="select-container form-field-wrapper">
             <div v-if="d_course_to_import_from !== null">
-              <label class="label">Project</label>
+              <label class="label" for="import-from-project">Project</label>
             </div>
             <div v-if="d_loading_projects" class="loading">
-              <i class="fa fa-spinner fa-pulse"></i>
+              <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
             </div>
             <template v-else-if="d_selected_course_projects !== null">
               <select-object ref="project_to_import_from"
                              :items="d_selected_course_projects"
+                             input_id="import-from-project"
                              id_field="pk"
                              v-model="d_project_to_import_from">
                 <option selected disabled :value="null">-- Select a Project --</option>
@@ -63,7 +66,8 @@
                     class="green-button"
                     :disabled="d_project_to_import_from === null"
                     @click="import_rubric">
-              <i v-if="d_import_request_pending" class="fa fa-spinner fa-pulse"></i>
+              <i v-if="d_import_request_pending"
+                 class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
               <template v-else>Import</template>
             </button>
           </div>
@@ -108,9 +112,9 @@
             </div>
 
             <div class="form-field-wrapper extra-space">
-              <label for="points-style" class="label">Points style</label> <br>
+              <label for="handgrading-points-style" class="label">Points style</label> <br>
               <select v-model="d_handgrading_rubric.points_style"
-                      id="points-style"
+                      id="handgrading-points-style"
                       class="select">
                 <option :value="PointsStyle.start_at_zero_and_add">
                   Start at 0 and add
@@ -122,13 +126,13 @@
             </div>
 
             <div id="max-points-container" class="form-field-wrapper extra-space">
-              <label class="label">
+              <label class="label" for="handgrading-max-points">
                 {{d_handgrading_rubric.points_style === PointsStyle.start_at_max_and_subtract
                     ? 'Max points' : 'Override max points'}}
               </label>
 
               <validated-input
-                id="max-points"
+                input_id="handgrading-max-points"
                 ref="max_points"
                 v-model="d_handgrading_rubric.max_points"
                 input_style="width: 150px;"
@@ -192,13 +196,18 @@
           </div>
           <draggable ref="criteria_order"
                      v-model="d_handgrading_rubric.criteria"
-                     @change="set_criteria_order"
+                     @start="d_pre_drag_criteria_order = d_handgrading_rubric.criteria.slice()"
+                     @change="criteria_order_syncer.schedule(d_handgrading_rubric.criteria, d_pre_drag_criteria_order)"
                      @end="$event.item.style.transform = 'none'"
                      handle=".handle" ghost-class="ghost">
             <single-criterion v-for="(criterion, index) of d_handgrading_rubric.criteria"
                               :key="criterion.pk"
                               :class="{'criterion-border': index !== 0}"
-                              :criterion="criterion"></single-criterion>
+                              :criterion="criterion"
+                              :index="index"
+                              :count="d_handgrading_rubric.criteria.length"
+                              @move_up="move_criterion(index, -1)"
+                              @move_down="move_criterion(index, 1)"></single-criterion>
           </draggable>
         </div>
 
@@ -222,19 +231,25 @@
           </div>
           <draggable ref="annotation_order"
                      v-model="d_handgrading_rubric.annotations"
-                     @change="set_annotations_order"
+                     @start="d_pre_drag_annotations_order = d_handgrading_rubric.annotations.slice()"
+                     @change="annotations_order_syncer.schedule(d_handgrading_rubric.annotations, d_pre_drag_annotations_order)"
                      @end="$event.item.style.transform = 'none'"
                      handle=".handle" ghost-class="ghost">
             <single-annotation v-for="(annotation, index) of d_handgrading_rubric.annotations"
                                :key="annotation.pk"
                                :class="{'criterion-border': index !== 0}"
-                               :annotation="annotation"></single-annotation>
+                               :annotation="annotation"
+                               :index="index"
+                               :count="d_handgrading_rubric.annotations.length"
+                               @move_up="move_annotation(index, -1)"
+                               @move_down="move_annotation(index, 1)"></single-annotation>
           </draggable>
         </div>
       </div>
     </template>
 
     <modal ref="create_criterion_modal" size="large" click_outside_to_close
+           aria_label="Add checkbox"
            v-if="d_create_criterion_modal_is_open"
            @close="d_create_criterion_modal_is_open = false">
       <div class="modal-header">New Checkbox</div>
@@ -254,6 +269,7 @@
     </modal>
 
     <modal ref="create_annotation_modal" size="large" click_outside_to_close
+           aria_label="Add annotation"
            v-if="d_create_annotation_modal_is_open"
            @close="d_create_annotation_modal_is_open = false">
       <div class="modal-header">New Annotation</div>
@@ -304,7 +320,12 @@ import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import {
+  GlobalErrorsSubject,
+  handle_api_errors_async,
+  handle_global_errors_async,
+} from '@/error_handling';
+import { OrderSyncer } from '@/order_syncer';
 import { BeforeDestroy, Created, Mounted } from "@/lifecycle";
 import { assert_not_null, deep_copy, format_datetime } from "@/utils";
 import {
@@ -372,6 +393,14 @@ export default class HandgradingSettings extends Vue implements Created,
   d_create_annotation_form_is_valid = false;
   d_create_annotation_modal_is_open = false;
 
+  private d_pre_drag_criteria_order: Criterion[] = [];
+  private d_pre_drag_annotations_order: Annotation[] = [];
+
+  // Must be initialized in created(), not as class properties: arrow functions in class
+  // property initializers capture 'this' = vue-class-component's dummy instance.
+  private criteria_order_syncer!: OrderSyncer<Criterion>;
+  private annotations_order_syncer!: OrderSyncer<Annotation>;
+
   readonly is_not_empty = is_not_empty;
   readonly is_number = is_number;
   readonly is_integer = is_integer;
@@ -406,6 +435,22 @@ export default class HandgradingSettings extends Vue implements Created,
 
   @handle_global_errors_async
   async created() {
+    this.criteria_order_syncer = new OrderSyncer<Criterion>(
+      (criteria) => Criterion.update_order(
+        this.d_handgrading_rubric!.pk, criteria.map(c => c.pk)),
+      (saved) => {
+        this.d_handgrading_rubric!.criteria = saved.slice();
+      },
+      (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+    );
+    this.annotations_order_syncer = new OrderSyncer<Annotation>(
+      (annotations) => Annotation.update_order(
+        this.d_handgrading_rubric!.pk, annotations.map(a => a.pk)),
+      (saved) => {
+        this.d_handgrading_rubric!.annotations = saved.slice();
+      },
+      (e) => { GlobalErrorsSubject.get_instance().report_error(e); }
+    );
     Criterion.subscribe(this);
     Annotation.subscribe(this);
 
@@ -427,6 +472,8 @@ export default class HandgradingSettings extends Vue implements Created,
   beforeDestroy() {
     Annotation.unsubscribe(this);
     Criterion.unsubscribe(this);
+    this.criteria_order_syncer.flush();
+    this.annotations_order_syncer.flush();
   }
 
   @Watch('d_handgrading_rubric.points_style')
@@ -509,12 +556,11 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
-  @handle_global_errors_async
-  set_criteria_order() {
-    return Criterion.update_order(
-      this.d_handgrading_rubric!.pk,
-      this.d_handgrading_rubric!.criteria.map(criterion => criterion.pk)
-    );
+  move_criterion(index: number, delta: number) {
+    const criteria = this.d_handgrading_rubric!.criteria;
+    const prev_order = criteria.slice();
+    criteria.splice(index + delta, 0, criteria.splice(index, 1)[0]);
+    this.criteria_order_syncer.schedule(criteria, prev_order);
   }
 
   update_criteria_order_changed(criterion_list: number[], handgrading_rubric_pk: number): void {
@@ -566,12 +612,11 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
-  @handle_global_errors_async
-  set_annotations_order() {
-    return Annotation.update_order(
-      this.d_handgrading_rubric!.pk,
-      this.d_handgrading_rubric!.annotations.map(annotation => annotation.pk)
-    );
+  move_annotation(index: number, delta: number) {
+    const annotations = this.d_handgrading_rubric!.annotations;
+    const prev_order = annotations.slice();
+    annotations.splice(index + delta, 0, annotations.splice(index, 1)[0]);
+    this.annotations_order_syncer.schedule(annotations, prev_order);
   }
 
   update_annotations_order_changed(annotation_list: number[],

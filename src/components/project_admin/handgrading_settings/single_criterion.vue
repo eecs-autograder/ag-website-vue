@@ -4,11 +4,23 @@
       <div class="header row">
         <span class="short-description">{{d_criterion.short_description}}</span>
         <span class="header-icons">
-          <i class="fas fa-arrows-alt handle"></i>
-          <i class="edit-icon fas fa-pencil-alt"
-             @click="d_edit_mode = true"></i>
-          <i class="delete-icon fas fa-trash-alt"
-             @click="d_delete_modal_is_open = true"></i>
+          <i class="fas fa-arrows-alt handle" aria-hidden="true"></i>
+          <MoveButtons :index="index"
+                       :count="count"
+                       @move_up="$emit('move_up')"
+                       @move_down="$emit('move_down')" />
+          <button type="button"
+                  class="edit-criterion-button"
+                  aria-label="Edit criterion"
+                  @click="d_edit_mode = true">
+            <i class="edit-icon fas fa-pencil-alt" aria-hidden="true"></i>
+          </button>
+          <button type="button"
+                  class="delete-criterion-button"
+                  aria-label="Delete criterion"
+                  @click="d_delete_modal_is_open = true">
+            <i class="delete-icon fas fa-trash-alt" aria-hidden="true"></i>
+          </button>
         </span>
       </div>
       <div class="points row">
@@ -32,6 +44,7 @@
     </criterion-form>
 
     <modal ref="delete_criterion_modal" size="large" click_outside_to_close
+           aria_label="Confirm delete criterion"
            v-if="d_delete_modal_is_open"
            @close="d_delete_modal_is_open = false">
       <div class="modal-header">Confirm Delete</div>
@@ -59,6 +72,7 @@ import { Criterion } from "ag-client-typescript";
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from "@/components/modal.vue";
+import MoveButtons from "@/components/MoveButtons.vue";
 import CriterionForm, { CriterionFormData } from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import { handle_api_errors_async } from '@/error_handling';
 import { deep_copy, format_datetime, safe_assign } from "@/utils";
@@ -67,12 +81,19 @@ import { deep_copy, format_datetime, safe_assign } from "@/utils";
   components: {
     APIErrors,
     CriterionForm,
-    Modal
+    Modal,
+    MoveButtons,
   }
 })
 export default class SingleCriterion extends Vue {
   @Prop({type: Criterion})
   criterion!: Criterion;
+
+  @Prop({required: true, type: Number})
+  index!: number;
+
+  @Prop({required: true, type: Number})
+  count!: number;
 
   d_criterion: Criterion = new Criterion({
     pk: 0,
@@ -167,31 +188,35 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
 
 .header-icons {
   display: flex;
+  align-items: center;
 
   .handle {
     cursor: grabbing;
+    padding: 0 .25rem;
+  }
+
+  .edit-criterion-button, .delete-criterion-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0 .25rem;
   }
 
   .edit-icon {
     color: darken($gray-blue-2, 15%);
+  }
 
-    &:hover {
-      color: darken($gray-blue-2, 8%);
-      cursor: pointer;
-    }
+  .edit-criterion-button:hover .edit-icon {
+    color: darken($gray-blue-2, 8%);
   }
 
   .delete-icon {
     color: lighten($cherry, 10%);
-
-    &:hover {
-      color: lighten($cherry, 17%);
-      cursor: pointer;
-    }
   }
 
-  .handle, .edit-icon, .delete-icon {
-    padding: 0 .25rem;
+  .delete-criterion-button:hover .delete-icon {
+    color: lighten($cherry, 17%);
   }
 }
 

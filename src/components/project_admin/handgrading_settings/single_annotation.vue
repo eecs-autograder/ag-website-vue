@@ -4,11 +4,23 @@
       <div class="header row">
         <span class="short-description">{{d_annotation.short_description}}</span>
         <span class="header-icons">
-          <i class="fas fa-arrows-alt handle"></i>
-          <i class="edit-icon fas fa-pencil-alt"
-             @click="d_edit_mode = true"></i>
-          <i class="delete-icon fas fa-trash-alt"
-             @click="d_delete_modal_is_open = true"></i>
+          <i class="fas fa-arrows-alt handle" aria-hidden="true"></i>
+          <MoveButtons :index="index"
+                       :count="count"
+                       @move_up="$emit('move_up')"
+                       @move_down="$emit('move_down')" />
+          <button type="button"
+                  class="edit-annotation-button"
+                  aria-label="Edit annotation"
+                  @click="d_edit_mode = true">
+            <i class="edit-icon fas fa-pencil-alt" aria-hidden="true"></i>
+          </button>
+          <button type="button"
+                  class="delete-annotation-button"
+                  aria-label="Delete annotation"
+                  @click="d_delete_modal_is_open = true">
+            <i class="delete-icon fas fa-trash-alt" aria-hidden="true"></i>
+          </button>
         </span>
       </div>
       <div class="deduction row">
@@ -35,6 +47,7 @@
     </annotation-form>
 
     <modal ref="delete_annotation_modal" size="large" click_outside_to_close
+           aria_label="Confirm delete annotation"
            v-if="d_delete_modal_is_open"
            @close="d_delete_modal_is_open = false">
       <div class="modal-header">Confirm Delete</div>
@@ -63,6 +76,7 @@ import { Annotation } from "ag-client-typescript";
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from "@/components/modal.vue";
+import MoveButtons from "@/components/MoveButtons.vue";
 import AnnotationForm, { AnnotationFormData } from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 import { handle_api_errors_async } from '@/error_handling';
 import { deep_copy, format_datetime, safe_assign } from "@/utils";
@@ -71,12 +85,19 @@ import { deep_copy, format_datetime, safe_assign } from "@/utils";
   components: {
     APIErrors,
     AnnotationForm,
-    Modal
+    Modal,
+    MoveButtons,
   }
 })
 export default class SingleAnnotation extends Vue {
   @Prop({type: Annotation})
   annotation!: Annotation;
+
+  @Prop({required: true, type: Number})
+  index!: number;
+
+  @Prop({required: true, type: Number})
+  count!: number;
 
   d_annotation: Annotation = new Annotation({
     pk: 0,
@@ -166,27 +187,35 @@ export function handle_delete_annotation_error(component: SingleAnnotation, erro
 
 .header-icons {
   display: flex;
+  align-items: center;
+
+  .handle {
+    cursor: grabbing;
+    padding: 0 .25rem;
+  }
+
+  .edit-annotation-button, .delete-annotation-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    padding: 0 .25rem;
+  }
 
   .edit-icon {
     color: darken($gray-blue-2, 15%);
+  }
+
+  .edit-annotation-button:hover .edit-icon {
+    color: darken($gray-blue-2, 8%);
   }
 
   .delete-icon {
     color: lighten($cherry, 10%);
   }
 
-  .handle, .edit-icon, .delete-icon {
-    padding: 0 .25rem;
-  }
-
-  .edit-icon:hover {
-    color: darken($gray-blue-2, 8%);
-    cursor: pointer;
-  }
-
-  .delete-icon:hover {
+  .delete-annotation-button:hover .delete-icon {
     color: lighten($cherry, 17%);
-    cursor: pointer;
   }
 }
 

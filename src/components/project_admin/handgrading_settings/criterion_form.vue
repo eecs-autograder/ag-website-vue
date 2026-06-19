@@ -3,24 +3,27 @@
                   @submit="submit"
                   @form_validity_changed="$emit('form_validity_changed', $event)">
     <div class="form-field-wrapper">
-      <label class="label">Name</label>
+      <label class="label" :for="`criterion-name-${component_uid}`">Name</label>
       <validated-input v-model="d_form_data.short_description"
+                       :input_id="`criterion-name-${component_uid}`"
                        ref="short_description"
                        :validators="[is_not_empty]"></validated-input>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label">Points</label>
+      <label class="label" :for="`criterion-points-${component_uid}`">Points</label>
       <validated-input v-model="d_form_data.points"
                        ref="points"
+                       :input_id="`criterion-points-${component_uid}`"
                        :validators="[is_not_empty, is_integer]"
                        :from_string_fn="string_to_num"></validated-input>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label">Description</label>
+      <label class="label" :for="`criterion-description-${component_uid}`">Description</label>
       <validated-input v-model="d_form_data.long_description"
                        ref="long_description"
+                       :input_id="`criterion-description-${component_uid}`"
                        :num_rows="3"
                        :validators="[]"></validated-input>
     </div>
@@ -38,6 +41,7 @@ import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { Created } from '@/lifecycle';
 import { is_integer, is_not_empty, string_to_num } from '@/validators';
+import { generate_uid } from '@/utils';
 
 export class CriterionFormData {
   short_description: string;
@@ -88,6 +92,10 @@ export default class CriterionForm extends Vue implements Created {
   reset() {
     (<ValidatedForm> this.$refs.form).reset_warning_state();
     this.d_form_data = new CriterionFormData(this.criterion);
+  }
+
+  get component_uid() {
+    return generate_uid();
   }
 }
 

@@ -2,24 +2,27 @@
   <validated-form ref="form" @submit="submit"
                   @form_validity_changed="$emit('form_validity_changed', $event)">
     <div class="form-field-wrapper">
-      <label class="label">Name</label>
+      <label class="label" :for="`annotation-name-${component_uid}`">Name</label>
       <validated-input v-model="d_form_data.short_description"
+                       :input_id="`annotation-name-${component_uid}`"
                        ref="short_description"
                        :validators="[is_not_empty]"></validated-input>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label">Deduction</label>
+      <label class="label" :for="`annotation-deduction-${component_uid}`">Deduction</label>
       <validated-input v-model="d_form_data.deduction"
                        ref="deduction"
+                       :input_id="`annotation-deduction-${component_uid}`"
                        :validators="[is_not_empty, is_integer, is_non_positive]"
                        :from_string_fn="string_to_num"></validated-input>
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label">Max deduction</label>
+      <label class="label" :for="`annotation-max-deduction-${component_uid}`">Max deduction</label>
       <validated-input v-model="d_form_data.max_deduction"
                        ref="max_deduction"
+                       :input_id="`annotation-max-deduction-${component_uid}`"
                        :validators="[is_non_positive_or_empty]"
                        :to_string_fn="(num) => num === null ? '' : num.toString()"
                        :from_string_fn="(val) => val.trim() === '' ? null : Number(val)">
@@ -27,9 +30,10 @@
     </div>
 
     <div class="form-field-wrapper">
-      <label class="label">Description</label>
+      <label class="label" :for="`annotation-description-${component_uid}`">Description</label>
       <validated-input v-model="d_form_data.long_description"
                        ref="long_description"
+                       :input_id="`annotation-description-${component_uid}`"
                        :num_rows="3"
                        :validators="[]"></validated-input>
     </div>
@@ -52,6 +56,7 @@ import {
   make_max_value_validator,
   string_to_num,
 } from '@/validators';
+import { generate_uid } from '@/utils';
 
 export class AnnotationFormData {
   short_description: string;
@@ -106,6 +111,10 @@ export default class AnnotationForm extends Vue implements Created {
   reset() {
     (<ValidatedForm> this.$refs.form).reset_warning_state();
     this.d_form_data = new AnnotationFormData(this.annotation);
+  }
+
+  get component_uid() {
+    return generate_uid();
   }
 }
 

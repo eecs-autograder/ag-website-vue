@@ -318,9 +318,9 @@ describe('Handgrading settings tests', () => {
 
     test('Points style binding', () => {
         expect_html_element_has_value(
-            wrapper.find('#points-style'), PointsStyle.start_at_zero_and_add);
+            wrapper.find('#handgrading-points-style'), PointsStyle.start_at_zero_and_add);
 
-        wrapper.find('#points-style').setValue(PointsStyle.start_at_max_and_subtract);
+        wrapper.find('#handgrading-points-style').setValue(PointsStyle.start_at_max_and_subtract);
 
         expect(
             wrapper.vm.d_handgrading_rubric!.points_style
@@ -333,10 +333,10 @@ describe('Handgrading settings tests', () => {
         ).toEqual(PointsStyle.start_at_zero_and_add);
 
         expect(wrapper.vm.d_handgrading_rubric!.max_points).toBeNull();
-        expect(get_validated_input_text(wrapper.find('#max-points'))).toEqual('');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
+        expect(get_validated_input_text(wrapper.findComponent({ref: 'max_points'}))).toEqual('');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(true);
 
-        set_validated_input_text(wrapper.find('#max-points'), '42');
+        set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '42');
         expect(wrapper.vm.d_handgrading_rubric!.max_points).toEqual(42);
     });
 
@@ -350,22 +350,22 @@ describe('Handgrading settings tests', () => {
 
         wrapper.vm.d_handgrading_rubric!.points_style = PointsStyle.start_at_max_and_subtract;
         await wrapper.vm.$nextTick();
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
 
-        await wrapper.find('#points-style').setValue(PointsStyle.start_at_zero_and_add);
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
+        await wrapper.find('#handgrading-points-style').setValue(PointsStyle.start_at_zero_and_add);
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(true);
 
-        await wrapper.find('#points-style').setValue(PointsStyle.start_at_max_and_subtract);
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        await wrapper.find('#handgrading-points-style').setValue(PointsStyle.start_at_max_and_subtract);
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
 
-        await set_validated_input_text(wrapper.find('#max-points'), '1');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(true);
+        await set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '1');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(true);
 
-        await set_validated_input_text(wrapper.find('#max-points'), '0');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        await set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '0');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
 
-        await set_validated_input_text(wrapper.find('#max-points'), '-1');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        await set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '-1');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
     });
 
     test('Handgraders can leave comments binding', () => {
@@ -389,8 +389,8 @@ describe('Handgrading settings tests', () => {
     });
 
     test('Save button disabled when invalid', async () => {
-        await set_validated_input_text(wrapper.find('#max-points'), '-1');
-        expect(validated_input_is_valid(wrapper.find('#max-points'))).toEqual(false);
+        await set_validated_input_text(wrapper.findComponent({ref: 'max_points'}), '-1');
+        expect(validated_input_is_valid(wrapper.findComponent({ref: 'max_points'}))).toEqual(false);
         expect(wrapper.find('[data-testid=save_rubric_button]').element).toBeDisabled();
     });
 
@@ -526,12 +526,55 @@ describe('Criteria and annotation tests', () => {
     });
 
     test('Change criteria order', async () => {
+        vi.useFakeTimers();
         let order_stub = sinon.stub(Criterion, 'update_order');
-        wrapper.findComponent({ref: "criteria_order"}).vm.$emit('change');
-        await wrapper.vm.$nextTick();
+        const original_pks = rubric.criteria.map(c => c.pk);
+        const draggable = wrapper.findComponent({ref: "criteria_order"});
+        draggable.vm.$emit('start');
+        wrapper.vm.d_handgrading_rubric!.criteria.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
         expect(
-            order_stub.calledOnceWith(rubric.pk, rubric.criteria.map(item => item.pk))
+            order_stub.calledOnceWith(rubric.pk, [...original_pks].reverse())
         ).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Criteria order rolled back on failed request', async () => {
+        vi.useFakeTimers();
+        sinon.stub(Criterion, 'update_order').rejects(new HttpError(400, 'bad'));
+        const original_criteria = rubric.criteria.slice();
+        const draggable = wrapper.findComponent({ref: "criteria_order"});
+        draggable.vm.$emit('start');
+        wrapper.vm.d_handgrading_rubric!.criteria.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual(original_criteria);
+        vi.useRealTimers();
+    });
+
+    test('Move criterion up', async () => {
+        vi.useFakeTimers();
+        const order_stub = sinon.stub(Criterion, 'update_order');
+        const original = rubric.criteria.slice();
+        wrapper.find('#criteria-column').findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual([original[1], original[0]]);
+        expect(order_stub.calledOnceWith(rubric.pk, [original[1].pk, original[0].pk])).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Move criterion down', async () => {
+        vi.useFakeTimers();
+        const order_stub = sinon.stub(Criterion, 'update_order');
+        const original = rubric.criteria.slice();
+        wrapper.find('#criteria-column').findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual([original[1], original[0]]);
+        expect(order_stub.calledOnceWith(rubric.pk, [original[1].pk, original[0].pk])).toBe(true);
+        vi.useRealTimers();
     });
 
     test('Create annotation', async () => {
@@ -610,11 +653,104 @@ describe('Criteria and annotation tests', () => {
     });
 
     test('Change annotation order', async () => {
+        vi.useFakeTimers();
         let order_stub = sinon.stub(Annotation, 'update_order');
-        wrapper.findComponent({ref: "annotation_order"}).vm.$emit('change');
-        await wrapper.vm.$nextTick();
+        const original_pks = rubric.annotations.map(a => a.pk);
+        const draggable = wrapper.findComponent({ref: "annotation_order"});
+        draggable.vm.$emit('start');
+        wrapper.vm.d_handgrading_rubric!.annotations.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
         expect(
-            order_stub.calledOnceWith(rubric.pk, rubric.annotations.map(item => item.pk))
+            order_stub.calledOnceWith(rubric.pk, [...original_pks].reverse())
+        ).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Annotation order rolled back on failed request', async () => {
+        vi.useFakeTimers();
+        sinon.stub(Annotation, 'update_order').rejects(new HttpError(400, 'bad'));
+        const original_annotations = rubric.annotations.slice();
+        const draggable = wrapper.findComponent({ref: "annotation_order"});
+        draggable.vm.$emit('start');
+        wrapper.vm.d_handgrading_rubric!.annotations.reverse();
+        draggable.vm.$emit('change');
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual(original_annotations);
+        vi.useRealTimers();
+    });
+
+    test('Move annotation up', async () => {
+        vi.useFakeTimers();
+        const order_stub = sinon.stub(Annotation, 'update_order');
+        const original = rubric.annotations.slice();
+        wrapper.find('#annotations-column').findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual([original[1], original[0]]);
+        expect(order_stub.calledOnceWith(rubric.pk, [original[1].pk, original[0].pk])).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Move annotation down', async () => {
+        vi.useFakeTimers();
+        const order_stub = sinon.stub(Annotation, 'update_order');
+        const original = rubric.annotations.slice();
+        wrapper.find('#annotations-column').findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual([original[1], original[0]]);
+        expect(order_stub.calledOnceWith(rubric.pk, [original[1].pk, original[0].pk])).toBe(true);
+        vi.useRealTimers();
+    });
+
+    test('Criterion order rolled back on failed move button request', async () => {
+        vi.useFakeTimers();
+        sinon.stub(Criterion, 'update_order').rejects(new HttpError(400, 'bad'));
+        const original_criteria = rubric.criteria.slice();
+        wrapper.find('#criteria-column').findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual(original_criteria);
+        vi.useRealTimers();
+    });
+
+    test('Annotation order rolled back on failed move button request', async () => {
+        vi.useFakeTimers();
+        sinon.stub(Annotation, 'update_order').rejects(new HttpError(400, 'bad'));
+        const original_annotations = rubric.annotations.slice();
+        wrapper.find('#annotations-column').findAll('[aria-label="Move down"]').at(0).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.d_handgrading_rubric!.annotations).toEqual(original_annotations);
+        vi.useRealTimers();
+    });
+
+    test('Criterion move up disabled when first', () => {
+        const move_ups = wrapper.find('#criteria-column').findAll('[aria-label="Move up"]');
+        expect(
+            (move_ups.at(0).element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
+    test('Criterion move down disabled when last', () => {
+        const move_downs = wrapper.find('#criteria-column').findAll('[aria-label="Move down"]');
+        expect(
+            (move_downs.at(move_downs.length - 1).element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
+    test('Annotation move up disabled when first', () => {
+        const move_ups = wrapper.find('#annotations-column').findAll('[aria-label="Move up"]');
+        expect(
+            (move_ups.at(0).element as HTMLButtonElement).disabled
+        ).toBe(true);
+    });
+
+    test('Annotation move down disabled when last', () => {
+        const move_downs = wrapper.find('#annotations-column').findAll('[aria-label="Move down"]');
+        expect(
+            (move_downs.at(move_downs.length - 1).element as HTMLButtonElement).disabled
         ).toBe(true);
     });
 
@@ -633,5 +769,124 @@ describe('Criteria and annotation tests', () => {
         Annotation.notify_annotation_deleted(other_annotation);
 
         expect(wrapper.vm.d_handgrading_rubric).toEqual(original_rubric);
+    });
+});
+
+describe('Move button focus management', () => {
+    let rubric: HandgradingRubric;
+    let wrapper: Wrapper<HandgradingSettings>;
+
+    beforeEach(async () => {
+        vi.useFakeTimers();
+        current_project.has_handgrading_rubric = true;
+        rubric = new HandgradingRubric({
+            pk: 3,
+            project: current_project.pk,
+            last_modified: '',
+            points_style: PointsStyle.start_at_zero_and_add,
+            max_points: null,
+            show_grades_and_rubric_to_students: false,
+            show_only_applied_rubric_to_students: false,
+            handgraders_can_leave_comments: false,
+            handgraders_can_adjust_points: false,
+            criteria: [],
+            annotations: []
+        });
+        rubric.criteria = [
+            data_ut.make_criterion(rubric.pk),
+            data_ut.make_criterion(rubric.pk),
+            data_ut.make_criterion(rubric.pk),
+        ];
+        rubric.annotations = [
+            data_ut.make_annotation(rubric.pk),
+            data_ut.make_annotation(rubric.pk),
+            data_ut.make_annotation(rubric.pk),
+        ];
+
+        sinon.stub(HandgradingRubric, 'get_from_project').returns(Promise.resolve(rubric));
+        sinon.stub(Criterion, 'update_order');
+        sinon.stub(Annotation, 'update_order');
+
+        wrapper = managed_mount(HandgradingSettings, {
+            propsData: {
+                course: course,
+                project: current_project
+            },
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    test('Focus stays on move up after moving criterion up to non-boundary', async () => {
+        // criteria[2] is the 3rd "Move up" button (criteria[0] is disabled)
+        wrapper.find('#criteria-column').findAll('[aria-label="Move up"]').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(1)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move down when criterion moves to first position', async () => {
+        // criteria[1] is the 2nd "Move up" button (criteria[0] is disabled)
+        wrapper.find('#criteria-column').findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(0)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move up when criterion moves to last position', async () => {
+        // criteria[1] is the 2nd "Move down" button (criteria[2] is disabled)
+        wrapper.find('#criteria-column').findAll('[aria-label="Move down"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(2)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus stays on move up after moving annotation up to non-boundary', async () => {
+        wrapper.find('#annotations-column').findAll('[aria-label="Move up"]').at(2).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleAnnotation'}).at(1)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move down when annotation moves to first position', async () => {
+        wrapper.find('#annotations-column').findAll('[aria-label="Move up"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleAnnotation'}).at(0)
+            .find('[aria-label="Move down"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
+    });
+
+    test('Focus falls back to move up when annotation moves to last position', async () => {
+        wrapper.find('#annotations-column').findAll('[aria-label="Move down"]').at(1).trigger('click');
+        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
+
+        const find_expected = () => wrapper.findAllComponents({name: 'SingleAnnotation'}).at(2)
+            .find('[aria-label="Move up"]').element;
+        await wait_until(wrapper, () => document.activeElement === find_expected());
+        expect(document.activeElement).toBe(find_expected());
     });
 });
