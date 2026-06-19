@@ -13,7 +13,7 @@
         Cancelled
       </template>
       <template v-else>
-        <span class="progress-value">{{task.progress}}%</span>
+        <span class="progress-value" role="status">{{task.progress}}%</span>
         <button v-if="task.progress !== 100"
                 type="button"
                 class="refresh-button"
