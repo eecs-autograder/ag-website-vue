@@ -5,7 +5,7 @@
     </div>
   </div>
   <div v-else id="rerun-submissions-component">
-    <div id="grades-can-change-header" class="step-header">0. Download Grades So Far</div>
+    <h2 id="grades-can-change-header" class="step-header">0. Download Grades So Far</h2>
     <div id="grades-can-change-msg">
       <div class="msg-spacing">
         <i class="fas fa-exclamation-triangle"></i>
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="step-header">1. Choose submissions</div>
+    <h2 class="step-header">1. Choose submissions</h2>
     <div class="checkbox-input-container">
       <label>
         <input
@@ -38,6 +38,7 @@
         </div>
         <group-lookup
           :groups="d_groups"
+          :aria_label="`Search for ${project.max_group_size > 1 ? 'group' : 'student'} by username`"
           @update_group_selected="d_selected_groups.insert($event)">
         </group-lookup>
       </div>
@@ -53,7 +54,7 @@
       </submission-selector>
     </div>
 
-    <div class="step-header">2. Choose test cases</div>
+    <h2 class="step-header">2. Choose test cases</h2>
     <div class="checkbox-input-container">
       <label>
         <input
@@ -73,39 +74,22 @@
           but leave all its tests unchecked.
         </tooltip>
       </div>
-      <collapsible class="ag-test-suite-collapsible"
-                   v-for="ag_test_suite of d_ag_test_suites">
-        <template v-slot:header_text>
-          <div class="unpadded-checkbox-container ag-test-suite-header">
-            <label>
-              <input
-                type="checkbox"
-                class="checkbox"
-                data-testid="ag_test_suite_checkbox"
-                :checked="d_selected_test_cases_by_suite_pk.has(ag_test_suite.pk)"
-                @change="toggle_ag_test_suite_selected(ag_test_suite)"
-                @click.stop/>
-              {{ag_test_suite.name}}
-            </label>
-          </div>
-        </template>
-        <div class="unpadded-checkbox-container ag-test-case-checkbox-wrapper"
-            v-for="ag_test_case of ag_test_suite.ag_test_cases">
-          <label>
-            <input
-              type="checkbox"
-              class="checkbox"
-              data-testid="ag_test_case_checkbox"
-              :checked="ag_test_case_is_checked(ag_test_case)"
-              @change="toggle_ag_test_case_selected(ag_test_case)"/>
-            {{ag_test_case.name}}
-          </label>
-        </div>
-      </collapsible>
+
+      <rerun-select-suite
+        v-for="ag_test_suite of d_ag_test_suites"
+        :key="ag_test_suite.pk"
+        :ag_test_suite="ag_test_suite"
+        :suite_is_selected="d_selected_test_cases_by_suite_pk.has(ag_test_suite.pk)"
+        :selected_test_case_pks="d_selected_test_cases_by_suite_pk.get(ag_test_suite.pk, new Set())"
+        is_open_text="Hide tests"
+        is_closed_text="Show tests"
+        @ag_test_suite_selected="toggle_ag_test_suite_selected"
+        @ag_test_case_selected="toggle_ag_test_case_selected">
+      </rerun-select-suite>
     </div>
 
     <template v-if="d_mutation_test_suites.length !== 0" ref="choose_mutation_test_suites">
-      <div class="step-header">3. Choose mutation testing suites</div>
+      <h2 class="step-header">3. Choose mutation testing suites</h2>
       <div class="checkbox-input-container">
         <label>
           <input
@@ -135,7 +119,7 @@
       </div>
     </template>
 
-    <div class="step-header">4. Review and start rerun</div>
+    <h2 class="step-header">4. Review and start rerun</h2>
     <div class="summary-line">
       <span class="emphasize">{{num_submissions_to_rerun}}</span> submission(s)
     </div>
@@ -161,20 +145,48 @@
       <table class="rerun-table">
         <thead>
           <tr>
-            <th>Started At</th>
-            <th>Progress</th>
-            <th><!-- Cancel Button --></th>
+            <th scope="col">Started At</th>
+            <th scope="col">Progress</th>
           </tr>
         </thead>
         <tbody>
           <rerun-task-detail
             v-for="task of d_rerun_tasks"
             :task="task"
-            :key="task.pk">
+            :key="task.pk"
+            @request-cancel="on_request_cancel">
           </rerun-task-detail>
         </tbody>
       </table>
     </div>
+
+    <modal v-if="d_show_cancel_modal"
+           size="large"
+           ref="cancel_task_modal"
+           aria_label="Stop rerun confirmation"
+           @close="d_show_cancel_modal = false"
+           :click_outside_to_close="!d_cancelling"
+           :include_closing_x="!d_cancelling">
+      <div class="modal-header">
+        Stop Rerun
+      </div>
+      <div class="modal-button-footer">
+        <button type="button"
+                data-testid="stop_task_button"
+                class="orange-button"
+                :disabled="d_cancelling"
+                @click="cancel_task">
+          Stop Task
+        </button>
+        <button type="button"
+                class="white-button"
+                :disabled="d_cancelling"
+                @click="d_show_cancel_modal = false">
+          Go Back
+        </button>
+      </div>
+      <APIErrors ref="cancel_api_errors"></APIErrors>
+    </modal>
   </div>
 </template>
 
@@ -186,10 +198,10 @@ import * as ag_cli from 'ag-client-typescript';
 import { ArraySet, member_names_less, pk_less, pk_more } from '@/array_set';
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
-import CollapsibleContent from '@/components/CollapsibleContent.vue';
 import GroupLookup from '@/components/group_lookup.vue';
+import Modal from '@/components/modal.vue';
 import Tooltip from '@/components/tooltip.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { Poller } from '@/poller';
 import { SafeMap } from '@/safe_map';
@@ -202,6 +214,7 @@ import {
   update_changed_ag_test_case,
 } from '../suite_observer_utils';
 
+import RerunSelectSuite from './rerun_select_suite.vue';
 import RerunTaskDetail from './rerun_task_detail.vue';
 import SubmissionSelector from './submission_selector.vue';
 
@@ -213,8 +226,9 @@ interface GroupWithSubmissions {
 @Component({
   components: {
     APIErrors,
-    Collapsible: CollapsibleContent,
     GroupLookup,
+    Modal,
+    RerunSelectSuite,
     RerunTaskDetail,
     SubmissionSelector,
     Tooltip,
@@ -249,6 +263,10 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   d_starting_rerun = false;
   d_loading = true;
 
+  d_show_cancel_modal = false;
+  d_cancelling = false;
+  d_task_to_cancel: ag_cli.RerunSubmissionTask | null = null;
+
   @handle_global_errors_async
   async created() {
     await this.load_rerun_tasks();
@@ -282,6 +300,19 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
 
   async load_rerun_tasks() {
     this.d_rerun_tasks = await ag_cli.RerunSubmissionTask.get_all_from_project(this.project.pk);
+  }
+
+  on_request_cancel(task: ag_cli.RerunSubmissionTask) {
+    this.d_task_to_cancel = task;
+    this.d_show_cancel_modal = true;
+  }
+
+  @handle_api_errors_async(make_error_handler_func('cancel_api_errors'))
+  cancel_task() {
+    return toggle(this, 'd_cancelling', async () => {
+      await this.d_task_to_cancel!.cancel();
+      this.d_show_cancel_modal = false;
+    });
   }
 
   @handle_api_errors_async(handle_start_rerun_error)
@@ -361,12 +392,6 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
     }
 
     this.d_selected_test_cases_by_suite_pk = copy;
-  }
-
-  ag_test_case_is_checked(ag_test_case: ag_cli.AGTestCase) {
-    let ag_test_case_pks = this.d_selected_test_cases_by_suite_pk.get(
-      ag_test_case.ag_test_suite, new Set());
-    return ag_test_case_pks.has(ag_test_case.pk);
   }
 
   toggle_mutation_test_suite_selected(mutation_test_suite: ag_cli.MutationTestSuite) {
@@ -569,6 +594,7 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
 @import '@/styles/loading.scss';
+@import '@/styles/modal.scss';
 @import '@/styles/section_header.scss';
 
 #rerun-submissions-component {
@@ -619,27 +645,6 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
   max-width: 500px;
 }
 
-.ag-test-suite-collapsible {
-  margin: .5rem 0;
-}
-
-.ag-test-suite-header {
-  width: 100%;
-  margin-left: .25rem;
-  @include section-header(
-    $with-left-divider: false, $line-spacing: .25rem, $line-color: $pebble-dark
-  );
-
-  white-space: nowrap;
-}
-
-.ag-test-case-checkbox-wrapper {
-  margin: .25rem 0;
-  margin-left: 2.5rem;
-
-  white-space: nowrap;
-}
-
 .button-footer {
   margin-top: 1.5rem;
 }
@@ -650,6 +655,7 @@ function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
 
 .rerun-table {
   text-align: left;
+  table-layout: fixed;
   width: 100%;
   max-width: 550px;
 }

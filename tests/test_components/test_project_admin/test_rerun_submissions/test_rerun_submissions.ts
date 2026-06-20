@@ -122,18 +122,71 @@ describe('Rerun list tests', () => {
         let wrapper = await make_wrapper();
         await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun));
-        expect(wrapper.find('.progress-cell').text()).toEqual('0%');
-        expect(wrapper.find('.refresh-icon').exists()).toBe(true);
+        expect(wrapper.find('.progress-value').text()).toEqual('0%');
+        expect(wrapper.find('.refresh-button').exists()).toBe(true);
 
         let updated = new ag_cli.RerunSubmissionTask(new_tasks[0]);
         updated.progress = 100;
         sinon.stub(ag_cli.RerunSubmissionTask, 'get_by_pk').withArgs(
             new_tasks[0].pk).resolves(updated);
-        await wrapper.find('.refresh-icon').trigger('click');
+        await wrapper.find('.refresh-button').trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(wrapper.find('.progress-cell').text()).toEqual('100%');
-        expect(wrapper.find('.refresh-icon').exists()).toBe(false);
+        expect(wrapper.find('.refresh-button').exists()).toBe(false);
+    });
+
+    test('Cancel button opens modal', async () => {
+        let wrapper = await make_wrapper();
+        await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun));
+
+        expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(false);
+        await wrapper.find('.cancel-button').trigger('click');
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(true);
+    });
+
+    test('Cancel rerun', async () => {
+        let cancel_stub = sinon.stub(ag_cli.RerunSubmissionTask.prototype, 'cancel');
+        cancel_stub.callsFake(function(this: ag_cli.RerunSubmissionTask) {
+            this.is_cancelled = true;
+            return Promise.resolve();
+        });
+
+        let wrapper = await make_wrapper();
+        await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun));
+
+        await wrapper.find('.cancel-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        await wrapper.find('[data-testid=stop_task_button]').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_cancelling)).toBe(true);
+
+        expect(wrapper.find('.progress-cell').text()).toContain('Cancelled');
+        expect(cancel_stub.calledOnce).toBe(true);
+        expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(false);
+    });
+
+    test('Cancel rerun API errors handled', async () => {
+        let cancel_stub = sinon.stub(ag_cli.RerunSubmissionTask.prototype, 'cancel');
+        cancel_stub.rejects(new ag_cli.HttpError(403, 'noope'));
+
+        let wrapper = await make_wrapper();
+        await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun));
+
+        await wrapper.find('.cancel-button').trigger('click');
+        await wrapper.vm.$nextTick();
+
+        await wrapper.find('[data-testid=stop_task_button]').trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_cancelling)).toBe(true);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(true);
+        let api_errors = <APIErrors> wrapper.findComponent({ref: 'cancel_api_errors'}).vm;
+        expect(api_errors.state.api_errors.length).toBe(1);
     });
 
     test('Task has error', async () => {
@@ -147,7 +200,7 @@ describe('Rerun list tests', () => {
         expect(wrapper.find('.progress-cell').text()).toContain('ERROR');
         expect(wrapper.find('.progress-cell').text()).toContain(
             `Rerun task ID: ${wrapper.vm.d_rerun_tasks[0].pk}`);
-        expect(wrapper.find('.refresh-icon').exists()).toBe(false);
+        expect(wrapper.find('.refresh-button').exists()).toBe(false);
     });
 });
 
