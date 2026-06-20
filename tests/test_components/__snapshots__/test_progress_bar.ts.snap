@@ -2,8 +2,13 @@
 
 exports[`Progress bar tests > Partial progress 1`] = `
 <div
+  aria-label="Loading progress"
+  aria-valuemax="100"
+  aria-valuemin="0"
+  aria-valuenow="51"
   class="total-progress"
   data-v-a22d59b9=""
+  role="progressbar"
 >
   <div
     class="completed-progress"
@@ -21,8 +26,13 @@ exports[`Progress bar tests > Partial progress 1`] = `
 
 exports[`Progress bar tests > Progress > 100% custom slot 1`] = `
 <div
+  aria-label="Loading progress"
+  aria-valuemax="100"
+  aria-valuemin="0"
+  aria-valuenow="100"
   class="total-progress"
   data-v-a22d59b9=""
+  role="progressbar"
 >
   <div
     class="completed-progress fully-round"
@@ -40,8 +50,13 @@ exports[`Progress bar tests > Progress > 100% custom slot 1`] = `
 
 exports[`Progress bar tests > Progress > 100% default slot 1`] = `
 <div
+  aria-label="Loading progress"
+  aria-valuemax="100"
+  aria-valuemin="0"
+  aria-valuenow="100"
   class="total-progress"
   data-v-a22d59b9=""
+  role="progressbar"
 >
   <div
     class="completed-progress fully-round"
@@ -59,8 +74,13 @@ exports[`Progress bar tests > Progress > 100% default slot 1`] = `
 
 exports[`Progress bar tests > Progress 0 1`] = `
 <div
+  aria-label="Loading progress"
+  aria-valuemax="100"
+  aria-valuemin="0"
+  aria-valuenow="0"
   class="total-progress"
   data-v-a22d59b9=""
+  role="progressbar"
 >
   <div
     class="completed-progress"
@@ -78,8 +98,13 @@ exports[`Progress bar tests > Progress 0 1`] = `
 
 exports[`Progress bar tests > Progress 100% custom slot 1`] = `
 <div
+  aria-label="Loading progress"
+  aria-valuemax="100"
+  aria-valuemin="0"
+  aria-valuenow="100"
   class="total-progress"
   data-v-a22d59b9=""
+  role="progressbar"
 >
   <div
     class="completed-progress fully-round"
@@ -97,8 +122,13 @@ exports[`Progress bar tests > Progress 100% custom slot 1`] = `
 
 exports[`Progress bar tests > Progress 100% default slot 1`] = `
 <div
+  aria-label="Loading progress"
+  aria-valuemax="100"
+  aria-valuemin="0"
+  aria-valuenow="100"
   class="total-progress"
   data-v-a22d59b9=""
+  role="progressbar"
 >
   <div
     class="completed-progress fully-round"

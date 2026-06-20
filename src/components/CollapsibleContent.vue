@@ -3,29 +3,33 @@
     <div
       class="panel"
       :class="[`level-${indentation_level}`, { active: is_active }]"
-      tabindex="0"
-      role="button"
-      :aria-controls="body_id"
-      :aria-expanded="state.is_open"
-      @click="toggle_is_open"
-      @keydown.space.prevent="toggle_is_open"
-      @keydown.enter="toggle_is_open"
     >
-      <i
-        v-if="include_caret"
-        class="caret fas"
-        :class="state.is_open ? 'fa-caret-down' : 'fa-caret-right'"
-      ></i>
-      <div class="text">
-        <slot name="header_text"></slot>
-      </div>
+      <button
+        type="button"
+        class="panel-toggle unstyled-button"
+        :aria-controls="body_id"
+        :aria-expanded="state.is_open"
+        @click="toggle_is_open"
+      >
+        <i
+          v-if="include_caret"
+          class="caret fas"
+          aria-hidden="true"
+          :class="state.is_open ? 'fa-caret-down' : 'fa-caret-right'"
+        ></i>
+        <div class="text">
+          <slot name="header_text"></slot>
+        </div>
+      </button>
       <div class="icons" :class="{ 'always-visible': always_show_icons }">
         <slot name="header_icons"></slot>
       </div>
     </div>
     <template v-if="use_v_if">
-      <div v-if="state.is_open" data-testid="collapsible_body" :id="body_id">
-        <slot></slot>
+      <div v-show="state.is_open" data-testid="collapsible_body" :id="body_id">
+        <div v-if="state.is_open">
+          <slot></slot>
+        </div>
       </div>
     </template>
     <template v-else>
@@ -103,6 +107,7 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+@import "@/styles/button_styles.scss";
 @import "@/styles/list_panels.scss";
 
 * {
@@ -118,6 +123,13 @@ defineExpose({
 // to override the style rules from list-panels;
 .always-visible.icons {
   visibility: visible;
+}
+
+.panel-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
 }
 
 .caret {

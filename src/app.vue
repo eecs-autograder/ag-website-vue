@@ -457,7 +457,12 @@ body, input, textarea {
 }
 
 a {
+  color: darken($ocean-blue, 10%);
   text-decoration: none;
+
+  &:visited {
+    color: revert;
+  }
 }
 
 // Prevent overlay from interfering with e2e tests

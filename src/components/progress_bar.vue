@@ -1,5 +1,11 @@
 <template>
-  <div class="total-progress">
+  <div class="total-progress"
+       role="progressbar"
+       aria-label="Loading progress"
+       :aria-valuenow="processed_progress"
+       aria-valuemin="0"
+       aria-valuemax="100"
+  >
     <div class="completed-progress"
          :class="{'fully-round': processed_progress === 100}"
          :style="{'width': `${processed_progress}%`}"></div>

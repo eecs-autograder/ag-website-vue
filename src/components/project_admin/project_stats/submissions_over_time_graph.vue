@@ -2,7 +2,7 @@
   <div>
     <div class="controls-wrapper">
       <div>
-        <select v-model="d_timezone" class="select">
+        <select v-model="d_timezone" class="select" aria-label="Timezone">
           <option v-for="timezone of timezones" :value="timezone" :key="timezone">
             {{timezone}}
           </option>
@@ -26,7 +26,7 @@
 
     <!-- See https://www.chartjs.org/docs/latest/configuration/responsive.html#important-note -->
     <div style="position: relative; height: 70vh">
-      <canvas ref="submissions_over_time_canvas"></canvas>
+      <canvas ref="submissions_over_time_canvas" role="img" aria-label="Submissions over time chart"></canvas>
     </div>
   </div>
 </template>

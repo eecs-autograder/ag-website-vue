@@ -14,7 +14,13 @@
         <template v-else>{{ d_num_queued_submissions }}</template>
       </span>
       submission(s) currently in the queue
-      <i class="refresh-icon fas fa-sync-alt" @click="load_num_queued_submissions"></i>
+      <button type="button"
+              class="unstyled-button"
+              aria-label="Refresh queue count"
+              @click="load_num_queued_submissions"
+      >
+        <i class="fas fa-sync-alt"></i>
+      </button>
     </div>
 
     <div class="checkbox-input-container">
@@ -66,7 +72,10 @@
             :ultimate_submission_entries="submission_results"
           />
 
-          <score-table :submission_results="submission_results"/>
+          <score-table
+            v-if="submission_results !== null"
+            :submission_results="submission_results"
+          />
         </template>
       </collapsible>
     </div>
@@ -398,9 +407,4 @@ export default class ProjectStats extends Vue {
   @include section-header($with-left-divider: false);
   font-size: 1.25rem;
 }
-
-.refresh-icon {
-  cursor: pointer;
-}
-
 </style>
