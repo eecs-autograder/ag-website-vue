@@ -12,45 +12,56 @@
     </div>
     <template v-else>
       <header id="banner">
-        <div id="breadcrumbs">
-          <router-link to="/" id="home-logo">
-            Autograder.io
-          </router-link>
-          <template v-if="globals.current_course !== null">
-            <router-link :to="`/web/course/${globals.current_course.pk}`"
-                          class="breadcrumb-link">
-              <span> - {{globals.current_course.name}}</span>
-              <span v-if="globals.current_course.semester !== null">
-                {{globals.current_course.semester}}
-              </span>
-              <span v-if="globals.current_course.year !== null">
-                {{globals.current_course.year}}
-              </span>
-            </router-link>
-
-            <span v-if="globals.user_roles.is_admin">
-              <router-link :to="`/web/course_admin/${globals.current_course.pk}`"
-                            class="breadcrumb-link">
-                <i class="fas fa-cog cog" role="img" aria-label="course admin"></i>
+        <nav id="breadcrumbs" aria-label="Breadcrumb">
+          <ol>
+            <li>
+              <router-link to="/" id="home-logo">
+                Autograder.io
               </router-link>
-            </span>
-
-            <span v-if="globals.current_project !== null">
-              -
-              <router-link :to="`/web/project/${globals.current_project.pk}`"
-                            class="breadcrumb-link">
-                {{globals.current_project.name}}
-              </router-link>
-
-              <span v-if="globals.user_roles.is_admin">
-                <router-link :to="`/web/project_admin/${globals.current_project.pk}`"
+            </li>
+            <template v-if="globals.current_course !== null">
+              <li class="breadcrumb-separator" aria-hidden="true"> - </li>
+              <li>
+                <router-link :to="`/web/course/${globals.current_course.pk}`"
                               class="breadcrumb-link">
-                  <i class="fas fa-cog cog" role="img" aria-label="project admin"></i>
+                  <span>{{globals.current_course.name}}</span>
+                  <span v-if="globals.current_course.semester !== null">
+                    {{globals.current_course.semester}}
+                  </span>
+                  <span v-if="globals.current_course.year !== null">
+                    {{globals.current_course.year}}
+                  </span>
                 </router-link>
-              </span>
-            </span>
-          </template>
-        </div>
+              </li>
+
+              <li v-if="globals.user_roles.is_admin" class="breadcrumb-admin-link">
+                <router-link :to="`/web/course_admin/${globals.current_course.pk}`"
+                              class="breadcrumb-link"
+                              aria-label="Course admin">
+                  <i class="fas fa-cog cog" aria-hidden="true"></i>
+                </router-link>
+              </li>
+
+              <template v-if="globals.current_project !== null">
+                <li class="breadcrumb-separator" aria-hidden="true"> - </li>
+                <li>
+                  <router-link :to="`/web/project/${globals.current_project.pk}`"
+                                class="breadcrumb-link">
+                    {{globals.current_project.name}}
+                  </router-link>
+                </li>
+
+                <li v-if="globals.user_roles.is_admin" class="breadcrumb-admin-link">
+                  <router-link :to="`/web/project_admin/${globals.current_project.pk}`"
+                                class="breadcrumb-link"
+                                aria-label="Project admin">
+                    <i class="fas fa-cog cog" aria-hidden="true"></i>
+                  </router-link>
+                </li>
+              </template>
+            </template>
+          </ol>
+        </nav>
         <div id="right-side-icons">
           <a id="docs-icon" class="icon"
               aria-label="User Documentation"
@@ -302,6 +313,28 @@ $breadcrumb-font-size: 1.5rem;
   font-size: $breadcrumb-font-size;
   white-space: nowrap;
   overflow-x: auto;
+
+  ol {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+  }
+
+  .breadcrumb-separator {
+    padding: 0 .5rem;
+  }
+
+  .breadcrumb-admin-link {
+    margin-left: .5rem;
+  }
 
   .breadcrumb-link {
     color: $ocean-blue;
