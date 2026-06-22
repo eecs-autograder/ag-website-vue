@@ -132,7 +132,8 @@
           <i class="fas fa-exclamation-triangle"></i>
         </div>
         <ul class="file-list">
-          <li v-for="filename of unexpected_files" class="list-item filename">{{filename}}</li>
+          <li v-for="filename of unexpected_files"
+              class="list-item filename">"{{filename}}"</li>
           <li v-for="mismatch of patterns_with_too_many_matches" class="list-item">
             Expected no more than
             <span class="num-files">{{mismatch.num_expected}}</span>

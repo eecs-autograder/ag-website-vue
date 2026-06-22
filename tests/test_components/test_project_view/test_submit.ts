@@ -845,7 +845,7 @@ describe('Submitted file validation tests', () => {
 
         let unexpected_files = confirm_submit_modal.findAll('.file-list').at(2);
         expect(unexpected_files.findAll('li').length).toEqual(2);
-        expect(unexpected_files.findAll('li').at(0).text()).toEqual('unexpected');
+        expect(unexpected_files.findAll('li').at(0).text()).toEqual('"unexpected"');
         expect(compress_whitespace(unexpected_files.findAll('li').at(1).text())).toEqual(
             'Expected no more than 2 file(s) matching the pattern too_many_* but got 3'
         );

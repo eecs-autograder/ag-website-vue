@@ -345,8 +345,8 @@ describe('Discarded files tests', () => {
         let discarded = wrapper.findAll('.discarded-file');
         expect(discarded.length).toEqual(discarded_filenames.length);
 
-        expect(compress_whitespace(discarded.at(0).text())).toEqual(discarded_filenames[0]);
-        expect(compress_whitespace(discarded.at(1).text())).toEqual(discarded_filenames[1]);
+        expect(compress_whitespace(discarded.at(0).text())).toEqual(`"${discarded_filenames[0]}"`);
+        expect(compress_whitespace(discarded.at(1).text())).toEqual(`"${discarded_filenames[1]}"`);
     });
 });
 
