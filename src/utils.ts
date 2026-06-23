@@ -12,7 +12,7 @@ export function sleep(seconds: number) {
 // that "to" is a derived class of "from".
 // Also limits "from" to a single value.
 export function safe_assign<ToType extends FromType, FromType>(to: ToType, from: FromType) {
-    Object.assign(to, from);
+    Object.assign(to as object, from as object);
 }
 
 // Used to make a deep copy of an object whose constructor takes an object
