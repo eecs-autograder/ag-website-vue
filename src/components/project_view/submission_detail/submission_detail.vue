@@ -107,24 +107,18 @@
     <div class="submitted-files" role="list">
       <div v-for="filename of submission.submitted_filenames"
             class="submitted-file" role="listitem">
-        <a class="open-file-link"
-            :class="{'current-file': current_filename === filename}"
-            role="button"
-            tabindex="0"
-            @click="view_file(filename)"
-            @keydown.space.prevent="view_file(filename)"
-            @keydown.enter="view_file(filename)"
-        >{{filename}}</a>
-        <i
-          class="cursor-pointer fa fa-file-download download-file-icon"
-          role="button"
+        <button
+          ref="open_file_button"
+          :class="['unstyled-button', {'current-file': current_filename === filename}]"
+          @click="view_file(filename)"
+        >{{filename}}</button>
+        <button
           aria-label="Download file"
-          tabindex="0"
+          class="unstyled-button"
           @click="download_file(filename)"
-          @keydown.space.prevent="download_file(filename)"
-          @keydown.enter="download_file(filename)"
         >
-        </i>
+          <i class="fa fa-file-download download-file-icon"></i>
+        </button>
       </div>
     </div>
 
@@ -508,11 +502,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 
   .submitted-file {
     margin: .25rem 0;
-    color: $ocean-blue;
-  }
-
-  .open-file-link {
-    cursor: pointer;
+    color: darken($ocean-blue, 10%);
   }
 
   .current-file {
@@ -521,8 +511,7 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
   }
 
   .download-file-icon {
-    padding-left: .625rem;
-    cursor: pointer;
+    margin-left: .625rem;
   }
 }
 

@@ -122,7 +122,7 @@ export default class StudentLookup extends Vue implements GroupObserver, Created
 }
 
 .extension {
-  color: $ocean-blue;
+  color: darken($ocean-blue, 10%);
 }
 
 .extension-text {
