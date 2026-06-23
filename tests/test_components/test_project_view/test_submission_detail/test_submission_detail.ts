@@ -310,16 +310,16 @@ describe('Submitted files tests', () => {
         expect(wrapper.vm.current_filename).toBeNull();
 
         let submitted_files = wrapper.findAll('.submitted-file');
-        submitted_files.at(1).find('.open-file-link').trigger('click');
+        submitted_files.at(1).find('[data-testid=open_file_button]').trigger('click');
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
 
         expect(get_file_content_stub.calledOnce).toBe(true);
         expect(wrapper.vm.current_filename).toEqual('file_b');
 
-        submitted_files.at(0).find('.open-file-link').trigger('click');
+        submitted_files.at(0).find('[data-testid=open_file_button]').trigger('click');
         await wrapper.vm.$nextTick();
-        submitted_files.at(1).find('.open-file-link').trigger('click');
+        submitted_files.at(1).find('[data-testid=open_file_button]').trigger('click');
         await wrapper.vm.$nextTick();
         await wrapper.vm.$nextTick();
     });
@@ -480,7 +480,7 @@ describe('Adjust feedback tests', () => {
         // submission changes.
         sinon.stub(wrapper.vm.submission, 'get_file_content').resolves(new Blob([first_content]));
         let submitted_files = wrapper.findAll('.submitted-file');
-        submitted_files.at(0).find('.open-file-link').trigger('click');
+        submitted_files.at(0).find('[data-testid=open_file_button]').trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.current_filename).toEqual(filename);
         expect(await wrapper.vm.current_file_contents).toEqual(first_content);
@@ -509,7 +509,7 @@ describe('Adjust feedback tests', () => {
         // the same name. This will indicate that the stored file data was
         // cleared.
         sinon.stub(wrapper.vm.submission, 'get_file_content').resolves(new Blob([second_content]));
-        submitted_files.at(0).find('.open-file-link').trigger('click');
+        submitted_files.at(0).find('[data-testid=open_file_button]').trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.current_filename).toEqual(filename);
         expect(await wrapper.vm.current_file_contents).toEqual(second_content);

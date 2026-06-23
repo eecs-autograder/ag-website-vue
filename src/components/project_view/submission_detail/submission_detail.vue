@@ -108,7 +108,7 @@
       <div v-for="filename of submission.submitted_filenames"
             class="submitted-file" role="listitem">
         <button
-          ref="open_file_button"
+          data-testid="open_file_button"
           :class="['unstyled-button', {'current-file': current_filename === filename}]"
           @click="view_file(filename)"
         >{{filename}}</button>
