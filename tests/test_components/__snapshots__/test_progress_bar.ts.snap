@@ -67,7 +67,7 @@ exports[`Progress bar tests > Progress > 100% default slot 1`] = `
     class="progress-text"
     data-v-a22d59b9=""
   >
-     Please wait...
+     Please wait... 
   </div>
 </div>
 `;
@@ -139,7 +139,7 @@ exports[`Progress bar tests > Progress 100% default slot 1`] = `
     class="progress-text"
     data-v-a22d59b9=""
   >
-     Please wait...
+     Please wait... 
   </div>
 </div>
 `;
