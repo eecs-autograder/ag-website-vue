@@ -54,7 +54,7 @@
             <template v-if="!d_setup_stdout_loaded">
               <div class="loading-output">
                 <i class="fa fa-spinner fa-pulse fa-fw"
-                   role="status" aria-label="Loading"></i>
+                   role="img" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -76,7 +76,7 @@
             <template v-if="!d_setup_stderr_loaded">
               <div class="loading-output">
                 <i class="fa fa-spinner fa-pulse fa-fw"
-                   role="status" aria-label="Loading"></i>
+                   role="img" aria-label="Loading"></i>
               </div>
             </template>
             <template v-else>
@@ -209,7 +209,7 @@
                 <template v-if="!d_student_test_names_stdout_loaded">
                   <div class="loading-output">
                     <i class="fa fa-spinner fa-pulse fa-fw"
-                      role="status" aria-label="Loading"></i>
+                       role="img" aria-label="Loading"></i>
                   </div>
                 </template>
                 <template v-else>
@@ -233,7 +233,7 @@
               <template v-if="!d_student_test_names_stderr_loaded">
                 <div class="loading-output">
                   <i class="fa fa-spinner fa-pulse fa-fw"
-                    role="status" aria-label="Loading"></i>
+                     role="img" aria-label="Loading"></i>
                 </div>
               </template>
               <template v-else>
@@ -275,7 +275,7 @@
               <template v-if="!d_validity_check_stdout_loaded">
                 <div class="loading-output">
                   <i class="fa fa-spinner fa-pulse fa-fw"
-                    role="status" aria-label="Loading"></i>
+                     role="img" aria-label="Loading"></i>
                 </div>
               </template>
               <template v-else>
@@ -298,7 +298,7 @@
               <template v-if="!d_validity_check_stderr_loaded">
                 <div class="loading-output">
                   <i class="fa fa-spinner fa-pulse fa-fw"
-                    role="status" aria-label="Loading"></i>
+                     role="img" aria-label="Loading"></i>
                 </div>
               </template>
               <template v-else>
@@ -372,7 +372,7 @@
               <template v-if="!d_grade_buggy_stdout_loaded">
                 <div class="loading-output">
                   <i class="fa fa-spinner fa-pulse fa-fw"
-                    role="status" aria-label="Loading"></i>
+                     role="img" aria-label="Loading"></i>
                 </div>
               </template>
               <template v-else>
@@ -395,7 +395,7 @@
               <template v-if="!d_grade_buggy_stderr_loaded">
                 <div class="loading-output">
                   <i class="fa fa-spinner fa-pulse fa-fw"
-                    role="status" aria-label="Loading"></i>
+                     role="img" aria-label="Loading"></i>
                 </div>
               </template>
               <template v-else>
