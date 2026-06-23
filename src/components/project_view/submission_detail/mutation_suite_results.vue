@@ -1,6 +1,8 @@
 <template>
   <div id="mutation-test-suite-results"
-       class="suite-result">
+       class="suite-result"
+       role="region"
+       aria-label="Mutation test suite results">
     <div id="mutation-test-suites-title">Mutation Testing Suites</div>
     <div id="mutation-test-suites-header">
       <div class="column-1"> Suite Name </div>

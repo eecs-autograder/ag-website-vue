@@ -2,15 +2,15 @@
   <div id="correctness-icon">
     <div v-if="correctness_level === CorrectnessLevel.all_correct"
          class="correctness-level all-correct">
-      <i class="fas fa-check"></i>
+      <i class="fas fa-check" role="img" aria-label="Correct"></i>
     </div>
     <div v-else-if="correctness_level === CorrectnessLevel.some_correct"
          class="correctness-level some-correct">
-      <i class="fas fa-times"></i>
+      <i class="fas fa-times" role="img" aria-label="Partially correct"></i>
     </div>
     <div v-else-if="correctness_level === CorrectnessLevel.none_correct"
          class="correctness-level none-correct">
-      <i class="fas fa-times"></i>
+      <i class="fas fa-times" role="img" aria-label="Incorrect"></i>
     </div>
     <div v-else-if="correctness_level === CorrectnessLevel.info_only"
          class="correctness-level info-only">

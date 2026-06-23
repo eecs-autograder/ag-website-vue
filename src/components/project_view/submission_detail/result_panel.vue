@@ -4,7 +4,14 @@
                   {'command-panel-header-open': d_is_open && is_command },
                   {'panel-header-open': d_is_open && !is_command },
                   {'panel-header-closed': !d_is_open }]"
-         @click="toggle_d_is_open">
+         role="button"
+         :tabindex="can_open ? 0 : -1"
+         @click="toggle_d_is_open"
+         @keydown.space.prevent="toggle_d_is_open"
+         @keydown.enter="toggle_d_is_open"
+         :aria-controls="panel_body_uid"
+         :aria-expanded="d_is_open"
+    >
 
       <template v-if="is_command">
         <div class="command-name">{{name}}</div>
@@ -14,7 +21,8 @@
         </div>
         <div class="command-points">
           <span v-if="points_possible !== 0"
-                class="display-points">
+                class="display-points"
+                aria-label="Score">
             {{points_awarded}}/{{points_possible}}
           </span>
         </div>
@@ -27,18 +35,25 @@
         </div>
         <div class="points">
           <span v-if="points_possible !== 0"
-                class="display-points">
+                class="display-points"
+                aria-label="Score">
             {{points_awarded}}/{{points_possible}}
           </span>
         </div>
       </template>
     </div>
 
-    <div v-if="d_is_open"
+    <!-- Outer v-show so that aria-controls has something to reference. -->
+    <!-- Inner v-if so that the inner component doesn't send requests until
+         the panel is open. -->
+    <div v-show="d_is_open"
+         :id="panel_body_uid"
          :class="[`${panel_correctness}-panel-body`,
                   {'multiple-command-panel-body': is_multi_command_case},
                   {'command-panel-body': is_command}]">
-      <slot></slot>
+      <div v-if="d_is_open">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
@@ -48,6 +63,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from "@/components/project_view/submission_detail/correctness_icon.vue";
+import { generate_uid } from '@/utils';
 
 @Component({
   components: {
@@ -98,9 +114,17 @@ export default class ResultPanel extends Vue {
     return CorrectnessLevel.some_correct;
   }
 
+  get panel_body_uid() {
+    return `result-panel-${generate_uid()}`;
+  }
+
+  get can_open() {
+    return this.correctness_level !== CorrectnessLevel.not_available;
+  }
+
   toggle_d_is_open() {
     let top = this.$el.getBoundingClientRect().top;
-    if (this.correctness_level !== CorrectnessLevel.not_available) {
+    if (this.can_open) {
       this.d_is_open = !this.d_is_open;
     }
     // This prevents any open panels below this one from being pushed

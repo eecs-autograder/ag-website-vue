@@ -1,11 +1,13 @@
 <template>
   <div id="ag-case-setup-result">
 
-    <fieldset class="fieldset"
-              v-if="(ag_test_suite_result.setup_timed_out !== null
-                     && ag_test_suite_result.setup_timed_out)
-                     || ag_test_suite_result.setup_return_code !== null">
-      <legend class="legend"> Correctness </legend>
+    <div class="fieldset"
+         role="region"
+         :aria-label="`${ag_test_suite_result.ag_test_suite_name} test suite setup result`"
+         v-if="(ag_test_suite_result.setup_timed_out !== null
+                 && ag_test_suite_result.setup_timed_out)
+                 || ag_test_suite_result.setup_return_code !== null">
+      <div class="legend"> Correctness </div>
       <div id="exit-status-section">
         <div class="feedback-row">
           <div class="feedback-label"> Exit status: </div>
@@ -23,14 +25,16 @@
           </div>
         </div>
       </div>
-    </fieldset>
+    </div>
 
-    <fieldset v-if="d_output_size !== null
+    <div v-if="d_output_size !== null
                     && (d_output_size.setup_stdout_size !== null
                         || d_output_size.setup_stderr_size !== null)"
-              class="fieldset"
-              ref="actual_output">
-      <legend class="legend"> Actual Output </legend>
+         class="fieldset"
+         role="region"
+         :aria-label="`${ag_test_suite_result.ag_test_suite_name} test suite setup output`"
+         ref="actual_output">
+      <div class="legend"> Actual Output </div>
 
       <div v-if="d_output_size.setup_stdout_size !== null"
            ref="setup_stdout_section"
@@ -61,7 +65,7 @@
             </div>
         </div>
       </div>
-    </fieldset>
+    </div>
   </div>
 </template>
 

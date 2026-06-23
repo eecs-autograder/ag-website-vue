@@ -60,14 +60,17 @@
     </div>
 
     <div class="toggle-container">
-      <toggle v-model="state.show_whitespace" active_background_color="slategray">
-        <template slot="on">
-          Show Whitespace
-        </template>
-        <template slot="off">
-          Hide Whitespace
-        </template>
-      </toggle>
+      <div class="checkbox-input-container">
+        <label class="checkbox-label">
+          <input
+            data-testid="show_whitespace"
+            type="checkbox"
+            class="checkbox"
+            v-model="state.show_whitespace"
+          />
+          Show whitespace
+        </label>
+      </div>
     </div>
   </div>
 </template>

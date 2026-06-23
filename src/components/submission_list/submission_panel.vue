@@ -3,36 +3,37 @@
     <div class="submission-timestamp">
       {{format_datetime_short(submission.timestamp)}}
     </div>
-    <div class="submission-status">
+    <div class="submission-status" role="status">
       <template v-if="submission.status === GradingStatus.queued">
-        <div class="queued-symbol">Q</div>
+        <div class="queued-symbol" aria-label="Queued">Q</div>
       </template>
       <template v-else-if="submission.status === GradingStatus.being_graded">
-        <i class="fas fa-list"></i>
+        <i class="fas fa-list" aria-label="Being graded"></i>
       </template>
 
       <template v-else-if="submission.status === GradingStatus.waiting_for_deferred">
-        <div v-if="Number(submission.results.total_points_possible) !== 0" class="score">
+        <div v-if="Number(submission.results.total_points_possible) !== 0" class="score"
+             aria-label="Score">
           {{submission.results.total_points}}/{{submission.results.total_points_possible}}
         </div>
-        <i v-else class="far fa-check-circle"></i>
+        <i v-else class="far fa-check-circle" aria-label="Core tests finished"></i>
       </template>
       <template v-else-if="submission.status === GradingStatus.finished_grading">
-        <div v-if="Number(submission.results.total_points_possible) !== 0" class="score">
+        <div v-if="Number(submission.results.total_points_possible) !== 0" class="score"
+             aria-label="Score">
           {{submission.results.total_points}}/{{submission.results.total_points_possible}}
         </div>
-        <i v-else class="far fa-check-circle"></i>
+        <i v-else class="far fa-check-circle" aria-label="Finished grading"></i>
       </template>
 
       <template v-else-if="submission.status === GradingStatus.removed_from_queue">
-        <i class="fas fa-eject"></i>
+        <i class="fas fa-eject" aria-label="Removed from queue"></i>
       </template>
       <template v-else-if="submission.status === GradingStatus.rejected">
-        <i class="fas fa-ban"></i>
+        <i class="fas fa-ban" aria-label="Rejected"></i>
       </template>
       <template v-else-if="submission.status === GradingStatus.error">
-        <i class="fas fa-skull"></i>
-        <!-- <i class="fas fa-skull-crossbones"></i> -->
+        <i class="fas fa-skull" aria-label="Internal error"></i>
       </template>
     </div>
   </div>

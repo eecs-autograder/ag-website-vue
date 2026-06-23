@@ -765,7 +765,7 @@ describe('MutationSuiteResult student tests section tests', () => {
 
         wrapper = await make_wrapper();
 
-        expect(wrapper.find('[data-testid=test_names_stdout_section]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid=test_names_stdout_section]').isVisible()).toBe(false);
     });
 
     test('show_get_test_names_stdout === true AND test_names_stdout_content === null',
@@ -796,7 +796,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
-        expect(wrapper.find('[data-testid=test_names_stdout_section]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid=test_names_stdout_section]').isVisible()).toBe(false);
 
         // show
         wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
@@ -822,7 +822,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
-        expect(wrapper.find('[data-testid=test_names_stdout_section]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid=test_names_stdout_section]').isVisible()).toBe(false);
 
         // show again
         wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
@@ -852,7 +852,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_show_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_student_test_names_stdout_content).toBeNull();
-        expect(wrapper.find('[data-testid=test_names_stdout_section]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid=test_names_stdout_section]').isVisible()).toBe(false);
 
         // show
         wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
@@ -882,7 +882,7 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
             Promise.resolve(student_test_names_stdout_content)
         );
-        expect(wrapper.find('[data-testid=test_names_stdout_section]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid=test_names_stdout_section]').isVisible()).toBe(false);
 
         // show again
         wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');

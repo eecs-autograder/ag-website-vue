@@ -1,6 +1,7 @@
 <template>
-  <div class="progress-overlay" role="status">
-    <i v-if="progress === null" class="fa fa-spinner fa-pulse"></i>
+  <div class="progress-overlay">
+    <i v-if="progress === null" class="fa fa-spinner fa-pulse"
+       role="status" aria-label="Loading"></i>
     <progress-bar v-else
                   class="progress"
                   :progress="progress"></progress-bar>

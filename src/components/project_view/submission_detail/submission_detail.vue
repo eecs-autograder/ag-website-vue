@@ -10,11 +10,13 @@
       <b>{{submission_result.total_points}}/{{submission_result.total_points_possible}}</b>
     </div>
     <div v-if="submission.status === GradingStatus.waiting_for_deferred"
-         id="deferred-tests-message" class="info-spacing grading-status">
+         id="deferred-tests-message" class="info-spacing grading-status"
+         role="status">
       Core tests finished. You can submit again now!
     </div>
     <div v-else-if="submission.status === GradingStatus.finished_grading"
-         id="deferred-tests-message" class="info-spacing grading-status">
+         id="deferred-tests-message" class="info-spacing grading-status"
+         role="status">
       All tests finished.
     </div>
 
@@ -25,7 +27,8 @@
     <div v-if="submission.status !== GradingStatus.waiting_for_deferred
                 && submission.status !== GradingStatus.finished_grading"
           id="grading-status-section"
-          class="grading-status info-spacing">
+          class="grading-status info-spacing"
+          role="status">
       <div v-if="submission.status === GradingStatus.received">
         We got your submission! It should be queued soon.
       </div>
@@ -89,9 +92,10 @@
         This submission does <span class="does-not-count">NOT</span> count
         for the following users:
       </div>
-      <div id="does-not-count-for-list">
+      <div id="does-not-count-for-list" role="list">
         <div v-for="(username, index) of submission.does_not_count_for"
-             class="does-not-count-for-list-item">
+             class="does-not-count-for-list-item"
+             role="listitem">
           <span class="list-icon">
             <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
           </span>
@@ -100,14 +104,26 @@
       </div>
     </div>
 
-    <div class="submitted-files">
+    <div class="submitted-files" role="list">
       <div v-for="filename of submission.submitted_filenames"
-            class="submitted-file">
+            class="submitted-file" role="listitem">
         <a class="open-file-link"
             :class="{'current-file': current_filename === filename}"
-            @click="view_file(filename)">{{filename}}</a>
-        <i class="cursor-pointer fa fa-file-download download-file-icon"
-            @click="download_file(filename)">
+            role="button"
+            tabindex="0"
+            @click="view_file(filename)"
+            @keydown.space.prevent="view_file(filename)"
+            @keydown.enter="view_file(filename)"
+        >{{filename}}</a>
+        <i
+          class="cursor-pointer fa fa-file-download download-file-icon"
+          role="button"
+          aria-label="Download file"
+          tabindex="0"
+          @click="download_file(filename)"
+          @keydown.space.prevent="download_file(filename)"
+          @keydown.enter="download_file(filename)"
+        >
         </i>
       </div>
     </div>
@@ -127,16 +143,19 @@
     <div class="discarded-files" v-if="submission.discarded_files.length !== 0">
       <i class="fas fa-exclamation-triangle"></i>
       The following unexpected files were <b>discarded</b>:
-      <div v-for="filename of submission.discarded_files" class="discarded-file">
-        <i class="far fa-trash-alt"></i>
-        {{filename}}
+      <div role="list">
+        <div v-for="filename of submission.discarded_files" class="discarded-file"
+             role="listitem">
+          <i class="far fa-trash-alt"></i>
+          {{filename}}
+        </div>
       </div>
     </div>
 
     <div v-if="d_globals.user_roles.is_staff
                 && submission_with_results.status !== GradingStatus.removed_from_queue"
           id="adjust-feedback-section" class="info-spacing">
-      <span id="adjust-feedback-label"> Adjust Feedback </span>
+      <label id="adjust-feedback-label" for="adjust-feedback-select"> Adjust Feedback </label>
       <select id="adjust-feedback-select"
               class="select"
               :disabled="d_loading_results"
@@ -432,11 +451,11 @@ export function handle_remove_submission_from_queue_error(component: SubmissionD
 }
 
 #submitter {
-  color: $ocean-blue;
+  color: darken($ocean-blue, 10%);
 }
 
 #submission-timestamp {
-  color: $green;
+  color: darken($green, 20%);
 }
 
 #submission-score {
