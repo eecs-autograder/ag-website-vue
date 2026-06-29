@@ -4,10 +4,11 @@
       type="checkbox"
       :checked="is_code_theme_dark"
       @change="switch_code_theme"
+      aria-label="Toggle highlighting theme"
     />
     <span class="slider round">
-      <i class="fas fa-moon"></i>
-      <i class="fas fa-sun"></i>
+      <i class="fas fa-moon" role="img" aria-label="Dark mode"></i>
+      <i class="fas fa-sun" role="img" aria-label="Light mode"></i>
     </span>
   </label>
 </template>
