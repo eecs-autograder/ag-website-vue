@@ -108,17 +108,22 @@
           <template v-for="(result, index) of d_handgrading_result.criterion_results">
             <div class="divider" v-if="index !== 0"></div>
 
-            <div class="criterion"
-                 :class="{
-                   'loading-cursor': saving,
-                   'criterion-hover': !readonly_handgrading_results,
-                   'grayed-out': readonly_handgrading_results && !result.selected,
-                 }"
-                 :key="result.pk"
-                 @click="toggle_criterion(result)">
+            <div
+              class="criterion unstyled-button"
+              :class="{
+                'loading-cursor': saving,
+                'criterion-hover': !readonly_handgrading_results,
+                'grayed-out': readonly_handgrading_results && !result.selected,
+              }"
+              :key="result.pk"
+              role="checkbox"
+              :aria-checked="result.selected ? 'true' : 'false'"
+              @click="toggle_criterion(result)"
+              @keydown.space.prevent="toggle_criterion(result)"
+            >
               <div class="row">
-                <div class="criterion-checkbox">
-                  <i v-if="result.selected" class="fa fa-check" aria-hidden="true"></i>
+                <div class="criterion-checkbox" tabindex="0">
+                  <i v-if="result.selected" class="fa fa-check"></i>
                 </div>
                 <div class="short-description">
                   {{result.criterion.short_description}}
@@ -772,11 +777,13 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 }
 
 .criterion, .annotation, .comment {
+  width: 100%;
   background-color: white;
   padding: .5rem;
 
   .row {
     display: flex;
+    width: 100%;
   }
 
   .short-description {
@@ -787,17 +794,12 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     white-space: pre-wrap;
     font-size: .75rem;
     color: darken($stormy-gray-dark, 15%);
+    padding: .125rem .25rem 0;
   }
-}
 
-.criterion, .annotation {
   .points {
     margin-left: auto;
     color: $navy-blue;
-  }
-
-  .long-description {
-    padding: .125rem .25rem 0;
   }
 }
 

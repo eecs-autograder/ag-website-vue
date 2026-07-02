@@ -8,7 +8,7 @@
       :aria-expanded="d_is_open"
     >
       <i class="fas" :class="d_is_open ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
-      <div class="filename">{{filename}}</div>
+      <span class="filename">{{filename}}</span>
     </button>
     <div :id="`file-panel-${component_uid}`" class="body" v-show="d_is_open">
       <view-file v-if="d_content !== null"

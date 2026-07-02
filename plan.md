@@ -12,7 +12,7 @@ TODO:
     - [x] Aria expanded/controls
   - [x] Add region role & label to danger zone message
 - Grading right bar:
-  - [] Change checkboxes to actual checkboxes
+  - [x] Add checkbox role & keyboard control to criteria visual checkboxes
   - [] Change applied annotation "delete" x to an unstyled button
   - [x] Form input label association for "adjust points"
   - [] Form input label association for and "comments"
