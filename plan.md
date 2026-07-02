@@ -9,6 +9,7 @@
     - Grading body:
       - Tab focus & keyboard control for collapsible file panels (Add
         directly to file_panel.vue
+        - Aria expanded/controls
       - Add region role & label to danger zone
       - Add aria-hidden to warning triangle of "not most recent" warning
         message
