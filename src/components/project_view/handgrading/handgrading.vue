@@ -27,7 +27,8 @@
                   :readonly_handgrading_results="readonly_handgrading_results">
       </file-panel>
 
-      <div v-if="!readonly_handgrading_results" class="danger-zone-container">
+      <div v-if="!readonly_handgrading_results" class="danger-zone-container"
+           role="region" aria-label="Reset handgrading result">
         <div class="danger-text">Reset Handgrading Result</div>
         <button type="button"
                 class="delete-button"
