@@ -10,17 +10,16 @@ TODO:
   - [x] Tab focus & keyboard control for collapsible file panels (Add
     directly to file_panel.vue
     - [x] Aria expanded/controls
-  - [x] Add region role & label to danger zone
-  - [] Add aria-hidden to warning triangle of "not most recent" warning
-    message
+  - [x] Add region role & label to danger zone message
 - Grading right bar:
-  - Change checkboxes to actual checkboxes
-  - Change applied annotation "delete" x to an unstyled button
-  - Form input label association for "adjust points" and "comments"
-  - "Checkboxes", "Comments", and "Annotations" sub-headers
-    - Add keyboard focus & controls (use CollapsibleSection component)
-    - Use h2 tags
-    - Stretch: Add keyboard shortcuts for prev/done/next/done+next
+  - [] Change checkboxes to actual checkboxes
+  - [] Change applied annotation "delete" x to an unstyled button
+  - [x] Form input label association for "adjust points"
+  - [] Form input label association for and "comments"
+  - [] "Checkboxes", "Comments", and "Annotations" sub-headers
+    - [] Add keyboard focus & controls (use CollapsibleSection component)
+    - [] Use h2 tags
+    - [] Stretch: Add keyboard shortcuts for prev/done/next/done+next
 - Keyboard mechanism for applying annotations:
   - Brainstorm design options
     - Add button to file panel header; button opens modal w/

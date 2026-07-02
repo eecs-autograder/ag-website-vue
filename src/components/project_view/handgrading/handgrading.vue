@@ -82,6 +82,7 @@
           <label class="label" for="adjust-points">Adjust Points</label>
           <validated-input @input_validity_changed="d_adjust_points_is_valid = $event"
                            ref="adjust_points"
+                           input_id="adjust-points"
                            :validators="[is_not_empty, is_integer]"
                            :from_string_fn="string_to_num"
                            v-model="d_handgrading_result.points_adjustment">
