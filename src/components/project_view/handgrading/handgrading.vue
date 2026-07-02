@@ -97,12 +97,12 @@
         </div>
 
         <!-- Checkboxes -->
-        <div class="collapsible-section-header"
+        <h2 class="collapsible-section-header"
              @click="d_criteria_collapsed = !d_criteria_collapsed">
           <i class="caret fas"
              :class="d_criteria_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
           Checkboxes
-        </div>
+        </h2>
         <div class="sidebar-section"
              v-show="!d_criteria_collapsed && d_handgrading_result.criterion_results.length !== 0">
           <template v-for="(result, index) of d_handgrading_result.criterion_results">
@@ -140,12 +140,12 @@
         </div>
 
         <!-- Comments (and applied annotations) -->
-        <div class="collapsible-section-header"
+        <h2 class="collapsible-section-header"
              @click="d_comments_collapsed = !d_comments_collapsed">
           <i class="caret fas"
              :class="d_comments_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
           Comments
-        </div>
+        </h2>
         <div v-show="!d_comments_collapsed">
           <div id="new-comment" v-if="can_leave_comments">
             <textarea class="input" v-model="d_new_comment_text"></textarea>
@@ -216,12 +216,12 @@
 
         <!-- Annotations -->
         <div v-if="!readonly_handgrading_results" ref="annotation_reference">
-          <div class="collapsible-section-header"
+          <h2 class="collapsible-section-header"
               @click="d_annotations_collapsed = !d_annotations_collapsed">
             <i class="caret fas"
                :class="d_annotations_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
             Annotations
-          </div>
+          </h2>
           <div class="sidebar-section" v-show="!d_annotations_collapsed">
             <template
               v-for="(annotation, index) of d_handgrading_result.handgrading_rubric.annotations"

@@ -18,7 +18,7 @@ TODO:
   - [] Form input label association for and "comments"
   - [] "Checkboxes", "Comments", and "Annotations" sub-headers
     - [] Add keyboard focus & controls (use CollapsibleSection component)
-    - [] Use h2 tags
+    - [x] Use h2 tags
     - [] Stretch: Add keyboard shortcuts for prev/done/next/done+next
 - Keyboard mechanism for applying annotations:
   - Brainstorm design options
