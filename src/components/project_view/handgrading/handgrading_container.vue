@@ -1,18 +1,23 @@
 <template>
   <div id="handgrading-container">
     <div class="sidebar-container">
-      <div class="sidebar-menu">
+      <div class="sidebar-menu" role="region" aria-label="Sidebar">
         <div class="sidebar-header" :class="{'sidebar-header-closed': d_group_sidebar_collapsed}">
-          <div class="sidebar-collapse-button"
-                @click="d_group_sidebar_collapsed = !d_group_sidebar_collapsed">
+          <button
+            class="unstyled-button sidebar-collapse-button"
+            :aria-label="`${d_group_sidebar_collapsed ? 'Open' : 'Close'} handgrading sidebar`"
+            :aria-expanded="!d_group_sidebar_collapsed"
+            aria-controls="handgrading-sidebar-content"
+            @click="d_group_sidebar_collapsed = !d_group_sidebar_collapsed"
+          >
             <i class="fas fa-bars"></i>
-          </div>
+          </button>
           <template v-if="!d_group_sidebar_collapsed">
             <div class="sidebar-header-text">
               {{project.max_group_size === 1 ? 'Students' : 'Groups'}}
             </div>
             <div class="progress dropdown" v-if="!d_loading_result_summaries">
-              <div ref="progress_text">
+              <div ref="progress_text" tabindex="0">
                 {{num_finished}}/{{total_num_to_grade}}
                 ({{staff_filtered_groups.length}} total)
                 <i class="fas fa-caret-down"></i>
@@ -82,12 +87,16 @@
             </div>
           </template>
         </div>
-        <div class="sidebar-content" v-if="!d_group_sidebar_collapsed">
+        <div id="handgrading-sidebar-content" class="sidebar-content" v-if="!d_group_sidebar_collapsed">
           <template v-for="(group_summary, index) of username_filtered_groups">
             <div class="divider" v-if="index !== 0"></div>
             <group-summary-panel :key="group_summary.pk"
                                  :group_summary="group_summary"
+                                 tabindex="0"
+                                 role="button"
                                  @click="select_for_grading(group_summary)"
+                                 @keydown.enter="select_for_grading(group_summary)"
+                                 @keydown.space.prevent="select_for_grading(group_summary)"
                                  class="sidebar-item"
                                  :class="{
                                    'active': d_currently_grading !== null
@@ -307,6 +316,7 @@ export default class HandgradingContainer extends Vue implements ag_cli.Handgrad
 </script>
 
 <style scoped lang="scss">
+@import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/collapsible_sidebar.scss';
 @import '@/styles/forms.scss';
