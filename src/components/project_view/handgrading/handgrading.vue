@@ -169,9 +169,13 @@
                       :key="comment.pk">
                   <div class="row">
                     <div class="short-description">{{comment.text}}</div>
-                    <i v-if="!readonly_handgrading_results && can_leave_comments"
-                       @click="delete_comment(comment)"
-                       class="delete fas fa-times"></i>
+                    <button
+                      v-if="!readonly_handgrading_results && can_leave_comments"
+                      class="unstyled-button"
+                      @click="delete_comment(comment)"
+                    >
+                      <i class="delete fas fa-times" aria-label="Delete comment"></i>
+                    </button>
                   </div>
                 </div>
               </template>
@@ -192,10 +196,14 @@
                           v-if="handgrading_comment.max_deduction !== null"
                         >/{{handgrading_comment.max_deduction}} max</template>)</span>
                     </div>
-                    <i v-if="!readonly_handgrading_results
-                             && (can_leave_comments || !handgrading_comment.is_custom)"
-                       @click="delete_comment(handgrading_comment)"
-                       class="delete fas fa-times"></i>
+                    <button
+                      class="unstyled-button"
+                      v-if="!readonly_handgrading_results
+                              && (can_leave_comments || !handgrading_comment.is_custom)"
+                      @click="delete_comment(handgrading_comment)"
+                    >
+                      <i class="delete fas fa-times" aria-label="Delete applied annotation"></i>
+                    </button>
                   </div>
                   <div class="long-description" v-if="handgrading_comment.long_description !== ''">
                     {{handgrading_comment.long_description}}
@@ -842,7 +850,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
   .deduction {
     padding-left: .25rem;
-    color: darken($ocean-blue, 0%);
+    color: darken($ocean-blue, 15%);
     font-weight: bold;
   }
 
