@@ -30,9 +30,16 @@
 import { ref } from "vue";
 import { generate_uid } from "@/utils";
 
-const props = defineProps<{ section_id: string }>();
+interface PropTypes {
+  section_id: string,
+  open_initially?: boolean,
+}
 
-const is_open = ref(false);
+const props = withDefaults(defineProps<PropTypes>(), {
+  open_initially: false,
+});
+
+const is_open = ref(props.open_initially);
 const component_uid = generate_uid();
 
 function toggle_is_open() {

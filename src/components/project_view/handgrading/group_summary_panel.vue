@@ -40,7 +40,6 @@ export default class GroupSummaryPanel extends Vue {
 
   get status_text() {
     let status = get_handgrading_status(this.group_summary);
-    console.log(this.group_summary.member_names, status);
     if (status === HandgradingStatus.graded) {
       let result = this.group_summary.handgrading_result!;
       return `${result.total_points}/${result.total_points_possible}`;
