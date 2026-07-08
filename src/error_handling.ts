@@ -1,5 +1,6 @@
 import { Vue } from 'vue-property-decorator';
 import { APIErrorsExposed } from './exposed_component_types/api_errors_exposed';
+import { SafePromise } from './utils';
 
 // utility error
 export class DiffPrefixError extends Error {}
@@ -85,8 +86,8 @@ export function handle_global_errors_async(
 
 export function new_handle_global_errors_async<TArgs extends unknown[], TReturn>(
     fn: (...args: TArgs) => Promise<TReturn>
-): (...args: TArgs) => Promise<TReturn | undefined> {
-    return async (...args: TArgs): Promise<TReturn | undefined> => {
+): (...args: TArgs) => SafePromise<TReturn | undefined> {
+    const handler = async (...args: TArgs): Promise<TReturn | undefined> => {
         try {
             return await fn(...args);
         }
@@ -95,4 +96,5 @@ export function new_handle_global_errors_async<TArgs extends unknown[], TReturn>
             return undefined;
         }
     };
+    return (...args: TArgs) => handler(...args) as SafePromise<TReturn | undefined>;
 }

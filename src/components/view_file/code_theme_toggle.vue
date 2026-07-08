@@ -88,12 +88,13 @@ const update_hljs_theme = () => {
 };
 
 // Lifecycle - wrap with error handling
-const initialize = new_handle_global_errors_async(async () => {
+const initialize = new_handle_global_errors_async(() => {
   init_hljs();
+  return Promise.resolve();
 });
 
 onMounted(() => {
-  initialize();
+  void initialize();
 });
 </script>
 

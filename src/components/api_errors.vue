@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div v-for="(error, index) of state.api_errors" class="error-msg-container">
+    <div
+      v-for="(error, index) of state.api_errors"
+      :key="index"
+      class="error-msg-container"
+    >
       <div class="error-msg">{{ error }}</div>
       <button
         class="dismiss-error-button"
@@ -92,7 +96,7 @@ const show_400_error_data = (error: HttpError) => {
     for (let [field_name, message] of Object.entries(error.data)) {
       if (field_name === "__all__") {
         if (Array.isArray(message)) {
-          state.api_errors.push(message[0]);
+          state.api_errors.push(String(message[0]));
         } else if (typeof message === "string") {
           state.api_errors.push(message);
         }

@@ -9,6 +9,7 @@
       <div
         class="username-container"
         v-for="(member, index) of state.usernames"
+        :key="index"
       >
         <validated-text-input
           v-model="state.usernames[index]"
@@ -55,13 +56,14 @@ import { Course } from "ag-client-typescript";
 import { reactive, watch, onMounted, nextTick, ref } from "vue";
 import NewValidatedForm from "./validated_input/NewValidatedForm.vue";
 import ValidatedTextInput from "./validated_input/ValidatedTextInput.vue";
+import { ValidatedTextInputExposed } from "@/exposed_component_types/validated_text_input_exposed";
 import { is_email } from "@/new_validators";
 
 type PropTypes = {
   course: Course;
-  max_num_inputs: Number;
-  min_num_inputs: Number;
-  value?: String[];
+  max_num_inputs: number;
+  min_num_inputs: number;
+  value?: string[];
 };
 
 const props = withDefaults(defineProps<PropTypes>(), {
@@ -75,7 +77,7 @@ const emit = defineEmits<{
 }>();
 
 const group_members_form = ref<InstanceType<typeof NewValidatedForm>>();
-const username_input = ref<InstanceType<typeof ValidatedTextInput>[]>([]);
+const username_input = ref<ValidatedTextInputExposed[]>([]);
 
 const state = reactive({
   usernames: [] as string[],
@@ -83,7 +85,7 @@ const state = reactive({
 
 const initialize = (value: string[]) => {
   if (value.length === 0) {
-    state.usernames = Array(props.min_num_inputs).fill(
+    state.usernames = Array<string>(props.min_num_inputs).fill(
       props.course.allowed_guest_domain,
     );
   } else {
