@@ -9,14 +9,11 @@
       </router-link>
 
       <div class="toolbox" v-if="is_admin">
-        <div class="clone-course tool-icon" role="button"
-             @click="show_clone_course_modal"
-             @keydown.enter="show_clone_course_modal"
-             @keydown.space.prevent="show_clone_course_modal"
-             :title="'Clone ' + course.name"
-             tabindex="0">
-          <i class="fas fa-copy" role="presentation"> </i>
-        </div>
+        <button type="button" class="clone-course tool-icon unstyled-button"
+                @click="show_clone_course_modal"
+                :aria-label="'Clone ' + course.name">
+          <i class="fas fa-copy" aria-hidden="true"> </i>
+        </button>
         <router-link :to="`/web/course_admin/${course.pk}`"
                      :title="'Edit ' + course.name">
           <div class="edit-course-settings tool-icon">
