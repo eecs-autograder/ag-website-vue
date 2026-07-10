@@ -11,6 +11,8 @@ TODO:
     directly to file_panel.vue
     - [x] Aria expanded/controls
   - [x] Add region role & label to danger zone message
+  - View file:
+    - [x] Use unstyled button for delete comment/applied annotation x
 - Grading right bar:
   - [x] Use checkbox inputs for handgrading criteria
   - [x] Change applied annotation and comment "delete" x to an unstyled button

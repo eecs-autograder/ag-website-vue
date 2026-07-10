@@ -73,10 +73,15 @@
                           + `- ${comment.location.last_line + 1}`
                         :`Line ${comment.location.first_line + 1}`}}
                     </div>
-                    <i v-if="!readonly_handgrading_results
-                              && (enable_custom_comments || !comment.is_custom)"
-                        @click="delete_handgrading_comment(comment)"
-                        class="delete fas fa-times"></i>
+                    <button
+                      class="delete unstyled-button"
+                      v-if="!readonly_handgrading_results
+                              & (enable_custom_comments || !comment.is_custom)"
+                      @click="delete_handgrading_comment(comment)"
+                      aria-label="Delete comment/annotation"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
                   </div>
                   <div class="comment-message">
                     {{comment.short_description}}
@@ -602,10 +607,6 @@ $light-green: hsl(97, 42%, 79%);
       margin-left: auto;
       padding: .125rem;
       margin-top: -.125rem;
-
-      &:hover {
-        color: $stormy-gray-dark;
-      }
     }
   }
 
