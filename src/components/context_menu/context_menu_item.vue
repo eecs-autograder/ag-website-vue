@@ -1,11 +1,11 @@
 <template>
-  <div
-    class="context-menu-option"
-    :class="{ 'hoverable-item': !disabled, 'disabled-item': disabled }"
-    @click.stop="handle_click"
-  >
+  <button type="button"
+          class="context-menu-option unstyled-button"
+          :class="{'hoverable-item': !disabled, 'disabled-item': disabled}"
+          :disabled="disabled"
+          @click.stop="handle_click">
     <slot></slot>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -29,11 +29,15 @@ function handle_click() {
 </script>
 
 <style scoped lang="scss">
-@import "@/styles/colors.scss";
+@import '@/styles/button_styles.scss';
+@import '@/styles/colors.scss';
 
 .context-menu-option {
   color: black;
-  padding: 0.375rem 0.75rem;
+  padding: .375rem .75rem;
+  display: block;
+  width: 100%;
+  text-align: left;
 }
 
 .hoverable-item:hover {
