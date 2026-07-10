@@ -8,6 +8,7 @@
         ref="lookup"
         class="lookup"
         placeholder_text="Enter a username"
+        aria_label="Search for a student by username"
         @item_selected="search($event)"
         :filter_fn="(username, filter_text) => username.includes(filter_text)"
         :choices="d_students">
