@@ -12,14 +12,13 @@ TODO:
     - [x] Aria expanded/controls
   - [x] Add region role & label to danger zone message
 - Grading right bar:
-  - [] Add checkbox role & keyboard control to criteria visual checkboxes
+  - [x] Use checkbox inputs for handgrading criteria
   - [x] Change applied annotation and comment "delete" x to an unstyled button
   - [x] Form input label association for "adjust points"
   - [x] Form input label association for "comments"
   - [x] "Checkboxes", "Comments", and "Annotations" sub-headers
     - [x] Add keyboard focus & controls (use CollapsibleSection component)
     - [x] Use h2 tags
-    - [] Stretch: Add keyboard shortcuts for prev/done/next/done+next
 - Keyboard mechanism for applying annotations:
   - Brainstorm design options
     - Add button to file panel header; button opens modal w/

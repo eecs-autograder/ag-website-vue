@@ -111,34 +111,34 @@
           <template #body>
             <template v-for="(result, index) of d_handgrading_result.criterion_results">
               <div class="divider" v-if="index !== 0"></div>
-              <div
-                class="criterion unstyled-button"
+              <label
+                class="criterion"
                 :class="{
                   'loading-cursor': saving,
                   'criterion-hover': !readonly_handgrading_results,
                   'grayed-out': readonly_handgrading_results && !result.selected,
                 }"
                 :key="result.pk"
-                role="checkbox"
-                :aria-checked="result.selected ? 'true' : 'false'"
-                @click="toggle_criterion(result)"
-                @keydown.space.prevent.stop="toggle_criterion(result)"
               >
-                <div class="row">
-                  <div class="criterion-checkbox" tabindex="0">
-                    <i v-if="result.selected" class="fa fa-check"></i>
-                  </div>
-                  <div class="short-description">
+                <span class="row">
+                  <input
+                    type="checkbox"
+                    data-testid="criterion_checkbox"
+                    :checked="result.selected"
+                    @change="toggle_criterion(result)"
+                    :disabled="readonly_handgrading_results"
+                  />
+                  <span class="short-description">
                     {{result.criterion.short_description}}
-                  </div>
-                  <div class="points">
+                  </span>
+                  <span class="points">
                     {{result.criterion.points}}
-                  </div>
-                </div>
-                <div class="long-description" v-if="result.criterion.long_description !== ''">
+                  </span>
+                </span>
+                <span class="long-description" v-if="result.criterion.long_description !== ''">
                   {{result.criterion.long_description}}
-                </div>
-              </div>
+                </span>
+              </label>
             </template>
           </template>
         </CollapsibleSection>
@@ -781,17 +781,6 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   cursor: wait;
 }
 
-.criterion-checkbox {
-  width: 1rem;
-  min-width: 1rem;
-  height: 1rem;
-  min-height: 1rem;
-  background-color: $pebble-light;
-  border: 1px solid $gray-blue-2;
-
-  margin-right: .5rem;
-}
-
 .criterion, .annotation, .comment {
   width: 100%;
   background-color: white;
@@ -816,6 +805,14 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   .points {
     margin-left: auto;
     color: $navy-blue;
+  }
+}
+
+.criterion {
+  display: flex;
+
+  .row, .short-description, .points, .long-description {
+    display: block;
   }
 }
 

@@ -351,7 +351,7 @@ describe('Checkbox tests', () => {
         expect(
             criteria.at(0).find('.points').text()
         ).toEqual(checkbox_with_long_description.points.toString());
-        expect(criteria.at(0).find('.criterion-checkbox .fa-check').exists()).toBe(true);
+        expect(checkbox_is_checked(criteria.at(0).find('[data-testid=criterion_checkbox]'))).toBe(true);
 
         expect(
             criteria.at(1).find('.short-description').text()
@@ -360,7 +360,7 @@ describe('Checkbox tests', () => {
         expect(
             criteria.at(1).find('.points').text()
         ).toEqual(checkbox_empty_long_description.points.toString());
-        expect(criteria.at(1).find('.criterion-checkbox .fa-check').exists()).toBe(false);
+        expect(checkbox_is_checked(criteria.at(1).find('[data-testid=criterion_checkbox]'))).toBe(false);
     });
 
     describe('Toggle checkbox tests', () => {
@@ -369,7 +369,7 @@ describe('Checkbox tests', () => {
 
         beforeEach(async () => {
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('4/4');
-            criteria = wrapper.findAll('.criterion');
+            criteria = wrapper.findAll('[data-testid=criterion_checkbox]');
             assert_not_null(wrapper.vm.d_handgrading_result);
             let criterion_result = wrapper.vm.d_handgrading_result.criterion_results[0];
             save_stub = sinon.stub(
@@ -381,14 +381,14 @@ describe('Checkbox tests', () => {
         });
 
         test('Toggle checkbox, grading not marked as done, score updated locally', async () => {
-            criteria.at(0).trigger('click');
+            criteria.at(0).setChecked(false);
             expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
             expect(wrapper.vm.d_handgrading_result!.criterion_results[0].selected).toBe(false);
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('0/4');
             expect(save_stub.calledOnce).toBe(true);
 
-            criteria.at(0).trigger('click');
+            criteria.at(0).setChecked(true);
             expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
             expect(wrapper.vm.d_handgrading_result!.criterion_results[0].selected).toBe(true);
@@ -408,14 +408,14 @@ describe('Checkbox tests', () => {
                 return Promise.resolve();
             });
 
-            criteria.at(0).trigger('click');
+            criteria.at(0).setChecked(false);
             expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
             expect(wrapper.vm.d_handgrading_result!.criterion_results[0].selected).toBe(false);
             expect(wrapper.find('.grading-sidebar-header .score').text()).toEqual('3/4');
             expect(save_stub.calledOnce).toBe(true);
 
-            criteria.at(0).trigger('click');
+            criteria.at(0).setChecked(true);
             expect(await wait_until(wrapper, w => !w.vm.saving)).toBe(true);
 
             expect(wrapper.vm.d_handgrading_result!.criterion_results[0].selected).toBe(true);
@@ -1028,18 +1028,20 @@ test('Read-only mode', async () => {
     // Checkboxes are not toggleable
     let save_criterion_result_stub = sinon.stub(
         wrapper.vm.d_handgrading_result!.criterion_results[0], 'save');
-    let checkbox = wrapper.findAll('.criterion').at(0);
-    checkbox.trigger('click');
+    let checkbox_label = wrapper.findAll('.criterion').at(0);
+    let checkbox = checkbox_label.find('[data-testid=criterion_checkbox]');
+    expect(checkbox.element).toBeDisabled();
+    await checkbox.trigger('click');
     await wrapper.vm.$nextTick();
     expect(save_criterion_result_stub.callCount).toEqual(0);
 
     // Unselected checkbox is grayed out
     let unselected_checkbox = wrapper.findAll('.criterion').at(1);
     expect(unselected_checkbox.classes().includes('grayed-out')).toBe(true);
-    expect(checkbox.classes().includes('grayed-out')).toBe(false);
+    expect(checkbox_label.classes().includes('grayed-out')).toBe(false);
 
     // Checkbox is still shown
-    expect(checkbox.find('.criterion-checkbox .fa-check').exists()).toBe(true);
+    expect(checkbox_is_checked(checkbox)).toBe(true);
 
     // Deletion x's are gone
     expect(wrapper.findAll('.delete').length).toEqual(0);
