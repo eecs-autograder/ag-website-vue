@@ -8,8 +8,8 @@
     <div class="group-members-container">
       <div
         class="username-container"
-        v-for="member of state.usernames"
-        :key="member"
+        v-for="(member, index) of state.usernames"
+        :key="index"
       >
         <validated-text-input
           v-model="state.usernames[index]"
