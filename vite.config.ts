@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    // @ts-ignore
+    // @ts-expect-error - plugin type mismatch between @vitejs/plugin-vue2 and vitest/config
     vue2(),
   ],
   test: {

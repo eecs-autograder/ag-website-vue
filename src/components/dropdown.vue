@@ -19,6 +19,7 @@
             { highlight: index === state.highlighted_index },
           ]"
           v-for="(item, index) of state.items"
+          :key="index"
           @mousedown="$event.preventDefault()"
           @click.stop="choose_item_from_dropdown_menu(item, index)"
         >

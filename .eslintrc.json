@@ -23,6 +23,10 @@
     ],
     "rules": {
         "no-unused-vars": [ "off" ],
-        "@typescript-eslint/no-unused-vars": [ "off" ]
+        "@typescript-eslint/no-unused-vars": [ "off" ],
+        // TODO: re-enable once the legacy single-word components (modal, toggle,
+        // tooltip, ...) are renamed. Disabled for now so those ported
+        // single-word components can be brought under eslint.
+        "vue/multi-word-component-names": [ "off" ]
     }
 }
