@@ -108,6 +108,7 @@ export default class FilePanel extends Vue {
 
     position: sticky;
     top: 0;
+    z-index: 1;
 
     display: flex;
     padding: .5rem;

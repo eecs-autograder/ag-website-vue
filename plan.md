@@ -23,16 +23,26 @@ TODO:
     - [x] Use h2 tags
 - Keyboard mechanism for applying annotations:
   - Brainstorm design options
-    - Add button to file panel header; button opens modal w/
-      annotation <select> tag or similar, first & last line
-      inputs (last line optional)
-      - Notes:
-        - Text width is a potential issue with select tag
-        - Line number entering should have bounds-checking
-    - Make annotation cards in right-side grading panel clickable.
-      Clicking opens modal or inline form (better) to enter line numbers
-      - Notes:
-        - Line number entering should have bounds-checking
-        - Should Annotations right-side section start expanded?
+    ~~- Add button to file panel header; button opens modal w/~~
+    ~~  annotation <select> tag or similar, first & last line~~
+    ~~  inputs (last line optional)~~
+    ~~  - Notes:~~
+    ~~    - Text width is a potential issue with select tag~~
+    ~~    - Line number entering should have bounds-checking~~
+    ~~- Make annotation cards in right-side grading panel clickable.~~
+    ~~  Clicking opens modal or inline form (better) to enter line numbers~~
+    ~~  - Notes:~~
+    ~~    - Line number entering should have bounds-checking~~
+    ~~    - Should Annotations right-side section start expanded?~~
+    ~~    - Comment form needs optional line number inputs added to it~~
+    ~~- [] **Decision**: Integrate line-specific annotating to comment form~~
+    ~~  - [] Add select element to comment form. Options are "custom comment" (selected by default & last in list)~~
+    ~~  - [] Add select file ~~
+    ~~  - [] Add start & end line number inputs. ~~
+    ~~    - These are optional for "custom comment". ~~
+    ~~      - No line numbers specified means comment not associated with a line (start and end line ~~are null)
+    ~~    - End line number is always optional. Not present means start and end are same.~~
+    ~~      - Note: In the API~~
+    - **Decision**: After adding keyboard support to context menu, make lines of code focusable and so that enter opens the menu.
   - Add link to navigate from handgrading admin to project page
     handgrading tab
