@@ -6,7 +6,7 @@
   </div>
   <div v-else id="mutation-test-suites-component" class="scroll-container">
     <div class="sidebar-container">
-      <nav id="mutation-test-suite-sidebar" class="sidebar-menu" aria-label="Mutation test suites">
+      <div id="mutation-test-suite-sidebar" class="sidebar-menu" aria-label="Mutation test suites">
         <div id="sidebar-header"
              class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
           <button type="button"
@@ -59,7 +59,7 @@
             </div>
           </draggable>
         </div>
-      </nav>
+      </div>
 
       <div class="body"
            :class="{'body-closed': d_collapsed}"
