@@ -1,6 +1,6 @@
 <template>
   <div class="info-blurb">
-    <i class="fas fa-info-circle"></i>
+    <i class="fas fa-info-circle" aria-hidden="true"></i>
     <div class="content">
       <slot></slot>
     </div>
