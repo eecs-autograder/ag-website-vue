@@ -1,7 +1,7 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse" aria-label="loading" role="img"></i>
+      <i class="fa fa-spinner fa-pulse" aria-label="Loading" role="img"></i>
     </div>
   </div>
   <div v-else id="project-admin">
