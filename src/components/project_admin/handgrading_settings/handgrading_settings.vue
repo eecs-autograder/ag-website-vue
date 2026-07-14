@@ -191,7 +191,7 @@
             <div class="header-text">Checkboxes</div>
             <button type="button" class="flat-white-button"
                     @click="d_create_criterion_modal_is_open = true">
-              <i class="fas fa-plus"></i> New Checkbox
+              <i class="fas fa-plus" aria-hidden="true"></i> New Checkbox
             </button>
           </div>
           <draggable ref="criteria_order"
@@ -226,7 +226,7 @@
             </div>
             <button type="button" class="flat-white-button"
                     @click="d_create_annotation_modal_is_open = true">
-              <i class="fas fa-plus"></i> New Annotation
+              <i class="fas fa-plus" aria-hidden="true"></i> New Annotation
             </button>
           </div>
           <draggable ref="annotation_order"

@@ -7,7 +7,7 @@
               :aria-controls="`cases-container-${label_uid}`"
               @click="update_ag_test_suite_panel_when_clicked()">
         <div class="text">
-          <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+          <i class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'" aria-hidden="true"></i>
           <span>{{ag_test_suite.name}}</span>
         </div>
       </button>
@@ -22,7 +22,7 @@
                 class="icon add-ag-test-case-button"
                 aria-label="Add Test Case"
                 @click.stop="open_new_ag_test_case_modal">
-          <i class="fas fa-plus"></i>
+          <i class="fas fa-plus" aria-hidden="true"></i>
         </button>
       </div>
     </div>
@@ -90,7 +90,7 @@
                         type="button"
                         aria-label="Remove command"
                         @click="remove_command(index)">
-                  <i class="fas fa-times remove-ag-test-command-icon"></i>
+                  <i class="fas fa-times remove-ag-test-command-icon" aria-hidden="true"></i>
                 </button>
               </div>
             </validated-input>
@@ -136,7 +136,7 @@
                   type="button"
                   :disabled="d_new_commands.length === 3"
                   @click="add_command">
-            <i class="fas fa-plus"></i>
+            <i class="fas fa-plus" aria-hidden="true"></i>
             <span> Add Another Command </span>
           </button>
         </div>

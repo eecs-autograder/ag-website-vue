@@ -15,7 +15,7 @@
             <div class="correctness-output">
               <span v-if="ag_test_suite_result.setup_timed_out !== null
                           && this.ag_test_suite_result.setup_timed_out === true">
-                <i class="far fa-clock timed-out-icon"></i>
+                <i class="far fa-clock timed-out-icon" aria-hidden="true"></i>
                 <span class="timed-out-msg"> (Timed out) </span>
               </span>
               <span v-else>

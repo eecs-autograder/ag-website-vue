@@ -22,7 +22,7 @@
       <template v-else-if="build_task.status === BuildImageStatus.image_invalid">
         Invalid Image
         <div class="explanation">
-          <i class="fas fa-exclamation-triangle"></i>
+          <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
           {{build_task.validation_error_msg}}
         </div>
       </template>

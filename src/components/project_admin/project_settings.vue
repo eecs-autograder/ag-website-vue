@@ -45,7 +45,7 @@
                 :disabled="soft_closing_time_model === ''"
                 aria-label="clear soft deadline"
               >
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
                 <span class="clear-text">Clear</span>
               </button>
             </div>
@@ -76,7 +76,7 @@
                 :disabled="closing_time_model === ''"
                 aria-label="clear hard deadline"
               >
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
                 <span class="clear-text">Clear</span>
               </button>
             </div>

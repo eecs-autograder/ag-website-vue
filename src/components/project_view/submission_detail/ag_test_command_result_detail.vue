@@ -55,7 +55,7 @@
                 v-if="ag_test_command_result.timed_out !== null
                       && this.ag_test_command_result.timed_out"
               >
-                <i class="far fa-clock timed-out-icon"></i>
+                <i class="far fa-clock timed-out-icon" aria-hidden="true"></i>
                 <span class="timed-out-msg"> (Timed out) </span>
               </span>
               <span

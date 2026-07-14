@@ -19,7 +19,7 @@
                 class="refresh-button"
                 aria-label="Refresh task progress"
                 @click="refresh_task(task)">
-          <i class="fas fa-sync-alt"></i>
+          <i class="fas fa-sync-alt" aria-hidden="true"></i>
         </button>
         <button v-if="task.progress !== 100"
                 type="button"

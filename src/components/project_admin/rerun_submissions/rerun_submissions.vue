@@ -8,7 +8,7 @@
     <h2 id="grades-can-change-header" class="step-header">0. Download Grades So Far</h2>
     <div id="grades-can-change-msg">
       <div class="msg-spacing">
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         When rerunning test cases,
         <span class="emphasize">some students' scores might change</span>
       </div>

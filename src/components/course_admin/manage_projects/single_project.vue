@@ -27,7 +27,7 @@
           @keydown.enter="start_clone_dialog"
           @keydown.space.prevent="start_clone_dialog"
         >
-          <i class="fas fa-copy"></i>
+          <i class="fas fa-copy" aria-hidden="true"></i>
         </div>
 
         <router-link
@@ -35,7 +35,7 @@
           class="edit-project tool-icon"
           title="Edit project"
         >
-          <i class="fas fa-cog"></i>
+          <i class="fas fa-cog" aria-hidden="true"></i>
         </router-link>
       </div>
     </div>

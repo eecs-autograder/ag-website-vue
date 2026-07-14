@@ -14,7 +14,7 @@
                   :aria-expanded="!d_collapsed"
                   aria-controls="test-suite-sidebar"
                   @click="d_collapsed = !d_collapsed">
-            <i class="fas fa-bars"></i>
+            <i class="fas fa-bars" aria-hidden="true"></i>
           </button>
           <template v-if="!d_collapsed">
             <span class="sidebar-header-text"> Suites </span>
@@ -22,7 +22,7 @@
                     id="add-ag-test-suite-button"
                     class="sidebar-new-button"
                     @click="open_new_ag_test_suite_modal()">
-              <i class="fas fa-plus sidebar-plus"></i> Add Suite
+              <i class="fas fa-plus sidebar-plus" aria-hidden="true"></i> Add Suite
             </button>
           </template>
         </div>
@@ -77,14 +77,14 @@
                 @click="go_to_prev_ag_test_case"
                 id="prev-ag-test-case-button"
                 :disabled="!prev_ag_test_case_is_available">
-          <i class="fas fa-angle-double-left" id="prev"> </i> Prev Test
+          <i class="fas fa-angle-double-left" id="prev" aria-hidden="true"> </i> Prev Test
         </button>
 
         <button type="button"
                 @click="go_to_next_ag_test_case"
                 id="next-ag-test-case-button"
                 :disabled="!next_ag_test_case_is_available">
-          Next Test <i class="fas fa-angle-double-right" id="next"></i>
+          Next Test <i class="fas fa-angle-double-right" id="next" aria-hidden="true"></i>
         </button>
       </span>
     </div>

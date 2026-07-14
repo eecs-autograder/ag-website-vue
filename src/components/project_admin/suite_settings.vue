@@ -111,7 +111,7 @@
                   aria-label="Remove instructor file"
                   @click="d_suite.instructor_files_needed.splice(index, 1);
                           $emit('field_change', d_suite)">
-            <span><i class="fas fa-times remove-file"></i></span>
+            <span><i class="fas fa-times remove-file" aria-hidden="true"></i></span>
       </button>
         </div>
       </div>
@@ -151,7 +151,7 @@
                   aria-label="Remove student file"
                   @click="d_suite.student_files_needed.splice(index, 1);
                          $emit('field_change', d_suite)">
-            <span><i class="fas fa-times remove-file"></i></span>
+            <span><i class="fas fa-times remove-file" aria-hidden="true"></i></span>
           </button>
         </div>
       </div>

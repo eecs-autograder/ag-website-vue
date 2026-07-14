@@ -10,7 +10,7 @@
          @click="d_collapsed = !d_collapsed"
          @keydown.enter="d_collapsed = !d_collapsed"
          @keydown.space.prevent="d_collapsed = !d_collapsed">
-      <i class="caret fas" :class="d_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
+      <i class="caret fas" :class="d_collapsed ? 'fa-caret-right' : 'fa-caret-down'" aria-hidden="true"></i>
       <div class="member-names">
         <div class="member-name"
              v-for="(member, index) of group.member_names">
@@ -25,17 +25,17 @@
       <div v-else class="selector-body">
         <div class="button-footer">
           <button data-testid="select_all_button" class="white-button" @click="select_all">
-            <i class="far fa-check-square"></i>
+            <i class="far fa-check-square" aria-hidden="true"></i>
             Select All
           </button>
           <button data-testid="clear_all_button" class="white-button" @click="clear_all">
-            <i class="far fa-square"></i>
+            <i class="far fa-square" aria-hidden="true"></i>
             Clear All
           </button>
           <button data-testid="remove_group_button"
                   class="white-button"
                   @click="$emit('remove_group', group)">
-            <i class="fas fa-times"></i>
+            <i class="fas fa-times" aria-hidden="true"></i>
             Remove Group
           </button>
         </div>

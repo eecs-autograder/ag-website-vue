@@ -37,22 +37,22 @@
         Your submission is at position {{submission.position_in_queue}} in the queue.
       </div>
       <div v-else-if="submission.status === GradingStatus.being_graded">
-        <i class="fas fa-list being-graded-symbol"></i>
+        <i class="fas fa-list being-graded-symbol" aria-hidden="true"></i>
         Your submission is being graded!
       </div>
       <div v-else-if="submission.status === GradingStatus.removed_from_queue">
-        <i class="fas fa-eject removed-symbol"></i>
+        <i class="fas fa-eject removed-symbol" aria-hidden="true"></i>
         You removed this submission from the queue. That means it won't be graded,
         and it won't count towards your daily submission limit.
       </div>
       <div v-else-if="submission.status === GradingStatus.rejected">
-        <i class="fas fa-ban rejected-symbol"></i>
+        <i class="fas fa-ban rejected-symbol" aria-hidden="true"></i>
         Your submission has been rejected because it did not pass certain
         required checks (see first test suite results). It won't be graded,
         and it won't count towards your daily submission limit.
       </div>
       <div v-else-if="submission.status === GradingStatus.error">
-        <i class="fas fa-skull error-symbol"></i>
+        <i class="fas fa-skull error-symbol" aria-hidden="true"></i>
         An unexpected error occurred while grading your submission.
         This submission will not count towards your daily limit.
         Please wait a few minutes and try your submission again.
@@ -75,14 +75,14 @@
     <div v-if="submission.is_bonus_submission"
           id="is-bonus-submission-message"
           class="info-spacing">
-      <i class="fas fa-star bonus-icon"></i>
+      <i class="fas fa-star bonus-icon" aria-hidden="true"></i>
       This submission used one of your bonus submissions.
     </div>
 
     <div v-if="does_not_count_for_current_user"
          id="does-not-count-for-user-message"
          class="info-spacing">
-      <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
+      <i class="fas fa-exclamation-circle submission-does-not-count-icon" aria-hidden="true"></i>
       Since you ran out of late day tokens, this submission will
       <b>NOT</b> count towards your final grade.
     </div>
@@ -97,7 +97,7 @@
              class="does-not-count-for-list-item"
              role="listitem">
           <span class="list-icon">
-            <i class="fas fa-exclamation-circle submission-does-not-count-icon"></i>
+            <i class="fas fa-exclamation-circle submission-does-not-count-icon" aria-hidden="true"></i>
           </span>
           <span class="username">{{username}}</span>
         </div>
@@ -117,7 +117,7 @@
           class="unstyled-button"
           @click="download_file(filename)"
         >
-          <i class="fa fa-file-download download-file-icon"></i>
+          <i class="fa fa-file-download download-file-icon" aria-hidden="true"></i>
         </button>
       </div>
     </div>
@@ -135,12 +135,12 @@
     </div>
 
     <div class="discarded-files" v-if="submission.discarded_files.length !== 0">
-      <i class="fas fa-exclamation-triangle"></i>
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
       The following unexpected files were <b>discarded</b>:
       <div role="list">
         <div v-for="filename of submission.discarded_files" class="discarded-file"
              role="listitem">
-          <i class="far fa-trash-alt"></i>
+          <i class="far fa-trash-alt" aria-hidden="true"></i>
           "{{filename}}"
         </div>
       </div>

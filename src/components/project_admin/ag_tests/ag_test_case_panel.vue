@@ -25,14 +25,14 @@
                   class="menu-icon-button icon"
                   aria-label="Test case options"
                   @click.stop="$emit('update_active_item', ag_test_case)">
-            <i class="fas fa-ellipsis-h"></i>
+            <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
           </button>
           <div class="menu">
             <button ref="add_ag_test_command_menu_item"
                     type="button"
                     @click="open_new_ag_test_command_modal"
                     class="menu-item">
-              <i class="fas fa-plus"></i>
+              <i class="fas fa-plus" aria-hidden="true"></i>
               <span class="menu-item-text">Add command</span>
             </button>
             <template>
@@ -41,7 +41,7 @@
                       type="button"
                       @click="d_show_ag_test_case_settings_modal = true"
                       class="menu-item">
-                <i class="fas fa-pencil-alt"></i>
+                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                 <span class="menu-item-text">Advanced test settings</span>
               </button>
             </template>
@@ -50,7 +50,7 @@
                     type="button"
                     @click="open_clone_ag_test_case_modal"
                     class="menu-item">
-              <i class="far fa-copy"></i>
+              <i class="far fa-copy" aria-hidden="true"></i>
               <span class="menu-item-text"> Clone test case </span>
             </button>
             <div class="menu-divider"> </div>
@@ -58,7 +58,7 @@
                     type="button"
                     @click="d_show_delete_ag_test_case_modal = true"
                     class="menu-item">
-              <i class="fas fa-trash-alt"></i>
+              <i class="fas fa-trash-alt" aria-hidden="true"></i>
               <span class="delete-ag-test-case-label menu-item-text"> Delete test case </span>
             </button>
           </div>

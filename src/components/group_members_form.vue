@@ -42,7 +42,7 @@
           "
           @click="add_member"
         >
-          <i class="fas fa-plus"></i>
+          <i class="fas fa-plus" aria-hidden="true"></i>
           Add Member
         </button>
       </div>
