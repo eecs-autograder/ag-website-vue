@@ -39,7 +39,7 @@
 
       <div class="sidebar-content" v-if="!d_collapsed">
         <div class="list-loading-container" v-if="d_loading">
-          <i class="loading-horiz-centered loading-medium fa fa-spinner fa-pulse"></i>
+          <i class="loading-horiz-centered loading-medium fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
         </div>
         <template v-else>
           <div class="no-submissions" v-if="d_submissions.length === 0">No submissions</div>

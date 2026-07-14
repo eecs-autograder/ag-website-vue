@@ -20,7 +20,7 @@
     </div>
     <div v-show="!d_collapsed">
       <div v-if="d_loading" class="loading-horiz-centered loading-medium">
-        <i class="fa fa-spinner fa-pulse"></i>
+        <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
       </div>
       <div v-else class="selector-body">
         <div class="button-footer">

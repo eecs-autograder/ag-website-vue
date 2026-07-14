@@ -83,7 +83,7 @@
                   class="clone-project-button"
                   :disabled="!cloned_project_name_is_valid || d_cloning">Clone Project</button>
           <div class="loading-vertically-centered" v-if="d_cloning">
-            <i class="fa fa-spinner fa-pulse"></i>
+            <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
           </div>
         </div>
       </div>

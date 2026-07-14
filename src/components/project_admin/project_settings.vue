@@ -466,8 +466,13 @@
         >
           Save
         </button>
-        <div class="last-saved-timestamp">
-          <i v-if="state.saving" class="loading fa fa-spinner fa-pulse"></i>
+        <div class="last-saved-timestamp" role="status">
+          <i
+            v-if="state.saving"
+            class="loading fa fa-spinner fa-pulse"
+            role="img"
+            aria-label="Saving"
+          ></i>
           <template v-else
             >Last saved:
             {{ format_datetime_short(state.project.last_modified) }}</template

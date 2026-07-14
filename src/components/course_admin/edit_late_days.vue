@@ -1,6 +1,6 @@
 <template>
   <div v-if="d_loading" class="loading loading-medium">
-    <i class="fa fa-spinner fa-pulse"></i>
+    <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
   </div>
   <div v-else id="edit-late-days-component">
     <div class="search-wrapper">
@@ -21,7 +21,7 @@
     </div>
 
     <div v-if="d_searching" class="loading-medium">
-      <i class="fa fa-spinner loading fa-pulse"></i>
+      <i class="fa fa-spinner loading fa-pulse" role="img" aria-label="Loading"></i>
     </div>
     <div class="late-day-info-wrapper" v-else-if="d_selected_username !== ''">
       <div v-if="d_show_not_found_message" class="user-not-found">

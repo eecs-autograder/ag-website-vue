@@ -56,7 +56,8 @@
       </div>
       <div id="late-days-remaining" class="limit-container" v-if="show_late_day_count">
         <i v-if="late_days_remaining === null"
-            class="loading fa fa-spinner fa-pulse"></i>
+            class="loading fa fa-spinner fa-pulse"
+            role="img" aria-label="Loading"></i>
         <span class="allotment">
           {{late_days_remaining}}
         </span>

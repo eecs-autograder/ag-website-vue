@@ -1,7 +1,7 @@
 <template>
   <div v-if="d_loading" class="loading-centered">
     <div class="loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
     </div>
   </div>
   <div v-else class="sandbox-images sidebar-container">
@@ -138,7 +138,7 @@
               <template v-if="!d_saving_image_name">
                 Last saved: {{format_datetime_short(selected_image.last_modified)}}
               </template>
-              <i v-else class="loading fa fa-spinner fa-pulse"></i>
+              <i v-else class="loading fa fa-spinner fa-pulse" role="img" aria-label="Saving"></i>
             </div>
 
           </div>
