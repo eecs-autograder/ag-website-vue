@@ -21,7 +21,7 @@
         <button
           type="button"
           class="add-files gray-button"
-          @click="file_input.click()"
+          @click="open_file_picker()"
         >
           <div>Choose files to upload</div>
         </button>
@@ -130,10 +130,6 @@ import Modal from "@/components/modal.vue";
 
 import { assert_not_null } from "../utils";
 
-interface HTMLInputEvent extends Event {
-  target: HTMLInputElement & EventTarget;
-}
-
 type HasName = { name: string };
 function name_less(first: HasName, second: HasName) {
   return first.name < second.name;
@@ -175,18 +171,22 @@ function table_row_styling(file_in: File, row_index: number): string {
   return "file-not-empty-row-even";
 }
 
-function add_files_from_button(event: HTMLInputEvent) {
-  if (event.target === null) {
-    throw new Error("Target is null");
-  }
-  if (event.target.files === null) {
-    throw new Error("Files property of event target is unexpectedly null");
-  }
-  for (let file of event.target.files) {
+function open_file_picker() {
+  file_input.value?.click();
+}
+
+function add_files_from_button(event: Event) {
+  assert_not_null(event.target, "Target is null");
+  const target = event.target as HTMLInputElement;
+  assert_not_null(
+    target.files,
+    "Files property of event target is unexpectedly null",
+  );
+  for (let file of target.files) {
     add_or_update_file(file);
     check_for_emptiness(file);
   }
-  event.target.value = "";
+  target.value = "";
 }
 
 function add_dropped_files(event: DragEvent) {
