@@ -1,6 +1,6 @@
 <template>
   <button type="button"
-          class="context-menu-option unstyled-button"
+          class="unstyled-button context-menu-option"
           :class="{'hoverable-item': !disabled, 'disabled-item': disabled}"
           :disabled="disabled"
           @click.stop="handle_click">
@@ -32,7 +32,7 @@ function handle_click() {
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 
-.context-menu-option {
+.unstyled-button.context-menu-option {
   color: black;
   padding: .375rem .75rem;
   display: block;
