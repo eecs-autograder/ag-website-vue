@@ -2,7 +2,7 @@
   <div class="context-menu-demo-outer">
     <div class="context-menu-demo-1">
       <div class="area-of-focus-1 menu-parent"
-           @click="menu_1_coordinates = {x: $event.pageX, y: $event.pageY};
+           @click="menu_1_coordinates = {x: $event.clientX, y: $event.clientY};
                    menu_1_is_open = true">
         Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -54,7 +54,7 @@
 
     <div class="context-menu-demo-2">
       <div class="area-of-focus-2 menu-parent"
-           @click="menu_2_coordinates = {x: $event.pageX, y: $event.pageY};
+           @click="menu_2_coordinates = {x: $event.clientX, y: $event.clientY};
                    menu_2_is_open = true">
         Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -84,7 +84,7 @@
     </context-menu>
 
     <br>
-    <div @click="empty_menu_coordinates = {x: $event.pageX, y: $event.pageY};
+    <div @click="empty_menu_coordinates = {x: $event.clientX, y: $event.clientY};
                  empty_menu_is_open = true"
          class="menu-parent">
       This context menu is empty <br> <br>

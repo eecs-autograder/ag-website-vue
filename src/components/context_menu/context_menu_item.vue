@@ -1,14 +1,27 @@
 <template>
-  <button type="button"
-          class="unstyled-button context-menu-option"
-          :class="{'hoverable-item': !disabled, 'disabled-item': disabled}"
-          :disabled="disabled"
-          @click.stop="handle_click">
+  <button
+    type="button"
+    ref="context_menu_items"
+    class="unstyled-button context-menu-option"
+    :class="{
+      'hoverable-item': !disabled,
+      'disabled-item': disabled,
+      'active-descendant': active_descendent_id === id,
+    }"
+    :disabled="disabled"
+    @click.stop="handle_click"
+  >
     <slot></slot>
   </button>
 </template>
 
 <script setup lang="ts">
+import { inject, onMounted } from "vue";
+
+import { assert_not_null, generate_uid } from "@/utils";
+
+const id = `context-menu-item-${generate_uid()}`;
+
 interface PropTypes {
   disabled?: boolean;
 }
@@ -21,6 +34,13 @@ const emit = defineEmits<{
   click: [];
 }>();
 
+const register = inject<(id: string) => unknown>("register");
+onMounted(() => {
+  assert_not_null(register);
+  register(id);
+});
+const active_descendent_id = inject("active_descendent_id");
+
 function handle_click() {
   if (!props.disabled) {
     emit("click");
@@ -29,12 +49,12 @@ function handle_click() {
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/button_styles.scss';
-@import '@/styles/colors.scss';
+@import "@/styles/button_styles.scss";
+@import "@/styles/colors.scss";
 
 .unstyled-button.context-menu-option {
   color: black;
-  padding: .375rem .75rem;
+  padding: 0.375rem 0.75rem;
   display: block;
   width: 100%;
   text-align: left;
@@ -48,5 +68,9 @@ function handle_click() {
 .disabled-item,
 .disabled-item:hover {
   color: $baking-pan;
+}
+
+.active-descendant {
+  outline-style: auto;
 }
 </style>

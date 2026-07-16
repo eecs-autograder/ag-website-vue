@@ -425,7 +425,7 @@ export default class ViewFile extends Vue implements Created {
     }
 
     this.d_is_highlighting = false;
-    this.d_context_menu_coordinates = {x: event.pageX, y: event.pageY};
+    this.d_context_menu_coordinates = {x: event.clientX, y: event.clientY};
     this.d_context_menu_is_open = true;
   }
 
