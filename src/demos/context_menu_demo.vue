@@ -133,7 +133,7 @@ export default class ContextMenuDemo extends Vue {
     {name: 'Option 1', disabled: false},
     {name: 'Option 2', disabled: false},
     {name: 'Option 3', disabled: false},
-    {name: 'Option 4', disabled: true}
+    {name: 'Option 4 (disabled)', disabled: true}
   ];
 
 }

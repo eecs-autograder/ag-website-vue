@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import Vue, { defineComponent } from 'vue';
 import Component from 'vue-class-component';
 
 import { mount, Wrapper } from '@vue/test-utils';
@@ -17,20 +17,20 @@ import { emitted, wait_until } from '@/tests/utils';
                   <div class="context-menu-area"
                        @click="show_menu">
                     <p class="greeting"
-                       :style="[{color: 'black', font: 'Arial'}]"> Happy Halloween </p>
+                       :style="[{color: color, font: font}]"> {{ text }} </p>
                   </div>
                   <context-menu ref="context_menu" :is_open="is_open" :coordinates="coordinates"
                                 @close="is_open = false">
-                    <context-menu-item ref="item_1" @click="change_greeting_color('orange')">
+                    <context-menu-item data-testid="item_1" @click="change_greeting_color('orange')">
                       One
                     </context-menu-item>
-                    <context-menu-item ref="item_2" @click="make_greeting_cursive()">
+                    <context-menu-item data-testid="item_2" @click="make_greeting_cursive()">
                       Two
                     </context-menu-item>
-                    <context-menu-item ref="item_3" @click="change_greeting_text('Boo!')">
+                    <context-menu-item data-testid="item_3" @click="change_greeting_text('Boo!')">
                       Three
                     </context-menu-item>
-                    <context-menu-item ref="disabled_item" :disabled="true">
+                    <context-menu-item data-testid="disabled_item" :disabled="true">
                       Disabled
                     </context-menu-item>
                   </context-menu>
@@ -45,26 +45,20 @@ import { emitted, wait_until } from '@/tests/utils';
 class WrapperComponent extends Vue {
     coordinates = {x: 0, y: 0};
     is_open = false;
+    color = 'black';
+    font = 'Arial';
+    text = 'Happy Halloween';
 
     change_greeting_color(color_in: string) {
-        let greeting = <HTMLElement> this.$el.getElementsByClassName(
-            'greeting'
-        )[0];
-        greeting.style.color = color_in;
+        this.color = color_in;
     }
 
     make_greeting_cursive() {
-        let greeting = <HTMLElement> this.$el.getElementsByClassName(
-            'greeting'
-        )[0];
-        greeting.style.font = "cursive";
+        this.font = 'cursive';
     }
 
     change_greeting_text(new_text: string) {
-        let greeting = <HTMLElement> this.$el.getElementsByClassName(
-            'greeting'
-        )[0];
-        greeting.innerHTML = new_text;
+        this.text = new_text;
     }
 
     show_menu(event: MouseEvent) {
@@ -88,8 +82,8 @@ describe('ContextMenu tests', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        let context_menu_item_1 = wrapper.findComponent({ref: 'item_1'});
-        context_menu_item_1.trigger('click');
+        let context_menu_item_1 = wrapper.find('[data-testid=item_1] [role=menuitem]');
+        await context_menu_item_1.trigger('click');
         await context_menu.$nextTick();
 
         expect(greeting.element.style.color).toBe('orange');
@@ -97,7 +91,7 @@ describe('ContextMenu tests', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        let context_menu_item_2 = wrapper.findComponent({ref: 'item_2'});
+        let context_menu_item_2 = wrapper.find('[data-testid=item_2] [role=menuitem]');
         context_menu_item_2.trigger('click');
         await context_menu.$nextTick();
 
@@ -106,7 +100,7 @@ describe('ContextMenu tests', () => {
         context_menu_area.trigger('click');
         await context_menu.$nextTick();
 
-        let context_menu_item_3 = wrapper.findComponent({ref: 'item_3'});
+        let context_menu_item_3 = wrapper.find('[data-testid=item_3] [role=menuitem]');
 
         context_menu_item_3.trigger('click');
         await context_menu.$nextTick();
@@ -138,13 +132,19 @@ describe('ContextMenu tests', () => {
 
     test("Click event not emitted when disabled item clicked", async () => {
         let wrapper = mount(WrapperComponent);
-        let menu_wrapper = <Wrapper<ContextMenu>> wrapper.findComponent({ref: 'context_menu'});
-        wrapper.find('.context-menu-area').trigger('click');
+        let menu_wrapper = wrapper.findComponent(ContextMenu);
+        await wrapper.find('.context-menu-area').trigger('click');
         await menu_wrapper.vm.$nextTick();
 
-        let disabled_wrapper = wrapper.findComponent({ref: 'disabled_item'});
-        disabled_wrapper.trigger('click');
-        expect(disabled_wrapper.emitted('click')).toBeUndefined();
+        let disabled_wrapper = wrapper.find('[data-testid=disabled_item] [role=menuitem]');
+        expect(disabled_wrapper.element).toBeDisabled();
+        console.log(disabled_wrapper.html())
+        await disabled_wrapper.trigger('click');
+
+        expect(
+            menu_wrapper.findAllComponents(ContextMenuItem).at(3).emitted('click')
+        ).toBeUndefined();
+        expect(menu_wrapper.isVisible()).toBe(true);
     });
 
     test.skip("Position adjusted when too near right edge", async () => {
@@ -268,7 +268,7 @@ describe('ContextMenu keyboard navigation tests', () => {
             'item_2',
             'item_3',
             'disabled_item'
-        ].map((ref) => wrapper.findComponent({ref: ref}));
+        ].map((test_id) => wrapper.find(`[data-testid=${test_id}] [role=menuitem]`));
     });
 
     afterEach(() => {
@@ -302,4 +302,73 @@ describe('ContextMenu keyboard navigation tests', () => {
     test("Up arrow moves focus to prev item, wrapping to the last item", async () => {
         await expect_cycle('up', [disabled_item, item_3, item_2, item_1]);
     });
-})
+});
+
+describe('Keyboard item activation', () => {
+    const TestComponent = defineComponent({
+        template: `<div>
+            <context-menu :is_open="true" :coordinates="{x: 0, y: 0}">
+                <context-menu-item @click="$emit('item1')">Not disabled</context-menu-item>
+                <context-menu-item @click="$emit('item2')">Not disabled 2</context-menu-item>
+                <context-menu-item @click="$emit('item3')" :disabled="true">Disabled</context-menu-item>
+            </context-menu>
+        </div>
+        `,
+        components: {ContextMenu, ContextMenuItem}
+    });
+
+    test("Activate item with enter", async () => {
+        const wrapper = mount(TestComponent);
+        let context_menu_wrapper = wrapper.find('.context-menu-container');
+        expect(wrapper.emitted()).toEqual({});
+
+        await context_menu_wrapper.trigger('keydown.enter');
+        expect(Object.keys(wrapper.emitted())).toHaveLength(1);
+        expect(wrapper.emitted()).toHaveProperty('item1');
+
+        await context_menu_wrapper.trigger('keydown.down');
+        await context_menu_wrapper.trigger('keydown.enter');
+        expect(Object.keys(wrapper.emitted())).toHaveLength(2);
+        expect(wrapper.emitted()).toHaveProperty('item2');
+    });
+
+    test("Activate item with space", async () => {
+        const wrapper = mount(TestComponent);
+        let context_menu_wrapper = wrapper.find('.context-menu-container');
+        expect(wrapper.emitted()).toEqual({});
+
+        await context_menu_wrapper.trigger('keydown.enter');
+        expect(Object.keys(wrapper.emitted())).toHaveLength(1);
+        expect(wrapper.emitted()).toHaveProperty('item1');
+
+        await context_menu_wrapper.trigger('keydown.down');
+        await context_menu_wrapper.trigger('keydown.enter');
+        expect(Object.keys(wrapper.emitted())).toHaveLength(2);
+        expect(wrapper.emitted()).toHaveProperty('item2');
+    });
+
+    test("Disabled item can't be activated with keyboard", async () => {
+        const wrapper = mount(TestComponent);
+        let context_menu_wrapper = wrapper.find('.context-menu-container');
+        expect(wrapper.emitted()).toEqual({});
+
+        // Navigate to disabled item
+        await context_menu_wrapper.trigger('keydown.down');
+        expect(wrapper.emitted()).toEqual({});
+        await context_menu_wrapper.trigger('keydown.down');
+        expect(wrapper.emitted()).toEqual({});
+
+        await context_menu_wrapper.trigger('keydown.enter');
+        expect(wrapper.emitted()).toEqual({});
+        await context_menu_wrapper.trigger('keydown.space');
+
+        expect(wrapper.emitted()).toEqual({});
+
+        // Wrap around to first item and select
+        await context_menu_wrapper.trigger('keydown.down');
+
+        await context_menu_wrapper.trigger('keydown.enter');
+        expect(Object.keys(wrapper.emitted())).toHaveLength(1);
+        expect(wrapper.emitted()).toHaveProperty('item1');
+    });
+});

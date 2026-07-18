@@ -1,18 +1,17 @@
 <template>
   <li
     role="presentation"
-    :id="id"
-    :class="{ 'active-descendant': active_descendent_id === id }"
   >
     <button
+      :id="id"
       role="menuitem"
       tabindex="-1"
       type="button"
-      ref="context_menu_items"
       class="unstyled-button context-menu-option"
       :class="{
         'hoverable-item': !disabled,
         'disabled-item': disabled,
+        'active-descendant': active_descendent_id === id,
       }"
       :disabled="disabled"
       @click="on_item_selected"
@@ -48,10 +47,8 @@ const register =
 onMounted(() => {
   assert_not_null(register);
   register(id, () => {
-    console.log("item receieved update");
-    console.log(active_descendent_id, id);
     assert_not_null(active_descendent_id);
-    if (active_descendent_id.value === id) {
+    if (active_descendent_id.value === id && !props.disabled) {
       emit("click");
     }
   });
@@ -74,7 +71,6 @@ function on_item_selected() {
 @import "@/styles/colors.scss";
 
 .unstyled-button.context-menu-option {
-  color: black;
   padding: 0.375rem 0.75rem;
   display: block;
   width: 100%;
@@ -83,12 +79,10 @@ function on_item_selected() {
 
 .hoverable-item:hover {
   background-color: $pebble-medium;
-  cursor: pointer;
 }
 
-.disabled-item,
-.disabled-item:hover {
-  color: $baking-pan;
+.disabled-item {
+  color: $normal-text-color-3;
 }
 
 .active-descendant {

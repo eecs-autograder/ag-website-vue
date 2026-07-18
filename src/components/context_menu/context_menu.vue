@@ -55,14 +55,12 @@ const items = ref<MenuItem[]>([]);
 provide(
   "register",
   (id: string, update_item_activated_with_keyboard: () => unknown) => {
-    console.log("registered", id);
     items.value.push({ id, update_item_activated_with_keyboard });
   },
 );
 provide(
   "active_descendent_id",
   computed(() => {
-    console.log("computing");
     if (items.value.length !== 0) {
       return items.value[active_index.value].id;
     }
@@ -73,9 +71,7 @@ provide(
 provide<() => unknown>("update_item_selected", () => emit("close"));
 
 function broadcast_item_activated_with_keyboard() {
-  console.log("broadcasting");
   for (const menu_item of items.value) {
-    console.log(menu_item.id);
     menu_item.update_item_activated_with_keyboard();
   }
 }
