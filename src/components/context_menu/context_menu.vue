@@ -4,7 +4,11 @@
       ref="root"
       class="context-menu-container"
       tabindex="0"
-      :active-descendent="item_ids[active_index]"
+      :active-descendent="items[active_index]"
+      @keydown.enter="broadcast_item_activated_with_keyboard"
+      @keydown.space.prevent="broadcast_item_activated_with_keyboard"
+      @keydown.tab="$emit('close')"
+      @keydown.tab.shift="$emit('close')"
       @keydown.esc="$emit('close')"
       @keydown.right.prevent.stop="focus_next_item"
       @keydown.down.prevent.stop="focus_next_item"
@@ -28,6 +32,11 @@ interface MenuCoordinates {
   y: number;
 }
 
+interface MenuItem {
+  id: string;
+  update_item_activated_with_keyboard: () => unknown;
+}
+
 const props = defineProps<{
   coordinates: MenuCoordinates;
   is_open: boolean;
@@ -41,23 +50,43 @@ const active_index = ref(0);
 
 const root = ref<HTMLElement | null>(null);
 
-const item_ids = ref<string[]>([]);
+const items = ref<MenuItem[]>([]);
 
-provide("register", (id: string) => {
-  item_ids.value.push(id);
+provide("register", (id: string, update_item_activated_with_keyboard: () => unknown) => {
+  console.log('registered', id)
+  items.value.push({id, update_item_activated_with_keyboard});
 });
 provide(
   "active_descendent_id",
-  computed(() => item_ids.value[active_index.value]),
+  computed(() => {
+    console.log('computing')
+    if (items.value.length !== 0) {
+      return items.value[active_index.value].id;
+    }
+    return null;
+  }),
 );
 
+provide(
+  "update_item_selected",
+  () => emit('close')
+);
+
+function broadcast_item_activated_with_keyboard() {
+  console.log("broadcasting")
+  for (const menu_item of items.value) {
+    console.log(menu_item.id)
+    menu_item.update_item_activated_with_keyboard();
+  }
+}
+
 function focus_next_item() {
-  active_index.value = (active_index.value + 1) % item_ids.value.length;
+  active_index.value = (active_index.value + 1) % items.value.length;
 }
 
 function focus_prev_item() {
   active_index.value =
-    (active_index.value - 1 + item_ids.value.length) % item_ids.value.length;
+    (active_index.value - 1 + items.value.length) % items.value.length;
 }
 
 watch(
@@ -122,6 +151,7 @@ watch(
   min-width: 100px;
   min-height: 20px;
   padding: 0;
+  list-style: none;
 }
 
 .context-menu-container:focus {

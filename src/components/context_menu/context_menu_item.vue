@@ -1,22 +1,29 @@
 <template>
-  <button
-    type="button"
-    ref="context_menu_items"
-    class="unstyled-button context-menu-option"
-    :class="{
-      'hoverable-item': !disabled,
-      'disabled-item': disabled,
-      'active-descendant': active_descendent_id === id,
-    }"
-    :disabled="disabled"
-    @click.stop="handle_click"
+  <li
+    role="presentation"
+    :id="id"
+    :class="{'active-descendant': active_descendent_id === id}"
   >
-    <slot></slot>
-  </button>
+    <button
+      role="menuitem"
+      tabindex="-1"
+      type="button"
+      ref="context_menu_items"
+      class="unstyled-button context-menu-option"
+      :class="{
+        'hoverable-item': !disabled,
+        'disabled-item': disabled,
+      }"
+      :disabled="disabled"
+      @click="on_item_selected"
+    >
+      <slot></slot>
+    </button>
+  </li>
 </template>
 
 <script setup lang="ts">
-import { inject, onMounted } from "vue";
+import { ComputedRef, inject, onMounted } from "vue";
 
 import { assert_not_null, generate_uid } from "@/utils";
 
@@ -34,17 +41,26 @@ const emit = defineEmits<{
   click: [];
 }>();
 
-const register = inject<(id: string) => unknown>("register");
+const register = inject<(id: string, update_item_activated_with_keyboard: () => unknown) => unknown>("register");
 onMounted(() => {
   assert_not_null(register);
-  register(id);
+  register(id, () => {
+    console.log("item receieved update");
+    console.log(active_descendent_id, id)
+    assert_not_null(active_descendent_id);
+    if (active_descendent_id.value === id) {
+      emit('click');
+    }
+  });
 });
-const active_descendent_id = inject("active_descendent_id");
+const active_descendent_id = inject<ComputedRef<string | null>>("active_descendent_id");
 
-function handle_click() {
-  if (!props.disabled) {
-    emit("click");
-  }
+const update_item_selected = inject<() => unknown>("update_item_selected");
+
+function on_item_selected() {
+  emit('click');
+  assert_not_null(update_item_selected);
+  update_item_selected();
 }
 </script>
 
