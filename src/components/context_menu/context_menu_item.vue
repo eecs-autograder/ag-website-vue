@@ -2,7 +2,7 @@
   <li
     role="presentation"
     :id="id"
-    :class="{'active-descendant': active_descendent_id === id}"
+    :class="{ 'active-descendant': active_descendent_id === id }"
   >
     <button
       role="menuitem"
@@ -41,24 +41,29 @@ const emit = defineEmits<{
   click: [];
 }>();
 
-const register = inject<(id: string, update_item_activated_with_keyboard: () => unknown) => unknown>("register");
+const register =
+  inject<
+    (id: string, update_item_activated_with_keyboard: () => unknown) => unknown
+  >("register");
 onMounted(() => {
   assert_not_null(register);
   register(id, () => {
     console.log("item receieved update");
-    console.log(active_descendent_id, id)
+    console.log(active_descendent_id, id);
     assert_not_null(active_descendent_id);
     if (active_descendent_id.value === id) {
-      emit('click');
+      emit("click");
     }
   });
 });
-const active_descendent_id = inject<ComputedRef<string | null>>("active_descendent_id");
+const active_descendent_id = inject<ComputedRef<string | null>>(
+  "active_descendent_id",
+);
 
 const update_item_selected = inject<() => unknown>("update_item_selected");
 
 function on_item_selected() {
-  emit('click');
+  emit("click");
   assert_not_null(update_item_selected);
   update_item_selected();
 }

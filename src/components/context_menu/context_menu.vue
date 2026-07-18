@@ -7,7 +7,7 @@
       :active-descendent="items[active_index]"
       @keydown.enter="broadcast_item_activated_with_keyboard"
       @keydown.space.prevent="broadcast_item_activated_with_keyboard"
-      @keydown.tab="$emit('close')"
+      @keydown.tab.exact="$emit('close')"
       @keydown.tab.shift="$emit('close')"
       @keydown.esc="$emit('close')"
       @keydown.right.prevent.stop="focus_next_item"
@@ -52,14 +52,17 @@ const root = ref<HTMLElement | null>(null);
 
 const items = ref<MenuItem[]>([]);
 
-provide("register", (id: string, update_item_activated_with_keyboard: () => unknown) => {
-  console.log('registered', id)
-  items.value.push({id, update_item_activated_with_keyboard});
-});
+provide(
+  "register",
+  (id: string, update_item_activated_with_keyboard: () => unknown) => {
+    console.log("registered", id);
+    items.value.push({ id, update_item_activated_with_keyboard });
+  },
+);
 provide(
   "active_descendent_id",
   computed(() => {
-    console.log('computing')
+    console.log("computing");
     if (items.value.length !== 0) {
       return items.value[active_index.value].id;
     }
@@ -67,15 +70,12 @@ provide(
   }),
 );
 
-provide(
-  "update_item_selected",
-  () => emit('close')
-);
+provide<() => unknown>("update_item_selected", () => emit("close"));
 
 function broadcast_item_activated_with_keyboard() {
-  console.log("broadcasting")
+  console.log("broadcasting");
   for (const menu_item of items.value) {
-    console.log(menu_item.id)
+    console.log(menu_item.id);
     menu_item.update_item_activated_with_keyboard();
   }
 }
