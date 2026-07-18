@@ -6,7 +6,7 @@
       class="context-menu-container"
       tabindex="0"
       :aria-activedescendant="active_descendent_id"
-      @keydown.enter="broadcast_item_activated_with_keyboard"
+      @keydown.enter.prevent="broadcast_item_activated_with_keyboard"
       @keydown.space.prevent="broadcast_item_activated_with_keyboard"
       @keydown.tab.exact="$emit('close')"
       @keydown.tab.shift="$emit('close')"

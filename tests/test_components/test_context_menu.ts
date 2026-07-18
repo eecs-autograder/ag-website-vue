@@ -371,4 +371,21 @@ describe('Keyboard item activation', () => {
         expect(Object.keys(wrapper.emitted())).toHaveLength(1);
         expect(wrapper.emitted()).toHaveProperty('item1');
     });
+
+    test("Default action prevented for enter, space, and arrow key shortcuts", async () => {
+        const wrapper = mount(TestComponent);
+        let context_menu_wrapper = wrapper.find('.context-menu-container');
+
+        let captured_event: KeyboardEvent | null = null;
+        context_menu_wrapper.element.addEventListener(
+            'keydown', (event) => { captured_event = <KeyboardEvent> event; }
+        );
+
+        for (let key of ['enter', 'space', 'right', 'down', 'left', 'up']) {
+            captured_event = null;
+            await context_menu_wrapper.trigger(`keydown.${key}`);
+            expect(captured_event).not.toBeNull();
+            expect(captured_event!.defaultPrevented).toBe(true);
+        }
+    });
 });
