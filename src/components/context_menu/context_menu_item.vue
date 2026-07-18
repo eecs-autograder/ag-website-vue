@@ -1,7 +1,5 @@
 <template>
-  <li
-    role="presentation"
-  >
+  <li role="presentation">
     <button
       :id="id"
       role="menuitem"
