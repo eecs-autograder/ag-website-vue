@@ -12,7 +12,7 @@
         'active-descendant': active_descendent_id === id,
       }"
       :disabled="disabled"
-      @click="on_item_selected"
+      @click="emit('click')"
     >
       <slot></slot>
     </button>
@@ -54,14 +54,6 @@ onMounted(() => {
 const active_descendent_id = inject<ComputedRef<string | null>>(
   "active_descendent_id",
 );
-
-const update_item_selected = inject<() => unknown>("update_item_selected");
-
-function on_item_selected() {
-  emit("click");
-  assert_not_null(update_item_selected);
-  update_item_selected();
-}
 </script>
 
 <style scoped lang="scss">

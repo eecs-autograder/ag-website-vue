@@ -67,8 +67,6 @@ const active_descendent_id = computed(() => {
 });
 provide("active_descendent_id", active_descendent_id);
 
-provide<() => unknown>("update_item_selected", () => emit("close"));
-
 function broadcast_item_activated_with_keyboard() {
   for (const menu_item of items.value) {
     menu_item.update_item_activated_with_keyboard();

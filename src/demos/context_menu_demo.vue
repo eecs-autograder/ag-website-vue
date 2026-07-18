@@ -32,22 +32,22 @@
     <context-menu ref="context_menu_1"
                   :is_open="menu_1_is_open" :coordinates="menu_1_coordinates"
                   @close="menu_1_is_open = false">
-      <context-menu-item @click="choice_alert('A Fish!')">
+      <context-menu-item @click="choice_alert('A Fish!'); menu_1_is_open = false">
         One Fish <i class="fas fa-fish fish"></i>
       </context-menu-item>
       <div class="context-menu-divider"> </div>
-      <context-menu-item @click="choice_alert('Two Fish!')">
+      <context-menu-item @click="choice_alert('Two Fish!'); menu_1_is_open = false">
         Two Fish
         <i class="fas fa-fish fish"></i>
         <i class="fas fa-fish fish"></i>
       </context-menu-item>
       <div class="context-menu-divider"> </div>
       <context-menu-item
-        @click="change_color('red')">
+        @click="change_color('red'); menu_1_is_open = false">
         Red Fish <i class="fas fa-fish red-fish"></i>
       </context-menu-item>
       <div class="context-menu-divider"> </div>
-      <context-menu-item @click="change_color('blue')">
+      <context-menu-item @click="change_color('blue'); menu_1_is_open = false">
         Blue Fish <i class="fas fa-fish blue-fish"></i>
       </context-menu-item>
     </context-menu>
@@ -78,7 +78,7 @@
                   @close="menu_2_is_open = false">
       <context-menu-item v-for="item of items"
                          :disabled="item.disabled"
-                         @click="choice_alert(item.name)">
+                         @click="choice_alert(item.name); menu_2_is_open = false">
         {{item.name}}
       </context-menu-item>
     </context-menu>
