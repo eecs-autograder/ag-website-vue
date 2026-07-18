@@ -2,6 +2,7 @@
   <div class="context-menu-mask" v-show="is_open" @click.self="$emit('close')">
     <menu
       ref="root"
+      role="menu"
       class="context-menu-container"
       tabindex="0"
       :aria-activedescendant="active_descendent_id"
