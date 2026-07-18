@@ -4,7 +4,7 @@
       ref="root"
       class="context-menu-container"
       tabindex="0"
-      :active-descendent="items[active_index]"
+      :aria-activedescendant="active_descendent_id"
       @keydown.enter="broadcast_item_activated_with_keyboard"
       @keydown.space.prevent="broadcast_item_activated_with_keyboard"
       @keydown.tab.exact="$emit('close')"
@@ -58,15 +58,13 @@ provide(
     items.value.push({ id, update_item_activated_with_keyboard });
   },
 );
-provide(
-  "active_descendent_id",
-  computed(() => {
-    if (items.value.length !== 0) {
-      return items.value[active_index.value].id;
-    }
-    return null;
-  }),
-);
+const active_descendent_id = computed(() => {
+  if (items.value.length !== 0) {
+    return items.value[active_index.value].id;
+  }
+  return null;
+});
+provide("active_descendent_id", active_descendent_id);
 
 provide<() => unknown>("update_item_selected", () => emit("close"));
 
