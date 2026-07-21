@@ -74,9 +74,20 @@
             role="link"
             tabindex="0"
             :class="{'active': d_current_tab === 'handgrading'}"
-            @click="set_current_tab('handgrading')"
-            @keydown.enter="set_current_tab('handgrading')">
+            @click.self="set_current_tab('handgrading')"
+            @keydown.enter.self="set_current_tab('handgrading')">
         Handgrading
+        <router-link
+          v-if="d_project !== null"
+          :to="`/web/project/${d_project.pk}?current_tab=handgrading`"
+        >
+          <i
+            id="project-handgrading-link"
+            class="fas fa-clipboard-check"
+            role="img"
+            aria-label="To handgrading grade submissions page"
+          ></i>
+          </router-link>
       </div>
       <div class="nav-link"
             role="link"
@@ -320,6 +331,11 @@ export default class ProjectAdmin extends CurrentTabMixin implements ProjectObse
   $active-color: $navbar-active-color,
   $border-color: $navbar-hover-color
 );
+
+#project-handgrading-link {
+  margin-left: .375rem;
+  color: $ocean-blue;
+}
 
 .body {
   height: 100%;

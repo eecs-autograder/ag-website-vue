@@ -21,7 +21,7 @@ TODO:
   - [x] "Checkboxes", "Comments", and "Annotations" sub-headers
     - [x] Add keyboard focus & controls (use CollapsibleSection component)
     - [x] Use h2 tags
-- Keyboard mechanism for applying annotations:
+- [ ] Keyboard mechanism for applying annotations:
   - Brainstorm design options
     ~~- Add button to file panel header; button opens modal w/~~
     ~~  annotation <select> tag or similar, first & last line~~
@@ -43,6 +43,11 @@ TODO:
     ~~      - No line numbers specified means comment not associated with a line (start and end line ~~are null)
     ~~    - End line number is always optional. Not present means start and end are same.~~
     ~~      - Note: In the API~~
-    - **Decision**: After adding keyboard support to context menu, make lines of code focusable and so that enter opens the menu.
-  - Add link to navigate from handgrading admin to project page
-    handgrading tab
+    - **Decision**:
+      - Add keyboard support to context menu (done)
+      - Make lines of code focusable and so that enter opens the menu
+        - Remember to add aria-controls and aria-expanded to the lines
+      - Add to top of context menu:
+        - Inputs for first line and last line selected
+          -
+  - [x] Add link to navigate from handgrading admin to project page handgrading tab
