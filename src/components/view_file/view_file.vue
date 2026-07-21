@@ -425,11 +425,12 @@ export default class ViewFile extends Vue implements Created {
     }
 
     this.d_is_highlighting = false;
-    this.d_context_menu_coordinates = {x: event.pageX, y: event.pageY};
+    this.d_context_menu_coordinates = {x: event.clientX, y: event.clientY};
     this.d_context_menu_is_open = true;
   }
 
   open_comment_modal() {
+    this.d_context_menu_is_open = false;
     this.d_show_comment_modal = true;
     this.$nextTick(() => (<HTMLElement> this.$refs.comment_text).focus());
   }

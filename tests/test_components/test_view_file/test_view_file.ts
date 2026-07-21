@@ -410,7 +410,7 @@ describe('ViewFile handgrading tests', () => {
 
             await wrapper.vm.$nextTick();
 
-            wrapper.findAllComponents(ContextMenuItem).at(0).trigger('click');
+            wrapper.findAll('[role=menuitem]').at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
@@ -458,7 +458,7 @@ describe('ViewFile handgrading tests', () => {
 
             await wrapper.vm.$nextTick();
 
-            wrapper.findAllComponents(ContextMenuItem).at(0).trigger('click');
+            wrapper.findAll('[role=menuitem]').at(0).trigger('click');
             expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
@@ -512,7 +512,7 @@ describe('ViewFile handgrading tests', () => {
         code_lines.at(0).trigger('mouseup');
         await wrapper.vm.$nextTick();
 
-        wrapper.findAllComponents(ContextMenuItem).at(2).trigger('click');
+        wrapper.findAll('[role=menuitem]').at(2).trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.findComponent({ref: 'comment_text'}).setValue(text);

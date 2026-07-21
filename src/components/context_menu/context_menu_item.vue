@@ -1,14 +1,31 @@
 <template>
-  <div
-    class="context-menu-option"
-    :class="{ 'hoverable-item': !disabled, 'disabled-item': disabled }"
-    @click.stop="handle_click"
-  >
-    <slot></slot>
-  </div>
+  <li role="presentation">
+    <button
+      :id="id"
+      role="menuitem"
+      tabindex="-1"
+      type="button"
+      class="unstyled-button context-menu-option"
+      :class="{
+        'hoverable-item': !disabled,
+        'disabled-item': disabled,
+        'active-descendant': active_descendent_id === id,
+      }"
+      :disabled="disabled"
+      @click="emit('click')"
+    >
+      <slot></slot>
+    </button>
+  </li>
 </template>
 
 <script setup lang="ts">
+import { ComputedRef, inject, onMounted } from "vue";
+
+import { assert_not_null, generate_uid } from "@/utils";
+
+const id = `context-menu-item-${generate_uid()}`;
+
 interface PropTypes {
   disabled?: boolean;
 }
@@ -21,28 +38,44 @@ const emit = defineEmits<{
   click: [];
 }>();
 
-function handle_click() {
-  if (!props.disabled) {
-    emit("click");
-  }
-}
+const register =
+  inject<
+    (id: string, update_item_activated_with_keyboard: () => unknown) => unknown
+  >("register");
+onMounted(() => {
+  assert_not_null(register);
+  register(id, () => {
+    assert_not_null(active_descendent_id);
+    if (active_descendent_id.value === id && !props.disabled) {
+      emit("click");
+    }
+  });
+});
+const active_descendent_id = inject<ComputedRef<string>>(
+  "active_descendent_id",
+);
 </script>
 
 <style scoped lang="scss">
+@import "@/styles/button_styles.scss";
 @import "@/styles/colors.scss";
 
-.context-menu-option {
-  color: black;
+.unstyled-button.context-menu-option {
   padding: 0.375rem 0.75rem;
+  display: block;
+  width: 100%;
+  text-align: left;
 }
 
 .hoverable-item:hover {
   background-color: $pebble-medium;
-  cursor: pointer;
 }
 
-.disabled-item,
-.disabled-item:hover {
-  color: $baking-pan;
+.disabled-item {
+  color: $normal-text-color-3;
+}
+
+.active-descendant {
+  outline-style: auto;
 }
 </style>

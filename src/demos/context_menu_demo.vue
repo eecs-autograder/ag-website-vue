@@ -2,7 +2,7 @@
   <div class="context-menu-demo-outer">
     <div class="context-menu-demo-1">
       <div class="area-of-focus-1 menu-parent"
-           @click="menu_1_coordinates = {x: $event.pageX, y: $event.pageY};
+           @click="menu_1_coordinates = {x: $event.clientX, y: $event.clientY};
                    menu_1_is_open = true">
         Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -32,29 +32,29 @@
     <context-menu ref="context_menu_1"
                   :is_open="menu_1_is_open" :coordinates="menu_1_coordinates"
                   @close="menu_1_is_open = false">
-      <context-menu-item @click="choice_alert('A Fish!')">
+      <context-menu-item @click="choice_alert('A Fish!'); menu_1_is_open = false">
         One Fish <i class="fas fa-fish fish"></i>
       </context-menu-item>
       <div class="context-menu-divider"> </div>
-      <context-menu-item @click="choice_alert('Two Fish!')">
+      <context-menu-item @click="choice_alert('Two Fish!'); menu_1_is_open = false">
         Two Fish
         <i class="fas fa-fish fish"></i>
         <i class="fas fa-fish fish"></i>
       </context-menu-item>
       <div class="context-menu-divider"> </div>
       <context-menu-item
-        @click="change_color('red')">
+        @click="change_color('red'); menu_1_is_open = false">
         Red Fish <i class="fas fa-fish red-fish"></i>
       </context-menu-item>
       <div class="context-menu-divider"> </div>
-      <context-menu-item @click="change_color('blue')">
+      <context-menu-item @click="change_color('blue'); menu_1_is_open = false">
         Blue Fish <i class="fas fa-fish blue-fish"></i>
       </context-menu-item>
     </context-menu>
 
     <div class="context-menu-demo-2">
       <div class="area-of-focus-2 menu-parent"
-           @click="menu_2_coordinates = {x: $event.pageX, y: $event.pageY};
+           @click="menu_2_coordinates = {x: $event.clientX, y: $event.clientY};
                    menu_2_is_open = true">
         Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
@@ -78,13 +78,13 @@
                   @close="menu_2_is_open = false">
       <context-menu-item v-for="item of items"
                          :disabled="item.disabled"
-                         @click="choice_alert(item.name)">
+                         @click="choice_alert(item.name); menu_2_is_open = false">
         {{item.name}}
       </context-menu-item>
     </context-menu>
 
     <br>
-    <div @click="empty_menu_coordinates = {x: $event.pageX, y: $event.pageY};
+    <div @click="empty_menu_coordinates = {x: $event.clientX, y: $event.clientY};
                  empty_menu_is_open = true"
          class="menu-parent">
       This context menu is empty <br> <br>
@@ -133,7 +133,7 @@ export default class ContextMenuDemo extends Vue {
     {name: 'Option 1', disabled: false},
     {name: 'Option 2', disabled: false},
     {name: 'Option 3', disabled: false},
-    {name: 'Option 4', disabled: true}
+    {name: 'Option 4 (disabled)', disabled: true}
   ];
 
 }
