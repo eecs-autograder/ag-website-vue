@@ -46,7 +46,10 @@
                                                     && index <= d_last_highlighted_line}"
                 @mousedown="start_highlighting(index)"
                 @mouseenter="grow_highlighted_region(index)"
-                @mouseup="stop_highlighting($event, index)"
+                @mouseup="open_annotation_context_menu({x: $event.clientX, y: $event.clientY})"
+                tabindex="0"
+                @keydown.enter.prevent="keyboard_open_annotation_context_menu($event, index)"
+                ref="code_lines"
                 data-testid="code_line">
               <td class="line-number" :class="{'line-number-code': is_code_file}">{{line_num}}</td>
               <td class="line-of-file-content"
@@ -112,7 +115,7 @@
                   v-if="handgrading_enabled"
                   :is_open="d_context_menu_is_open"
                   :coordinates="d_context_menu_coordinates"
-                  @close="d_context_menu_is_open = false">
+                  @close="cancel_commenting()">
       <context-menu-item v-for="annotation of handgrading_result.handgrading_rubric.annotations"
                           :key="annotation.pk"
                           @click="apply_annotation(annotation)">
@@ -147,16 +150,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import {
   Annotation,
   AppliedAnnotation,
   Comment,
   HandgradingResult,
-  HandgradingRubric,
-  Location,
-  UserRoles,
 } from "ag-client-typescript";
 import hljs from 'highlight.js'; // "hljs" class in HTML element styles it with imported theme
 
@@ -175,6 +175,7 @@ import {
 } from '../project_view/handgrading/handgrading_comment';
 
 import { CODE_THEME_STORE } from './code_theme_store';
+import { nextTick } from 'process';
 
 @Component({
   components: {
@@ -422,7 +423,7 @@ export default class ViewFile extends Vue implements Created {
     }
   }
 
-  stop_highlighting(event: MouseEvent, line_index: number) {
+  open_annotation_context_menu(menu_coordinates: {x: number, y: number}) {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
         || !this.d_is_highlighting) {
@@ -430,8 +431,19 @@ export default class ViewFile extends Vue implements Created {
     }
 
     this.d_is_highlighting = false;
-    this.d_context_menu_coordinates = {x: event.clientX, y: event.clientY};
+    this.d_context_menu_coordinates = menu_coordinates;
     this.d_context_menu_is_open = true;
+  }
+
+  keyboard_open_annotation_context_menu(event: KeyboardEvent, line_number: number) {
+    const element = <HTMLElement> event.target;
+    const bounding_rect = element.getBoundingClientRect();
+
+    this.start_highlighting(line_number);
+    this.open_annotation_context_menu({
+      x: bounding_rect.x,
+      y: bounding_rect.y,
+    });
   }
 
   open_comment_modal() {
@@ -483,11 +495,31 @@ export default class ViewFile extends Vue implements Created {
   }
 
   finish_commenting() {
+    // IMPORTANT: If you change anything about this method,
+    // double check whether cancel_commenting needs the same changes.
+    // cancel_commenting is currently an alias for this method.
+    const first_line_highlighted = this.d_first_highlighted_line;
     this.d_context_menu_is_open = false;
     this.d_first_highlighted_line = null;
     this.d_last_highlighted_line = null;
+    nextTick(() => {
+      if (first_line_highlighted !== null) {
+        this.focus_line(first_line_highlighted);
+      }
+    });
+  }
+
+  cancel_commenting() {
+    this.finish_commenting();
+  }
+
+  focus_line(line_index: number) {
+    console.log('focus line', line_index);
+    const lines = <HTMLElement[]> this.$refs.code_lines;
+    lines[line_index].focus();
   }
 }
+
 
 </script>
 
