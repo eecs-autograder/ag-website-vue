@@ -37,18 +37,24 @@
         </div>
         <table :class="{'saving': d_saving}">
           <template v-for="(line_num, index) of num_lines_to_show">
-            <tr :class="{'commented-line': line_in_comment(index),
+            <tr :key="`line-${line_num}`"
+                :class="{'commented-line': line_in_comment(index),
                           'hovered-comment-line': d_hovered_comment !== null
                                                   && index >= d_hovered_comment.location.first_line
                                                   && index <= d_hovered_comment.location.last_line,
                           'highlighted-region-line': d_first_highlighted_line !== null
                                                     && index >= d_first_highlighted_line
                                                     && index <= d_last_highlighted_line}"
-                @mousedown="start_highlighting(index)"
+                @mousedown="start_mouse_highlighting(index)"
                 @mouseenter="grow_highlighted_region(index)"
                 @mouseup="open_annotation_context_menu({x: $event.clientX, y: $event.clientY})"
                 tabindex="0"
+                @focus="on_line_focus(index)"
                 @keydown.enter.prevent="keyboard_open_annotation_context_menu($event, index)"
+                @keydown.shift.down.prevent="extend_selection('down', index)"
+                @keydown.shift.up.prevent="extend_selection('up', index)"
+                @keydown.esc.prevent="cancel_selection()"
+                :aria-keyshortcuts="line_shortcuts"
                 ref="code_lines"
                 data-testid="code_line">
               <td class="line-number" :class="{'line-number-code': is_code_file}">{{line_num}}</td>
@@ -61,14 +67,29 @@
                       v-html="split_code_content[index]"
                 ></span>
                 <span v-else>{{ split_content[index] === "" ? "\n" : split_content[index] }}</span>
+                <span v-if="handgrading_enabled && !readonly_handgrading_results"
+                      class="line-hint"
+                      aria-hidden="true">
+                  <template v-if="is_selecting">
+                    <kbd>Esc</kbd> cancel
+                    <span class="line-hint-sep">·</span>
+                  </template>
+                  <kbd>Enter</kbd> add feedback
+                  <span class="line-hint-sep">·</span>
+                  <kbd>Shift</kbd>+<kbd>↑↓</kbd> select lines
+                </span>
               </td>
             </tr>
-            <tr v-for="comment of handgrading_comments.get(index, [])">
+            <tr v-for="comment of handgrading_comments.get(index, [])"
+                :key="comment.vue_key">
               <td></td>
               <td>
                 <div class="comment"
+                      :tabindex="comment_is_deletable(comment) ? undefined : 0"
                       @mouseenter="d_hovered_comment = comment"
-                      @mouseleave="d_hovered_comment = null">
+                      @mouseleave="d_hovered_comment = null"
+                      @focusin="d_hovered_comment = comment"
+                      @focusout="d_hovered_comment = null">
                   <div class="comment-header">
                     <div class="comment-line-range">
                       {{comment.location.first_line !== comment.location.last_line
@@ -78,8 +99,7 @@
                     </div>
                     <button
                       class="delete unstyled-button"
-                      v-if="!readonly_handgrading_results
-                              & (enable_custom_comments || !comment.is_custom)"
+                      v-if="comment_is_deletable(comment)"
                       @click="delete_handgrading_comment(comment)"
                       aria-label="Delete comment/annotation"
                     >
@@ -99,6 +119,9 @@
             </tr>
           </template>
         </table>
+        <div class="sr-only" role="status" aria-live="polite">
+          {{d_selection_announcement}}
+        </div>
       </div>
 
       <div class="show-more-button-container" v-if="d_num_lines_rendered < split_content.length">
@@ -251,6 +274,21 @@ export default class ViewFile extends Vue implements Created {
   d_first_highlighted_line: number | null = null;
   d_last_highlighted_line: number | null = null;
 
+  // True only while the mouse button is held during a drag-select. Mouse
+  // hover (mouseenter) grows the region only when this is set, so it doesn't
+  // interfere with a keyboard selection when the cursor moves or the page
+  // scrolls under a stationary cursor.
+  d_is_mouse_dragging = false;
+
+  // Anchor (where a keyboard selection began) and head (the line that moves
+  // with Shift+Arrow). The highlighted region spans between them. These stay
+  // null during mouse selection, which is how on_line_focus tells the two
+  // apart.
+  d_highlight_anchor_line: number | null = null;
+  d_highlight_head_line: number | null = null;
+
+  d_selection_announcement = '';
+
   @handle_global_errors_async
   async created() {
     this.d_handgrading_result = this.handgrading_result;
@@ -383,6 +421,11 @@ export default class ViewFile extends Vue implements Created {
     return result;
   }
 
+  comment_is_deletable(comment: HandgradingComment): boolean {
+    return !this.readonly_handgrading_results
+           && (this.enable_custom_comments || !comment.is_custom);
+  }
+
   // Returns true if line_num is contained in any provided handgrading comments.
   line_in_comment(line_num: number) {
     for (let [last_line, comment_list] of this.handgrading_comments) {
@@ -394,7 +437,7 @@ export default class ViewFile extends Vue implements Created {
     return false;
   }
 
-  start_highlighting(line_index: number) {
+  start_keyboard_highlighting(line_index: number) {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
         || this.d_is_highlighting
@@ -408,10 +451,26 @@ export default class ViewFile extends Vue implements Created {
     this.d_last_highlighted_line = line_index;
   }
 
+  start_mouse_highlighting(line_index: number) {
+    if (this.readonly_handgrading_results
+        || !this.handgrading_enabled
+        || this.d_is_mouse_dragging
+        || this.d_context_menu_is_open
+        || this.d_saving) {
+      return;
+    }
+
+    this.reset_keyboard_selection();
+    this.d_is_mouse_dragging = true;
+    this.d_is_highlighting = true;
+    this.d_first_highlighted_line = line_index;
+    this.d_last_highlighted_line = line_index;
+  }
+
   grow_highlighted_region(line_index: number) {
     if (this.readonly_handgrading_results
         || !this.handgrading_enabled
-        || !this.d_is_highlighting) {
+        || !this.d_is_mouse_dragging) {
       return;
     }
 
@@ -431,19 +490,86 @@ export default class ViewFile extends Vue implements Created {
     }
 
     this.d_is_highlighting = false;
+    this.d_is_mouse_dragging = false;
     this.d_context_menu_coordinates = menu_coordinates;
     this.d_context_menu_is_open = true;
+  }
+
+  cancel_selection() {
+    if (this.d_first_highlighted_line === null) {
+      return;
+    }
+    this.reset_keyboard_selection();
+    this.d_selection_announcement = 'Selection cancelled';
   }
 
   keyboard_open_annotation_context_menu(event: KeyboardEvent, line_number: number) {
     const element = <HTMLElement> event.target;
     const bounding_rect = element.getBoundingClientRect();
 
-    this.start_highlighting(line_number);
+    this.start_keyboard_highlighting(line_number);
     this.open_annotation_context_menu({
       x: bounding_rect.x,
       y: bounding_rect.y,
     });
+  }
+
+  get is_selecting() {
+    return this.d_highlight_anchor_line !== null;
+  }
+
+  get line_shortcuts() {
+    if (!this.handgrading_enabled || this.readonly_handgrading_results) {
+      return undefined;
+    }
+    return 'Enter Shift+ArrowUp Shift+ArrowDown Escape';
+  }
+
+  extend_selection(direction: 'up' | 'down', from_line: number) {
+    if (this.readonly_handgrading_results
+        || !this.handgrading_enabled
+        || this.d_context_menu_is_open
+        || this.d_saving) {
+      return;
+    }
+
+    let anchor = this.d_highlight_anchor_line ?? from_line;
+    let head = this.d_highlight_head_line ?? from_line;
+    let new_head = head + (direction === 'down' ? 1 : -1);
+    if (new_head < 0 || new_head >= this.num_lines_to_show) {
+      return;
+    }
+
+    this.d_highlight_anchor_line = anchor;
+    this.d_highlight_head_line = new_head;
+    this.d_is_highlighting = true;
+    this.d_first_highlighted_line = Math.min(anchor, new_head);
+    this.d_last_highlighted_line = Math.max(anchor, new_head);
+
+    this.d_selection_announcement =
+      `Selecting lines ${this.d_first_highlighted_line + 1} `
+      + `to ${this.d_last_highlighted_line + 1}`;
+
+    this.focus_line(new_head);
+  }
+
+  // Collapse an in-progress keyboard selection when focus lands on a line
+  // that isn't the current head (e.g. the grader tabbed away).
+  on_line_focus(line_index: number) {
+    if (this.d_highlight_anchor_line !== null
+        && line_index !== this.d_highlight_head_line) {
+      this.reset_keyboard_selection();
+    }
+  }
+
+  reset_keyboard_selection() {
+    this.d_highlight_anchor_line = null;
+    this.d_highlight_head_line = null;
+    this.d_is_highlighting = false;
+    this.d_is_mouse_dragging = false;
+    this.d_first_highlighted_line = null;
+    this.d_last_highlighted_line = null;
+    this.d_selection_announcement = '';
   }
 
   open_comment_modal() {
@@ -502,6 +628,9 @@ export default class ViewFile extends Vue implements Created {
     this.d_context_menu_is_open = false;
     this.d_first_highlighted_line = null;
     this.d_last_highlighted_line = null;
+    this.d_highlight_anchor_line = null;
+    this.d_highlight_head_line = null;
+    this.d_selection_announcement = '';
     nextTick(() => {
       if (first_line_highlighted !== null) {
         this.focus_line(first_line_highlighted);
@@ -514,9 +643,8 @@ export default class ViewFile extends Vue implements Created {
   }
 
   focus_line(line_index: number) {
-    console.log('focus line', line_index);
     const lines = <HTMLElement[]> this.$refs.code_lines;
-    lines[line_index].focus();
+    lines?.[line_index]?.focus();
   }
 }
 
@@ -624,6 +752,11 @@ $light-green: hsl(97, 42%, 79%);
   font-family: "Helvetica Neue", Helvetica;
   font-size: .875rem;
 
+  &:focus-visible {
+    outline: 2px solid $ocean-blue;
+    outline-offset: 2px;
+  }
+
   .comment-header {
     display: flex;
 
@@ -667,6 +800,53 @@ $light-green: hsl(97, 42%, 79%);
   background-color: $bubble-gum;
 }
 
+tr:focus-visible {
+  outline: 2px solid $ocean-blue;
+  outline-offset: -2px;
+}
+
+.line-of-file-content {
+  position: relative;
+}
+
+.line-hint {
+  display: none;
+  position: absolute;
+  right: .5rem;
+  top: 50%;
+  transform: translateY(-50%);
+
+  font-family: "Helvetica Neue", Helvetica;
+  font-size: .75rem;
+  color: $normal-text-color-2;
+
+  padding: .0625rem .375rem;
+  border: 1px solid $pebble-dark;
+  border-radius: 3px;
+  background-color: $white-gray;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+
+  kbd {
+    font-family: "Helvetica Neue", Helvetica;
+    font-size: .6875rem;
+    padding: 0 .1875rem;
+    border: 1px solid $pebble-dark;
+    border-radius: 2px;
+    background-color: white;
+  }
+
+  .line-hint-sep {
+    margin: 0 .125rem;
+    color: $stormy-gray-light;
+  }
+}
+
+tr:focus-visible .line-hint {
+  display: inline-block;
+}
+
 .modal {
   .input {
     width: 100%;
@@ -678,6 +858,13 @@ $light-green: hsl(97, 42%, 79%);
   // to avoid color clashes
   .commented-line td,
   .highlighted-region-line td {
+    filter: invert(1);
+  }
+
+  // The line hint carries its own theme-independent colors, so undo the
+  // parent td's invert to keep it looking the same on highlighted lines.
+  .commented-line .line-hint,
+  .highlighted-region-line .line-hint {
     filter: invert(1);
   }
 }
