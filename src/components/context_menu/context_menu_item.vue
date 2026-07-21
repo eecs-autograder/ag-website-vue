@@ -51,7 +51,7 @@ onMounted(() => {
     }
   });
 });
-const active_descendent_id = inject<ComputedRef<string | null>>(
+const active_descendent_id = inject<ComputedRef<string>>(
   "active_descendent_id",
 );
 </script>

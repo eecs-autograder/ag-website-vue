@@ -17,7 +17,7 @@
       @keydown.up.prevent.stop="focus_prev_item"
     >
       <!--
-        Items rendered in this slot must stay mounted for the lifetime
+        Menu items rendered in this slot must stay mounted for the lifetime
         of the menu and not be reordered.
       -->
       <slot></slot>
@@ -35,6 +35,11 @@ interface MenuCoordinates {
 
 interface MenuItem {
   id: string;
+  // This update is broadcast to all menu items when
+  // the enter or space keys are used to select a menu item.
+  // Note that the broadcast does not indicate which item
+  // was selected. That is provided separately as the
+  // active descendant ID.
   update_item_activated_with_keyboard: () => unknown;
 }
 
@@ -63,7 +68,7 @@ const active_descendent_id = computed(() => {
   if (items.value.length !== 0) {
     return items.value[active_index.value].id;
   }
-  return null;
+  return "";
 });
 provide("active_descendent_id", active_descendent_id);
 
