@@ -752,10 +752,10 @@ $light-green: hsl(97, 42%, 79%);
   font-family: "Helvetica Neue", Helvetica;
   font-size: .875rem;
 
-  &:focus-visible {
-    outline: 2px solid $ocean-blue;
-    outline-offset: 2px;
-  }
+  // &:focus-visible {
+  //   outline: 2px solid auto;
+  //   outline-offset: 2px;
+  // }
 
   .comment-header {
     display: flex;
@@ -800,21 +800,25 @@ $light-green: hsl(97, 42%, 79%);
   background-color: $bubble-gum;
 }
 
-tr:focus-visible {
-  outline: 2px solid $ocean-blue;
-  outline-offset: -2px;
-}
+// tr:focus-visible {
+//   outline: 2px solid auto;
+//   outline-offset: -2px;
+// }
 
 .line-of-file-content {
   position: relative;
 }
 
 .line-hint {
+  z-index: 1;
   display: none;
   position: absolute;
-  right: .5rem;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 0;
+  top: 0;
+  // Note: I tried positioning it above the line (-100%),
+  // but I couldn't figure out how to prevent it from being covered
+  // by the file panel header when on the first line.
+  transform: translateY(100%);
 
   font-family: "Helvetica Neue", Helvetica;
   font-size: .75rem;
