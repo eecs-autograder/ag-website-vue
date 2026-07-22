@@ -42,35 +42,35 @@
                           'hovered-comment-line': d_hovered_comment !== null
                                                   && index >= d_hovered_comment.location.first_line
                                                   && index <= d_hovered_comment.location.last_line,
-                          'highlighted-region-line': d_first_highlighted_line !== null
-                                                    && index >= d_first_highlighted_line
-                                                    && index <= d_last_highlighted_line}"
-                @mousedown="start_mouse_highlighting(index)"
-                @mouseenter="grow_highlighted_region(index)"
-                @mouseup="open_annotation_context_menu({x: $event.clientX, y: $event.clientY})"
+                          'highlighted-region-line': d_selector !== null
+                                                    && index >= d_selector.range.first
+                                                    && index <= d_selector.range.last}"
+                @mousedown="start_mouse_selection(index)"
+                @mouseenter="update_mouse_selection(index)"
+                @mouseup="commit_mouse_selection($event)"
                 tabindex="0"
-                @focus="on_line_focus(index)"
-                @keydown.enter.prevent="keyboard_open_annotation_context_menu($event, index)"
-                @keydown.shift.down.prevent="extend_selection('down', index)"
-                @keydown.shift.up.prevent="extend_selection('up', index)"
-                @keydown.esc.prevent="cancel_selection()"
+                @keydown.shift.down.prevent="start_or_expand_keyboard_selection('down', index)"
+                @keydown.shift.up.prevent="start_or_expand_keyboard_selection('up', index)"
+                @keydown.enter.prevent="commit_keyboard_selection($event, index)"
+                @keydown.esc.prevent="cancel_commenting()"
+                @keydown.tab.exact="cancel_commenting()"
+                @keydown.shift.tab="cancel_commenting()"
                 :aria-keyshortcuts="line_shortcuts"
                 ref="code_lines"
                 data-testid="code_line">
               <td class="line-number" :class="{'line-number-code': is_code_file}">{{line_num}}</td>
               <td class="line-of-file-content"
                   :class="{'line-of-file-content-code': is_code_file}"
-                  :style="{'user-select': (handgrading_enabled
-                                            && !readonly_handgrading_results) ? 'none' : 'auto'}"
+                  :style="{'user-select': can_edit_handgrading ? 'none' : 'auto'}"
               >
                 <span v-if="is_code_file"
                       v-html="split_code_content[index]"
                 ></span>
                 <span v-else>{{ split_content[index] === "" ? "\n" : split_content[index] }}</span>
-                <span v-if="handgrading_enabled && !readonly_handgrading_results"
+                <span v-if="can_edit_handgrading"
                       class="line-hint"
                       aria-hidden="true">
-                  <template v-if="is_selecting">
+                  <template v-if="d_selector !== null">
                     <kbd>Esc</kbd> cancel
                     <span class="line-hint-sep">·</span>
                   </template>
@@ -190,7 +190,7 @@ import ProgressBar from '@/components/progress_bar.vue';
 import { handle_global_errors_async } from '@/error_handling';
 import { Created } from '@/lifecycle';
 import { SafeMap } from '@/safe_map';
-import { chain, toggle } from '@/utils';
+import { assert_not_null, chain, toggle } from '@/utils';
 
 import {
   handgrading_comment_factory,
@@ -199,6 +199,7 @@ import {
 
 import { CODE_THEME_STORE } from './code_theme_store';
 import { nextTick } from 'process';
+import { useLineSelector } from './line_selector';
 
 @Component({
   components: {
@@ -270,23 +271,7 @@ export default class ViewFile extends Vue implements Created {
   d_show_comment_modal = false;
   d_comment_text = '';
 
-  d_is_highlighting = false;
-  d_first_highlighted_line: number | null = null;
-  d_last_highlighted_line: number | null = null;
-
-  // True only while the mouse button is held during a drag-select. Mouse
-  // hover (mouseenter) grows the region only when this is set, so it doesn't
-  // interfere with a keyboard selection when the cursor moves or the page
-  // scrolls under a stationary cursor.
-  d_is_mouse_dragging = false;
-
-  // Anchor (where a keyboard selection began) and head (the line that moves
-  // with Shift+Arrow). The highlighted region spans between them. These stay
-  // null during mouse selection, which is how on_line_focus tells the two
-  // apart.
-  d_highlight_anchor_line: number | null = null;
-  d_highlight_head_line: number | null = null;
-
+  d_selector: ReturnType<typeof useLineSelector> | null = null;
   d_selection_announcement = '';
 
   @handle_global_errors_async
@@ -392,6 +377,10 @@ export default class ViewFile extends Vue implements Created {
     return this.handgrading_result !== null;
   }
 
+  get can_edit_handgrading() {
+    return this.handgrading_enabled && !this.readonly_handgrading_results;
+  }
+
   get handgrading_comments(): SafeMap<number, HandgradingComment[]> {
     if (this.d_handgrading_result === null) {
       return new SafeMap();
@@ -426,6 +415,16 @@ export default class ViewFile extends Vue implements Created {
            && (this.enable_custom_comments || !comment.is_custom);
   }
 
+  @handle_global_errors_async
+  async delete_handgrading_comment(handgrading_comment: HandgradingComment) {
+    if (!this.d_saving) {
+      await toggle(this, 'd_saving', async () => {
+        await handgrading_comment.delete();
+        this.d_hovered_comment = null;
+      });
+    }
+  }
+
   // Returns true if line_num is contained in any provided handgrading comments.
   line_in_comment(line_num: number) {
     for (let [last_line, comment_list] of this.handgrading_comments) {
@@ -437,139 +436,189 @@ export default class ViewFile extends Vue implements Created {
     return false;
   }
 
-  start_keyboard_highlighting(line_index: number) {
-    if (this.readonly_handgrading_results
-        || !this.handgrading_enabled
-        || this.d_is_highlighting
-        || this.d_context_menu_is_open
-        || this.d_saving) {
+  start_mouse_selection(clicked_line_index: number) {
+    if (
+      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+      // Note: Don't refactor this and similar checks unless
+      // you have a very good reason.
+      !this.can_edit_handgrading
+      // Don't interrupt existing mouse selection
+      || this.d_selector?.controls === 'mouse'
+      || this.d_context_menu_is_open
+      || this.d_saving
+    ) {
+      return;
+    }
+    console.log('start_mouse_selection')
+
+    this.d_selector = useLineSelector(clicked_line_index, 'mouse');
+  }
+
+  update_mouse_selection(hovered_line_index: number) {
+    if (
+      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+      // Note: Don't refactor this and similar checks unless
+      // you have a very good reason.
+      !this.can_edit_handgrading
+      // Don't interrupt keyboard selection
+      || this.d_selector?.controls === 'keyboard'
+      || this.d_context_menu_is_open
+      || this.d_saving
+    ) {
+      return;
+    }
+    console.log('update_mouse_selection')
+
+    this.d_selector?.update_selection(hovered_line_index);
+  }
+
+  commit_mouse_selection(mouseup_event: MouseEvent) {
+    if (
+      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+      // Note: Don't refactor this and similar checks unless
+      // you have a very good reason.
+      !this.can_edit_handgrading
+      // It's possible to cancel a mouse selection with esc before
+      // committing it.
+      // If that happens, this method should do nothing.
+      || this.d_selector === null
+      // Don't interrupt keyboard selection
+      || this.d_selector.controls === 'keyboard'
+      || this.d_context_menu_is_open
+      || this.d_saving
+    ) {
+      return;
+    }
+    console.log('commit_mouse_selection')
+
+    this.open_annotation_context_menu({x: mouseup_event.clientX, y: mouseup_event.clientY});
+  }
+
+  // There is overlap between how cancellation is triggered for keyboard and mouse.
+  // See cancel_commenting for a method that handles all possibilities.
+
+  start_or_expand_keyboard_selection(direction: 'up' | 'down', from_line_index: number) {
+    console.log('start_or_expand_keyboard_selection')
+    if (
+      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+      // Note: Don't refactor this and similar checks unless
+      // you have a very good reason.
+      !this.can_edit_handgrading
+      // Don't interrupt mouse selection
+      || this.d_selector?.controls === 'mouse'
+      || this.d_context_menu_is_open
+      || this.d_saving
+    ) {
       return;
     }
 
-    this.d_is_highlighting = true;
-    this.d_first_highlighted_line = line_index;
-    this.d_last_highlighted_line = line_index;
-  }
+    console.log('expandy!');
+    if (this.d_selector === null) {
+      this.d_selector = useLineSelector(from_line_index, 'keyboard');
+    }
 
-  start_mouse_highlighting(line_index: number) {
-    if (this.readonly_handgrading_results
-        || !this.handgrading_enabled
-        || this.d_is_mouse_dragging
-        || this.d_context_menu_is_open
-        || this.d_saving) {
+    let new_line: number;
+    switch (direction) {
+      case 'down':
+        if (this.d_selector.range.first < this.d_selector.anchor_index) {
+          new_line = this.d_selector.range.first + 1;
+        }
+        else {
+          new_line = this.d_selector.range.last + 1;
+        }
+        break;
+      case 'up':
+        if (this.d_selector.range.last > this.d_selector.anchor_index) {
+          new_line = this.d_selector.range.last - 1;
+        }
+        else {
+          new_line = this.d_selector.range.first - 1;
+        }
+        break;
+    }
+
+    if (new_line < 0 || new_line >= this.num_lines_to_show) {
+      console.log('out of range');
       return;
     }
+    this.d_selector.update_selection(new_line);
 
-    this.reset_keyboard_selection();
-    this.d_is_mouse_dragging = true;
-    this.d_is_highlighting = true;
-    this.d_first_highlighted_line = line_index;
-    this.d_last_highlighted_line = line_index;
+    this.d_selection_announcement =
+      `Selecting lines ${this.d_selector.range.first + 1} `
+      + `to ${this.d_selector.range.last + 1}`;
+
+    // Note: we can keep focus on the original anchor because that
+    // will make it visually apparent to the user what the anchor is
+    // and simplify the cancel and post-commit behaviors.
   }
 
-  grow_highlighted_region(line_index: number) {
-    if (this.readonly_handgrading_results
-        || !this.handgrading_enabled
-        || !this.d_is_mouse_dragging) {
+  commit_keyboard_selection(enter_event: KeyboardEvent, line_index: number) {
+    console.log('commit_keyboard_selection')
+    if (
+      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+      // Note: Don't refactor this and similar checks unless
+      // you have a very good reason.
+      !this.can_edit_handgrading
+      // Don't interrupt mouse selection
+      || this.d_selector?.controls === 'mouse'
+      || this.d_context_menu_is_open
+      || this.d_saving
+    ) {
       return;
     }
+    console.log('committy!');
 
-    if (line_index < this.d_first_highlighted_line!) {
-      this.d_first_highlighted_line = line_index;
-    }
-    if (line_index > this.d_last_highlighted_line!) {
-      this.d_last_highlighted_line = line_index;
-    }
-  }
-
-  open_annotation_context_menu(menu_coordinates: {x: number, y: number}) {
-    if (this.readonly_handgrading_results
-        || !this.handgrading_enabled
-        || !this.d_is_highlighting) {
-      return;
+    // If there isn't a current selection, start one on the current line,
+    // then immediately commit it.
+    if (this.d_selector === null) {
+      this.d_selector = useLineSelector(line_index, 'keyboard');
     }
 
-    this.d_is_highlighting = false;
-    this.d_is_mouse_dragging = false;
-    this.d_context_menu_coordinates = menu_coordinates;
-    this.d_context_menu_is_open = true;
-  }
+    const last_line_elt = this.get_line_element_at(this.d_selector.range.last);
+    const bounding_rect = last_line_elt.getBoundingClientRect();
 
-  cancel_selection() {
-    if (this.d_first_highlighted_line === null) {
-      return;
-    }
-    this.reset_keyboard_selection();
-    this.d_selection_announcement = 'Selection cancelled';
-  }
-
-  keyboard_open_annotation_context_menu(event: KeyboardEvent, line_number: number) {
-    const element = <HTMLElement> event.target;
-    const bounding_rect = element.getBoundingClientRect();
-
-    this.start_keyboard_highlighting(line_number);
     this.open_annotation_context_menu({
       x: bounding_rect.x,
       y: bounding_rect.y,
     });
   }
 
+  private open_annotation_context_menu(menu_coordinates: {x: number, y: number}) {
+    this.d_context_menu_coordinates = menu_coordinates;
+    this.d_context_menu_is_open = true;
+  }
+
   get is_selecting() {
-    return this.d_highlight_anchor_line !== null;
+    return this.d_selector !== null;
   }
 
   get line_shortcuts() {
-    if (!this.handgrading_enabled || this.readonly_handgrading_results) {
+    if (!this.can_edit_handgrading) {
       return undefined;
     }
     return 'Enter Shift+ArrowUp Shift+ArrowDown Escape';
   }
 
-  extend_selection(direction: 'up' | 'down', from_line: number) {
-    if (this.readonly_handgrading_results
-        || !this.handgrading_enabled
-        || this.d_context_menu_is_open
-        || this.d_saving) {
-      return;
-    }
-
-    let anchor = this.d_highlight_anchor_line ?? from_line;
-    let head = this.d_highlight_head_line ?? from_line;
-    let new_head = head + (direction === 'down' ? 1 : -1);
-    if (new_head < 0 || new_head >= this.num_lines_to_show) {
-      return;
-    }
-
-    this.d_highlight_anchor_line = anchor;
-    this.d_highlight_head_line = new_head;
-    this.d_is_highlighting = true;
-    this.d_first_highlighted_line = Math.min(anchor, new_head);
-    this.d_last_highlighted_line = Math.max(anchor, new_head);
-
-    this.d_selection_announcement =
-      `Selecting lines ${this.d_first_highlighted_line + 1} `
-      + `to ${this.d_last_highlighted_line + 1}`;
-
-    this.focus_line(new_head);
-  }
-
-  // Collapse an in-progress keyboard selection when focus lands on a line
-  // that isn't the current head (e.g. the grader tabbed away).
-  on_line_focus(line_index: number) {
-    if (this.d_highlight_anchor_line !== null
-        && line_index !== this.d_highlight_head_line) {
-      this.reset_keyboard_selection();
-    }
-  }
-
-  reset_keyboard_selection() {
-    this.d_highlight_anchor_line = null;
-    this.d_highlight_head_line = null;
-    this.d_is_highlighting = false;
-    this.d_is_mouse_dragging = false;
-    this.d_first_highlighted_line = null;
-    this.d_last_highlighted_line = null;
-    this.d_selection_announcement = '';
+  @handle_global_errors_async
+  apply_annotation(annotation: Annotation) {
+    return toggle(this, 'd_saving', async () => {
+      assert_not_null(this.d_selector);
+      console.log(this.d_selector);
+      console.log('ee')
+      console.log(this.d_selector.range);
+      console.log(this.d_selector.range);
+      console.log(this.d_selector.range.first);
+      console.log('oo');
+      await AppliedAnnotation.create(this.d_handgrading_result!.pk, {
+        annotation: annotation.pk,
+        location: {
+          first_line: this.d_selector.range.first,
+          last_line: this.d_selector.range.last,
+          filename: this.filename,
+        }
+      });
+      this.finish_commenting();
+    });
   }
 
   open_comment_modal() {
@@ -579,28 +628,14 @@ export default class ViewFile extends Vue implements Created {
   }
 
   @handle_global_errors_async
-  apply_annotation(annotation: Annotation) {
-    return toggle(this, 'd_saving', async () => {
-      await AppliedAnnotation.create(this.d_handgrading_result!.pk, {
-        annotation: annotation.pk,
-        location: {
-          first_line: this.d_first_highlighted_line!,
-          last_line: this.d_last_highlighted_line!,
-          filename: this.filename,
-        }
-      });
-      this.finish_commenting();
-    });
-  }
-
-  @handle_global_errors_async
   create_comment() {
     return toggle(this, 'd_saving', async () => {
+      assert_not_null(this.d_selector);
       await Comment.create(this.d_handgrading_result!.pk, {
         text: this.d_comment_text,
         location: {
-          first_line: this.d_first_highlighted_line!,
-          last_line: this.d_last_highlighted_line!,
+          first_line: this.d_selector.range.first,
+          last_line: this.d_selector.range.last,
           filename: this.filename,
         }
       });
@@ -610,45 +645,58 @@ export default class ViewFile extends Vue implements Created {
     });
   }
 
-  @handle_global_errors_async
-  async delete_handgrading_comment(handgrading_comment: HandgradingComment) {
-    if (!this.d_saving) {
-      await toggle(this, 'd_saving', async () => {
-        await handgrading_comment.delete();
-        this.d_hovered_comment = null;
-      });
-    }
-  }
-
   finish_commenting() {
+    console.log('finish_commenting')
     // IMPORTANT: If you change anything about this method,
     // double check whether cancel_commenting needs the same changes.
     // cancel_commenting is currently an alias for this method.
-    const first_line_highlighted = this.d_first_highlighted_line;
     this.d_context_menu_is_open = false;
-    this.d_first_highlighted_line = null;
-    this.d_last_highlighted_line = null;
-    this.d_highlight_anchor_line = null;
-    this.d_highlight_head_line = null;
     this.d_selection_announcement = '';
+
+    assert_not_null(this.d_selector);
+    assert_not_null(this.d_selector.anchor_index);
+    const anchor_index = this.d_selector.anchor_index;
+
     nextTick(() => {
-      if (first_line_highlighted !== null) {
-        this.focus_line(first_line_highlighted);
-      }
+      this.focus_line(anchor_index);
+      this.d_selector = null;
     });
   }
 
   cancel_commenting() {
-    this.finish_commenting();
+    console.log('cancel_commenting')
+    if (this.d_selector === null) {
+      return;
+    }
+
+    const anchor_index = this.d_selector.anchor_index;
+
+    if (this.d_context_menu_is_open) {
+      this.d_context_menu_is_open = false;
+      nextTick(() => {
+        this.focus_line(anchor_index);
+      });
+    }
+    else {
+      this.focus_line(anchor_index);
+    }
+
+    if (this.d_selector?.controls === 'keyboard') {
+      this.d_selection_announcement = 'Selection cancelled';
+    }
+
+    this.d_selector = null;
   }
 
   focus_line(line_index: number) {
+    this.get_line_element_at(line_index).focus();
+  }
+
+  get_line_element_at(line_index: number) {
     const lines = <HTMLElement[]> this.$refs.code_lines;
-    lines?.[line_index]?.focus();
+    return lines[line_index];
   }
 }
-
-
 </script>
 
 <style scoped lang="scss">
