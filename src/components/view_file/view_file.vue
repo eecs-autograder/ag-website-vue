@@ -64,9 +64,12 @@
                   :style="{'user-select': can_edit_handgrading ? 'none' : 'auto'}"
               >
                 <span v-if="is_code_file"
+                      class="line-content-text"
                       v-html="split_code_content[index]"
                 ></span>
-                <span v-else>{{ split_content[index] === "" ? "\n" : split_content[index] }}</span>
+                <span v-else
+                      class="line-content-text"
+                >{{ split_content[index] === "" ? "\n" : split_content[index] }}</span>
                 <span v-if="can_edit_handgrading"
                       class="line-hint"
                       aria-hidden="true">
@@ -905,18 +908,13 @@ tr:focus-visible .line-hint {
 }
 
 .code-dark {
-  // Invert highlighted lines' text when dark theme
-  // to avoid color clashes
-  .commented-line td,
-  .highlighted-region-line td {
-    filter: invert(1);
-  }
-
-  // The line hint carries its own theme-independent colors, so undo the
-  // parent td's invert to keep it looking the same on highlighted lines.
-  .commented-line .line-hint,
-  .highlighted-region-line .line-hint {
-    filter: invert(1);
+  // Invert highlighted lines' text in dark theme to avoid color clashes.
+  .commented-line,
+  .highlighted-region-line {
+    .line-number,
+    .line-content-text {
+      filter: invert(1);
+    }
   }
 }
 
