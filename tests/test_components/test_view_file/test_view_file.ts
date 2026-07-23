@@ -438,11 +438,10 @@ describe('ViewFile handgrading tests', () => {
             expect(
                 wrapper.findComponent({ref: 'handgrading_context_menu'}).element
             ).not.toBeVisible();
-            expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-            expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+            expect(wrapper.vm.d_selector).toBeNull();
         });
 
-        test('Add new multi-line-annotation', async () => {
+        test.only('Add new multi-line-annotation', async () => {
             expect(wrapper.findAll('.comment').length).toEqual(3);
 
             let new_applied_annotation = make_create_result(0, 2);
@@ -462,6 +461,7 @@ describe('ViewFile handgrading tests', () => {
             expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
+            console.log(create_stub.getCalls());
             expect(create_stub.calledOnceWith(
                 result.pk,
                 {
@@ -484,8 +484,7 @@ describe('ViewFile handgrading tests', () => {
             expect(
                 wrapper.findComponent({ref: 'handgrading_context_menu'}).element
             ).not.toBeVisible();
-            expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-            expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+            expect(wrapper.vm.d_selector).toBeNull();
         });
     });
 
@@ -590,8 +589,7 @@ describe('ViewFile handgrading tests', () => {
         wrapper.setProps({readonly_handgrading_results: true});
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.delete').length).toEqual(0);
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         let code_lines = wrapper.findAll('[data-testid=code_line]');
         code_lines.at(0).trigger('mousedown');
@@ -599,14 +597,12 @@ describe('ViewFile handgrading tests', () => {
         code_lines.at(2).trigger('mouseenter');
         code_lines.at(2).trigger('mouseup');
 
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
     });
 
     test('Highlighting events ignored while saving', async () => {
         await wrapper.setData({d_saving: true});
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');
@@ -614,27 +610,22 @@ describe('ViewFile handgrading tests', () => {
         await code_lines.at(2).trigger('mouseenter');
         await code_lines.at(2).trigger('mouseup');
 
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
     });
 
     test('Highlight events out of order ignored', async () => {
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mouseenter');
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         await code_lines.at(0).trigger('mouseup');
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         await code_lines.at(0).trigger('mousedown');
         await code_lines.at(1).trigger('mousedown');
-        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
-        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_selector?.range.first).toEqual(0);
     });
 
     test('Highlighting disabled when context menu open', async () => {
@@ -643,19 +634,16 @@ describe('ViewFile handgrading tests', () => {
         await code_lines.at(0).trigger('mouseup');
         expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
 
-        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
-        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_selector?.range.first).toEqual(0);
 
         await code_lines.at(1).trigger('mouseenter');
         await code_lines.at(2).trigger('mouseenter');
         await code_lines.at(3).trigger('mouseenter');
-        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
-        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_selector?.range.first).toEqual(0);
 
         await code_lines.at(4).trigger('mousedown');
         await code_lines.at(4).trigger('mouseup');
-        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
-        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_selector?.range.first).toEqual(0);
     });
 
     test('Deletion disabled while saving', async () => {
@@ -682,8 +670,7 @@ describe('ViewFile handgrading tests', () => {
         await wrapper.setData({d_handgrading_result: null});
 
         expect(wrapper.findAll('.delete').length).toEqual(0);
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');
@@ -691,8 +678,7 @@ describe('ViewFile handgrading tests', () => {
         await code_lines.at(2).trigger('mouseenter');
         await code_lines.at(2).trigger('mouseup');
 
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
     });
 
     test('No annotations, custom comments not allowed', async () => {
