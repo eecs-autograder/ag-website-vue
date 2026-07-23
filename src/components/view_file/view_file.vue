@@ -654,11 +654,10 @@ export default class ViewFile extends Vue implements Created {
     this.d_selection_announcement = '';
 
     assert_not_null(this.d_selector);
-    assert_not_null(this.d_selector.anchor_index);
-    const anchor_index = this.d_selector.anchor_index;
+    const last_index = this.d_selector.range.last;
 
     nextTick(() => {
-      this.focus_line(anchor_index);
+      this.focus_line(last_index);
       this.d_selector = null;
     });
   }
@@ -689,7 +688,7 @@ export default class ViewFile extends Vue implements Created {
   }
 
   focus_line(line_index: number) {
-    this.get_line_element_at(line_index).focus();
+    this.get_line_element_at(line_index)?.focus();
   }
 
   get_line_element_at(line_index: number) {
