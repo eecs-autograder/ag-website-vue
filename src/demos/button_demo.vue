@@ -26,7 +26,7 @@
 
     <div class="button-box">
       <button class="red-button" :disabled="buttons_disabled"> Delete
-        <span class="trash-can fas fa-trash"></span>
+        <span class="trash-can fas fa-trash" aria-hidden="true"></span>
       </button>
     </div>
 

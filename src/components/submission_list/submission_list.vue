@@ -30,7 +30,7 @@
           @keydown.space.prevent="d_collapsed = !d_collapsed"
           @keydown.enter="d_collapsed = !d_collapsed"
         >
-          <i class="fas fa-bars"></i>
+          <i class="fas fa-bars" aria-hidden="true"></i>
         </span>
         <span class="header-text" v-if="!d_collapsed">
           All Submissions

@@ -25,7 +25,7 @@
             :aria-expanded="!d_collapsed"
             tabindex=0
           >
-            <i class="fas fa-bars"></i>
+            <i class="fas fa-bars" aria-hidden="true"></i>
           </span>
           <span class="sidebar-header-text"
                 v-if="!d_collapsed || current_filename === null">Uploaded Files</span>

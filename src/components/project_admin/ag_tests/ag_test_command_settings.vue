@@ -12,6 +12,7 @@
           <i
             ref="toggle_name_edit"
             class="fas fa-pencil-alt"
+            aria-hidden="true"
           ></i>
         </button>
       </template>
@@ -778,8 +779,8 @@
                 class="sticky-save-button"
                 aria-label="Save"
                 :disabled="!d_settings_form_is_valid || d_saving">
-          <i v-if="d_num_api_errors === 0" class="far fa-save"></i>
-          <i v-else class="fas fa-exclamation-triangle"></i>
+          <i v-if="d_num_api_errors === 0" class="far fa-save" aria-hidden="true"></i>
+          <i v-else class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         </button>
 
         <div v-if="!d_saving" class="last-saved-timestamp">

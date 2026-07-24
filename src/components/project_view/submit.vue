@@ -107,9 +107,9 @@
 
       <template v-if="missing_files.length !== 0 || patterns_with_too_few_matches.length !== 0">
         <div class="file-list-header">
-          <i class="fas fa-exclamation-triangle"></i>
+          <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
           Missing files detected
-          <i class="fas fa-exclamation-triangle"></i>
+          <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         </div>
         <ul class="file-list">
           <li v-for="filename of missing_files" class="list-item">
@@ -128,9 +128,9 @@
       <template v-if="unexpected_files.length !== 0
                       || patterns_with_too_many_matches.length !== 0">
         <div class="file-list-header">
-          <i class="fas fa-exclamation-triangle"></i>
+          <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
           Extra files detected (these will be discarded arbitrarily)
-          <i class="fas fa-exclamation-triangle"></i>
+          <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         </div>
         <ul class="file-list">
           <li v-for="filename of unexpected_files"

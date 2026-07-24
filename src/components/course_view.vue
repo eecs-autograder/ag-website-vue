@@ -30,7 +30,7 @@
                         class="edit-project tool-icon"
                         :title="'Edit ' + project.name"
                         v-if="d_globals.user_roles.is_admin">
-            <i class="fas fa-cog cog"></i>
+            <i class="fas fa-cog cog" aria-hidden="true"></i>
           </router-link>
         </div>
       </div>

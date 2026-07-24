@@ -15,7 +15,7 @@
                   :aria-expanded="!d_collapsed"
                   aria-controls="mutation-suite-sidebar-content"
                   @click="d_collapsed = !d_collapsed">
-            <i class="fas fa-bars"></i>
+            <i class="fas fa-bars" aria-hidden="true"></i>
           </button>
           <template v-if="!d_collapsed">
             <div class="sidebar-header-text"> Suites </div>
@@ -23,7 +23,7 @@
                     id="add-mutation-test-suite-button"
                     class="sidebar-new-button"
                     @click="open_new_mutation_test_suite_modal">
-              <i class="fas fa-plus sidebar-plus"></i> Add Suite
+              <i class="fas fa-plus sidebar-plus" aria-hidden="true"></i> Add Suite
             </button>
           </template>
         </div>
@@ -184,8 +184,8 @@
                         class="sticky-save-button"
                         aria-label="Save"
                         :disabled="!d_settings_form_is_valid || d_saving">
-                  <i v-if="d_num_save_api_errors === 0" class="far fa-save"></i>
-                  <i v-else class="fas fa-exclamation-triangle"></i>
+                  <i v-if="d_num_save_api_errors === 0" class="far fa-save" aria-hidden="true"></i>
+                  <i v-else class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 </button>
 
                 <last-saved

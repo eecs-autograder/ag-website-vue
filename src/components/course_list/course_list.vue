@@ -10,7 +10,7 @@
               class="flat-white-button"
               @click="d_show_create_course_modal = true"
               data-testid="show_create_course_modal_button">
-        <i class="fas fa-plus plus"></i> New Course
+        <i class="fas fa-plus plus" aria-hidden="true"></i> New Course
       </button>
 
       <modal v-if="d_show_create_course_modal"

@@ -12,14 +12,14 @@
           <button class="delete-file"
                   :title="'Delete ' + expected_student_file.pattern"
                   @click="show_delete_modal">
-            <i class="fas fa-trash delete-file-icon"></i>
+            <i class="fas fa-trash delete-file-icon" aria-hidden="true"></i>
           </button>
           <button class="edit-file"
                   :title="'Edit ' + expected_student_file.pattern"
                   @click="edit_expected_student_file"
                   :aria-controls="`edit-single-file-form-${component_uuid}`"
                   :aria-expanded="editing">
-            <i class="fas fa-edit edit-file-icon"></i>
+            <i class="fas fa-edit edit-file-icon" aria-hidden="true"></i>
           </button>
         </div>
       </div>

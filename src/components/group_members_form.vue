@@ -29,7 +29,7 @@
               $emit('input', state.usernames);
             "
           >
-            <i class="fas fa-times"></i>
+            <i class="fas fa-times" aria-hidden="true"></i>
           </button>
         </validated-text-input>
       </div>
@@ -42,7 +42,7 @@
           "
           @click="add_member"
         >
-          <i class="fas fa-plus"></i>
+          <i class="fas fa-plus" aria-hidden="true"></i>
           Add Member
         </button>
       </div>

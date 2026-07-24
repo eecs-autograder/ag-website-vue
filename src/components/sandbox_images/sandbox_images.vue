@@ -16,7 +16,7 @@
               @keydown.enter="d_sidebar_collapsed = !d_sidebar_collapsed"
               @keydown.space="d_sidebar_collapsed = !d_sidebar_collapsed"
               tabindex="0">
-          <i class="fas fa-bars"></i>
+          <i class="fas fa-bars" aria-hidden="true"></i>
         </span>
         <template v-if="!d_sidebar_collapsed">
           <span class="sidebar-header-text">Sandbox Images</span>
@@ -24,7 +24,7 @@
                   data-testid="new_image_button"
                   @click="show_new_image_build"
                   :disabled="selected_image === null && selected_build_task === null">
-            <i class="fas fa-plus sidebar-plus"></i> New Image
+            <i class="fas fa-plus sidebar-plus" aria-hidden="true"></i> New Image
           </button>
 
         </template>

@@ -55,15 +55,15 @@
                 v-if="ag_test_command_result.timed_out !== null
                       && this.ag_test_command_result.timed_out"
               >
-                <i class="far fa-clock timed-out-icon"></i>
+                <i class="far fa-clock timed-out-icon" aria-hidden="true"></i>
                 <span class="timed-out-msg"> (Timed out) </span>
               </span>
               <span
                 v-else-if="ag_test_command_result.return_code_correct !== null"
               >
                 <i v-if="ag_test_command_result.return_code_correct"
-                    class="fas fa-check correct-icon"></i>
-                <i v-else class="fas fa-times incorrect-icon"></i>
+                    class="fas fa-check correct-icon" role="img" aria-label="Correct"></i>
+                <i v-else class="fas fa-times incorrect-icon" role="img" aria-label="Incorrect"></i>
               </span>
             </div>
           </div>
@@ -113,10 +113,10 @@
           <div class="feedback">
             <div class="short-output">
               <span v-if="ag_test_command_result.stdout_correct">
-                <i class="fas fa-check correct-icon"></i>
+                <i class="fas fa-check correct-icon" role="img" aria-label="Correct"></i>
               </span>
               <span v-else>
-                <i class="fas fa-times incorrect-icon"></i>
+                <i class="fas fa-times incorrect-icon" role="img" aria-label="Incorrect"></i>
               </span>
             </div>
           </div>
@@ -148,10 +148,10 @@
           <div class="feedback">
             <div class="short-output">
               <span v-if="ag_test_command_result.stderr_correct">
-                <i class="fas fa-check correct-icon"></i>
+                <i class="fas fa-check correct-icon" role="img" aria-label="Correct"></i>
               </span>
               <span v-else>
-                <i class="fas fa-times incorrect-icon"></i>
+                <i class="fas fa-times incorrect-icon" role="img" aria-label="Incorrect"></i>
               </span>
             </div>
           </div>

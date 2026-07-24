@@ -15,12 +15,12 @@
              @keydown.space.prevent="show_clone_course_modal"
              :title="'Clone ' + course.name"
              tabindex="0">
-          <i class="fas fa-copy" role="presentation"> </i>
+          <i class="fas fa-copy" aria-hidden="true"> </i>
         </div>
         <router-link :to="`/web/course_admin/${course.pk}`"
                      :title="'Edit ' + course.name">
           <div class="edit-course-settings tool-icon">
-            <i class="fas fa-cog"></i>
+            <i class="fas fa-cog" aria-hidden="true"></i>
           </div>
         </router-link>
       </div>

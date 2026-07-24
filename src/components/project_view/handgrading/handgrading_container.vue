@@ -10,7 +10,7 @@
             aria-controls="handgrading-sidebar-content"
             @click="d_group_sidebar_collapsed = !d_group_sidebar_collapsed"
           >
-            <i class="fas fa-bars"></i>
+            <i class="fas fa-bars" aria-hidden="true"></i>
           </button>
           <template v-if="!d_group_sidebar_collapsed">
             <div class="sidebar-header-text">
@@ -20,7 +20,7 @@
               <div ref="progress_text" tabindex="0">
                 {{num_finished}}/{{total_num_to_grade}}
                 ({{staff_filtered_groups.length}} total)
-                <i class="fas fa-caret-down"></i>
+                <i class="fas fa-caret-down" aria-hidden="true"></i>
               </div>
 
               <div id="filter-menu" class="menu">

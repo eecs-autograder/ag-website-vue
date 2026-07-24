@@ -13,6 +13,7 @@
     >
       <i
         :class="{ 'far fa-copy': !is_copying, 'fas fa-check': is_copying }"
+        aria-hidden="true"
       ></i>
     </button>
   </span>

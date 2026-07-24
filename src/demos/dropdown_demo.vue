@@ -17,7 +17,7 @@
           </p>
         </template>
         <template slot-scope="{item}">
-           <div class="airplane"><i class="fas fa-plane"></i></div>
+           <div class="airplane"><i class="fas fa-plane" aria-hidden="true"></i></div>
            <span> {{item.option}} </span>
         </template>
       </dropdown>

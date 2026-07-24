@@ -45,17 +45,17 @@
           type="button"
           aria-label="Edit file name"
           @click.stop="begin_renaming_file"
-        ><i class="fas fa-pencil-alt"></i></button>
+        ><i class="fas fa-pencil-alt" aria-hidden="true"></i></button>
         <button class="download-file"
           type="button"
           aria-label="Download file"
           @click.stop="download_file"
-        ><i class="fas fa-file-download"></i></button>
+        ><i class="fas fa-file-download" aria-hidden="true"></i></button>
         <button class="delete-file"
           type="button"
           aria-label="Delete file"
           @click.stop="$emit('delete_requested')"
-        ><i class="far fa-trash-alt"></i></button>
+        ><i class="far fa-trash-alt" aria-hidden="true"></i></button>
       </div>
     </div>
     <div class="display-timestamp">

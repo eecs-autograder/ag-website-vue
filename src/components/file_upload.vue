@@ -71,7 +71,7 @@
         </div>
         <ul class="list-of-empty-file-names">
           <li class="list-item" v-for="empty_file of d_empty_filenames.data">
-            <i class="fas fa-exclamation-triangle empty-warning-symbol"></i>
+            <i class="fas fa-exclamation-triangle empty-warning-symbol" aria-hidden="true"></i>
             {{empty_file}}
           </li>
         </ul>

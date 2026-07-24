@@ -26,7 +26,8 @@
       <div id="resolve-invitation-message"
            v-if="invitations_received.length > 0 || invitation_sent !== null">
         <i class="fas fa-info-circle"
-           id="resolve-invitation-square">
+           id="resolve-invitation-square"
+           aria-hidden="true">
         </i>
         You must resolve pending invitations before sending a new one.
       </div>

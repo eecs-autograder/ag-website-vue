@@ -34,7 +34,7 @@
               @click.stop="state.group.extended_due_date = null"
               :disabled="state.group.extended_due_date === null"
             >
-              <i class="fas fa-times"></i>
+              <i class="fas fa-times" aria-hidden="true"></i>
               <span class="clear-text">Revoke</span>
             </button>
           </div>

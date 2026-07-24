@@ -27,7 +27,7 @@
             <div class="correctness-output">
               <span v-if="mutation_test_suite_result.setup_timed_out !== null
                                && mutation_test_suite_result.setup_timed_out">
-                <i class="far fa-clock timed-out-icon setup-timed-out-icon"></i>
+                <i class="far fa-clock timed-out-icon setup-timed-out-icon" aria-hidden="true"></i>
                 <span> (Timed Out) </span>
               </span>
               <span v-else>
@@ -37,9 +37,9 @@
                   <i class="fas fa-check correct-icon"
                      role="img" aria-label="Correct"></i>
                 </span>
-                <span v-else-if="mutation_test_suite_result.setup_return_code !== 0"
-                      role="img" aria-label="Incorrect">
-                  <i class="fas fa-times incorrect-icon"></i>
+                <span v-else-if="mutation_test_suite_result.setup_return_code !== 0">
+                  <i class="fas fa-times incorrect-icon"
+                     role="img" aria-label="Incorrect"></i>
                 </span>
               </span>
             </div>
@@ -124,7 +124,7 @@
             <div class="list" data-testid="discarded_tests" role="list">
               <div v-for="discarded_test_name of mutation_test_suite_result.discarded_tests"
                    class="list-item" role="listitem">
-                <span class="list-icon"><i class="far fa-trash-alt discarded-test-icon"></i></span>
+                <span class="list-icon"><i class="far fa-trash-alt discarded-test-icon" aria-hidden="true"></i></span>
                 <span class="test-name">{{discarded_test_name}}</span>
               </div>
             </div>
@@ -148,11 +148,11 @@
                    class="list-item" role="listitem">
                 <span v-if="test_timed_out(false_positive_test)"
                       class="list-icon">
-                  <i class="far fa-clock timed-out-icon"></i>
+                  <i class="far fa-clock timed-out-icon" aria-hidden="true"></i>
                 </span>
                 <span v-else
                      class="list-icon">
-                  <i class="fas fa-exclamation-triangle false-positive-test-icon"></i>
+                  <i class="fas fa-exclamation-triangle false-positive-test-icon" aria-hidden="true"></i>
                 </span>
                 <span class="test-name">{{false_positive_test}}
                   <span v-if="test_timed_out(false_positive_test)"
@@ -172,7 +172,7 @@
           <div class="feedback test-names-feedback">
             <div class="list" data-testid="valid_tests" role="list">
               <div v-for="valid_test of valid_tests" class="list-item" role="listitem">
-                <span class="list-icon"><i class="far fa-check-circle valid-test-icon"></i></span>
+                <span class="list-icon"><i class="far fa-check-circle valid-test-icon" aria-hidden="true"></i></span>
                 <span class="test-name">{{valid_test}}</span>
               </div>
             </div>
@@ -341,7 +341,7 @@
                    class="list-item"
                    :class="{'unexposed-bug': !exposed_bug_set.has(bug_name)}"
                    role="listitem">
-                <span class="list-icon"><i class="fas fa-bug bug-icon"></i></span>
+                <span class="list-icon"><i class="fas fa-bug bug-icon" aria-hidden="true"></i></span>
                 <span class="bug-name">{{bug_name}}</span>
               </div>
             </div>

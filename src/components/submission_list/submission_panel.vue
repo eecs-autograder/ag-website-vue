@@ -8,7 +8,7 @@
         <div class="queued-symbol" aria-label="Queued">Q</div>
       </template>
       <template v-else-if="submission.status === GradingStatus.being_graded">
-        <i class="fas fa-list" aria-label="Being graded"></i>
+        <i class="fas fa-list" role="img" aria-label="Being graded"></i>
       </template>
 
       <template v-else-if="submission.status === GradingStatus.waiting_for_deferred">
@@ -16,24 +16,24 @@
              aria-label="Score">
           {{submission.results.total_points}}/{{submission.results.total_points_possible}}
         </div>
-        <i v-else class="far fa-check-circle" aria-label="Core tests finished"></i>
+        <i v-else class="far fa-check-circle" role="img" aria-label="Core tests finished"></i>
       </template>
       <template v-else-if="submission.status === GradingStatus.finished_grading">
         <div v-if="Number(submission.results.total_points_possible) !== 0" class="score"
              aria-label="Score">
           {{submission.results.total_points}}/{{submission.results.total_points_possible}}
         </div>
-        <i v-else class="far fa-check-circle" aria-label="Finished grading"></i>
+        <i v-else class="far fa-check-circle" role="img" aria-label="Finished grading"></i>
       </template>
 
       <template v-else-if="submission.status === GradingStatus.removed_from_queue">
-        <i class="fas fa-eject" aria-label="Removed from queue"></i>
+        <i class="fas fa-eject" role="img" aria-label="Removed from queue"></i>
       </template>
       <template v-else-if="submission.status === GradingStatus.rejected">
-        <i class="fas fa-ban" aria-label="Rejected"></i>
+        <i class="fas fa-ban" role="img" aria-label="Rejected"></i>
       </template>
       <template v-else-if="submission.status === GradingStatus.error">
-        <i class="fas fa-skull" aria-label="Internal error"></i>
+        <i class="fas fa-skull" role="img" aria-label="Internal error"></i>
       </template>
     </div>
   </div>

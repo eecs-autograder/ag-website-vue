@@ -11,10 +11,14 @@
       <div class="header">{{left_header}}</div>
       <div class="header right-header">
         {{right_header}}
-        <div class="fullscreen-icon" @click="state.fullscreen = !state.fullscreen">
-          <i v-if="!state.fullscreen" class="fas fa-expand"></i>
-          <i v-else class="fas fa-compress"></i>
-        </div>
+        <button
+          class="unsyled-button fullscreen-icon"
+          @click="state.fullscreen = !state.fullscreen"
+          :title="!state.fullscreen ? 'Fullscreen' : 'Exit fullscreen'"
+        >
+          <i v-if="!state.fullscreen" class="fas fa-expand" aria-hidden="true"></i>
+          <i v-else class="fas fa-compress" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
 

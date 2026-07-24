@@ -8,7 +8,7 @@
       :disabled="index === 0"
       @click.stop="on_move_up"
     >
-      <i class="fas fa-arrow-up"></i>
+      <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
     <button
       ref="move_down_btn"
@@ -18,7 +18,7 @@
       :disabled="index === count - 1"
       @click.stop="on_move_down"
     >
-      <i class="fas fa-arrow-down"></i>
+      <i class="fas fa-arrow-down" aria-hidden="true"></i>
     </button>
   </span>
 </template>
