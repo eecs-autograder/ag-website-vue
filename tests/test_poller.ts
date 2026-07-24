@@ -1,5 +1,10 @@
 import { Poller } from "@/poller";
 import { sleep } from '@/utils';
+import { vi } from "vitest";
+
+beforeEach(() => {
+    vi.useRealTimers();
+});
 
 test('Start and stop poller', async () => {
     let count = 0;
