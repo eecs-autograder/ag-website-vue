@@ -31,8 +31,8 @@ import { ref } from "vue";
 import { generate_uid } from "@/utils";
 
 interface PropTypes {
-  section_id: string,
-  open_initially?: boolean,
+  section_id: string;
+  open_initially?: boolean;
 }
 
 const props = withDefaults(defineProps<PropTypes>(), {
