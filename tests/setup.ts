@@ -11,6 +11,7 @@ import {
     reset_provided_global_data,
     set_global_current_user
 } from '@/tests/data_utils';
+import { vi } from 'vitest';
 
 beforeAll(() => {
     // IMPORTANT: The port in this url must be the same as the port being listened to
@@ -37,6 +38,7 @@ export function managed_shallow_mount<V extends Vue, U>(component: VueClass<V>, 
 
 beforeEach(() => {
     set_global_current_user(make_user());
+    vi.useFakeTimers();
 });
 
 afterEach(() => {
@@ -47,6 +49,7 @@ afterEach(() => {
     }
     wrappers = [];
     sinon.restore();
+    vi.useRealTimers();
 
     reset_provided_global_data();
 });

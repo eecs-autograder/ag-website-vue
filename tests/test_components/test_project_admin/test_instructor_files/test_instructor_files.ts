@@ -122,17 +122,14 @@ describe('InstructorFiles.vue', () => {
     test('Re-upload file being viewed, contents updated', async () => {
         sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Old Content"]));
 
-        await wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
-        expect(
-            await wait_until(wrapper, w => w.vm.current_filename === instructor_file_1.name)
-        ).toBe(true);
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         let view_file = wrapper.findComponent(ViewFile);
-        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
         expect(view_file.vm.state.d_file_contents).toEqual('Old Content');
 
         InstructorFile.notify_instructor_file_content_changed(
             instructor_file_1, new Blob(["New Content"]));
-        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
         expect(view_file.vm.state.d_file_contents).toEqual('New Content');
     });
 
@@ -179,80 +176,30 @@ describe('InstructorFiles.vue', () => {
         expect(api_errors.state.api_errors.length).toBe(1);
     });
 
-    test.only('Viewing a file', async () => {
+    test('Viewing a file', async () => {
         let get_content_stub_1 = sinon.stub(instructor_file_1, 'get_content').callsFake(
             (on_upload_progress) => {
-                console.log('this thing')
                 // tslint:disable-next-line: no-object-literal-type-assertion
                 on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
                 return Promise.resolve(new Blob(['Monday']));
             }
         );
-        wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-
-        console.log('waited after the clicky')
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
+        await vi.runAllTimersAsync();
 
         let view_file = wrapper.findComponent(ViewFile);
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        await view_file.vm.$nextTick();
-        console.log(view_file.html());
-        console.log(JSON.stringify(view_file.vm.state));
         expect(view_file.vm.state.d_file_contents).toEqual('Monday');
 
         sinon.stub(instructor_file_2, 'get_content').resolves(new Blob(["Tuesday"]));
-        wrapper.findAllComponents(SingleInstructorFile).at(1).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.findAllComponents(SingleInstructorFile).at(1).trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(view_file.vm.state.d_file_contents).toEqual('Tuesday');
 
         // Check that contents are cached locally
 
-        wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(view_file.vm.state.d_file_contents).toEqual('Monday');
 
@@ -261,29 +208,18 @@ describe('InstructorFiles.vue', () => {
 
     test('Rename opened file', async () => {
         let expected_content = 'I am contenttt';
-        vi.spyOn(instructor_file_1, 'get_content').mockResolvedValue(new Blob([expected_content]));
-        // sinon.stub(instructor_file_1, 'get_content').resolves(new Blob([expected_content]));
+        sinon.stub(instructor_file_1, 'get_content').resolves(new Blob([expected_content]));
         let renamed = new InstructorFile(instructor_file_1);
         renamed.name = 'Renamed';
 
         await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
 
         let view_file = wrapper.findComponent(ViewFile);
-        await wait_until(view_file, (w) => w.vm.state.d_file_contents === expected_content);
-        // expect(
-        // ).toBe(true);
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        await wrapper.vm.$nextTick();
-        // console.log(view_file.vm)
-        console.log(JSON.stringify(view_file.vm.state), JSON.stringify(view_file.vm.$props))
+        await vi.runAllTimersAsync();
         expect(view_file.vm.state.d_file_contents).toEqual(expected_content);
 
         InstructorFile.notify_instructor_file_renamed(renamed, instructor_file_1.name);
-        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
 
         expect(view_file.vm.state.d_file_contents).toEqual(expected_content);
     });

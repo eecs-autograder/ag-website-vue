@@ -356,10 +356,8 @@ watch(
   () => props.file_contents,
   new_handle_global_errors_async((new_content: Promise<string>) => {
     return toggle(state, "d_loading", async () => {
-      console.log('loading', new_content)
       state.d_show_anyway = false;
       state.d_file_contents = await new_content;
-      console.log('loaded', state.d_file_contents)
     });
   }),
   { immediate: true },
