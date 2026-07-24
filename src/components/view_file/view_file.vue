@@ -267,16 +267,14 @@ onMounted(new_handle_global_errors_async(async () => {
     d_handgrading_result.value = props.handgrading_result;
   }
   await set_new_file_contents(props.file_contents);
-  console.log(state.d_file_contents);
 
   state.d_loading = false;
 }));
 
 watch(
   () => props.file_contents,
-  async (new_content: Promise<string>, old_content: string) => {
-    console.log('watcher');
-    return await set_new_file_contents(new_content);
+  (new_content: Promise<string>, _: Promise<string>) => {
+    return set_new_file_contents(new_content);
   }
 );
 
@@ -299,7 +297,6 @@ const file_is_large = computed(() => {
 // a large reactive array in the template will significantly increase
 // render times.
 const split_content = computed(() => {
-  console.log('split_content')
   return state.d_file_contents.split('\n');
 });
 
@@ -330,10 +327,8 @@ function separate_span_tags_with_newlines(code_html_str: string): string {
 
 // Returns HTML for highlighted contents of code file, split by newlines.
 const split_code_content = computed(() => {
-  console.log('split code content');
   const highlighted_code = hljs.highlightAuto(state.d_file_contents).value;
   const padded_highlighted_code = separate_span_tags_with_newlines(highlighted_code);
-  console.log('huzzah', padded_highlighted_code);
   return padded_highlighted_code.split('\n');
 });
 
@@ -351,7 +346,6 @@ const copy_file_to_clipboard = new_handle_global_errors_async(async () => {
 });
 
 const num_lines_to_show = computed(() => {
-  console.log('num lines to show', Math.min(state.d_num_lines_rendered, split_content.value.length))
   return Math.min(state.d_num_lines_rendered, split_content.value.length);
 });
 
@@ -439,7 +433,6 @@ function start_mouse_selection(clicked_line_index: number) {
   ) {
     return;
   }
-  console.log('start_mouse_selection')
 
   selector.value = useLineSelector(clicked_line_index, 'mouse');
 }
@@ -457,7 +450,6 @@ function update_mouse_selection(hovered_line_index: number) {
   ) {
     return;
   }
-  console.log('update_mouse_selection')
 
   selector.value?.update_selection(hovered_line_index);
 }
@@ -479,7 +471,6 @@ function commit_mouse_selection(mouseup_event: MouseEvent) {
   ) {
     return;
   }
-  console.log('commit_mouse_selection')
 
   open_annotation_context_menu({x: mouseup_event.clientX, y: mouseup_event.clientY});
 }
@@ -488,7 +479,6 @@ function commit_mouse_selection(mouseup_event: MouseEvent) {
 // See cancel_commenting for a method that handles all possibilities.
 
 function start_or_expand_keyboard_selection(direction: 'up' | 'down', from_line_index: number) {
-  console.log('start_or_expand_keyboard_selection')
   if (
     // IMPORTANT: CHANGE THESE CHECKS TOGETHER
     // Note: Don't refactor this and similar checks unless
@@ -502,7 +492,6 @@ function start_or_expand_keyboard_selection(direction: 'up' | 'down', from_line_
     return;
   }
 
-  console.log('expandy!');
   if (selector.value === null) {
     selector.value = useLineSelector(from_line_index, 'keyboard');
   }
@@ -528,7 +517,6 @@ function start_or_expand_keyboard_selection(direction: 'up' | 'down', from_line_
   }
 
   if (new_line < 0 || new_line >= num_lines_to_show.value) {
-    console.log('out of range');
     return;
   }
   selector.value.update_selection(new_line);
@@ -543,7 +531,6 @@ function start_or_expand_keyboard_selection(direction: 'up' | 'down', from_line_
 }
 
 function commit_keyboard_selection(line_index: number) {
-  console.log('commit_keyboard_selection')
   if (
     // IMPORTANT: CHANGE THESE CHECKS TOGETHER
     // Note: Don't refactor this and similar checks unless
@@ -556,7 +543,6 @@ function commit_keyboard_selection(line_index: number) {
   ) {
     return;
   }
-  console.log('committy!');
 
   // If there isn't a current selection, start one on the current line,
   // then immediately commit it.
@@ -589,7 +575,7 @@ const apply_annotation = new_handle_global_errors_async(
   async (annotation: Annotation) => {
     assert_not_null(props.filename);
     return toggle(state, 'd_saving', async () => {
-      assert_not_null(selector);
+      assert_not_null(selector.value);
       await AppliedAnnotation.create(d_handgrading_result.value!.pk, {
         annotation: annotation.pk,
         location: {
@@ -614,7 +600,7 @@ function open_comment_modal() {
 const create_comment = new_handle_global_errors_async(
   () => {
     return toggle(state, 'd_saving', async () => {
-      assert_not_null(selector);
+      assert_not_null(selector.value);
       assert_not_null(props.filename);
       await Comment.create(d_handgrading_result.value!.pk, {
         text: state.d_comment_text,
@@ -632,14 +618,13 @@ const create_comment = new_handle_global_errors_async(
 );
 
 function finish_commenting() {
-  console.log('finish_commenting')
   // IMPORTANT: If you change anything about this method,
   // double check whether cancel_commenting needs the same changes.
   // cancel_commenting is currently an alias for this method.
   state.d_context_menu_is_open = false;
   state.d_selection_announcement = '';
 
-  assert_not_null(selector);
+  assert_not_null(selector.value);
   const last_index = selector.value.range.last;
 
   nextTick(() => {
@@ -649,7 +634,6 @@ function finish_commenting() {
 }
 
 function cancel_commenting() {
-  console.log('cancel_commenting')
   if (selector.value === null) {
     return;
   }
