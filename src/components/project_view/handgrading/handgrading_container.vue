@@ -106,7 +106,13 @@
             </group-summary-panel>
           </template>
 
-          <i v-if="d_loading_result_summaries" class="loading fa fa-spinner fa-pulse"></i>
+          <span role="status">
+            <i
+              v-if="d_loading_result_summaries"
+              class="loading fa fa-spinner fa-pulse"
+              role="img" aria-label="Loading"
+            ></i>
+          </span>
         </div>
         <div class="sidebar-footer" v-if="!d_group_sidebar_collapsed">
           <input type="text"
@@ -125,7 +131,7 @@
                      @prev_group="select_for_grading(previous)"
                      @next_group="select_for_grading(next)"></handgrading>
         <div v-else-if="d_loading_result" class="loading-large loading-horiz-centered">
-          <i class="fa fa-spinner fa-pulse"></i>
+          <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
         </div>
       </div>
     </div>

@@ -18,7 +18,7 @@
           <template v-if="!d_saving">
             Last saved: {{format_datetime_short(course.last_modified)}}
           </template>
-          <i v-else class="loading fa fa-spinner fa-pulse"></i>
+          <i v-else class="loading fa fa-spinner fa-pulse" role="img" aria-label="Saving"></i>
         </div>
       </div>
     </course-form>

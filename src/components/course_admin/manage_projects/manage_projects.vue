@@ -33,7 +33,7 @@
     </div>
 
     <div v-if="d_loading" class="loading-centered loading-medium">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
     </div>
     <div v-else-if="!d_loading && projects.length === 0"
           class="no-projects-message">

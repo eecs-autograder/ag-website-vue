@@ -785,8 +785,8 @@
         <div v-if="!d_saving" class="last-saved-timestamp">
           Last Saved: {{format_datetime(d_ag_test_command.last_modified)}}
         </div>
-        <div v-else class="last-saved-spinner">
-          <i class="fa fa-spinner fa-pulse"></i>
+        <div v-else class="last-saved-spinner" role="status">
+          <i class="fa fa-spinner fa-pulse" role="img" aria-label="Saving"></i>
         </div>
       </div>
 

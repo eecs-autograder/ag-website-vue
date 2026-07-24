@@ -36,7 +36,7 @@
     </validated-form>
 
     <div v-if="d_roster === null" class="loading loading-medium">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
     </div>
     <div v-else-if="d_roster.length !== 0" class="user-table-wrapper">
       <table class="user-table">

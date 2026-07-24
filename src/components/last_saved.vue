@@ -1,6 +1,11 @@
 <template>
-  <div class="last-saved-timestamp">
-    <i v-if="saving" class="loading fa fa-spinner fa-pulse"></i>
+  <div class="last-saved-timestamp" role="status">
+    <i
+      v-if="saving"
+      class="loading fa fa-spinner fa-pulse"
+      role="img"
+      aria-label="Saving"
+    ></i>
     <template v-else>
       Last saved:
       {{
