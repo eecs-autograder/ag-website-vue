@@ -11,6 +11,7 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { compress_whitespace, new_wait_for_load, wait_until } from '@/tests/utils';
 import ProgressBar from '@/components/progress_bar.vue';
+import { vi } from 'vitest';
 
 
 describe('ViewFile.vue', () => {
@@ -113,8 +114,6 @@ describe('ViewFile.vue', () => {
             },
         });
 
-        const clock = sinon.useFakeTimers();
-
         // Init
         const file_text = 'Just keep <span class="dori">swimming,\nswimming,\nswimming!</span>';
         await wrapper.setProps({file_contents: Promise.resolve(file_text)});
@@ -129,7 +128,7 @@ describe('ViewFile.vue', () => {
         expect(write_text_mock.getCall(0).args[0]).toBe(file_text);
 
         expect(wrapper.vm.state.d_is_file_copying).toBe(true);
-        clock.tick(3000);
+        await vi.runAllTimersAsync();
         expect(wrapper.vm.state.d_is_file_copying).toBe(false);
     });
 
@@ -141,8 +140,6 @@ describe('ViewFile.vue', () => {
                 writeText: write_text_mock,
             },
         });
-
-        const clock = sinon.useFakeTimers();
 
         // Init
         const file_text = 'Just keep <span class="dori">swimming,\nswimming,\nswimming!</span>';
@@ -161,7 +158,7 @@ describe('ViewFile.vue', () => {
         expect(write_text_mock.getCall(0).args[0]).toBe(file_text);
 
         expect(wrapper.vm.state.d_is_file_copying).toBe(true);
-        clock.tick(3000);
+        await vi.runAllTimersAsync();
         expect(wrapper.vm.state.d_is_file_copying).toBe(false);
     });
 

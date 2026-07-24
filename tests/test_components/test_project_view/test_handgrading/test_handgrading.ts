@@ -19,6 +19,7 @@ import {
     set_validated_input_text,
     wait_until,
 } from '@/tests/utils';
+import { vi } from 'vitest';
 
 let project: ag_cli.Project;
 let rubric: ag_cli.HandgradingRubric;
@@ -443,6 +444,8 @@ describe('Comment tests', () => {
     let applied_long_description_annotation_1: ag_cli.AppliedAnnotation;
 
     beforeEach(() => {
+        vi.useRealTimers();
+
         annotation_with_long_description = data_ut.make_annotation(
             result.handgrading_rubric.pk,
             {

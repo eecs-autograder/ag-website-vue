@@ -6,11 +6,13 @@ import * as sinon from 'sinon';
 import APIErrors from "@/components/api_errors.vue";
 
 import { emitted } from '@/tests/utils';
+import { vi } from "vitest";
 
 describe('APIErrors component tests', () => {
     let wrapper: Wrapper<APIErrors>;
 
     beforeEach(() => {
+        vi.useRealTimers();
         wrapper = mount(APIErrors);
     });
 

@@ -39,6 +39,7 @@ import {
     validated_input_is_valid,
     wait_until,
 } from '@/tests/utils';
+import { vi } from 'vitest';
 
 
 let ag_test_suite: AGTestSuite;
@@ -60,6 +61,8 @@ function make_wrapper() {
 }
 
 beforeEach(() => {
+    vi.useRealTimers();
+
     let course = data_ut.make_course();
     project = data_ut.make_project(course.pk);
 

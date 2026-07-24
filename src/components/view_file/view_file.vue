@@ -285,7 +285,7 @@ import {
 import { CODE_THEME_STORE } from "./code_theme_store";
 import { nextTick } from "process";
 import { LineSelector, useLineSelector } from "./line_selector";
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, onMounted, reactive, readonly, ref, watch } from "vue";
 import hljs from "highlight.js";
 
 type PropTypes = {
@@ -766,6 +766,7 @@ defineExpose({
   d_handgrading_result,
   d_selector: selector.value,
   is_loading: () => state.d_loading,
+  get_props: () => props,
 });
 </script>
 

@@ -3,6 +3,11 @@ import { mount } from '@vue/test-utils';
 import Modal from '@/components/modal.vue';
 
 import { emitted } from '@/tests/utils';
+import { vi } from 'vitest';
+
+beforeEach(() => {
+    vi.useRealTimers();
+});
 
 describe('Modal.vue', () => {
     test('Open and close modal using external boolean', async () => {

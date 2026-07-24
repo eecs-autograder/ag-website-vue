@@ -50,12 +50,10 @@ export async function toggle<T, Key extends keyof T, ReturnType>(
     }
     let original = <boolean> <unknown> obj[key];
     try {
-        console.log('toggle', original);
         (<boolean> <unknown> obj[key]) = !original;
         return await body();
     }
     finally {
-        console.log('toggle back', original);
         (<boolean> <unknown> obj[key]) = original;
     }
 }

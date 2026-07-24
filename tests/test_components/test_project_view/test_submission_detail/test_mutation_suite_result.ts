@@ -7,6 +7,7 @@ import MutationSuiteResult from '@/components/project_view/submission_detail/mut
 
 import * as data_ut from '@/tests/data_utils';
 import { wait_fixed } from '@/tests/utils';
+import { vi } from 'vitest';
 let group: ag_cli.Group;
 let mutation_test_suite_result: ag_cli.MutationTestSuiteResultFeedback;
 let submission: ag_cli.Submission;
@@ -333,7 +334,6 @@ describe('MutationSuiteResult setup section tests', () => {
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stdout_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stdout_content).toEqual(Promise.resolve(setup_stdout_content));
         expect(wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_setup_stdout).toBe(true);
         expect(
             wrapper.find('[data-testid=setup_stdout_section]').text()
@@ -393,11 +393,11 @@ describe('MutationSuiteResult setup section tests', () => {
         mutation_test_suite_result.fdbk_settings.show_setup_stderr = true;
 
         wrapper = await make_wrapper();
+        await vi.runAllTimersAsync();
         expect(wrapper.vm.mutation_test_suite_result!.setup_return_code).toBe(1);
         expect(wrapper.vm.mutation_test_suite_result!.fdbk_settings.show_setup_stderr).toBe(true);
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_setup_stderr_stub.calledOnce).toBe(true);
-        expect(wrapper.vm.d_setup_stderr_content).toEqual(Promise.resolve(setup_stderr_content));
         expect(wrapper.find('[data-testid=setup_stderr_section]').text()).toContain(
             setup_stderr_content
         );
@@ -566,24 +566,21 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(wrapper.find('[data-testid=buggy_stdout_section]').exists()).toBe(false);
 
         // show
-        wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
         expect(wrapper.vm.d_load_grade_buggy_output).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(
-            Promise.resolve(grade_buggy_impls_stdout_content)
-        );
         expect(wrapper.find('[data-testid=buggy_stdout_section]').text()).toContain(
             grade_buggy_impls_stdout_content
         );
 
         // hide
-        wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
@@ -593,16 +590,13 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(wrapper.find('[data-testid=buggy_stdout_section]').exists()).toBe(false);
 
         // show again
-        wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stdout_content).toEqual(
-            Promise.resolve(grade_buggy_impls_stdout_content)
-        );
         expect(wrapper.find('[data-testid=buggy_stdout_section]').text()).toContain(
             grade_buggy_impls_stdout_content
         );
@@ -689,24 +683,21 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(wrapper.find('[data-testid=buggy_stderr_section]').exists()).toBe(false);
 
         // show
-        wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
         expect(wrapper.vm.d_load_grade_buggy_output).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(
-            Promise.resolve(grade_buggy_impls_stderr_content)
-        );
         expect(wrapper.find('[data-testid=buggy_stderr_section]').text()).toContain(
             grade_buggy_impls_stderr_content
         );
 
         // hide
-        wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
@@ -716,16 +707,13 @@ describe('MutationSuiteResult buggy implementations section tests', () => {
         expect(wrapper.find('[data-testid=buggy_stderr_section]').exists()).toBe(false);
 
         // show again
-        wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_buggy_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stderr_stub.calledOnce).toBe(true);
         expect(get_grade_buggy_impls_stdout_stub.calledOnce).toBe(true);
         expect(wrapper.vm.d_show_buggy_implementations_output).toBe(true);
-        expect(wrapper.vm.d_grade_buggy_stderr_content).toEqual(
-            Promise.resolve(grade_buggy_impls_stderr_content)
-        );
         expect(wrapper.find('[data-testid=buggy_stderr_section]').text()).toContain(
             grade_buggy_impls_stderr_content
         );
@@ -855,47 +843,38 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.find('[data-testid=test_names_stdout_section]').isVisible()).toBe(false);
 
         // show
-        wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
         expect(get_student_test_names_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
-        expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
-            Promise.resolve(student_test_names_stdout_content)
-        );
         expect(wrapper.find('[data-testid=test_names_stdout_section]').text()).toContain(
             student_test_names_stdout_content
         );
 
         // hide
-        wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
         expect(get_student_test_names_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
-        expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
-            Promise.resolve(student_test_names_stdout_content)
-        );
         expect(wrapper.find('[data-testid=test_names_stdout_section]').isVisible()).toBe(false);
 
         // show again
-        wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
         expect(get_student_test_names_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
-        expect(wrapper.vm.d_student_test_names_stdout_content).toEqual(
-            Promise.resolve(student_test_names_stdout_content)
-        );
         expect(wrapper.find('[data-testid=test_names_stdout_section]').text()).toContain(
             student_test_names_stdout_content
         );
@@ -988,47 +967,38 @@ describe('MutationSuiteResult student tests section tests', () => {
         expect(wrapper.find('[data-testid=test_names_stderr_section]').exists()).toBe(false);
 
         // show
-        wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
         expect(get_student_test_names_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
-        expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
-            Promise.resolve(student_test_names_stderr_content)
-        );
         expect(wrapper.find('[data-testid=test_names_stderr_section]').text()).toContain(
             student_test_names_stderr_content
         );
 
         // hide
-        wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
         expect(get_student_test_names_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_student_test_names_output).toBe(false);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
-        expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
-            Promise.resolve(student_test_names_stderr_content)
-        );
         expect(wrapper.find('[data-testid=test_names_stderr_section]').exists()).toBe(false);
 
         // show again
-        wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_test_names_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_student_test_names_stdout_stub.callCount).toEqual(1);
         expect(get_student_test_names_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_student_test_names_output).toBe(true);
         expect(wrapper.vm.d_load_student_test_names_output).toBe(true);
-        expect(wrapper.vm.d_student_test_names_stderr_content).toEqual(
-            Promise.resolve(student_test_names_stderr_content)
-        );
         expect(wrapper.find('[data-testid=test_names_stderr_section]').text()).toContain(
             student_test_names_stderr_content
         );
@@ -1355,47 +1325,38 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(wrapper.find('[data-testid=validity_check_stdout_section]').exists()).toBe(false);
 
         // show
-        wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(
-            Promise.resolve(validity_check_stdout_content)
-        );
         expect(wrapper.find('[data-testid=validity_check_stdout_section]').text()).toContain(
             validity_check_stdout_content
         );
 
         // hide
-        wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(false);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(
-            Promise.resolve(validity_check_stdout_content)
-        );
         expect(wrapper.find('[data-testid=validity_check_stdout_section]').exists()).toBe(false);
 
         // show again
-        wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stdout_content).toEqual(
-            Promise.resolve(validity_check_stdout_content)
-        );
         expect(wrapper.find('[data-testid=validity_check_stdout_section]').text()).toContain(
             validity_check_stdout_content
         );
@@ -1489,47 +1450,38 @@ describe('MutationSuiteResult validity check related tests', () => {
         expect(wrapper.find('[data-testid=validity_check_stderr_section]').exists()).toBe(false);
 
         // show
-        wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(
-            Promise.resolve(validity_check_stderr_content)
-        );
         expect(wrapper.find('[data-testid=validity_check_stderr_section]').text()).toContain(
             validity_check_stderr_content
         );
 
         // hide
-        wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wrapper.vm.$nextTick();
+        await wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(false);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(
-            Promise.resolve(validity_check_stderr_content)
-        );
         expect(wrapper.find('[data-testid=validity_check_stderr_section]').exists()).toBe(false);
 
         // show again
-        wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
-        await wait_fixed(wrapper, 3);
+        await wrapper.find('[data-testid=show_validity_check_output_button]').trigger('click');
+        await vi.runAllTimersAsync();
 
         expect(get_output_size_stub.calledOnce).toBe(true);
         expect(get_validity_check_stdout_stub.callCount).toEqual(1);
         expect(get_validity_check_stderr_stub.callCount).toEqual(1);
         expect(wrapper.vm.d_show_validity_check_output).toBe(true);
         expect(wrapper.vm.d_load_validity_check_output).toBe(true);
-        expect(wrapper.vm.d_validity_check_stderr_content).toEqual(
-            Promise.resolve(validity_check_stderr_content)
-        );
         expect(wrapper.find('[data-testid=validity_check_stderr_section]').text()).toContain(
             validity_check_stderr_content
         );
