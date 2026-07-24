@@ -19,7 +19,7 @@
               aria-label="Refresh queue count"
               @click="load_num_queued_submissions"
       >
-        <i class="fas fa-sync-alt"></i>
+        <i class="fas fa-sync-alt" aria-hidden="true"></i>
       </button>
     </div>
 

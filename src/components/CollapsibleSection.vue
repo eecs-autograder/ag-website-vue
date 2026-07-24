@@ -8,8 +8,8 @@
       :aria-expanded="is_open"
       @click="toggle_is_open"
     >
-      <i v-if="is_open" class="fas fa-caret-down caret-down"></i>
-      <i v-else class="fas fa-caret-right caret-right"></i>
+      <i v-if="is_open" class="fas fa-caret-down caret-down" aria-hidden="true"></i>
+      <i v-else class="fas fa-caret-right caret-right" aria-hidden="true"></i>
 
       <div class="collapsible-section-header-slot">
         <slot name="header"></slot>

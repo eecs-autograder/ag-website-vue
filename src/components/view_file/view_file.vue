@@ -165,7 +165,7 @@
                       @click="delete_handgrading_comment(comment)"
                       aria-label="Delete comment/annotation"
                     >
-                      <i class="fas fa-times"></i>
+                      <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                   </div>
                   <div class="comment-message">

@@ -3,7 +3,7 @@
     <div class="files" role="region" aria-label="Files to handgrade">
       <div class="has-wrong-submission"
            v-if="d_has_correct_submission !== null && !d_has_correct_submission">
-        <i class="fas fa-exclamation-triangle"></i> The submission being handgraded
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i> The submission being handgraded
         is not the {{
           d_globals.current_project.ultimate_submission_policy
             === UltimateSubmissionPolicy.most_recent ? 'most recent' : 'best'
@@ -269,7 +269,7 @@
                 @click="$emit('prev_group')"
                 class="footer-button footer-item"
                 :disabled="saving || is_first">
-          <i class="fas fa-chevron-left"></i>
+          <i class="fas fa-chevron-left" aria-hidden="true"></i>
           Prev
         </button>
         <div id="finished-grading-container" class="checkbox-input-container footer-item">
@@ -290,7 +290,7 @@
                 :class="{'green': d_handgrading_result.finished_grading}"
                 :disabled="saving || is_last">
           {{d_handgrading_result.finished_grading ? 'Next' : 'Skip'}}
-          <i class="fas fa-chevron-right"></i>
+          <i class="fas fa-chevron-right" aria-hidden="true"></i>
         </button>
       </div>
     </div>

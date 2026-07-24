@@ -37,9 +37,9 @@
                   <i class="fas fa-check correct-icon"
                      role="img" aria-label="Correct"></i>
                 </span>
-                <span v-else-if="mutation_test_suite_result.setup_return_code !== 0"
-                      role="img" aria-label="Incorrect">
-                  <i class="fas fa-times incorrect-icon" aria-hidden="true"></i>
+                <span v-else-if="mutation_test_suite_result.setup_return_code !== 0">
+                  <i class="fas fa-times incorrect-icon"
+                     role="img" aria-label="Incorrect"></i>
                 </span>
               </span>
             </div>

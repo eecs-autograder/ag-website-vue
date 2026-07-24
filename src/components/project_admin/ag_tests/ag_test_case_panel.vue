@@ -9,7 +9,8 @@
               @click="update_ag_test_case_panel_when_clicked">
         <div class="text">
           <i v-if="ag_test_case.ag_test_commands.length > 1"
-            class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"></i>
+            class="fas caret" :class="is_open ? 'fa-caret-down' : 'fa-caret-right'"
+            aria-hidden="true"></i>
           <span>{{ag_test_case.name}}</span>
         </div>
       </button>

@@ -67,7 +67,7 @@
               aria-label="User Documentation"
               target="_blank"
               href="https://eecs-autograder.github.io/autograder.io/">
-            <i class="fas fa-book"></i>
+            <i class="fas fa-book" aria-hidden="true"></i>
           </a>
 
           <a id="github-icon" class="icon"
