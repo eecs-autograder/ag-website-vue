@@ -272,10 +272,7 @@ import ContextMenu from "@/components/context_menu/context_menu.vue";
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from "@/components/modal.vue";
 import ProgressBar from "@/components/progress_bar.vue";
-import {
-  handle_global_errors_async,
-  new_handle_global_errors_async,
-} from "@/error_handling";
+import { new_handle_global_errors_async } from "@/error_handling";
 import { SafeMap } from "@/safe_map";
 import { assert_not_null, chain, toggle } from "@/utils";
 
@@ -344,32 +341,21 @@ const state = reactive({
   d_selection_announcement: "",
 });
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-onMounted(
-  new_handle_global_errors_async(async () => {
-    if (props.handgrading_result !== undefined) {
-      d_handgrading_result.value = props.handgrading_result;
-    }
-    await set_new_file_contents(props.file_contents);
-
-    state.d_loading = false;
-  }),
-);
+onMounted(() => {
+  if (props.handgrading_result !== undefined) {
+    d_handgrading_result.value = props.handgrading_result;
+  }
+});
 
 watch(
   () => props.file_contents,
-  (new_content: Promise<string>, _: Promise<string>) => {
-    return set_new_file_contents(new_content);
-  },
-);
-
-const set_new_file_contents = new_handle_global_errors_async(
-  (new_content: Promise<string>) => {
+  new_handle_global_errors_async((new_content: Promise<string>) => {
     return toggle(state, "d_loading", async () => {
       state.d_show_anyway = false;
       state.d_file_contents = await new_content;
     });
-  },
+  }),
+  { immediate: true },
 );
 
 const is_code_theme_dark = computed(() => {
