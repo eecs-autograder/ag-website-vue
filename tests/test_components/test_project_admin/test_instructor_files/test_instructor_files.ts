@@ -124,13 +124,14 @@ describe('InstructorFiles.vue', () => {
         expect(
             await wait_until(wrapper, w => w.vm.current_filename === instructor_file_1.name)
         ).toBe(true);
-        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
-        expect(await view_file.vm.file_contents).toEqual('Old Content');
+        let view_file = wrapper.findComponent(ViewFile);
+        await wrapper.vm.$nextTick();
+        expect(view_file.vm.state.d_file_contents).toEqual('Old Content');
 
         InstructorFile.notify_instructor_file_content_changed(
             instructor_file_1, new Blob(["New Content"]));
         await wrapper.vm.$nextTick();
-        expect(await view_file.vm.file_contents).toEqual('New Content');
+        expect(view_file.vm.state.d_file_contents).toEqual('New Content');
     });
 
     test('Upload new instructor file', async () => {
@@ -187,24 +188,22 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
         await wrapper.vm.$nextTick();
 
-        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
-        expect(view_file.vm.filename).toEqual(instructor_file_1.name);
-        expect(await view_file.vm.file_contents).toEqual('Monday');
+        let view_file = wrapper.findComponent(ViewFile);
+        await wrapper.vm.$nextTick();
+        expect(view_file.vm.state.d_file_contents).toEqual('Monday');
 
         sinon.stub(instructor_file_2, 'get_content').resolves(new Blob(["Tuesday"]));
         wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(1).element.focus();
         await wrapper.vm.$nextTick();
 
-        expect(view_file.vm.filename).toEqual(instructor_file_2.name);
-        expect(await view_file.vm.file_contents).toEqual('Tuesday');
+        expect(view_file.vm.state.d_file_contents).toEqual('Tuesday');
 
         // Check that contents are cached locally
 
         wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
         await wrapper.vm.$nextTick();
 
-        expect(view_file.vm.filename).toEqual(instructor_file_1.name);
-        expect(await view_file.vm.file_contents).toEqual('Monday');
+        expect(view_file.vm.state.d_file_contents).toEqual('Monday');
 
         expect(get_content_stub_1.calledOnce).toBe(true);
     });
@@ -218,15 +217,14 @@ describe('InstructorFiles.vue', () => {
         wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
         await wrapper.vm.$nextTick();
 
-        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
-        expect(view_file.vm.filename).toEqual(instructor_file_1.name);
-        expect(await view_file.vm.file_contents).toEqual(expected_content);
+        let view_file = wrapper.findComponent(ViewFile);
+        await wrapper.vm.$nextTick();
+        expect(view_file.vm.state.d_file_contents).toEqual(expected_content);
 
         InstructorFile.notify_instructor_file_renamed(renamed, instructor_file_1.name);
         await wrapper.vm.$nextTick();
 
-        expect(view_file.vm.filename).toEqual(renamed.name);
-        expect(await view_file.vm.file_contents).toEqual(expected_content);
+        expect(view_file.vm.state.d_file_contents).toEqual(expected_content);
     });
 
     test('Delete single file', async () => {

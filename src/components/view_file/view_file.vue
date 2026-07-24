@@ -208,7 +208,8 @@
       @close="cancel_commenting()"
     >
       <context-menu-item
-        v-for="annotation of d_handgrading_result.handgrading_rubric.annotations"
+        v-for="annotation of d_handgrading_result.handgrading_rubric
+          .annotations"
         :key="annotation.pk"
         @click="apply_annotation(annotation)"
       >
@@ -348,8 +349,8 @@ watch(
       d_handgrading_result.value = handgrading_result;
     }
   },
-  {deep: true, immediate: true},
-)
+  { deep: true, immediate: true },
+);
 
 watch(
   () => props.file_contents,
