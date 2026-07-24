@@ -1,17 +1,17 @@
 <template>
   <table class="group-members-container" cellpadding="0">
     <tr>
-      <td class="header-cell">
+      <th scope="col" class="header-cell">
         <template v-if="group.member_names.length > 1">
           Group members
         </template>
         <template v-else>
           Student
         </template>
-      </td>
-      <td v-if="show_late_days" class="header-cell">
+      </th>
+      <th scope="col" v-if="show_late_days" class="header-cell">
         Late Day Tokens
-      </td>
+      </th>
     </tr>
     <tr v-for="(member, index) of group.member_names"
         :key="member"
@@ -97,6 +97,7 @@ export default class GroupMembers extends Vue {
   .header-cell {
     padding: .625rem;
     font-weight: bold;
+    text-align: left;
     background-color: $white-gray;
   }
 
