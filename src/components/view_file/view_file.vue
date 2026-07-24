@@ -1,7 +1,7 @@
 <template>
   <div class="view-file-component"
-       :style="{height: view_file_height, max_height: view_file_max_height}">
-    <div v-if="d_loading" class="loading-container">
+       :style="{height: view_file_height, maxHeight: view_file_max_height}">
+    <div v-if="state.d_loading" class="loading-container">
       <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
       <i
         v-else
@@ -10,9 +10,9 @@
         role="img"
       />
     </div>
-    <div v-else-if="file_is_large && !d_show_anyway" class="large-file-message">
-      <div class="text">This file is very large ({{d_file_contents.length}} bytes)</div>
-      <button type="button" class="orange-button" @click="d_show_anyway = true">
+    <div v-else-if="file_is_large && !state.d_show_anyway" class="large-file-message">
+      <div class="text">This file is very large ({{state.d_file_contents.length}} bytes)</div>
+      <button type="button" class="orange-button" @click="state.d_show_anyway = true">
         Click here to display its contents
       </button>
     </div>
@@ -20,38 +20,43 @@
       <div class="viewing-container"
             :class="{'hljs': is_code_file,
                       'code-dark': is_code_file && is_code_theme_dark}"
-            @mouseenter="d_is_file_hovered = true"
-            @mouseleave="d_is_file_hovered = false"
+            @mouseenter="state.d_is_file_hovered = true"
+            @mouseleave="state.d_is_file_hovered = false"
       >
-        <div class="copy-file-button" :class="{'opacity-1': d_is_file_hovered}">
+        <div class="copy-file-button" :class="{'opacity-1': state.d_is_file_hovered}">
           <button type="button"
                   class="copy-button-clickable"
                   :class="{'code-copy-button': is_code_file}"
                   @click="copy_file_to_clipboard"
                   aria-label="Copy file contents"
           >
-            <i :class="{'far fa-copy': !d_is_file_copying,
-                        'fas fa-check': d_is_file_copying}"
+            <i :class="{'far fa-copy': !state.d_is_file_copying,
+                        'fas fa-check': state.d_is_file_copying}"
             ></i>
           </button>
         </div>
-        <table :class="{'saving': d_saving}">
+        <table :class="{'saving': state.d_saving}">
+          <!-- For some reason, adding a key to this loop makes the loop
+               not render any children. Since we don't have anything
+               to gain from Vue's re-rendering optimization, we
+               won't set a key here. -->
+          <!-- eslint-disable vue/require-v-for-key -->
           <template v-for="(line_num, index) of num_lines_to_show">
-            <tr :key="`line-${line_num}`"
-                :class="{'commented-line': line_in_comment(index),
-                          'hovered-comment-line': d_hovered_comment !== null
-                                                  && index >= d_hovered_comment.location.first_line
-                                                  && index <= d_hovered_comment.location.last_line,
-                          'highlighted-region-line': d_selector !== null
-                                                    && index >= d_selector.range.first
-                                                    && index <= d_selector.range.last}"
+            <!-- eslint-enable -->
+            <tr :class="{'commented-line': line_in_comment(index),
+                          'hovered-comment-line': state.d_hovered_comment !== null
+                                                  && index >= state.d_hovered_comment.location.first_line
+                                                  && index <= state.d_hovered_comment.location.last_line,
+                          'highlighted-region-line': selector !== null
+                                                    && index >= selector.range.first
+                                                    && index <= selector.range.last}"
                 @mousedown="start_mouse_selection(index)"
                 @mouseenter="update_mouse_selection(index)"
                 @mouseup="commit_mouse_selection($event)"
                 tabindex="0"
                 @keydown.shift.down.prevent="start_or_expand_keyboard_selection('down', index)"
                 @keydown.shift.up.prevent="start_or_expand_keyboard_selection('up', index)"
-                @keydown.enter.prevent="commit_keyboard_selection($event, index)"
+                @keydown.enter.prevent="commit_keyboard_selection(index)"
                 @keydown.esc.prevent="cancel_commenting()"
                 @keydown.tab.exact="cancel_commenting()"
                 @keydown.shift.tab="cancel_commenting()"
@@ -73,7 +78,7 @@
                 <span v-if="can_edit_handgrading"
                       class="line-hint"
                       aria-hidden="true">
-                  <template v-if="d_selector !== null">
+                  <template v-if="selector !== null">
                     <kbd>Esc</kbd> cancel
                     <span class="line-hint-sep">·</span>
                   </template>
@@ -89,10 +94,10 @@
               <td>
                 <div class="comment"
                       :tabindex="comment_is_deletable(comment) ? undefined : 0"
-                      @mouseenter="d_hovered_comment = comment"
-                      @mouseleave="d_hovered_comment = null"
-                      @focusin="d_hovered_comment = comment"
-                      @focusout="d_hovered_comment = null">
+                      @mouseenter="state.d_hovered_comment = comment"
+                      @mouseleave="state.d_hovered_comment = null"
+                      @focusin="state.d_hovered_comment = comment"
+                      @focusout="state.d_hovered_comment = null">
                   <div class="comment-header">
                     <div class="comment-line-range">
                       {{comment.location.first_line !== comment.location.last_line
@@ -123,11 +128,11 @@
           </template>
         </table>
         <div class="sr-only" role="status" aria-live="polite">
-          {{d_selection_announcement}}
+          {{state.d_selection_announcement}}
         </div>
       </div>
 
-      <div class="show-more-button-container" v-if="d_num_lines_rendered < split_content.length">
+      <div class="show-more-button-container" v-if="state.d_num_lines_rendered < split_content.length">
         <button type="button"
                 class="blue-button"
                 @click="render_more_lines"
@@ -139,8 +144,8 @@
 
     <context-menu ref="handgrading_context_menu"
                   v-if="handgrading_enabled"
-                  :is_open="d_context_menu_is_open"
-                  :coordinates="d_context_menu_coordinates"
+                  :is_open="state.d_context_menu_is_open"
+                  :coordinates="state.d_context_menu_coordinates"
                   @close="cancel_commenting()">
       <context-menu-item v-for="annotation of handgrading_result.handgrading_rubric.annotations"
                           :key="annotation.pk"
@@ -153,20 +158,20 @@
       </context-menu-item>
     </context-menu>
 
-    <modal v-if="d_show_comment_modal"
-           @close="d_show_comment_modal = false"
+    <modal v-if="state.d_show_comment_modal"
+           @close="state.d_show_comment_modal = false"
            ref="show_comment_modal"
            click_outside_to_close
            size="medium">
       <div class="modal">
         <div class="modal-header">Comment</div>
-        <textarea class="input" v-model="d_comment_text" rows="4" ref="comment_text"></textarea>
+        <textarea class="input" v-model="state.d_comment_text" rows="4" ref="comment_text"></textarea>
         <div class="modal-button-footer">
-          <button class="green-button" :disabled="d_saving" @click="create_comment">
+          <button class="green-button" :disabled="state.d_saving" @click="create_comment">
             Comment
           </button>
 
-          <button class="white-button" :disabled="d_saving" @click="d_show_comment_modal = false">
+          <button class="white-button" :disabled="state.d_saving" @click="state.d_show_comment_modal = false">
             Cancel
           </button>
         </div>
@@ -175,23 +180,19 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-
+<script setup lang="ts">
 import {
   Annotation,
   AppliedAnnotation,
   Comment,
   HandgradingResult,
 } from "ag-client-typescript";
-import hljs from 'highlight.js'; // "hljs" class in HTML element styles it with imported theme
 
 import ContextMenu from '@/components/context_menu/context_menu.vue';
 import ContextMenuItem from "@/components/context_menu/context_menu_item.vue";
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
-import { handle_global_errors_async } from '@/error_handling';
-import { Created } from '@/lifecycle';
+import { handle_global_errors_async, new_handle_global_errors_async } from '@/error_handling';
 import { SafeMap } from '@/safe_map';
 import { assert_not_null, chain, toggle } from '@/utils';
 
@@ -202,503 +203,492 @@ import {
 
 import { CODE_THEME_STORE } from './code_theme_store';
 import { nextTick } from 'process';
-import { useLineSelector } from './line_selector';
+import { LineSelector, useLineSelector } from './line_selector';
+import { computed, onMounted, reactive, ref, watch } from "vue";
+import hljs from "highlight.js";
 
-@Component({
-  components: {
-    ContextMenu,
-    ContextMenuItem,
-    Modal,
-    ProgressBar,
-  }
-})
-export default class ViewFile extends Vue implements Created {
+type PropTypes = {
+  file_contents: Promise<string>;
+  filename?: string;
+  progress?: number | null;
+  display_size_threshold?: number;
+  view_file_height?: string;
+  view_file_max_height?: string;
+  handgrading_result?: HandgradingResult;
+  enable_custom_comments?: boolean;
+  readonly_handgrading_results?: boolean;
+  is_code_file?: boolean;
+};
+const props = withDefaults(defineProps<PropTypes>(), {
+  filename: "",
+  progress: null,
+  display_size_threshold: Math.pow(10, 6),
+  view_file_height: "",
+  view_file_max_height: "",
+  enable_custom_comments: false,
+  readonly_handgrading_results: true,
+  is_code_file: false,
+});
 
-  @Prop({default: "", type: String})
-  filename!: string;
+const num_lines_per_page = 1000;
 
-  @Prop({required: true, type: Promise})
-  file_contents!: Promise<string>;
+let selector = ref<LineSelector | null>(null);
 
-  // A number from 0 to 100 that will be displayed as
-  // the progress in loading file_contents.
-  @Prop({default: null, type: Number})
-  progress!: number | null;
+// Apparently we need to alias props.handgrading_result for deep reactivity on
+// its members.
+// We can possibly simplify this once we're fully migrated to Vue 3.
+const d_handgrading_result = ref<HandgradingResult | null>(null);
 
-  // If the file is larger than this number, the user will be prompted before
-  // it's displayed.
-  @Prop({default: Math.pow(10, 6), type: Number})
-  display_size_threshold!: number;
+const state = reactive({
+  d_file_contents: "",
+  d_loading: false,
+  d_saving: false,
+  d_show_anyway: false,
 
-  @Prop({default: "", type: String})
-  view_file_height!: string;
-
-  @Prop({default: "", type: String})
-  view_file_max_height!: string;
-
-  d_filename: string = "";
-  d_file_contents: string = "";
-  d_loading = true;
-  d_saving = false;
-  d_show_anyway = false;
-
-  readonly num_lines_per_page = 1000;
-  d_num_lines_rendered = this.num_lines_per_page;
-
-  // If null, the component will behave normally (no handgrading).
-  // When this field is non-null, handgrading functionality will be made available.
-  @Prop({default: null, type: HandgradingResult})
-  handgrading_result!: HandgradingResult | null;
-  // Aliasing handgrading result for reactivity on members of handgrading_result
-  d_handgrading_result: HandgradingResult | null = null;
-
-  @Prop({default: false, type: Boolean})
-  enable_custom_comments!: boolean;
-
-  // When true, editing handgrading results will be disabled.
-  @Prop({default: true, type: Boolean})
-  readonly_handgrading_results!: boolean;
-
-  // When true, file contents have syntax-highlighting
-  @Prop({default: false, type: Boolean})
-  is_code_file!: boolean;
+  d_num_lines_rendered: num_lines_per_page,
 
   // Tracking file copying
-  d_is_file_hovered = false;
-  d_is_file_copying = false;
+  d_is_file_hovered: false,
+  d_is_file_copying: false,
 
-  d_hovered_comment: HandgradingComment | null = null;
+  d_hovered_comment: null as HandgradingComment | null,
 
-  d_context_menu_is_open = false;
-  d_context_menu_coordinates = {x: 0, y: 0};
-  d_show_comment_modal = false;
-  d_comment_text = '';
+  d_context_menu_is_open: false,
+  d_context_menu_coordinates: {x: 0, y: 0},
+  d_show_comment_modal: false,
+  d_comment_text: '',
 
-  d_selector: ReturnType<typeof useLineSelector> | null = null;
-  d_selection_announcement = '';
+  d_selection_announcement: '',
+});
 
-  @handle_global_errors_async
-  async created() {
-    this.d_handgrading_result = this.handgrading_result;
-    this.d_file_contents = await this.file_contents;
-    this.d_filename = this.filename;
-
-    this.d_loading = false;
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+onMounted(new_handle_global_errors_async(async () => {
+  if (props.handgrading_result !== undefined) {
+    d_handgrading_result.value = props.handgrading_result;
   }
+  await set_new_file_contents(props.file_contents);
+  console.log(state.d_file_contents);
 
-  @Watch('file_contents')
-  async on_file_contents_change(new_content: Promise<string>, old_content: string) {
-    return this.set_new_file_contents(new_content);
+  state.d_loading = false;
+}));
+
+watch(
+  () => props.file_contents,
+  async (new_content: Promise<string>, old_content: string) => {
+    console.log('watcher');
+    return await set_new_file_contents(new_content);
   }
+);
 
-  @handle_global_errors_async
-  private set_new_file_contents(new_content: Promise<string>) {
-    return toggle(this, 'd_loading', async () => {
-      this.d_show_anyway = false;
-      this.d_file_contents = await new_content;
-    });
-  }
+const set_new_file_contents = new_handle_global_errors_async((new_content: Promise<string>) => {
+  return toggle(state, 'd_loading', async () => {
+    state.d_show_anyway = false;
+    state.d_file_contents = await new_content;
+  });
+});
 
-  @Watch('filename')
-  on_filename_change(new_file_name: string, old_file_name: string) {
-    this.d_filename = new_file_name;
-  }
+const is_code_theme_dark = computed(() => {
+  return CODE_THEME_STORE.current_code_theme === 'dark';
+});
 
-  private get is_code_theme_dark() {
-    return CODE_THEME_STORE.current_code_theme === 'dark';
-  }
+const file_is_large = computed(() => {
+  return state.d_file_contents.length > props.display_size_threshold;
+});
 
-  get file_is_large() {
-    return this.d_file_contents.length > this.display_size_threshold;
-  }
+// IMPORTANT: We want this to be a computed property. Indexing into
+// a large reactive array in the template will significantly increase
+// render times.
+const split_content = computed(() => {
+  console.log('split_content')
+  return state.d_file_contents.split('\n');
+});
 
-  // IMPORTANT: We want this to be a computed property. Indexing into
-  // a large reactive array in the template will significantly increase
-  // render times.
-  private get split_content() {
-    return this.d_file_contents.split('\n');
-  }
+// Makes each line of code have independent styling by padding newlines in
+// the midle of spans.
+function separate_span_tags_with_newlines(code_html_str: string): string {
+  // Adapted from: https://stackoverflow.com/questions/64280814
+  //  /how-can-i-correctly-highlight-a-line-by-line-code-using-highlight-js-react
+  const open_spans: string[] = [];
 
-  // Makes each line of code have independent styling by padding newlines in
-  // the midle of spans.
-  private separate_span_tags_with_newlines(code_html_str: string): string {
-    // Adapted from: https://stackoverflow.com/questions/64280814
-    //  /how-can-i-correctly-highlight-a-line-by-line-code-using-highlight-js-react
-    const open_spans: string[] = [];
-
-    const padded_code = code_html_str.replace(/(<span [^>]+>)|(<\/span>)|(\n)/g, match => {
-      if (match === "\n") {
-        return "</span>".repeat(open_spans.length) + "\n" + open_spans.join("");
-      }
-
-      if (match === "</span>") {
-        open_spans.pop();
-      }
-      else {
-        open_spans.push(match);
-      }
-
-      return match;
-    });
-
-    return padded_code;
-  }
-
-  // Returns HTML for highlighted contents of code file, split by newlines.
-  private get split_code_content() {
-    const highlighted_code = hljs.highlightAuto(this.d_file_contents).value;
-    const padded_highlighted_code = this.separate_span_tags_with_newlines(highlighted_code);
-    return padded_highlighted_code.split('\n');
-  }
-
-  @handle_global_errors_async
-  private async copy_file_to_clipboard() {
-    await navigator.clipboard.writeText(this.d_file_contents);
-    this.d_is_file_copying = true;
-
-    // Wait to set icon back
-    setTimeout(
-      () => {
-        this.d_is_file_copying = false;
-      },
-      3000
-    );
-  }
-
-  private get num_lines_to_show() {
-    return Math.min(this.d_num_lines_rendered, this.split_content.length);
-  }
-
-  private render_more_lines() {
-    this.d_num_lines_rendered = Math.min(
-      this.split_content.length,
-      this.d_num_lines_rendered + this.num_lines_per_page
-    );
-  }
-
-  get handgrading_enabled() {
-    return this.handgrading_result !== null;
-  }
-
-  get can_edit_handgrading() {
-    return this.handgrading_enabled && !this.readonly_handgrading_results;
-  }
-
-  get handgrading_comments(): SafeMap<number, HandgradingComment[]> {
-    if (this.d_handgrading_result === null) {
-      return new SafeMap();
+  const padded_code = code_html_str.replace(/(<span [^>]+>)|(<\/span>)|(\n)/g, match => {
+    if (match === "\n") {
+      return "</span>".repeat(open_spans.length) + "\n" + open_spans.join("");
     }
 
-    let result =  new SafeMap<number, HandgradingComment[]>();
-
-    let annotations = this.d_handgrading_result.applied_annotations.filter(
-      (item) => item.location.filename === this.filename);
-
-    let comments = this.d_handgrading_result.comments.filter(
-      (item) => item.location !== null && item.location.filename === this.filename);
-
-    for (let item of chain<AppliedAnnotation | Comment>(annotations, comments)) {
-      let handgrading_comment = handgrading_comment_factory(item);
-      result.get(
-        handgrading_comment.location.last_line, [], true
-      ).push(handgrading_comment);
-    }
-
-    // Sort lists of comments ending on the same line by first line
-    for (let [last_line, comment_list] of result) {
-      comment_list.sort(
-        (first, second) => first.location.first_line - second.location.first_line);
-    }
-
-    return result;
-  }
-
-  comment_is_deletable(comment: HandgradingComment): boolean {
-    return !this.readonly_handgrading_results
-           && (this.enable_custom_comments || !comment.is_custom);
-  }
-
-  @handle_global_errors_async
-  async delete_handgrading_comment(handgrading_comment: HandgradingComment) {
-    if (!this.d_saving) {
-      await toggle(this, 'd_saving', async () => {
-        await handgrading_comment.delete();
-        this.d_hovered_comment = null;
-      });
-    }
-  }
-
-  // Returns true if line_num is contained in any provided handgrading comments.
-  line_in_comment(line_num: number) {
-    for (let [last_line, comment_list] of this.handgrading_comments) {
-      let first_line = comment_list[0].location.first_line;
-      if (line_num >= first_line && line_num <= last_line) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  start_mouse_selection(clicked_line_index: number) {
-    if (
-      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
-      // Note: Don't refactor this and similar checks unless
-      // you have a very good reason.
-      !this.can_edit_handgrading
-      // Don't interrupt existing mouse selection
-      || this.d_selector?.controls === 'mouse'
-      || this.d_context_menu_is_open
-      || this.d_saving
-    ) {
-      return;
-    }
-    console.log('start_mouse_selection')
-
-    this.d_selector = useLineSelector(clicked_line_index, 'mouse');
-  }
-
-  update_mouse_selection(hovered_line_index: number) {
-    if (
-      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
-      // Note: Don't refactor this and similar checks unless
-      // you have a very good reason.
-      !this.can_edit_handgrading
-      // Don't interrupt keyboard selection
-      || this.d_selector?.controls === 'keyboard'
-      || this.d_context_menu_is_open
-      || this.d_saving
-    ) {
-      return;
-    }
-    console.log('update_mouse_selection')
-
-    this.d_selector?.update_selection(hovered_line_index);
-  }
-
-  commit_mouse_selection(mouseup_event: MouseEvent) {
-    if (
-      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
-      // Note: Don't refactor this and similar checks unless
-      // you have a very good reason.
-      !this.can_edit_handgrading
-      // It's possible to cancel a mouse selection with esc before
-      // committing it.
-      // If that happens, this method should do nothing.
-      || this.d_selector === null
-      // Don't interrupt keyboard selection
-      || this.d_selector.controls === 'keyboard'
-      || this.d_context_menu_is_open
-      || this.d_saving
-    ) {
-      return;
-    }
-    console.log('commit_mouse_selection')
-
-    this.open_annotation_context_menu({x: mouseup_event.clientX, y: mouseup_event.clientY});
-  }
-
-  // There is overlap between how cancellation is triggered for keyboard and mouse.
-  // See cancel_commenting for a method that handles all possibilities.
-
-  start_or_expand_keyboard_selection(direction: 'up' | 'down', from_line_index: number) {
-    console.log('start_or_expand_keyboard_selection')
-    if (
-      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
-      // Note: Don't refactor this and similar checks unless
-      // you have a very good reason.
-      !this.can_edit_handgrading
-      // Don't interrupt mouse selection
-      || this.d_selector?.controls === 'mouse'
-      || this.d_context_menu_is_open
-      || this.d_saving
-    ) {
-      return;
-    }
-
-    console.log('expandy!');
-    if (this.d_selector === null) {
-      this.d_selector = useLineSelector(from_line_index, 'keyboard');
-    }
-
-    let new_line: number;
-    switch (direction) {
-      case 'down':
-        if (this.d_selector.range.first < this.d_selector.anchor_index) {
-          new_line = this.d_selector.range.first + 1;
-        }
-        else {
-          new_line = this.d_selector.range.last + 1;
-        }
-        break;
-      case 'up':
-        if (this.d_selector.range.last > this.d_selector.anchor_index) {
-          new_line = this.d_selector.range.last - 1;
-        }
-        else {
-          new_line = this.d_selector.range.first - 1;
-        }
-        break;
-    }
-
-    if (new_line < 0 || new_line >= this.num_lines_to_show) {
-      console.log('out of range');
-      return;
-    }
-    this.d_selector.update_selection(new_line);
-
-    this.d_selection_announcement =
-      `Selecting lines ${this.d_selector.range.first + 1} `
-      + `to ${this.d_selector.range.last + 1}`;
-
-    // Note: we can keep focus on the original anchor because that
-    // will make it visually apparent to the user what the anchor is
-    // and simplify the cancel and post-commit behaviors.
-  }
-
-  commit_keyboard_selection(enter_event: KeyboardEvent, line_index: number) {
-    console.log('commit_keyboard_selection')
-    if (
-      // IMPORTANT: CHANGE THESE CHECKS TOGETHER
-      // Note: Don't refactor this and similar checks unless
-      // you have a very good reason.
-      !this.can_edit_handgrading
-      // Don't interrupt mouse selection
-      || this.d_selector?.controls === 'mouse'
-      || this.d_context_menu_is_open
-      || this.d_saving
-    ) {
-      return;
-    }
-    console.log('committy!');
-
-    // If there isn't a current selection, start one on the current line,
-    // then immediately commit it.
-    if (this.d_selector === null) {
-      this.d_selector = useLineSelector(line_index, 'keyboard');
-    }
-
-    const last_line_elt = this.get_line_element_at(this.d_selector.range.last);
-    const bounding_rect = last_line_elt.getBoundingClientRect();
-
-    this.open_annotation_context_menu({
-      x: bounding_rect.x,
-      y: bounding_rect.y,
-    });
-  }
-
-  private open_annotation_context_menu(menu_coordinates: {x: number, y: number}) {
-    this.d_context_menu_coordinates = menu_coordinates;
-    this.d_context_menu_is_open = true;
-  }
-
-  get is_selecting() {
-    return this.d_selector !== null;
-  }
-
-  get line_shortcuts() {
-    if (!this.can_edit_handgrading) {
-      return undefined;
-    }
-    return 'Enter Shift+ArrowUp Shift+ArrowDown Escape';
-  }
-
-  @handle_global_errors_async
-  apply_annotation(annotation: Annotation) {
-    return toggle(this, 'd_saving', async () => {
-      assert_not_null(this.d_selector);
-      console.log(this.d_selector);
-      console.log('ee')
-      console.log(this.d_selector.range);
-      console.log(this.d_selector.range);
-      console.log(this.d_selector.range.first);
-      console.log('oo');
-      await AppliedAnnotation.create(this.d_handgrading_result!.pk, {
-        annotation: annotation.pk,
-        location: {
-          first_line: this.d_selector.range.first,
-          last_line: this.d_selector.range.last,
-          filename: this.filename,
-        }
-      });
-      this.finish_commenting();
-    });
-  }
-
-  open_comment_modal() {
-    this.d_context_menu_is_open = false;
-    this.d_show_comment_modal = true;
-    this.$nextTick(() => (<HTMLElement> this.$refs.comment_text).focus());
-  }
-
-  @handle_global_errors_async
-  create_comment() {
-    return toggle(this, 'd_saving', async () => {
-      assert_not_null(this.d_selector);
-      await Comment.create(this.d_handgrading_result!.pk, {
-        text: this.d_comment_text,
-        location: {
-          first_line: this.d_selector.range.first,
-          last_line: this.d_selector.range.last,
-          filename: this.filename,
-        }
-      });
-      this.finish_commenting();
-      this.d_show_comment_modal = false;
-      this.d_comment_text = '';
-    });
-  }
-
-  finish_commenting() {
-    console.log('finish_commenting')
-    // IMPORTANT: If you change anything about this method,
-    // double check whether cancel_commenting needs the same changes.
-    // cancel_commenting is currently an alias for this method.
-    this.d_context_menu_is_open = false;
-    this.d_selection_announcement = '';
-
-    assert_not_null(this.d_selector);
-    const last_index = this.d_selector.range.last;
-
-    nextTick(() => {
-      this.focus_line(last_index);
-      this.d_selector = null;
-    });
-  }
-
-  cancel_commenting() {
-    console.log('cancel_commenting')
-    if (this.d_selector === null) {
-      return;
-    }
-
-    const anchor_index = this.d_selector.anchor_index;
-
-    if (this.d_context_menu_is_open) {
-      this.d_context_menu_is_open = false;
-      nextTick(() => {
-        this.focus_line(anchor_index);
-      });
+    if (match === "</span>") {
+      open_spans.pop();
     }
     else {
-      this.focus_line(anchor_index);
+      open_spans.push(match);
     }
 
-    if (this.d_selector?.controls === 'keyboard') {
-      this.d_selection_announcement = 'Selection cancelled';
-    }
+    return match;
+  });
 
-    this.d_selector = null;
-  }
-
-  focus_line(line_index: number) {
-    this.get_line_element_at(line_index)?.focus();
-  }
-
-  get_line_element_at(line_index: number) {
-    const lines = <HTMLElement[]> this.$refs.code_lines;
-    return lines[line_index];
-  }
+  return padded_code;
 }
+
+// Returns HTML for highlighted contents of code file, split by newlines.
+const split_code_content = computed(() => {
+  console.log('split code content');
+  const highlighted_code = hljs.highlightAuto(state.d_file_contents).value;
+  const padded_highlighted_code = separate_span_tags_with_newlines(highlighted_code);
+  console.log('huzzah', padded_highlighted_code);
+  return padded_highlighted_code.split('\n');
+});
+
+const copy_file_to_clipboard = new_handle_global_errors_async(async () => {
+  await navigator.clipboard.writeText(state.d_file_contents);
+  state.d_is_file_copying = true;
+
+  // Wait to set icon back
+  setTimeout(
+    () => {
+      state.d_is_file_copying = false;
+    },
+    3000
+  );
+});
+
+const num_lines_to_show = computed(() => {
+  console.log('num lines to show', Math.min(state.d_num_lines_rendered, split_content.value.length))
+  return Math.min(state.d_num_lines_rendered, split_content.value.length);
+});
+
+function render_more_lines() {
+  state.d_num_lines_rendered = Math.min(
+    split_content.value.length,
+    state.d_num_lines_rendered + num_lines_per_page,
+  );
+}
+
+const handgrading_enabled = computed(() => {
+  return props.handgrading_result !== null;
+});
+
+const can_edit_handgrading = computed(() => {
+  return handgrading_enabled.value && !props.readonly_handgrading_results;
+});
+
+const handgrading_comments = computed<SafeMap<number, HandgradingComment[]>>(() => {
+  if (d_handgrading_result.value === null) {
+    return new SafeMap();
+  }
+
+  let result =  new SafeMap<number, HandgradingComment[]>();
+
+  let annotations = d_handgrading_result.value.applied_annotations.filter(
+    (item) => item.location.filename === props.filename);
+
+  let comments = d_handgrading_result.value.comments.filter(
+    (item) => item.location !== null && item.location.filename === props.filename);
+
+  for (let item of chain<AppliedAnnotation | Comment>(annotations, comments)) {
+    let handgrading_comment = handgrading_comment_factory(item);
+    result.get(
+      handgrading_comment.location.last_line, [], true
+    ).push(handgrading_comment);
+  }
+
+  // Sort lists of comments ending on the same line by first line
+  for (let [last_line, comment_list] of result) {
+    comment_list.sort(
+      (first, second) => first.location.first_line - second.location.first_line);
+  }
+
+  return result;
+});
+
+function comment_is_deletable(comment: HandgradingComment): boolean {
+  return !props.readonly_handgrading_results
+          && (props.enable_custom_comments || !comment.is_custom);
+}
+
+const delete_handgrading_comment = new_handle_global_errors_async(
+  async (handgrading_comment: HandgradingComment) => {
+    if (!state.d_saving) {
+      await toggle(state, 'd_saving', async () => {
+        await handgrading_comment.delete();
+        state.d_hovered_comment = null;
+      });
+    }
+  }
+);
+
+// Returns true if line_num is contained in any provided handgrading comments.
+function line_in_comment(line_num: number) {
+  for (let [last_line, comment_list] of handgrading_comments.value) {
+    let first_line = comment_list[0].location.first_line;
+    if (line_num >= first_line && line_num <= last_line) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function start_mouse_selection(clicked_line_index: number) {
+  if (
+    // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+    // Note: Don't refactor this and similar checks unless
+    // you have a very good reason.
+    !can_edit_handgrading.value
+    // Don't interrupt existing mouse selection
+    || selector.value?.controls === 'mouse'
+    || state.d_context_menu_is_open
+    || state.d_saving
+  ) {
+    return;
+  }
+  console.log('start_mouse_selection')
+
+  selector.value = useLineSelector(clicked_line_index, 'mouse');
+}
+
+function update_mouse_selection(hovered_line_index: number) {
+  if (
+    // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+    // Note: Don't refactor this and similar checks unless
+    // you have a very good reason.
+    !can_edit_handgrading.value
+    // Don't interrupt keyboard selection
+    || selector.value?.controls === 'keyboard'
+    || state.d_context_menu_is_open
+    || state.d_saving
+  ) {
+    return;
+  }
+  console.log('update_mouse_selection')
+
+  selector.value?.update_selection(hovered_line_index);
+}
+
+function commit_mouse_selection(mouseup_event: MouseEvent) {
+  if (
+    // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+    // Note: Don't refactor this and similar checks unless
+    // you have a very good reason.
+    !can_edit_handgrading.value
+    // It's possible to cancel a mouse selection with esc before
+    // committing it.
+    // If that happens, this method should do nothing.
+    || selector.value === null
+    // Don't interrupt keyboard selection
+    || selector.value.controls === 'keyboard'
+    || state.d_context_menu_is_open
+    || state.d_saving
+  ) {
+    return;
+  }
+  console.log('commit_mouse_selection')
+
+  open_annotation_context_menu({x: mouseup_event.clientX, y: mouseup_event.clientY});
+}
+
+// There is overlap between how cancellation is triggered for keyboard and mouse.
+// See cancel_commenting for a method that handles all possibilities.
+
+function start_or_expand_keyboard_selection(direction: 'up' | 'down', from_line_index: number) {
+  console.log('start_or_expand_keyboard_selection')
+  if (
+    // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+    // Note: Don't refactor this and similar checks unless
+    // you have a very good reason.
+    !can_edit_handgrading.value
+    // Don't interrupt mouse selection
+    || selector.value?.controls === 'mouse'
+    || state.d_context_menu_is_open
+    || state.d_saving
+  ) {
+    return;
+  }
+
+  console.log('expandy!');
+  if (selector.value === null) {
+    selector.value = useLineSelector(from_line_index, 'keyboard');
+  }
+
+  let new_line: number;
+  switch (direction) {
+    case 'down':
+      if (selector.value.range.first < selector.value.anchor_index) {
+        new_line = selector.value.range.first + 1;
+      }
+      else {
+        new_line = selector.value.range.last + 1;
+      }
+      break;
+    case 'up':
+      if (selector.value.range.last > selector.value.anchor_index) {
+        new_line = selector.value.range.last - 1;
+      }
+      else {
+        new_line = selector.value.range.first - 1;
+      }
+      break;
+  }
+
+  if (new_line < 0 || new_line >= num_lines_to_show.value) {
+    console.log('out of range');
+    return;
+  }
+  selector.value.update_selection(new_line);
+
+  state.d_selection_announcement =
+    `Selecting lines ${selector.value.range.first + 1} `
+    + `to ${selector.value.range.last + 1}`;
+
+  // Note: we can keep focus on the original anchor because that
+  // will make it visually apparent to the user what the anchor is
+  // and simplify the cancel and post-commit behaviors.
+}
+
+function commit_keyboard_selection(line_index: number) {
+  console.log('commit_keyboard_selection')
+  if (
+    // IMPORTANT: CHANGE THESE CHECKS TOGETHER
+    // Note: Don't refactor this and similar checks unless
+    // you have a very good reason.
+    !can_edit_handgrading.value
+    // Don't interrupt mouse selection
+    || selector.value?.controls === 'mouse'
+    || state.d_context_menu_is_open
+    || state.d_saving
+  ) {
+    return;
+  }
+  console.log('committy!');
+
+  // If there isn't a current selection, start one on the current line,
+  // then immediately commit it.
+  if (selector.value === null) {
+    selector.value = useLineSelector(line_index, 'keyboard');
+  }
+
+  const last_line_elt = get_line_element_at(selector.value.range.last);
+  const bounding_rect = last_line_elt.getBoundingClientRect();
+
+  open_annotation_context_menu({
+    x: bounding_rect.x,
+    y: bounding_rect.y,
+  });
+}
+
+function open_annotation_context_menu(menu_coordinates: {x: number, y: number}) {
+  state.d_context_menu_coordinates = menu_coordinates;
+  state.d_context_menu_is_open = true;
+}
+
+const line_shortcuts = computed(() => {
+  if (!can_edit_handgrading.value) {
+    return undefined;
+  }
+  return 'Enter Shift+ArrowUp Shift+ArrowDown Escape';
+});
+
+const apply_annotation = new_handle_global_errors_async(
+  async (annotation: Annotation) => {
+    assert_not_null(props.filename);
+    return toggle(state, 'd_saving', async () => {
+      assert_not_null(selector);
+      await AppliedAnnotation.create(d_handgrading_result.value!.pk, {
+        annotation: annotation.pk,
+        location: {
+          first_line: selector.value.range.first,
+          last_line: selector.value.range.last,
+          filename: props.filename,
+        }
+      });
+      finish_commenting();
+    });
+  }
+);
+
+const comment_text = ref<HTMLElement>();
+
+function open_comment_modal() {
+  state.d_context_menu_is_open = false;
+  state.d_show_comment_modal = true;
+  nextTick(() => comment_text.value?.focus());
+}
+
+const create_comment = new_handle_global_errors_async(
+  () => {
+    return toggle(state, 'd_saving', async () => {
+      assert_not_null(selector);
+      assert_not_null(props.filename);
+      await Comment.create(d_handgrading_result.value!.pk, {
+        text: state.d_comment_text,
+        location: {
+          first_line: selector.value.range.first,
+          last_line: selector.value.range.last,
+          filename: props.filename,
+        }
+      });
+      finish_commenting();
+      state.d_show_comment_modal = false;
+      state.d_comment_text = '';
+    });
+  }
+);
+
+function finish_commenting() {
+  console.log('finish_commenting')
+  // IMPORTANT: If you change anything about this method,
+  // double check whether cancel_commenting needs the same changes.
+  // cancel_commenting is currently an alias for this method.
+  state.d_context_menu_is_open = false;
+  state.d_selection_announcement = '';
+
+  assert_not_null(selector);
+  const last_index = selector.value.range.last;
+
+  nextTick(() => {
+    focus_line(last_index);
+    selector.value = null;
+  });
+}
+
+function cancel_commenting() {
+  console.log('cancel_commenting')
+  if (selector.value === null) {
+    return;
+  }
+
+  const anchor_index = selector.value.anchor_index;
+
+  if (state.d_context_menu_is_open) {
+    state.d_context_menu_is_open = false;
+    nextTick(() => {
+      focus_line(anchor_index);
+    });
+  }
+  else {
+    focus_line(anchor_index);
+  }
+
+  if (selector.value?.controls === 'keyboard') {
+    state.d_selection_announcement = 'Selection cancelled';
+  }
+
+  selector.value = null;
+}
+
+function focus_line(line_index: number) {
+  get_line_element_at(line_index)?.focus();
+}
+
+const code_lines = ref<HTMLElement[]>([]);
+
+function get_line_element_at(line_index: number) {
+  const element = code_lines.value?.[line_index];
+  assert_not_null(element);
+  return element;
+}
+
+defineExpose({
+  ...state,
+  d_handgrading_result,
+});
 </script>
 
 <style scoped lang="scss">

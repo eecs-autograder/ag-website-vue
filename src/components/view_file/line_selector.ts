@@ -1,4 +1,4 @@
-import { readonly, ref } from "vue";
+import { readonly, Ref, ref } from "vue";
 
 export function useLineSelector(start_line_index: number, controls: 'keyboard' | 'mouse') {
     const range = ref({
@@ -53,10 +53,12 @@ export function useLineSelector(start_line_index: number, controls: 'keyboard' |
         }
     }
 
-    return {
+    return readonly({
         update_selection,
         range: readonly(range),
-        anchor_index: readonly(anchor_index),
+        anchor_index: anchor_index,
         controls,
-    };
+    });
 }
+
+export type LineSelector = ReturnType<typeof useLineSelector>;
