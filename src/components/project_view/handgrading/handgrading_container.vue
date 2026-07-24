@@ -87,7 +87,7 @@
             </div>
           </template>
         </div>
-        <div id="handgrading-sidebar-content" class="sidebar-content" v-if="!d_group_sidebar_collapsed">
+        <div id="handgrading-sidebar-content" class="sidebar-content" v-show="!d_group_sidebar_collapsed">
           <template v-for="(group_summary, index) of username_filtered_groups">
             <div class="divider" v-if="index !== 0"></div>
             <group-summary-panel :key="group_summary.pk"
