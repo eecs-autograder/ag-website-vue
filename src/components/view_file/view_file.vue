@@ -208,7 +208,7 @@
       @close="cancel_commenting()"
     >
       <context-menu-item
-        v-for="annotation of handgrading_result.handgrading_rubric.annotations"
+        v-for="annotation of d_handgrading_result.handgrading_rubric.annotations"
         :key="annotation.pk"
         @click="apply_annotation(annotation)"
       >
@@ -341,11 +341,15 @@ const state = reactive({
   d_selection_announcement: "",
 });
 
-onMounted(() => {
-  if (props.handgrading_result !== undefined) {
-    d_handgrading_result.value = props.handgrading_result;
-  }
-});
+watch(
+  () => props.handgrading_result,
+  (handgrading_result) => {
+    if (handgrading_result !== undefined) {
+      d_handgrading_result.value = handgrading_result;
+    }
+  },
+  {deep: true, immediate: true},
+)
 
 watch(
   () => props.file_contents,
@@ -430,7 +434,7 @@ function render_more_lines() {
 }
 
 const handgrading_enabled = computed(() => {
-  return props.handgrading_result !== null;
+  return props.handgrading_result !== undefined;
 });
 
 const can_edit_handgrading = computed(() => {
@@ -478,7 +482,7 @@ const handgrading_comments = computed<SafeMap<number, HandgradingComment[]>>(
 
 function comment_is_deletable(comment: HandgradingComment): boolean {
   return (
-    !props.readonly_handgrading_results &&
+    can_edit_handgrading.value &&
     (props.enable_custom_comments || !comment.is_custom)
   );
 }
@@ -753,14 +757,14 @@ function focus_line(line_index: number) {
 const code_lines = ref<HTMLElement[]>([]);
 
 function get_line_element_at(line_index: number) {
-  const element = code_lines.value?.[line_index];
-  assert_not_null(element);
-  return element;
+  return code_lines.value[line_index];
 }
 
 defineExpose({
-  ...state,
+  state,
   d_handgrading_result,
+  d_selector: selector.value,
+  is_loading: () => state.d_loading,
 });
 </script>
 
