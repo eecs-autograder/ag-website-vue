@@ -1,10 +1,16 @@
 <template>
   <div class="file-panel">
-    <div class="panel" @click="toggle_open">
+    <button
+      class="panel unstyled-button"
+      tabindex="0"
+      @click="toggle_open"
+      :aria-controls="`file-panel-${component_uid}`"
+      :aria-expanded="d_is_open"
+    >
       <i class="fas" :class="d_is_open ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
-      <div class="filename">{{filename}}</div>
-    </div>
-    <div class="body" v-show="d_is_open">
+      <span class="filename">{{filename}}</span>
+    </button>
+    <div :id="`file-panel-${component_uid}`" class="body" v-show="d_is_open">
       <view-file v-if="d_content !== null"
                  :filename="filename"
                  :file_contents="d_content"
@@ -23,7 +29,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { HandgradingResult } from 'ag-client-typescript';
 
 import ViewFile from '@/components/view_file/view_file.vue';
-import { toggle } from '@/utils';
+import { generate_uid } from '@/utils';
 
 @Component({
   components: {
@@ -74,11 +80,16 @@ export default class FilePanel extends Vue {
       });
     }
   }
+
+  get component_uid() {
+    return generate_uid();
+  }
 }
 </script>
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+@import '@/styles/button_styles.scss';
 
 * {
   box-sizing: border-box;
@@ -93,8 +104,11 @@ export default class FilePanel extends Vue {
   $border-color: $pebble-dark;
 
   .panel {
+    width: 100%;
+
     position: sticky;
     top: 0;
+    z-index: 1;
 
     display: flex;
     padding: .5rem;

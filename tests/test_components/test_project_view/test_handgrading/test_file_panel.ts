@@ -8,7 +8,8 @@ import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { find_by_name, set_props, wait_until } from '@/tests/utils';
+import { set_props, wait_until } from '@/tests/utils';
+import { vi } from 'vitest';
 
 let filename: string;
 let content: string;
@@ -55,9 +56,10 @@ test('File loaded on open', async () => {
     expect(wrapper.find('.body').isVisible()).toBe(true);
     expect(await wrapper.vm.d_content).toEqual(content);
 
-    let view_file = find_by_name<ViewFile>(wrapper, 'ViewFile');
-    expect(await view_file.vm.file_contents).toEqual(await wrapper.vm.d_content);
-    expect(view_file.vm.filename).toEqual(filename);
+    let view_file = wrapper.findComponent(ViewFile);
+    await vi.runAllTimersAsync();
+    expect(view_file.vm.state.d_file_contents).toEqual(await wrapper.vm.d_content);
+    expect(view_file.vm.get_props().filename).toEqual(filename);
 
     wrapper.find('.panel').trigger('click');
     await wrapper.vm.$nextTick();
@@ -73,13 +75,13 @@ test('Handgrading props passed through to view file', async () => {
     await wrapper.find('.panel').trigger('click');
     expect(await wait_until(wrapper, w => w.vm.d_content !== null));
 
-    let view_file = find_by_name<ViewFile>(wrapper, 'ViewFile');
-    expect(view_file.vm.enable_custom_comments).toBe(false);
-    expect(view_file.vm.readonly_handgrading_results).toBe(false);
+    let view_file = wrapper.findComponent(ViewFile);
+    expect(view_file.vm.get_props().enable_custom_comments).toBe(false);
+    expect(view_file.vm.get_props().readonly_handgrading_results).toBe(false);
 
     await set_props(wrapper, {enable_custom_comments: true});
-    expect(view_file.vm.enable_custom_comments).toBe(true);
+    expect(view_file.vm.get_props().enable_custom_comments).toBe(true);
 
     await set_props(wrapper, {readonly_handgrading_results: true});
-    expect(view_file.vm.readonly_handgrading_results).toBe(true);
+    expect(view_file.vm.get_props().readonly_handgrading_results).toBe(true);
 });

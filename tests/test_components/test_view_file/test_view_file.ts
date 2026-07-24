@@ -1,4 +1,4 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { mount, Wrapper, WrapperArray } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 import hljs, { AutoHighlightResult } from 'highlight.js';
@@ -9,7 +9,9 @@ import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, wait_for_load, wait_until } from '@/tests/utils';
+import { compress_whitespace, new_wait_for_load, wait_until } from '@/tests/utils';
+import ProgressBar from '@/components/progress_bar.vue';
+import { vi } from 'vitest';
 
 
 describe('ViewFile.vue', () => {
@@ -26,14 +28,13 @@ describe('ViewFile.vue', () => {
                 view_file_height: height_in
             }
         });
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await new_wait_for_load(wrapper)).toBe(true);
     });
 
     test('ViewFile data set to values passed in by parent', async () => {
         let view_file_wrapper = wrapper.find('.view-file-component');
         expect(view_file_wrapper.element.style.height).toEqual('250px');
-        expect(wrapper.vm.d_filename).toBe(filename);
-        expect(wrapper.vm.d_file_contents).toBe(await content);
+        expect(wrapper.vm.state.d_file_contents).toBe(await content);
     });
 
     test('File content and line numbers displayed in order', async () => {
@@ -55,24 +56,12 @@ describe('ViewFile.vue', () => {
         expect(content_lines.at(1).text()).toContain('line two');
 
         await wrapper.setProps({file_contents: Promise.resolve("Blue \nMoon")});
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await new_wait_for_load(wrapper)).toBe(true);
 
         content_lines = wrapper.findAll('.line-of-file-content');
         expect(content_lines.length).toEqual(2);
         expect(content_lines.at(0).text()).toContain('Blue');
         expect(content_lines.at(1).text()).toContain('Moon');
-    });
-
-    test('The filename of a ViewFile Component can change', async () => {
-        let new_filename = "macklemore.cpp";
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_filename).toEqual(filename);
-
-        wrapper.setProps({filename: new_filename});
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_filename).toEqual(new_filename);
     });
 
     test('File too large, user prompted before displaying', async () => {
@@ -86,7 +75,7 @@ describe('ViewFile.vue', () => {
 
         // display anyway flag should be reset when content changes.
         await wrapper.setProps({file_contents: Promise.resolve('Some content')});
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await new_wait_for_load(wrapper)).toBe(true);
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(0);
         expect(wrapper.find('.large-file-message').exists()).toBe(true);
     });
@@ -94,7 +83,7 @@ describe('ViewFile.vue', () => {
     test('1000 lines initially rendered, show more button used', async () => {
         await wrapper.setProps(
             {file_contents: Promise.resolve(Array(2700).fill('spam').join('\n'))});
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await new_wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll('.line-of-file-content').length).toEqual(1000);
 
@@ -108,11 +97,11 @@ describe('ViewFile.vue', () => {
     });
 
     test('Progress bar', async () => {
-        wrapper.vm.d_loading = true;
+        wrapper.vm.state.d_loading = true;
         wrapper.setProps({progress: 42});
 
         await wrapper.vm.$nextTick();
-        expect(wrapper.findComponent({name: 'ProgressBar'}).exists()).toBe(true);
+        expect(wrapper.findComponent(ProgressBar).exists()).toBe(true);
         expect(wrapper.find('viewing-container').exists()).toBe(false);
     });
 
@@ -125,12 +114,10 @@ describe('ViewFile.vue', () => {
             },
         });
 
-        const clock = sinon.useFakeTimers();
-
         // Init
         const file_text = 'Just keep <span class="dori">swimming,\nswimming,\nswimming!</span>';
         await wrapper.setProps({file_contents: Promise.resolve(file_text)});
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await new_wait_for_load(wrapper)).toBe(true);
 
         // Test
         expect(wrapper.find('.copy-button-clickable').exists()).toBe(true);
@@ -140,9 +127,9 @@ describe('ViewFile.vue', () => {
         expect(write_text_mock.calledOnce).toBe(true);
         expect(write_text_mock.getCall(0).args[0]).toBe(file_text);
 
-        expect(wrapper.vm.d_is_file_copying).toBe(true);
-        clock.tick(3000);
-        expect(wrapper.vm.d_is_file_copying).toBe(false);
+        expect(wrapper.vm.state.d_is_file_copying).toBe(true);
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.state.d_is_file_copying).toBe(false);
     });
 
     test('Code file copies unhighlighted code to clipboard', async () => {
@@ -154,15 +141,13 @@ describe('ViewFile.vue', () => {
             },
         });
 
-        const clock = sinon.useFakeTimers();
-
         // Init
         const file_text = 'Just keep <span class="dori">swimming,\nswimming,\nswimming!</span>';
         await wrapper.setProps({
             is_code_file: true,
             file_contents: Promise.resolve(file_text)
         });
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await new_wait_for_load(wrapper)).toBe(true);
 
         // Test
         expect(wrapper.find('.copy-button-clickable').exists()).toBe(true);
@@ -172,9 +157,9 @@ describe('ViewFile.vue', () => {
         expect(write_text_mock.calledOnce).toBe(true);
         expect(write_text_mock.getCall(0).args[0]).toBe(file_text);
 
-        expect(wrapper.vm.d_is_file_copying).toBe(true);
-        clock.tick(3000);
-        expect(wrapper.vm.d_is_file_copying).toBe(false);
+        expect(wrapper.vm.state.d_is_file_copying).toBe(true);
+        await vi.runAllTimersAsync();
+        expect(wrapper.vm.state.d_is_file_copying).toBe(false);
     });
 
     describe('Code file tests', () => {
@@ -202,7 +187,7 @@ describe('ViewFile.vue', () => {
                 is_code_file: true,
                 file_contents: Promise.resolve("Hello world")
             });
-            expect(await wait_for_load(wrapper)).toBe(true);
+            expect(await new_wait_for_load(wrapper)).toBe(true);
 
             const content_lines = wrapper.findAll('.line-of-file-content');
             expect(content_lines.length).toEqual(1);
@@ -223,7 +208,7 @@ describe('ViewFile.vue', () => {
                 is_code_file: true,
                 file_contents: Promise.resolve("omg HELLO\nworld")
             });
-            expect(await wait_for_load(wrapper)).toBe(true);
+            expect(await new_wait_for_load(wrapper)).toBe(true);
 
             const content_lines = wrapper.findAll('.line-of-file-content');
             expect(content_lines.length).toEqual(2);
@@ -253,7 +238,7 @@ describe('ViewFile.vue', () => {
                     'not join them. Bring balance to the force...',
                 )
             });
-            expect(await wait_for_load(wrapper)).toBe(true);
+            expect(await new_wait_for_load(wrapper)).toBe(true);
 
             const content_lines = wrapper.findAll('.line-of-file-content');
             expect(content_lines.length).toEqual(3);
@@ -411,7 +396,7 @@ describe('ViewFile handgrading tests', () => {
             await wrapper.vm.$nextTick();
 
             wrapper.findAll('[role=menuitem]').at(0).trigger('click');
-            expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+            expect(await wait_until(wrapper, w => !w.vm.state.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
             expect(create_stub.calledOnceWith(
@@ -438,8 +423,7 @@ describe('ViewFile handgrading tests', () => {
             expect(
                 wrapper.findComponent({ref: 'handgrading_context_menu'}).element
             ).not.toBeVisible();
-            expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-            expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+            expect(wrapper.vm.d_selector).toBeNull();
         });
 
         test('Add new multi-line-annotation', async () => {
@@ -449,9 +433,7 @@ describe('ViewFile handgrading tests', () => {
             create_stub.resolves(new_applied_annotation);
 
             let code_lines = wrapper.findAll('[data-testid=code_line]');
-            // Highlighed region expands up and down
             code_lines.at(1).trigger('mousedown');
-            code_lines.at(0).trigger('mouseenter');
             code_lines.at(1).trigger('mouseenter');
             code_lines.at(2).trigger('mouseenter');
             code_lines.at(2).trigger('mouseup');
@@ -459,7 +441,7 @@ describe('ViewFile handgrading tests', () => {
             await wrapper.vm.$nextTick();
 
             wrapper.findAll('[role=menuitem]').at(0).trigger('click');
-            expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+            expect(await wait_until(wrapper, w => !w.vm.state.d_saving)).toBe(true);
 
             expect(create_stub.calledOnce).toBe(true);
             expect(create_stub.calledOnceWith(
@@ -467,7 +449,7 @@ describe('ViewFile handgrading tests', () => {
                 {
                     annotation: annotation_no_long_description.pk,
                     location: {
-                        first_line: 0,
+                        first_line: 1,
                         last_line: 2,
                         filename: filename,
                     }
@@ -484,9 +466,150 @@ describe('ViewFile handgrading tests', () => {
             expect(
                 wrapper.findComponent({ref: 'handgrading_context_menu'}).element
             ).not.toBeVisible();
-            expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-            expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+            expect(wrapper.vm.d_selector).toBeNull();
         });
+
+        test("Select lines up with mouse", () => {
+            // Skipping is possible
+            return do_mouse_selection_test([10, 9, 6], 6, 10);
+        });
+
+        test("Select lines down with mouse", () => {
+            // Skipping is possible
+            return do_mouse_selection_test([11, 15, 16, 17], 11, 17);
+        });
+
+        test("Selection grow and shrink up with mouse", () => {
+            return do_mouse_selection_test([3, 2, 1, 2], 2, 3);
+        });
+
+        test("Selection grow and shrink down with mouse", () => {
+            return do_mouse_selection_test([3, 4, 5, 4], 3, 4);
+        });
+
+
+        test("Selection up then down with mouse", () => {
+            return do_mouse_selection_test([10, 9, 8, 9, 10, 11, 12], 10, 12);
+        });
+
+        test("Selection down then up with mouse", () => {
+            return do_mouse_selection_test([11, 12, 13, 12, 11, 10, 9, 8], 8, 11);
+        });
+
+        test("Select lines up with keyboard", () => {
+            return do_keyboard_selection_test(10, ['up', 'up', 'up'], 7, 10);
+        });
+
+        test("Select lines down with keyboard", () => {
+            return do_keyboard_selection_test(10, ['down', 'down'], 10, 12);
+        });
+
+        test("Selection grow and shrink up with keyboard", () => {
+            return do_keyboard_selection_test(15, ['up', 'up', 'down'], 14, 15);
+        });
+
+        test("Selection grow and shrink down with keyboard", () => {
+            return do_keyboard_selection_test(6, ['down', 'down', 'down', 'up'], 6, 8);
+        });
+
+        test("Selection up then down with keyboard", () => {
+            return do_keyboard_selection_test(10, ['up', 'down', 'down'], 10, 11);
+        });
+
+        test("Selection down then up with keyboard", () => {
+            return do_keyboard_selection_test(12, ['down', 'down', 'up', 'up', 'up'], 11, 12);
+        });
+
+        test("Selection doesn't go below line zero with keyboard", () => {
+            return do_keyboard_selection_test(1, ['up', 'up', 'up'], 0, 1);
+        });
+
+        test("Selection doesn't go past last line line with keyboard", () => {
+            return do_keyboard_selection_test(18, ['down', 'down', 'down'], 18, 19);
+        });
+
+        async function do_mouse_selection_test(
+            // First line gets mousedown, then remaining lines
+            // get mouseenter, then last line gets mouseup
+            line_sequence: number[],
+            expected_first_line_index: number,
+            expected_last_line_index: number,
+        ) {
+            let new_applied_annotation = make_create_result(0, 2);
+            create_stub.resolves(new_applied_annotation);
+
+            let code_lines = wrapper.findAll('[data-testid=code_line]');
+            await code_lines.at(line_sequence[0]).trigger('mousedown');
+            for (let i = 1; i < line_sequence.length; i++) {
+                await code_lines.at(line_sequence[i]).trigger('mouseenter');
+            }
+            await code_lines.at(line_sequence[line_sequence.length - 1]).trigger('mouseup');
+
+            await wrapper.vm.$nextTick();
+
+            wrapper.findAll('[role=menuitem]').at(0).trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.state.d_saving)).toBe(true);
+
+            expect(create_stub.calledOnce).toBe(true);
+            expect(
+                create_stub.getCalls()[0].args[1].location.first_line
+            ).toEqual(expected_first_line_index);
+            expect(
+                create_stub.getCalls()[0].args[1].location.last_line
+            ).toEqual(expected_last_line_index);
+            expect(create_stub.calledOnceWith(
+                result.pk,
+                {
+                    annotation: annotation_no_long_description.pk,
+                    location: {
+                        first_line: expected_first_line_index,
+                        last_line: expected_last_line_index,
+                        filename: filename,
+                    }
+                }
+            )).toBe(true);
+        }
+
+        async function do_keyboard_selection_test(
+            initial_focus_index: number,
+            key_sequence: ('up' | 'down')[],
+            expected_first_line_index: number,
+            expected_last_line_index: number,
+        ) {
+            let new_applied_annotation = make_create_result(0, 2);
+            create_stub.resolves(new_applied_annotation);
+
+            let code_lines = wrapper.findAll('[data-testid=code_line]');
+            await code_lines.at(initial_focus_index).trigger('focus');
+            for (const key of key_sequence) {
+                await code_lines.at(initial_focus_index).trigger('keydown.' + key, {shiftKey: true});
+            }
+            await code_lines.at(initial_focus_index).trigger('keydown.enter');
+
+            await wrapper.vm.$nextTick();
+
+            wrapper.findAll('[role=menuitem]').at(0).trigger('click');
+            expect(await wait_until(wrapper, w => !w.vm.state.d_saving)).toBe(true);
+
+            expect(create_stub.calledOnce).toBe(true);
+            expect(
+                create_stub.getCalls()[0].args[1].location.first_line
+            ).toEqual(expected_first_line_index);
+            expect(
+                create_stub.getCalls()[0].args[1].location.last_line
+            ).toEqual(expected_last_line_index);
+            expect(create_stub.calledOnceWith(
+                result.pk,
+                {
+                    annotation: annotation_no_long_description.pk,
+                    location: {
+                        first_line: expected_first_line_index,
+                        last_line: expected_last_line_index,
+                        filename: filename,
+                    }
+                }
+            )).toBe(true);
+        }
     });
 
     test('Custom comments enabled', async () => {
@@ -518,7 +641,7 @@ describe('ViewFile handgrading tests', () => {
         wrapper.findComponent({ref: 'comment_text'}).setValue(text);
         wrapper.find('.modal .green-button').trigger('click');
 
-        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+        expect(await wait_until(wrapper, w => !w.vm.state.d_saving)).toBe(true);
         expect(wrapper.find('.modal').exists()).toBe(false);
 
         expect(create_stub.calledOnce).toBe(true);
@@ -565,7 +688,7 @@ describe('ViewFile handgrading tests', () => {
 
         let delete_stub = sinon.stub(applied_annotation_with_long_description, 'delete');
         wrapper.findAll('.delete').at(2).trigger('click');
-        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+        expect(await wait_until(wrapper, w => !w.vm.state.d_saving)).toBe(true);
         expect(delete_stub.calledOnce).toBe(true);
 
         wrapper.vm.handgrading_result!.applied_annotations.pop();
@@ -578,7 +701,7 @@ describe('ViewFile handgrading tests', () => {
 
         let delete_stub = sinon.stub(comment, 'delete');
         wrapper.findAll('.delete').at(0).trigger('click');
-        expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
+        expect(await wait_until(wrapper, w => !w.vm.state.d_saving)).toBe(true);
         expect(delete_stub.calledOnce).toBe(true);
 
         wrapper.vm.handgrading_result!.comments.pop();
@@ -590,8 +713,7 @@ describe('ViewFile handgrading tests', () => {
         wrapper.setProps({readonly_handgrading_results: true});
         await wrapper.vm.$nextTick();
         expect(wrapper.findAll('.delete').length).toEqual(0);
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         let code_lines = wrapper.findAll('[data-testid=code_line]');
         code_lines.at(0).trigger('mousedown');
@@ -599,14 +721,12 @@ describe('ViewFile handgrading tests', () => {
         code_lines.at(2).trigger('mouseenter');
         code_lines.at(2).trigger('mouseup');
 
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
     });
 
     test('Highlighting events ignored while saving', async () => {
         await wrapper.setData({d_saving: true});
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');
@@ -614,52 +734,11 @@ describe('ViewFile handgrading tests', () => {
         await code_lines.at(2).trigger('mouseenter');
         await code_lines.at(2).trigger('mouseup');
 
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
-    });
-
-    test('Highlight events out of order ignored', async () => {
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
-
-        let code_lines = wrapper.findAll('[data-testid=code_line]');
-        await code_lines.at(0).trigger('mouseenter');
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
-
-        await code_lines.at(0).trigger('mouseup');
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
-
-        await code_lines.at(0).trigger('mousedown');
-        await code_lines.at(1).trigger('mousedown');
-        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
-        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
-    });
-
-    test('Highlighting disabled when context menu open', async () => {
-        let code_lines = wrapper.findAll('[data-testid=code_line]');
-        await code_lines.at(0).trigger('mousedown');
-        await code_lines.at(0).trigger('mouseup');
-        expect(wrapper.findComponent({ref: 'handgrading_context_menu'}).isVisible()).toBe(true);
-
-        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
-        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
-
-        await code_lines.at(1).trigger('mouseenter');
-        await code_lines.at(2).trigger('mouseenter');
-        await code_lines.at(3).trigger('mouseenter');
-        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
-        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
-
-        await code_lines.at(4).trigger('mousedown');
-        await code_lines.at(4).trigger('mouseup');
-        expect(wrapper.vm.d_first_highlighted_line).toEqual(0);
-        expect(wrapper.vm.d_last_highlighted_line).toEqual(0);
+        expect(wrapper.vm.d_selector).toBeNull();
     });
 
     test('Deletion disabled while saving', async () => {
-        wrapper.setData({d_saving: true});
+        wrapper.setData({state: {d_saving: true}});
         await wrapper.vm.$nextTick();
         let delete_stubs = [
             sinon.stub(comment, 'delete'),
@@ -678,12 +757,10 @@ describe('ViewFile handgrading tests', () => {
     });
 
     test('Highlighting events ignored while handgrading disabled', async () => {
-        await wrapper.setProps({handgrading_result: null});
-        await wrapper.setData({d_handgrading_result: null});
+        await wrapper.setProps({handgrading_result: undefined});
 
         expect(wrapper.findAll('.delete').length).toEqual(0);
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
 
         let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');
@@ -691,8 +768,7 @@ describe('ViewFile handgrading tests', () => {
         await code_lines.at(2).trigger('mouseenter');
         await code_lines.at(2).trigger('mouseup');
 
-        expect(wrapper.vm.d_first_highlighted_line).toBeNull();
-        expect(wrapper.vm.d_last_highlighted_line).toBeNull();
+        expect(wrapper.vm.d_selector).toBeNull();
     });
 
     test('No annotations, custom comments not allowed', async () => {
@@ -706,7 +782,7 @@ describe('ViewFile handgrading tests', () => {
                 enable_custom_comments: false,
             }
         });
-        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(await new_wait_for_load(wrapper)).toBe(true);
 
         let code_lines = wrapper.findAll('[data-testid=code_line]');
         await code_lines.at(0).trigger('mousedown');

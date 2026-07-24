@@ -11,12 +11,15 @@ import { assert_not_null, deep_copy } from '@/utils';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import { compress_whitespace, set_props, wait_until } from '@/tests/utils';
+import { vi } from 'vitest';
 
 let build_task: ag_cli.BuildSandboxDockerImageTask;
 let load_output_stub: sinon.SinonStub;
 let output: string;
 
 beforeEach(() => {
+    vi.useRealTimers();
+
     output = 'noreistanoraftoinurtr';
     build_task = data_ut.make_build_sanbdox_docker_image_task(null, null);
     load_output_stub = sinon.stub(build_task, 'get_output').callsFake(callback => {

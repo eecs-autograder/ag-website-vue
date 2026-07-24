@@ -1,6 +1,6 @@
 <template>
   <div class="handgrading">
-    <div class="files">
+    <div class="files" role="region" aria-label="Files to handgrade">
       <div class="has-wrong-submission"
            v-if="d_has_correct_submission !== null && !d_has_correct_submission">
         <i class="fas fa-exclamation-triangle"></i> The submission being handgraded
@@ -27,7 +27,8 @@
                   :readonly_handgrading_results="readonly_handgrading_results">
       </file-panel>
 
-      <div v-if="!readonly_handgrading_results" class="danger-zone-container">
+      <div v-if="!readonly_handgrading_results" class="danger-zone-container"
+           role="region" aria-label="Reset handgrading result">
         <div class="danger-text">Reset Handgrading Result</div>
         <button type="button"
                 class="delete-button"
@@ -81,6 +82,7 @@
           <label class="label" for="adjust-points">Adjust Points</label>
           <validated-input @input_validity_changed="d_adjust_points_is_valid = $event"
                            ref="adjust_points"
+                           input_id="adjust-points"
                            :validators="[is_not_empty, is_integer]"
                            :from_string_fn="string_to_num"
                            v-model="d_handgrading_result.points_adjustment">
@@ -95,127 +97,143 @@
         </div>
 
         <!-- Checkboxes -->
-        <div class="collapsible-section-header"
-             @click="d_criteria_collapsed = !d_criteria_collapsed">
-          <i class="caret fas"
-             :class="d_criteria_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
-          Checkboxes
-        </div>
-        <div class="sidebar-section"
-             v-show="!d_criteria_collapsed && d_handgrading_result.criterion_results.length !== 0">
-          <template v-for="(result, index) of d_handgrading_result.criterion_results">
-            <div class="divider" v-if="index !== 0"></div>
-
-            <div class="criterion"
-                 :class="{
-                   'loading-cursor': saving,
-                   'criterion-hover': !readonly_handgrading_results,
-                   'grayed-out': readonly_handgrading_results && !result.selected,
-                 }"
-                 :key="result.pk"
-                 @click="toggle_criterion(result)">
-              <div class="row">
-                <div class="criterion-checkbox">
-                  <i v-if="result.selected" class="fa fa-check" aria-hidden="true"></i>
-                </div>
-                <div class="short-description">
-                  {{result.criterion.short_description}}
-                </div>
-                <div class="points">
-                  {{result.criterion.points}}
-                </div>
-              </div>
-              <div class="long-description" v-if="result.criterion.long_description !== ''">
-                {{result.criterion.long_description}}
-              </div>
-            </div>
+        <CollapsibleSection
+          :include_caret="true"
+          :use_v_if="false"
+          :open_initially="true"
+          section_id="handgrading-checkboxes"
+        >
+          <template #header>
+            <h2 class="collapsible-section-header">
+              Checkboxes
+            </h2>
           </template>
-        </div>
+          <template #body>
+            <template v-for="(result, index) of d_handgrading_result.criterion_results">
+              <div class="divider" v-if="index !== 0"></div>
+              <label
+                class="criterion"
+                :class="{
+                  'loading-cursor': saving,
+                  'criterion-hover': !readonly_handgrading_results,
+                  'grayed-out': readonly_handgrading_results && !result.selected,
+                }"
+                :key="result.pk"
+              >
+                <span class="row">
+                  <input
+                    type="checkbox"
+                    data-testid="criterion_checkbox"
+                    :checked="result.selected"
+                    @change="toggle_criterion(result)"
+                    :disabled="readonly_handgrading_results"
+                  />
+                  <span class="short-description">
+                    {{result.criterion.short_description}}
+                  </span>
+                  <span class="points">
+                    {{result.criterion.points}}
+                  </span>
+                </span>
+                <span class="long-description" v-if="result.criterion.long_description !== ''">
+                  {{result.criterion.long_description}}
+                </span>
+              </label>
+            </template>
+          </template>
+        </CollapsibleSection>
 
         <!-- Comments (and applied annotations) -->
-        <div class="collapsible-section-header"
-             @click="d_comments_collapsed = !d_comments_collapsed">
-          <i class="caret fas"
-             :class="d_comments_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
-          Comments
-        </div>
-        <div v-show="!d_comments_collapsed">
-          <div id="new-comment" v-if="can_leave_comments">
-            <textarea class="input" v-model="d_new_comment_text"></textarea>
-            <button type="button" class="blue-button" @click="add_comment">Comment</button>
-          </div>
-
-          <div class="sidebar-section"
-               v-show="d_handgrading_result.comments.length !== 0
-                       || d_handgrading_result.applied_annotations.length !== 0">
-            <!-- General comments -->
-            <template v-for="(comment, index) of general_comments">
-              <div class="divider" v-if="index !== 0"></div>
-
-              <div class="comment"
-                    :class="{'loading-cursor': saving}"
-                    :key="comment.pk">
-                <div class="row">
-                  <div class="short-description">{{comment.text}}</div>
-                  <i v-if="!readonly_handgrading_results && can_leave_comments"
-                     @click="delete_comment(comment)"
-                     class="delete fas fa-times"></i>
-                </div>
-              </div>
-            </template>
-
-            <!-- inline comments/annotations -->
-            <template v-for="(handgrading_comment, index) of handgrading_comments">
-              <div class="divider" v-if="index !== 0 || general_comments.length !== 0"></div>
-
-              <div class="comment"
-                    :class="{'loading-cursor': saving}"
-                    :key="handgrading_comment.vue_key">
-                <div class="row">
-                  <div class="short-description">
-                    {{handgrading_comment.short_description}}
-                    <span class="deduction"
-                      v-if="handgrading_comment.deduction !== 0"
-                    >({{
-                      handgrading_comment.deduction
-                    }}<template
-                        v-if="handgrading_comment.max_deduction !== null"
-                      >/{{handgrading_comment.max_deduction}} max</template>)</span>
+        <CollapsibleSection
+          :include_caret="true"
+          :use_v_if="false"
+          section_id="handgrading-comments"
+          :open_initially="true"
+        >
+          <template #header>
+            <h2 class="collapsible-section-header">Comments</h2>
+          </template>
+          <template #body>
+            <div id="new-comment" v-if="can_leave_comments">
+              <textarea class="input" v-model="d_new_comment_text" aria-label="Comment"></textarea>
+              <button type="button" class="blue-button" @click="add_comment">Comment</button>
+            </div>
+            <div class="sidebar-section"
+                 v-show="d_handgrading_result.comments.length !== 0
+                         || d_handgrading_result.applied_annotations.length !== 0">
+              <!-- General comments -->
+              <template v-for="(comment, index) of general_comments">
+                <div class="divider" v-if="index !== 0"></div>
+                <div class="comment"
+                      :class="{'loading-cursor': saving}"
+                      :key="comment.pk">
+                  <div class="row">
+                    <div class="short-description">{{comment.text}}</div>
+                    <button
+                      v-if="!readonly_handgrading_results && can_leave_comments"
+                      class="unstyled-button"
+                      @click="delete_comment(comment)"
+                    >
+                      <i class="delete fas fa-times" aria-label="Delete comment"></i>
+                    </button>
                   </div>
-                  <i v-if="!readonly_handgrading_results
-                           && (can_leave_comments || !handgrading_comment.is_custom)"
-                     @click="delete_comment(handgrading_comment)"
-                     class="delete fas fa-times"></i>
                 </div>
-
-                <div class="long-description" v-if="handgrading_comment.long_description !== ''">
-                  {{handgrading_comment.long_description}}
+              </template>
+              <!-- inline comments/annotations -->
+              <template v-for="(handgrading_comment, index) of handgrading_comments">
+                <div class="divider" v-if="index !== 0 || general_comments.length !== 0"></div>
+                <div class="comment"
+                      :class="{'loading-cursor': saving}"
+                      :key="handgrading_comment.vue_key">
+                  <div class="row">
+                    <div class="short-description">
+                      {{handgrading_comment.short_description}}
+                      <span class="deduction"
+                        v-if="handgrading_comment.deduction !== 0"
+                      >({{
+                        handgrading_comment.deduction
+                      }}<template
+                          v-if="handgrading_comment.max_deduction !== null"
+                        >/{{handgrading_comment.max_deduction}} max</template>)</span>
+                    </div>
+                    <button
+                      class="unstyled-button"
+                      v-if="!readonly_handgrading_results
+                              && (can_leave_comments || !handgrading_comment.is_custom)"
+                      @click="delete_comment(handgrading_comment)"
+                    >
+                      <i class="delete fas fa-times" aria-label="Delete applied annotation"></i>
+                    </button>
+                  </div>
+                  <div class="long-description" v-if="handgrading_comment.long_description !== ''">
+                    {{handgrading_comment.long_description}}
+                  </div>
+                  <div class="location">
+                    {{
+                      handgrading_comment.location.filename
+                    }}:{{
+                      handgrading_comment.location.first_line + 1
+                    }}<template
+                        v-if="handgrading_comment.location.first_line
+                              !== handgrading_comment.location.last_line"
+                      > - {{handgrading_comment.location.last_line + 1}}</template>
+                  </div>
                 </div>
-
-                <div class="location">
-                  {{
-                    handgrading_comment.location.filename
-                  }}:{{
-                    handgrading_comment.location.first_line + 1
-                  }}<template
-                      v-if="handgrading_comment.location.first_line
-                            !== handgrading_comment.location.last_line"
-                    > - {{handgrading_comment.location.last_line + 1}}</template>
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
+              </template>
+            </div>
+          </template>
+        </CollapsibleSection>
 
         <!-- Annotations -->
-        <div v-if="!readonly_handgrading_results" ref="annotation_reference">
-          <div class="collapsible-section-header"
-              @click="d_annotations_collapsed = !d_annotations_collapsed">
-            <i class="caret fas"
-               :class="d_annotations_collapsed ? 'fa-caret-right' : 'fa-caret-down'"></i>
-            Annotations
-          </div>
-          <div class="sidebar-section" v-show="!d_annotations_collapsed">
+        <CollapsibleSection
+          v-if="!readonly_handgrading_results"
+          ref="annotation_reference"
+          section_id="handgrading-annotations"
+        >
+          <template #header>
+            <h2 class="collapsible-section-header">Annotations</h2>
+          </template>
+          <template #body>
             <template
               v-for="(annotation, index) of d_handgrading_result.handgrading_rubric.annotations"
             >
@@ -236,11 +254,16 @@
                 </div>
               </div>
             </template>
-          </div>
-        </div>
+          </template>
+        </CollapsibleSection>
       </div>
 
-      <div class="grading-sidebar-footer" v-if="!readonly_handgrading_results">
+      <div
+        role="region"
+        aria-label="Grading submission controls"
+        class="grading-sidebar-footer"
+        v-if="!readonly_handgrading_results"
+      >
         <button type="button"
                 id="prev-button"
                 @click="$emit('prev_group')"
@@ -290,6 +313,7 @@ import {
 
 import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
+import CollapsibleSection from '@/components/CollapsibleSection.vue';
 import Modal from '@/components/modal.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import CodeThemeToggle from '@/components/view_file/code_theme_toggle.vue';
@@ -331,6 +355,7 @@ class ProcessingSemaphore {
   components: {
     APIErrors,
     CodeThemeToggle,
+    CollapsibleSection,
     FilePanel,
     Modal,
     ValidatedInput,
@@ -677,9 +702,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     .collapsible-section-header {
       font-size: 1rem;
       font-weight: bold;
-      margin: .25rem;
-
-      @include collapsible-section-header();
+      margin: .25rem 0;
     }
 
     .sidebar-section {
@@ -758,23 +781,14 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   cursor: wait;
 }
 
-.criterion-checkbox {
-  width: 1rem;
-  min-width: 1rem;
-  height: 1rem;
-  min-height: 1rem;
-  background-color: $pebble-light;
-  border: 1px solid $gray-blue-2;
-
-  margin-right: .5rem;
-}
-
 .criterion, .annotation, .comment {
+  width: 100%;
   background-color: white;
   padding: .5rem;
 
   .row {
     display: flex;
+    width: 100%;
   }
 
   .short-description {
@@ -785,17 +799,20 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
     white-space: pre-wrap;
     font-size: .75rem;
     color: darken($stormy-gray-dark, 15%);
+    padding: .125rem .25rem 0;
   }
-}
 
-.criterion, .annotation {
   .points {
     margin-left: auto;
     color: $navy-blue;
   }
+}
 
-  .long-description {
-    padding: .125rem .25rem 0;
+.criterion {
+  display: flex;
+
+  .row, .short-description, .points, .long-description {
+    display: block;
   }
 }
 
@@ -830,7 +847,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
 
   .deduction {
     padding-left: .25rem;
-    color: darken($ocean-blue, 0%);
+    color: darken($ocean-blue, 15%);
     font-weight: bold;
   }
 

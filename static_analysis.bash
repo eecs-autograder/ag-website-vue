@@ -25,7 +25,7 @@ lint_paths=(
     'src/components/toggle.vue'
     'src/components/tooltip.vue'
     'src/components/validated_input/**/*.vue'
-    'src/components/view_file/code_theme_toggle.vue'
+    'src/components/view_file/*'
     'src/composables/**/*.ts'
     'src/demos/new_validated_form_demo/**/*.vue'
     'src/demos/new_validated_input_demo/**/*.vue'

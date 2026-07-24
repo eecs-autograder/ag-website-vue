@@ -1,10 +1,12 @@
 <template>
   <div class="group-summary-panel"
        :class="{
-         'graded': status === HandgradingStatus.graded,
-         'ungraded': status === HandgradingStatus.ungraded,
-         'in-progress': status === HandgradingStatus.in_progress,
-         'no-handgradeable-submission': status === HandgradingStatus.no_submission,
+         'graded': handgrading_status === HandgradingStatus.graded,
+         'ungraded': handgrading_status === HandgradingStatus.ungraded,
+         'in-progress': handgrading_status === HandgradingStatus.in_progress,
+         'no-handgradeable-submission': (
+            handgrading_status === HandgradingStatus.no_handgradeable_submission
+          ),
        }"
        v-on="$listeners">
     <div class="member-names">
@@ -13,7 +15,7 @@
       </div>
     </div>
     <div class="status">
-      {{status}}
+      {{status_text}}
     </div>
   </div>
 </template>
@@ -32,7 +34,11 @@ export default class GroupSummaryPanel extends Vue {
 
   readonly HandgradingStatus = HandgradingStatus;
 
-  get status() {
+  get handgrading_status() {
+    return get_handgrading_status(this.group_summary);
+  }
+
+  get status_text() {
     let status = get_handgrading_status(this.group_summary);
     if (status === HandgradingStatus.graded) {
       let result = this.group_summary.handgrading_result!;
@@ -67,19 +73,19 @@ export default class GroupSummaryPanel extends Vue {
 }
 
 .graded {
-  color: darken($green, 15%);
+  color: darken($green, 35%);
 }
 
 .ungraded {
-  color: darken($orange, 25%);
+  color: darken($orange, 35%);
 }
 
 .in-progress {
-  color: $ocean-blue;
+  color: darken($ocean-blue, 10%);
 }
 
 .no-handgradeable-submission {
-  color: $stormy-gray-dark;
+  color: $normal-text-color-3;
 }
 
 </style>

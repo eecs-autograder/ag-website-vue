@@ -9,7 +9,11 @@ import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.
 import { is_number } from "@/validators";
 
 import { get_validated_input_text, set_validated_input_text, sleep } from '@/tests/utils';
+import { vi } from "vitest";
 
+beforeEach(() => {
+    vi.useRealTimers();
+});
 
 describe('ValidatedForm.vue', () => {
     test('is_valid returns true only if all ValidatedInputs are valid ', async () => {

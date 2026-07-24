@@ -3,6 +3,7 @@ import { Dictionary } from 'vue-router/types/router';
 import { Course } from 'ag-client-typescript';
 // @ts-ignore
 import moment from "moment-timezone";
+import { Ref } from 'vue';
 
 export function sleep(seconds: number) {
     return new Promise(resolve => setTimeout(resolve, seconds * 1000));
@@ -54,6 +55,17 @@ export async function toggle<T, Key extends keyof T, ReturnType>(
     }
     finally {
         (<boolean> <unknown> obj[key]) = original;
+    }
+}
+
+export async function new_toggle<ReturnType>(to_toggle: Ref<boolean>, body: () => Promise<ReturnType>) {
+    const original = to_toggle.value;
+    try {
+        to_toggle.value = !original;
+        return await body();
+    }
+    finally {
+        to_toggle.value = original;
     }
 }
 

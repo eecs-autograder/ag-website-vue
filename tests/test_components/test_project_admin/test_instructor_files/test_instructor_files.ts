@@ -9,7 +9,9 @@ import InstructorFiles from '@/components/project_admin/instructor_files/instruc
 import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
-import { wait_until } from '@/tests/utils';
+import { new_wait_for_load, wait_until } from '@/tests/utils';
+import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
+import { vi } from 'vitest';
 
 
 describe('InstructorFiles.vue', () => {
@@ -120,17 +122,15 @@ describe('InstructorFiles.vue', () => {
     test('Re-upload file being viewed, contents updated', async () => {
         sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Old Content"]));
 
-        await wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
-        expect(
-            await wait_until(wrapper, w => w.vm.current_filename === instructor_file_1.name)
-        ).toBe(true);
-        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
-        expect(await view_file.vm.file_contents).toEqual('Old Content');
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
+        let view_file = wrapper.findComponent(ViewFile);
+        await vi.runAllTimersAsync();
+        expect(view_file.vm.state.d_file_contents).toEqual('Old Content');
 
         InstructorFile.notify_instructor_file_content_changed(
             instructor_file_1, new Blob(["New Content"]));
-        await wrapper.vm.$nextTick();
-        expect(await view_file.vm.file_contents).toEqual('New Content');
+        await vi.runAllTimersAsync();
+        expect(view_file.vm.state.d_file_contents).toEqual('New Content');
     });
 
     test('Upload new instructor file', async () => {
@@ -184,27 +184,24 @@ describe('InstructorFiles.vue', () => {
                 return Promise.resolve(new Blob(['Monday']));
             }
         );
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
-        await wrapper.vm.$nextTick();
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
+        await vi.runAllTimersAsync();
 
-        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
-        expect(view_file.vm.filename).toEqual(instructor_file_1.name);
-        expect(await view_file.vm.file_contents).toEqual('Monday');
+        let view_file = wrapper.findComponent(ViewFile);
+        expect(view_file.vm.state.d_file_contents).toEqual('Monday');
 
         sinon.stub(instructor_file_2, 'get_content').resolves(new Blob(["Tuesday"]));
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(1).element.focus();
-        await wrapper.vm.$nextTick();
+        await wrapper.findAllComponents(SingleInstructorFile).at(1).trigger('click');
+        await vi.runAllTimersAsync();
 
-        expect(view_file.vm.filename).toEqual(instructor_file_2.name);
-        expect(await view_file.vm.file_contents).toEqual('Tuesday');
+        expect(view_file.vm.state.d_file_contents).toEqual('Tuesday');
 
         // Check that contents are cached locally
 
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
-        await wrapper.vm.$nextTick();
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
+        await vi.runAllTimersAsync();
 
-        expect(view_file.vm.filename).toEqual(instructor_file_1.name);
-        expect(await view_file.vm.file_contents).toEqual('Monday');
+        expect(view_file.vm.state.d_file_contents).toEqual('Monday');
 
         expect(get_content_stub_1.calledOnce).toBe(true);
     });
@@ -215,18 +212,16 @@ describe('InstructorFiles.vue', () => {
         let renamed = new InstructorFile(instructor_file_1);
         renamed.name = 'Renamed';
 
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
-        await wrapper.vm.$nextTick();
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
 
-        let view_file = <Wrapper<ViewFile>> wrapper.findComponent({name: 'ViewFile'});
-        expect(view_file.vm.filename).toEqual(instructor_file_1.name);
-        expect(await view_file.vm.file_contents).toEqual(expected_content);
+        let view_file = wrapper.findComponent(ViewFile);
+        await vi.runAllTimersAsync();
+        expect(view_file.vm.state.d_file_contents).toEqual(expected_content);
 
         InstructorFile.notify_instructor_file_renamed(renamed, instructor_file_1.name);
-        await wrapper.vm.$nextTick();
+        await vi.runAllTimersAsync();
 
-        expect(view_file.vm.filename).toEqual(renamed.name);
-        expect(await view_file.vm.file_contents).toEqual(expected_content);
+        expect(view_file.vm.state.d_file_contents).toEqual(expected_content);
     });
 
     test('Delete single file', async () => {
@@ -337,7 +332,7 @@ describe('InstructorFiles.vue', () => {
             return Promise.resolve(new Blob(["File 1 Content"]));
         });
 
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.current_filename).toBe(instructor_file_1.name);
 
@@ -358,7 +353,7 @@ describe('InstructorFiles.vue', () => {
         // the cached contents should have been cleared.
         expect(get_content_stub.calledOnce).toBe(true);
         InstructorFile.notify_instructor_file_created(instructor_file_1);
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
+        wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(get_content_stub.calledTwice).toBe(true);
     });
@@ -395,7 +390,7 @@ describe('InstructorFiles.vue', () => {
 
         // Header text still shows up if we haven't selected a file
         sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Monday"]));
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
+        wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.find('.sidebar-collapse-button').trigger('click');

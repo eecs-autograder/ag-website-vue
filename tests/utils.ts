@@ -39,6 +39,12 @@ export async function wait_for_load<T extends (Wrapper<Vue> & {vm: {d_loading: b
     return wait_until(wrapper, wrap => !wrap.vm.d_loading, max_awaits);
 }
 
+export async function new_wait_for_load<T extends (Wrapper<Vue> & {vm: {is_loading: () => boolean}})>(
+    wrapper: T, max_awaits = 10
+) {
+    return wait_until(wrapper, wrap => !wrap.vm.is_loading(), max_awaits);
+}
+
 // Sets the text for the given validaded input wrapper and triggers an update.
 // Prefer calling this function rather than inlining its definition so that our tests
 // are more robust against changes to the ValidatedInput implementation.

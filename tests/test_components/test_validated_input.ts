@@ -3,6 +3,7 @@ import {  mount, Wrapper } from '@vue/test-utils';
 import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
 
 import { emitted, expect_html_element_has_value, set_validated_input_text, sleep } from '@/tests/utils';
+import { vi } from 'vitest';
 
 
 const IS_NUMBER = (value: string): ValidatorResponse => {
@@ -11,6 +12,10 @@ const IS_NUMBER = (value: string): ValidatorResponse => {
         error_msg: "Invalid number!"
     };
 };
+
+beforeEach(() => {
+    vi.useRealTimers();
+});
 
 describe('ValidatedInput.vue', () => {
     test('Validated input uses default string conversion when to_string_fn not present',

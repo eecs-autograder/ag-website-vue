@@ -45,7 +45,11 @@
             :key="instructor_file.pk"
             :file="instructor_file"
             tabindex="0"
-            @focus="view_file(instructor_file)"
+            role="button"
+            :aria-label="instructor_file.name"
+            @click="view_file(instructor_file)"
+            @keydown.enter.prevent.stop="view_file(instructor_file)"
+            @keydown.space.prevent.stop="view_file(instructor_file)"
             :selected_for_deletion="d_batch_to_be_deleted.some((f) => f.pk === instructor_file.pk)"
             @selected_for_deletion="toggle_file_for_batch_operation(instructor_file, $event)"
             @delete_requested="request_single_delete(instructor_file)"
@@ -55,7 +59,8 @@
           </single-instructor-file>
         </div>
       </div>
-      <div :class="['body', {'body-closed': d_collapsed}]" v-if="current_filename !== null">
+      <div role="region" aria-label="File contents"
+           :class="['body', {'body-closed': d_collapsed}]" v-if="current_filename !== null">
         <view-file :filename="current_filename"
                    :file_contents="current_file_contents"
                    :progress="load_contents_progress"></view-file>
