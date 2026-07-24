@@ -8,7 +8,7 @@
       </APIErrors>
     </div>
     <div v-if="d_loading" class="loading-fullscreen loading-large">
-      <i class="fa fa-spinner fa-pulse"></i>
+      <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
     </div>
     <template v-else>
       <header id="banner">

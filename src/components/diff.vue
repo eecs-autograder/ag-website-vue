@@ -1,7 +1,10 @@
 <template>
   <div v-if="state.loading" class="loading-container">
     <progress-bar v-if="progress !== null" :progress="progress"></progress-bar>
-    <i v-else class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"></i>
+    <i v-else
+      class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"
+      role="img" aria-label="Loading"
+    ></i>
   </div>
   <div v-else :class="{'fullscreen': state.fullscreen}">
     <div class="diff-headers">

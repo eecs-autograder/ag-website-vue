@@ -81,8 +81,8 @@
                   :disabled="!clone_course_form_is_valid || d_cloning">
             Clone Course
           </button>
-          <div class="loading-vertically-centered" v-if="d_cloning">
-            <i class="fa fa-spinner fa-pulse"></i>
+          <div class="loading-vertically-centered" role="status" v-if="d_cloning">
+            <i class="fa fa-spinner fa-pulse" role="img" aria-label="Loading"></i>
           </div>
         </div>
       </ValidatedForm>
