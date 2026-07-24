@@ -6,7 +6,7 @@
   </div>
   <div v-else id="ag-test-suites-component">
     <div class="sidebar-container">
-      <nav class="sidebar-menu" aria-label="Test suites">
+      <div class="sidebar-menu" aria-label="Test suites">
         <div class="sidebar-header" :class="{'sidebar-header-closed': d_collapsed}">
           <button type="button"
                   class="sidebar-collapse-button"
@@ -48,7 +48,7 @@
             </AGTestSuitePanel>
           </draggable>
         </div>
-      </nav>
+      </div>
 
       <div id="viewing-window"
            class="body"
