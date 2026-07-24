@@ -9,7 +9,9 @@ import InstructorFiles from '@/components/project_admin/instructor_files/instruc
 import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
-import { wait_until } from '@/tests/utils';
+import { new_wait_for_load, wait_until } from '@/tests/utils';
+import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
+import { vi } from 'vitest';
 
 
 describe('InstructorFiles.vue', () => {
@@ -177,30 +179,79 @@ describe('InstructorFiles.vue', () => {
         expect(api_errors.state.api_errors.length).toBe(1);
     });
 
-    test('Viewing a file', async () => {
+    test.only('Viewing a file', async () => {
         let get_content_stub_1 = sinon.stub(instructor_file_1, 'get_content').callsFake(
             (on_upload_progress) => {
+                console.log('this thing')
                 // tslint:disable-next-line: no-object-literal-type-assertion
                 on_upload_progress!(<ProgressEvent> {lengthComputable: true, loaded: 5, total: 6});
                 return Promise.resolve(new Blob(['Monday']));
             }
         );
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
+        wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+
+        console.log('waited after the clicky')
 
         let view_file = wrapper.findComponent(ViewFile);
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        await view_file.vm.$nextTick();
+        console.log(view_file.html());
+        console.log(JSON.stringify(view_file.vm.state));
         expect(view_file.vm.state.d_file_contents).toEqual('Monday');
 
         sinon.stub(instructor_file_2, 'get_content').resolves(new Blob(["Tuesday"]));
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(1).element.focus();
+        wrapper.findAllComponents(SingleInstructorFile).at(1).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(view_file.vm.state.d_file_contents).toEqual('Tuesday');
 
         // Check that contents are cached locally
 
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
+        wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         expect(view_file.vm.state.d_file_contents).toEqual('Monday');
@@ -210,15 +261,25 @@ describe('InstructorFiles.vue', () => {
 
     test('Rename opened file', async () => {
         let expected_content = 'I am contenttt';
-        sinon.stub(instructor_file_1, 'get_content').resolves(new Blob([expected_content]));
+        vi.spyOn(instructor_file_1, 'get_content').mockResolvedValue(new Blob([expected_content]));
+        // sinon.stub(instructor_file_1, 'get_content').resolves(new Blob([expected_content]));
         let renamed = new InstructorFile(instructor_file_1);
         renamed.name = 'Renamed';
 
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
-        await wrapper.vm.$nextTick();
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
 
         let view_file = wrapper.findComponent(ViewFile);
+        await wait_until(view_file, (w) => w.vm.state.d_file_contents === expected_content);
+        // expect(
+        // ).toBe(true);
         await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        await wrapper.vm.$nextTick();
+        // console.log(view_file.vm)
+        console.log(JSON.stringify(view_file.vm.state), JSON.stringify(view_file.vm.$props))
         expect(view_file.vm.state.d_file_contents).toEqual(expected_content);
 
         InstructorFile.notify_instructor_file_renamed(renamed, instructor_file_1.name);
@@ -335,7 +396,7 @@ describe('InstructorFiles.vue', () => {
             return Promise.resolve(new Blob(["File 1 Content"]));
         });
 
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
+        await wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.vm.current_filename).toBe(instructor_file_1.name);
 
@@ -356,7 +417,7 @@ describe('InstructorFiles.vue', () => {
         // the cached contents should have been cleared.
         expect(get_content_stub.calledOnce).toBe(true);
         InstructorFile.notify_instructor_file_created(instructor_file_1);
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
+        wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         await wrapper.vm.$nextTick();
         expect(get_content_stub.calledTwice).toBe(true);
     });
@@ -393,7 +454,7 @@ describe('InstructorFiles.vue', () => {
 
         // Header text still shows up if we haven't selected a file
         sinon.stub(instructor_file_1, 'get_content').resolves(new Blob(["Monday"]));
-        wrapper.findAllComponents({name: 'SingleInstructorFile'}).at(0).element.focus();
+        wrapper.findAllComponents(SingleInstructorFile).at(0).trigger('click');
         await wrapper.vm.$nextTick();
 
         wrapper.find('.sidebar-collapse-button').trigger('click');

@@ -16,6 +16,7 @@ export class OpenFilesMixin extends Vue {
     // Otherwise, calls get_content_func, stores and returns the resulting Promise.
     open_file(filename: string,
               get_content_func: (progress_callback: ProgressCallback) => Promise<Blob>) {
+        console.log('open file', filename)
         this.d_load_contents_progress = null;
         if (!this.d_open_files.has(filename)) {
             let content = get_content_func((event: ProgressEvent) => {
@@ -23,12 +24,15 @@ export class OpenFilesMixin extends Vue {
                     this.d_load_contents_progress = 100 * (1.0 * event.loaded / event.total);
                 }
             });
-            this.d_open_files.set(filename, blob_to_string(content));
+            const new_set = new SafeMap(this.d_open_files);
+            new_set.set(filename, blob_to_string(content));
+            this.d_open_files = new_set;
         }
         this.d_current_filename = filename;
     }
 
     update_file(filename: string, content: Promise<Blob>) {
+        console.log('update file', filename, content)
         let new_open_files = new SafeMap(this.d_open_files);
         new_open_files.set(filename, blob_to_string(content));
         this.d_open_files = new_open_files;
@@ -60,6 +64,7 @@ export class OpenFilesMixin extends Vue {
     }
 
     get current_file_contents() {
+      console.log('current_file_contents getter')
       if (this.d_current_filename === null) {
         // istanbul ignore next
         throw new Error('current_file_contents requested when d_current_filename is null');
