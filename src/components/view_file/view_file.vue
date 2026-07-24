@@ -2,6 +2,8 @@
   <div
     class="view-file-component"
     :style="{ height: view_file_height, maxHeight: view_file_max_height }"
+    role="region"
+    aria-label="File viewer"
   >
     <div v-if="state.d_loading" class="loading-container">
       <progress-bar
@@ -871,11 +873,6 @@ $light-green: hsl(97, 42%, 79%);
   font-family: "Helvetica Neue", Helvetica;
   font-size: 0.875rem;
 
-  // &:focus-visible {
-  //   outline: 2px solid auto;
-  //   outline-offset: 2px;
-  // }
-
   .comment-header {
     display: flex;
 
@@ -918,11 +915,6 @@ $light-green: hsl(97, 42%, 79%);
 .highlighted-region-line {
   background-color: $bubble-gum;
 }
-
-// tr:focus-visible {
-//   outline: 2px solid auto;
-//   outline-offset: -2px;
-// }
 
 .line-of-file-content {
   position: relative;

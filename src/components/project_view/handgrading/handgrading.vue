@@ -1,6 +1,6 @@
 <template>
   <div class="handgrading">
-    <div class="files">
+    <div class="files" role="region" aria-label="Files to handgrade">
       <div class="has-wrong-submission"
            v-if="d_has_correct_submission !== null && !d_has_correct_submission">
         <i class="fas fa-exclamation-triangle"></i> The submission being handgraded
