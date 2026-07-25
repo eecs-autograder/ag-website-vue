@@ -1,0 +1,131 @@
+// Syntax-highlighting theme adapted from the a11y-syntax-highlighting package
+// (https://github.com/ericwbailey/a11y-syntax-highlighting)
+
+// The light token colors are darkened a few % lightness from the upstream
+// values (~5:1 -> ~5.9:1 on white). The extra headroom lets the line-highlight
+// row backgrounds in view_file.vue be visibly tinted while still keeping every
+// token >= 4.5:1 on those rows. Dark tokens are unchanged.
+
+/*********
+Default theme (light)
+Derived from https://github.com/ericwbailey/a11y-syntax-highlighting/blob/1.1.0/dist/highlight/a11y-light.css
+**********/
+.hljs {
+  background: hsl(0, 0%, 100%);
+  color: hsl(0, 0%, 33%);
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: hsl(16, 100%, 25%);
+}
+
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+  color: hsl(2, 80%, 43%);
+}
+
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+  color: hsl(33, 100%, 29.5%);
+}
+
+.hljs-attribute {
+  color: hsl(43, 74%, 28.5%);
+}
+
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+  color: hsl(120, 100%, 23%);
+}
+
+.hljs-title,
+.hljs-section {
+  color: hsl(195, 100%, 28.5%);
+}
+
+.hljs-keyword,
+.hljs-selector-tag {
+  color: hsl(282, 100%, 41%);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs.code-dark {
+  background: hsl(0, 0%, 17%);
+  color: hsl(60, 30%, 96%);
+}
+
+/*********
+Dark theme
+Derived from https://github.com/ericwbailey/a11y-syntax-highlighting/blob/1.1.0/dist/highlight/a11y-dark.css
+**********/
+.code-dark {
+  .hljs-comment,
+  .hljs-quote {
+    color: hsl(54, 32%, 75%);
+  }
+
+  .hljs-variable,
+  .hljs-template-variable,
+  .hljs-tag,
+  .hljs-name,
+  .hljs-selector-id,
+  .hljs-selector-class,
+  .hljs-regexp,
+  .hljs-deletion {
+    color: hsl(17, 100%, 74%);
+  }
+
+  .hljs-number,
+  .hljs-built_in,
+  .hljs-builtin-name,
+  .hljs-literal,
+  .hljs-type,
+  .hljs-params,
+  .hljs-meta,
+  .hljs-link {
+    color: hsl(37, 91%, 58%);
+  }
+
+  .hljs-attribute {
+    color: hsl(51, 100%, 50%);
+  }
+
+  .hljs-string,
+  .hljs-symbol,
+  .hljs-bullet,
+  .hljs-addition {
+    color: hsl(80, 75%, 55%);
+  }
+
+  .hljs-title,
+  .hljs-section {
+    color: hsl(180, 100%, 44%);
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag {
+    color: hsl(291, 30%, 83%);
+  }
+}

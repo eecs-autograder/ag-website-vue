@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import '@/styles/hljs_a11y_theme.scss';
 
 import APITokenView from '@/components/api_token.vue';
 import CourseAdmin from '@/components/course_admin/course_admin.vue';

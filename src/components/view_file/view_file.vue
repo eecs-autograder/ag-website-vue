@@ -904,16 +904,26 @@ $light-green: hsl(97, 42%, 79%);
   }
 }
 
+// Line-highlight backgrounds are contrast-tuned: syntax tokens render on top of
+// these rows, so each must keep >= 4.5:1 (WCAG AA) against every token color.
+// See hljs_a11y_theme.scss for token colors.
+$commented-line-bg: hsl(212, 80%, 91%);
+$hovered-comment-line-bg: hsl(97, 55%, 84%);
+$highlighted-region-bg: hsl(5, 85%, 92.5%);
+$commented-line-bg-dark: hsl(212, 50%, 28.5%);
+$hovered-comment-line-bg-dark: hsl(97, 45%, 20.5%);
+$highlighted-region-bg-dark: hsl(5, 60%, 30.5%);
+
 .commented-line {
-  background-color: $gray-blue-1;
+  background-color: $commented-line-bg;
 }
 
 .hovered-comment-line {
-  background-color: $light-green;
+  background-color: $hovered-comment-line-bg;
 }
 
 .highlighted-region-line {
-  background-color: $bubble-gum;
+  background-color: $highlighted-region-bg;
 }
 
 .line-of-file-content {
@@ -969,13 +979,27 @@ tr:focus-visible .line-hint {
 }
 
 .code-dark {
-  // Invert highlighted lines' text in dark theme to avoid color clashes.
-  .commented-line,
+  .commented-line {
+    background-color: $commented-line-bg-dark;
+  }
+
+  .hovered-comment-line {
+    background-color: $hovered-comment-line-bg-dark;
+  }
+
   .highlighted-region-line {
-    .line-number,
-    .line-content-text {
-      filter: invert(1);
-    }
+    background-color: $highlighted-region-bg-dark;
+  }
+
+  // The comment box inherits the dark theme's light text color, so its header
+  // needs a dark background to stay readable (the message body sits on the
+  // dark code background already).
+  .comment-header {
+    background-color: hsl(210, 12%, 24%);
+  }
+
+  .comment:hover .comment-header {
+    background-color: hsl(97, 25%, 24%);
   }
 }
 

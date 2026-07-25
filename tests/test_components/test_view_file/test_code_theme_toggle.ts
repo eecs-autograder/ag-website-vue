@@ -1,103 +1,84 @@
 import { mount, Wrapper } from '@vue/test-utils';
 
-import * as sinon from 'sinon';
+import Vue from 'vue';
 
-import * as code_theme_store from '@/components/view_file/code_theme_store';
+import { CODE_THEME_STORE } from '@/components/view_file/code_theme_store';
 import CodeThemeToggle from '@/components/view_file/code_theme_toggle.vue';
 
-const HLJS_LINK_SELECTOR = '#hljs-code-theme';
 const CHECKBOX_SELECTOR = 'input[type="checkbox"]';
 
+function set_system_dark_pref(is_dark: boolean) {
+    Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: vi.fn().mockImplementation(query => ({
+            matches: is_dark,
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+        })),
+    });
+}
+
 describe('CodeThemeToggle tests', () => {
-    let wrapper: Wrapper<CodeThemeToggle>;
-    let set_code_theme_mock: sinon.SinonStub;
+    let wrapper: Wrapper<Vue>;
 
-    beforeEach(async () => {
-        set_code_theme_mock = sinon.stub();
-        vi.spyOn(code_theme_store, 'set_code_theme').mockImplementation(set_code_theme_mock);
+    beforeEach(() => {
+        CODE_THEME_STORE.current_code_theme = 'light';
+        CODE_THEME_STORE.initialized = false;
+        set_system_dark_pref(false);
     });
 
-    afterEach(async () => {
-        set_code_theme_mock.reset();
-
-        // Remove whatever link tags was inserted during the test
-        document.head.querySelector(HLJS_LINK_SELECTOR)?.remove();
+    afterEach(() => {
+        wrapper?.destroy();
     });
 
-    describe('Test default themes', () => {
-        const set_user_pref_dark_mode = (is_pref_dark: boolean) => {
-            // See bottom of https://jestjs.io/docs/manual-mocks
-            Object.defineProperty(window, 'matchMedia', {
-                writable: true,
-                value: vi.fn().mockImplementation(query => ({
-                    matches: is_pref_dark,
-                    media: query,
-                    onchange: null,
-                    addListener: vi.fn(), // deprecated
-                    removeListener: vi.fn(), // deprecated
-                    addEventListener: vi.fn(),
-                    removeEventListener: vi.fn(),
-                    dispatchEvent: vi.fn(),
-                })),
-            });
-        };
+    test('Checkbox reflects the current theme', () => {
+        CODE_THEME_STORE.initialized = true; // suppress mount-time auto-init
+        CODE_THEME_STORE.current_code_theme = 'dark';
 
-        test('User preference is dark theme', async () => {
-            set_user_pref_dark_mode(true);
+        wrapper = mount(CodeThemeToggle);
 
-            wrapper = mount(CodeThemeToggle);
-
-            expect(set_code_theme_mock.callCount).toBe(1);
-            expect(set_code_theme_mock.getCall(0).args[0]).toBe('dark');
-        });
-
-        test('User preference is light theme', async () => {
-            set_user_pref_dark_mode(false);
-
-            wrapper = mount(CodeThemeToggle);
-
-            expect(set_code_theme_mock.calledOnce).toBe(true);
-            expect(set_code_theme_mock.getCall(0).args[0]).toBe('light');
-        });
-    });
-
-    test.skip('Multiple instances only create one link tag', async () => {
-        // Mount 2 components
-        mount(CodeThemeToggle);
-        mount(CodeThemeToggle);
-
-        expect(document.querySelectorAll(HLJS_LINK_SELECTOR).length).toBe(1);
+        const checkbox = wrapper.find(CHECKBOX_SELECTOR).element as HTMLInputElement;
+        expect(checkbox.checked).toBe(true);
     });
 
     test('Test change theme from light', async () => {
-        const code_theme_mock = sinon.stub(
-            code_theme_store.CODE_THEME_STORE,
-            'current_code_theme'
-        );
-        code_theme_mock.get(() => 'light');
+        CODE_THEME_STORE.initialized = true;
+        CODE_THEME_STORE.current_code_theme = 'light';
 
         wrapper = mount(CodeThemeToggle);
-        expect(wrapper.find(CHECKBOX_SELECTOR).exists()).toBe(true);
 
-        set_code_theme_mock.reset(); // set to only track update
         await wrapper.find(CHECKBOX_SELECTOR).trigger('change');
-        expect(set_code_theme_mock.callCount).toBe(1);
-        expect(set_code_theme_mock.getCall(0).args[0]).toBe('dark');
+        expect(CODE_THEME_STORE.current_code_theme).toBe('dark');
     });
 
     test('Test change theme from dark', async () => {
-        const code_theme_mock = sinon.stub(
-            code_theme_store.CODE_THEME_STORE,
-            'current_code_theme'
-        );
-        code_theme_mock.get(() => 'dark');
+        CODE_THEME_STORE.initialized = true;
+        CODE_THEME_STORE.current_code_theme = 'dark';
 
         wrapper = mount(CodeThemeToggle);
-        expect(wrapper.find(CHECKBOX_SELECTOR).exists()).toBe(true);
 
-        set_code_theme_mock.reset(); // set to only track update
         await wrapper.find(CHECKBOX_SELECTOR).trigger('change');
-        expect(set_code_theme_mock.callCount).toBe(1);
-        expect(set_code_theme_mock.getCall(0).args[0]).toBe('light');
+        expect(CODE_THEME_STORE.current_code_theme).toBe('light');
+    });
+
+    test('Initializes to dark when the OS prefers dark', () => {
+        set_system_dark_pref(true);
+
+        wrapper = mount(CodeThemeToggle);
+
+        expect(CODE_THEME_STORE.current_code_theme).toBe('dark');
+    });
+
+    test('Initializes to light when the OS prefers light', () => {
+        set_system_dark_pref(false);
+
+        wrapper = mount(CodeThemeToggle);
+
+        expect(CODE_THEME_STORE.current_code_theme).toBe('light');
     });
 });
