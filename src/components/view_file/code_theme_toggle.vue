@@ -15,86 +15,22 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
-import { new_handle_global_errors_async } from "@/error_handling";
-import { CODE_THEME_STORE, set_code_theme } from "./code_theme_store";
+import {
+  CODE_THEME_STORE,
+  set_code_theme,
+  init_code_theme_from_system,
+} from "./code_theme_store";
 
-const CODE_LIGHT_THEME_NAME = "github";
-const CODE_DARK_THEME_NAME = "tokyo-night-dark";
-const HLJS_LINK_ID = "hljs-code-theme";
-
-// Computed properties
-const is_code_theme_dark = computed(() => {
-  return CODE_THEME_STORE.current_code_theme === "dark";
-});
-
-// Methods
-const init_hljs = () => {
-  // Check if style link already exists
-  const code_theme_elt = document.getElementById(HLJS_LINK_ID);
-  if (code_theme_elt !== null) {
-    return;
-  }
-
-  // Determine initial theme based on user's system preference
-  const is_init_theme_dark = window.matchMedia(
-    "(prefers-color-scheme: dark)",
-  ).matches;
-  const theme_name = is_init_theme_dark ? "dark" : "light";
-  set_code_theme(theme_name);
-
-  // Add link
-  const created_link = document.createElement("link");
-  created_link.rel = "stylesheet";
-  created_link.id = HLJS_LINK_ID;
-  created_link.setAttribute("data-theme", theme_name);
-  document.head.appendChild(created_link);
-
-  update_hljs_theme();
-};
+const is_code_theme_dark = computed(
+  () => CODE_THEME_STORE.current_code_theme === "dark",
+);
 
 const switch_code_theme = () => {
-  const curr_theme = CODE_THEME_STORE.current_code_theme;
-  if (curr_theme === "light") {
-    set_code_theme("dark");
-  } else {
-    set_code_theme("light");
-  }
-
-  update_hljs_theme();
+  set_code_theme(is_code_theme_dark.value ? "light" : "dark");
 };
-
-// Get the CDN url for the specified highlight.js theme
-const get_hljs_cdn_theme_link = (theme: string) => {
-  return `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${theme}.min.css`;
-};
-
-// Uses currently set hljs theme to make sure link tag is up-to-date
-const update_hljs_theme = () => {
-  const link_elt = document.getElementById(HLJS_LINK_ID) as HTMLLinkElement;
-
-  // Add null check to prevent the error
-  if (!link_elt) {
-    console.warn(`Element with ID '${HLJS_LINK_ID}' not found`);
-    return;
-  }
-
-  if (CODE_THEME_STORE.current_code_theme === "dark") {
-    link_elt.href = get_hljs_cdn_theme_link(CODE_DARK_THEME_NAME);
-    link_elt.setAttribute("data-theme", "dark");
-  } else {
-    link_elt.href = get_hljs_cdn_theme_link(CODE_LIGHT_THEME_NAME);
-    link_elt.setAttribute("data-theme", "light");
-  }
-};
-
-// Lifecycle - wrap with error handling
-const initialize = new_handle_global_errors_async(() => {
-  init_hljs();
-  return Promise.resolve();
-});
 
 onMounted(() => {
-  void initialize();
+  init_code_theme_from_system();
 });
 </script>
 
@@ -153,7 +89,7 @@ $padding-amt: 4px;
 }
 
 input:checked + .slider {
-  background-color: #1a1b26; // Matches hljs dark mode bg
+  background-color: hsl(0, 0%, 17%); // Matches a11y-dark bg
 }
 
 input:checked + .slider:before {
