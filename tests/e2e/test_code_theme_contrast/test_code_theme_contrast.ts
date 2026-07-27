@@ -90,14 +90,6 @@ test.describe("code viewer syntax theme contrast", () => {
   });
 });
 
-function parse_seed_value(stdout: string, key: string): string {
-  const match = stdout.match(new RegExp(`^${key}=(.+)$`, "m"));
-  if (match === null) {
-    throw new Error(`seed script did not print ${key}. Output:\n${stdout}`);
-  }
-  return match[1].trim();
-}
-
 function seed_handgrading_result() {
   const { stdout } = run_in_django_shell(SEED_SCRIPT);
   return {
@@ -107,15 +99,22 @@ function seed_handgrading_result() {
   };
 }
 
-async function assert_no_contrast_violations(page: Page, label: string) {
-  const { violations } = await new AxeBuilder({ page })
-    .include(".files")
-    .withRules(["color-contrast"])
-    .analyze();
-  expect(
-    violations,
-    `${label} contrast violations:\n${JSON.stringify(violations, null, 2)}`,
-  ).toEqual([]);
+function parse_seed_value(stdout: string, key: string): string {
+  const match = stdout.match(new RegExp(`^${key}=(.+)$`, "m"));
+  if (match === null) {
+    throw new Error(`seed script did not print ${key}. Output:\n${stdout}`);
+  }
+  return match[1].trim();
+}
+
+async function check_in_light_and_dark(
+  page: Page,
+  check: (page: Page, theme: string) => Promise<void>,
+) {
+  await ensure_light_theme(page);
+  await check(page, "light theme");
+  await switch_to_dark_theme(page);
+  await check(page, "dark theme");
 }
 
 // The plain code background and the commented-line background are both present
@@ -167,6 +166,17 @@ async function check_selected_background(page: Page, theme: string) {
   }
 }
 
+async function assert_no_contrast_violations(page: Page, label: string) {
+  const { violations } = await new AxeBuilder({ page })
+    .include(".files")
+    .withRules(["color-contrast"])
+    .analyze();
+  expect(
+    violations,
+    `${label} contrast violations:\n${JSON.stringify(violations, null, 2)}`,
+  ).toEqual([]);
+}
+
 async function ensure_light_theme(page: Page) {
   const containers = page.locator(".files .viewing-container.code-dark");
   if ((await containers.count()) > 0) {
@@ -181,14 +191,4 @@ async function switch_to_dark_theme(page: Page) {
   await expect(
     page.locator(".files .viewing-container.code-dark").first(),
   ).toBeVisible();
-}
-
-async function check_in_light_and_dark(
-  page: Page,
-  check: (page: Page, theme: string) => Promise<void>,
-) {
-  await ensure_light_theme(page);
-  await check(page, "light theme");
-  await switch_to_dark_theme(page);
-  await check(page, "dark theme");
 }
