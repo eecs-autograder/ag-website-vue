@@ -1,6 +1,6 @@
 {
   "name": "ag-website-vue",
-  "version": "2024.08.0",
+  "version": "0.0.0-dev0",
   "private": true,
   "scripts_comments": {
     "lint": "Run linters, e.g., eslint and prettier.",
