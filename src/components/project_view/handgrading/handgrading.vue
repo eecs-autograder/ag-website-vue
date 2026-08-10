@@ -170,11 +170,13 @@
                   <div class="row">
                     <div class="short-description">{{comment.text}}</div>
                     <button
+                      type="button"
                       v-if="!readonly_handgrading_results && can_leave_comments"
                       class="unstyled-button"
+                      aria-label="Delete comment"
                       @click="delete_comment(comment)"
                     >
-                      <i class="delete fas fa-times" aria-label="Delete comment"></i>
+                      <i class="delete fas fa-times" aria-hidden="true"></i>
                     </button>
                   </div>
                 </div>
@@ -197,12 +199,14 @@
                         >/{{handgrading_comment.max_deduction}} max</template>)</span>
                     </div>
                     <button
+                      type="button"
                       class="unstyled-button"
                       v-if="!readonly_handgrading_results
                               && (can_leave_comments || !handgrading_comment.is_custom)"
+                      aria-label="Delete applied annotation"
                       @click="delete_comment(handgrading_comment)"
                     >
-                      <i class="delete fas fa-times" aria-label="Delete applied annotation"></i>
+                      <i class="delete fas fa-times" aria-hidden="true"></i>
                     </button>
                   </div>
                   <div class="long-description" v-if="handgrading_comment.long_description !== ''">
