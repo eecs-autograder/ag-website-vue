@@ -24,6 +24,7 @@ import { onMounted, reactive, ref } from "vue";
 
 import DOMPurify from "dompurify";
 import showdown from "showdown";
+import { get_cookie } from "@/cookie";
 
 const converter = new showdown.Converter();
 
@@ -46,6 +47,11 @@ const state = reactive<{ to_display: [string, Message][] }>({
 });
 
 onMounted(() => {
+  // Display nothing if we're running e2e tests
+  if (get_cookie('E2E_TEST_MODE') === 'true') {
+    return;
+  }
+
   for (const message of props.messages ?? []) {
     if (!was_dismissed(message)) {
       state.to_display.push(message);
