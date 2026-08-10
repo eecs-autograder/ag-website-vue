@@ -37,6 +37,7 @@
         <validated-input ref="late_days_input"
                          input_id="late-day-token-email-lookup"
                          v-model="d_num_late_days"
+                         :aria_required="true"
                          :from_string_fn="string_to_num"
                          :validators="[is_non_negative]"
                          input_style="width: 100px">

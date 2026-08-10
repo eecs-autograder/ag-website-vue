@@ -11,6 +11,7 @@
               'error-input' : input_style === '' && show_errors
              }"
              type="text"
+             :aria-required="aria_required"
              :value="d_input_value"
              :placeholder="placeholder"
              @blur="on_blur"
@@ -25,6 +26,7 @@
                 :class="{
                  'error-input' : input_style === '' && show_errors
                 }"
+                :aria-required="aria_required"
                 :value="d_input_value"
                 :placeholder="placeholder"
                 @blur="on_blur"
@@ -79,6 +81,9 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
 
   @Prop({required: true})
   value!: unknown;
+
+  @Prop({required: true})
+  aria_required!: boolean;
 
   @Prop({required: true, type: Array})
   validators!: ValidatorFuncType[];

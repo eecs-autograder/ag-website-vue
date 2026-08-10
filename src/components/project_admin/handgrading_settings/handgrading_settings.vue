@@ -137,6 +137,7 @@
                 v-model="d_handgrading_rubric.max_points"
                 input_style="width: 150px;"
                 :validators="max_points_validators"
+                :aria_required="d_handgrading_rubric.points_style === PointsStyle.start_at_max_and_subtract"
                 :to_string_fn="(num) => num === null ? '' : num.toString()"
                 :from_string_fn="(val) => val.trim() === '' ? null : Number(val)">
               </validated-input>

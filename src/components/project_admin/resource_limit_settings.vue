@@ -20,6 +20,7 @@
                           v-model="d_resource_limits.time_limit"
                           @input="$emit('field_change', d_resource_limits)"
                           input_style="width: 150px;"
+                          :aria_required="true"
                           :validators="[
                             is_not_empty,
                             is_integer,
@@ -65,6 +66,7 @@
           @input="d_resource_limits.virtual_memory_limit = $event * Math.pow(10, 6);
                   $emit('field_change', d_resource_limits)"
           input_style="width: 100px;"
+          :aria_required="true"
           :validators="[
             is_not_empty,
             is_integer,

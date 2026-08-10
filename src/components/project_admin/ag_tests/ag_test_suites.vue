@@ -105,6 +105,7 @@
           <label class="label" for="new-ag-test-suite-name"> Suite name </label>
           <validated-input ref="new_ag_test_suite_name"
                             v-model="d_new_ag_test_suite_name"
+                            :aria_required="true"
                             :validators="[is_not_empty]"
                             input_id="new-ag-test-suite-name">
           </validated-input>

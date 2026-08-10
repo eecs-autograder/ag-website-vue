@@ -9,6 +9,7 @@
       <label class="input-label" :for="`filename-${label_uuid}`"> Filename </label>
       <validated-input ref="pattern"
                         v-model="d_expected_student_file.pattern"
+                        :aria_required="true"
                         :validators="[is_not_empty]"
                         :input_id="`filename-${label_uuid}`"
                         input_style="border-width: 1px; margin-top: 4px;">
@@ -51,6 +52,7 @@
         <label class="input-label" :for="`min-matches-${label_uuid}`"> Minimum number of matches </label>
         <validated-input ref='min_num_matches'
                           v-model="d_expected_student_file.min_num_matches"
+                          :aria_required="true"
                           :validators="[is_not_empty,
                                         is_number,
                                         is_non_negative]"
@@ -63,6 +65,7 @@
         <label class="input-label" :for="`max-matches-${label_uuid}`"> Maximum number of matches </label>
         <validated-input ref='max_num_matches'
                           v-model="d_expected_student_file.max_num_matches"
+                          :aria_required="true"
                           :validators="[is_not_empty,
                                         is_number]"
                           :input_id="`max-matches-${label_uuid}`"

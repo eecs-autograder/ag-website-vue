@@ -258,6 +258,7 @@
             <validated-input ref="new_mutation_test_suite_name"
                               input_id="new-mutation-test-suite-name"
                               v-model="d_new_mutation_test_suite_name"
+                              :aria_required="true"
                               :validators="[is_not_empty]">
             </validated-input>
           </div>

@@ -10,6 +10,7 @@
       <validated-input ref="name"
                        input_id="case-settings-name"
                        v-model="d_ag_test_case.name"
+                       :aria_required="true"
                        :validators="[is_not_empty]">
       </validated-input>
     </div>
