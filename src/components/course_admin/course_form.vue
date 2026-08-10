@@ -11,6 +11,7 @@
                        input_style="width: 100%;
                                     max-width: 500px;"
                        :validators="[is_not_empty]"
+                       :aria_required="true"
                        :input_id="`course-name-${label_uuid}`">
       </validated-input>
     </div>

@@ -22,6 +22,7 @@
           <label class="label" for="test-case-name"> Test Name </label>
           <validated-input ref="test_case_name"
                            v-model="d_new_test_name"
+                           :aria_required="true"
                            :validators="[is_not_empty]"
                            input_id="test-case-name">
           <template slot="suffix">
@@ -52,6 +53,7 @@
         <validated-input ref="command_name"
                          input_id="input-name"
                          v-model="d_ag_test_command.name"
+                         :aria_required="true"
                          :validators="[is_not_empty]">
         </validated-input>
       </div>
@@ -67,6 +69,7 @@
                          input_id="input-cmd"
                          v-model="d_ag_test_command.cmd"
                          :num_rows="2"
+                         :aria_required="true"
                          :validators="[is_not_empty]">
         </validated-input>
       </div>
@@ -202,6 +205,7 @@
                   <validated-input ref="points_for_correct_return_code"
                                     input_id="points-for-correct-return-code"
                                     v-model="d_ag_test_command.points_for_correct_return_code"
+                                    :aria_required="true"
                                     :validators="[
                                       is_not_empty,
                                       is_integer,
@@ -219,6 +223,7 @@
                                     input_id="deduction-for-wrong-return-code"
                                     v-model="
                                     d_ag_test_command.deduction_for_wrong_return_code"
+                                    :aria_required="true"
                                     :validators="[
                                       is_not_empty,
                                       is_integer,
@@ -307,6 +312,7 @@
                     <validated-input ref="points_for_correct_stdout"
                                       input_id="points-for-correct-stdout"
                                       v-model="d_ag_test_command.points_for_correct_stdout"
+                                      :aria_required="true"
                                       :validators="[
                                         is_not_empty,
                                         is_integer,
@@ -323,6 +329,7 @@
                     <validated-input ref="deduction_for_wrong_stdout"
                                       input_id="deduction-for-wrong-stdout"
                                       v-model="d_ag_test_command.deduction_for_wrong_stdout"
+                                      :aria_required="true"
                                       :validators="[
                                         is_not_empty,
                                         is_integer,
@@ -403,6 +410,7 @@
                     <validated-input ref="points_for_correct_stderr"
                                      input_id="points-for-correct-stderr"
                                      v-model="d_ag_test_command.points_for_correct_stderr"
+                                     :aria_required="true"
                                      :validators="[
                                        is_not_empty,
                                        is_integer,
@@ -419,6 +427,7 @@
                     <validated-input ref="deduction_for_wrong_stderr"
                                      input_id="deduction-for-wrong-stderr"
                                      v-model="d_ag_test_command.deduction_for_wrong_stderr"
+                                     :aria_required="true"
                                      :validators="[
                                        is_not_empty,
                                        is_integer,
@@ -569,6 +578,7 @@
                   <validated-input ref="max_custom_scoring_points"
                                    input_id="max-custom-scoring-points"
                                    v-model="d_ag_test_command.max_points_for_custom_scoring"
+                                   :aria_required="true"
                                    :validators="[
                                      is_not_empty,
                                      is_integer,
@@ -615,6 +625,7 @@
                       <validated-input ref="custom_scoring_label"
                                        input_id="custom-scoring-label"
                                        v-model="d_ag_test_command.custom_scoring_label"
+                                       :aria_required="true"
                                        :validators="[is_not_empty]" />
                     </div>
 
@@ -634,6 +645,7 @@
                       <validated-input ref="custom_scoring_regex"
                                        input_id="custom-scoring-regex"
                                        v-model="d_ag_test_command.custom_scoring_regex"
+                                       :aria_required="true"
                                        :validators="[is_not_empty, is_valid_regex]" />
                     </div>
                   </template>

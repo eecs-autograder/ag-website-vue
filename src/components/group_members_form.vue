@@ -13,6 +13,7 @@
       >
         <validated-text-input
           v-model="state.usernames[index]"
+          :aria_required="true"
           :validators="[is_email]"
           ref="username_input"
           @input="$emit('input', state.usernames)"

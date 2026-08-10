@@ -9,6 +9,7 @@
         <validated-input ref="name"
                          :input_id="`mutation-command-name-${label_uid}`"
                          v-model="d_ag_command.name"
+                         :aria_required="true"
                          :validators="[is_not_empty]"
                          input_style="width: 100%"
                          @input="$emit('input', d_ag_command)">
@@ -20,6 +21,7 @@
         <validated-input ref="cmd"
                          :input_id="`mutation-command-cmd-${label_uid}`"
                          v-model="d_ag_command.cmd"
+                         :aria_required="true"
                          :validators="[is_not_empty]"
                          input_style="width: 100%"
                          @input="$emit('input', d_ag_command)">

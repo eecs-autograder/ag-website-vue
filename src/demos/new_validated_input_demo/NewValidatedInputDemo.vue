@@ -12,6 +12,7 @@
 
         <validated-text-input
           v-model="val_1"
+          :aria_required="true"
           :validators="[
             has_even_number_of_chars,
             has_exclamation_point,

@@ -7,6 +7,7 @@
       <validated-input v-model="d_form_data.short_description"
                        :input_id="`criterion-name-${component_uid}`"
                        ref="short_description"
+                       :aria_required="true"
                        :validators="[is_not_empty]"></validated-input>
     </div>
 
@@ -15,6 +16,7 @@
       <validated-input v-model="d_form_data.points"
                        ref="points"
                        :input_id="`criterion-points-${component_uid}`"
+                       :aria_required="true"
                        :validators="[is_not_empty, is_integer]"
                        :from_string_fn="string_to_num"></validated-input>
     </div>
