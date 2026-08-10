@@ -45,11 +45,9 @@ const state = reactive<{ to_display: [string, Message][] }>({
   to_display: [],
 });
 
-onMounted(async () => {
-  console.log("waaaaa", props.messages);
+onMounted(() => {
   for (const message of props.messages ?? []) {
-    if (!(await was_dismissed(message))) {
-      console.log("display", message);
+    if (!was_dismissed(message)) {
       state.to_display.push(message);
     }
   }
@@ -59,23 +57,20 @@ function as_markdown(message: Message) {
   return DOMPurify.sanitize(<string> converter.makeHtml(message.text));
 }
 
-async function dismiss_message(message: Message) {
-  localStorage.setItem(await get_message_id(message), "dismissed");
+function dismiss_message(message: Message) {
+  localStorage.setItem(get_message_id(message), "dismissed");
   state.to_display.splice(state.to_display.indexOf(message));
 }
 
-async function was_dismissed(message: Message) {
-  return localStorage.getItem(await get_message_id(message)) !== null;
+function was_dismissed(message: Message) {
+  return localStorage.getItem(get_message_id(message)) !== null;
 }
 
-async function get_message_id(message: Message) {
+function get_message_id(message: Message) {
   return (
     message.for_version +
     " " +
-    (await window.crypto.subtle.digest(
-      "SHA-1",
-      new TextEncoder().encode(message.text),
-    ))
+    message.text
   );
 }
 </script>
