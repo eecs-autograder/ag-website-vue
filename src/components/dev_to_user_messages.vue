@@ -22,8 +22,8 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 
-import DOMPurify from 'dompurify';
-import showdown from 'showdown';
+import DOMPurify from "dompurify";
+import showdown from "showdown";
 
 const converter = new showdown.Converter();
 
@@ -54,7 +54,7 @@ onMounted(() => {
 });
 
 function as_markdown(message: Message) {
-  return DOMPurify.sanitize(<string> converter.makeHtml(message.text));
+  return DOMPurify.sanitize(<string>converter.makeHtml(message.text));
 }
 
 function dismiss_message(message: Message) {
@@ -67,11 +67,7 @@ function was_dismissed(message: Message) {
 }
 
 function get_message_id(message: Message) {
-  return (
-    message.for_version +
-    " " +
-    message.text
-  );
+  return message.for_version + " " + message.text;
 }
 </script>
 
