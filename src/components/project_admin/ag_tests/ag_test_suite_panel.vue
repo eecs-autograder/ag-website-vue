@@ -68,6 +68,7 @@
           <validated-input ref="new_case_name"
                            v-model="d_new_case_name"
                            :validators="[is_not_empty]"
+                           :aria_required="true"
                            :input_id="`new-case-name-${label_uid}`">
           </validated-input>
         </div>
@@ -81,6 +82,7 @@
             <validated-input ref="command_name"
                              v-model="new_command.name"
                              :validators="[is_not_empty]"
+                             :aria_required="true"
                              :input_id="`command-name-${label_uid}-${index}`"
                              input_style="width: 100%;
                                           min-width: 200px;
@@ -106,6 +108,7 @@
             <validated-input ref="command"
                               v-model="new_command.cmd"
                               :validators="[is_not_empty]"
+                              :aria_required="true"
                               :input_id="`command-cmd-${label_uid}-${index}`"
                               input_style="width: 100%;
                                            min-width: 200px;

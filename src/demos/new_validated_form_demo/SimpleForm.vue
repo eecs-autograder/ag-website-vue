@@ -15,6 +15,7 @@
     <p>Has to be the string "mars"</p>
     <validated-text-input
       v-model="text_input"
+      :aria_required="true"
       :validators="[is_mars]"
     ></validated-text-input>
 

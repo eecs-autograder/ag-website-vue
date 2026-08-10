@@ -56,6 +56,7 @@
           <validated-input ref="cloned_project_name"
                            input_id="cloned-course-name"
                            v-model="cloned_project_name"
+                           :aria_required="true"
                            :validators="[is_not_empty]"
                            :num_rows="1"
                            input_style="width: 100%"

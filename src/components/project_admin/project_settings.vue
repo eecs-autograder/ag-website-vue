@@ -12,6 +12,7 @@
         <validated-text-input
           ref="project_name_input"
           v-model="state.project.name"
+          :aria_required="true"
           :validators="[is_not_empty]"
           input_style="max-width: 500px; width: 100%"
         >
