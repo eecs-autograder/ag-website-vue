@@ -13,7 +13,7 @@
       <i
         v-else
         class="loading-horiz-centered loading-large fa fa-spinner fa-pulse"
-        aria-label="loading"
+        aria-label="Loading"
         role="img"
       />
     </div>
