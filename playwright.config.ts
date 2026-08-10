@@ -66,7 +66,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: test_mode_storage_state
+        storageState: test_mode_storage_state,
       },
       dependencies: ["global setup"],
     },
@@ -75,7 +75,7 @@ export default defineConfig({
       name: "firefox",
       use: {
         ...devices["Desktop Firefox"],
-        storageState: test_mode_storage_state
+        storageState: test_mode_storage_state,
       },
       dependencies: ["global setup"],
     },
@@ -84,7 +84,7 @@ export default defineConfig({
       name: "webkit",
       use: {
         ...devices["Desktop Safari"],
-        storageState: test_mode_storage_state
+        storageState: test_mode_storage_state,
       },
       dependencies: ["global setup"],
     },
