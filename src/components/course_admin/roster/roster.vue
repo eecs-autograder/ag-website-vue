@@ -52,7 +52,7 @@
           <td class="remove-user-column">
             <button type="button"
                     class="unstyled-button"
-                    :aria-label="'Delete ' + person.username"
+                    :aria-label="'Remove ' + person.username"
                     @click="remove_person_from_roster([person], index)">
               <i class="fas fa-user-times remove-user" aria-hidden="true"></i>
             </button>
