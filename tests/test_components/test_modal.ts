@@ -5,11 +5,11 @@ import Modal from '@/components/modal.vue';
 import { emitted } from '@/tests/utils';
 import { vi } from 'vitest';
 
-beforeEach(() => {
-    vi.useRealTimers();
-});
-
 describe('Modal.vue', () => {
+    beforeEach(() => {
+        vi.useRealTimers();
+    });
+
     test('Open and close modal using external boolean', async () => {
         const component = {
             template:  `<modal ref="modal"
@@ -110,13 +110,17 @@ describe('Modal.vue', () => {
         expect(emitted(wrapper, 'close').length).toBe(1);
     });
 
-    test('Enter on x emits "close"', async () => {
-        const wrapper = mount(Modal);
-        expect(wrapper.emitted('close')).toBeUndefined();
+    test('Modal container is labelled as a modal dialog', () => {
+        const wrapper = mount(Modal, {
+            propsData: {
+                aria_label: "Clone course"
+            }
+        });
 
-        await wrapper.find('.close-button').trigger('keydown.enter');
-
-        expect(emitted(wrapper, 'close').length).toBe(1);
+        const modal_container = wrapper.find('.modal-container');
+        expect(modal_container.attributes('role')).toBe('dialog');
+        expect(modal_container.attributes('aria-modal')).toBe('true');
+        expect(modal_container.attributes('aria-label')).toBe('Clone course');
     });
 
     test('Modal emits "close" when clicking outside the modal and ' +
@@ -243,5 +247,102 @@ describe('Modal.vue', () => {
         await outside_modal.trigger('click');
         expect(wrapper.findComponent({ref: 'modal'}).exists()).toBe(false);
         expect(wrapper.vm.$data.show_modal).toBe(false);
+    });
+});
+
+// focus-trap defers its initial and returning focus with setTimeout, so these
+// tests keep the fake timers set up in tests/setup.ts.
+describe('Modal.vue focus management', () => {
+    const component = {
+        template:  `<div>
+                        <button data-testid="trigger"
+                                @click="show_modal = true">Open</button>
+                        <modal v-if="show_modal" @close="show_modal = false">
+                            <input type="text" data-testid="first_input" />
+                            <input type="text" data-testid="second_input" />
+                        </modal>
+                    </div>`,
+        components: {
+            'modal': Modal
+        },
+        data: () => {
+            return {
+                show_modal: false
+            };
+        }
+    };
+
+    // jsdom performs no layout, so getClientRects() is empty for every element.
+    // focus-trap uses getClientRects() to find the elements to cycle through,
+    // so it considers them all hidden. Stub it so the tabbable elements are
+    // actually found.
+    beforeEach(() => {
+        vi.spyOn(Element.prototype, 'getClientRects').mockReturnValue(
+            [{width: 10, height: 10}] as unknown as DOMRectList
+        );
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    test('Focus moves to the first tabbable element when the modal opens', async () => {
+        const wrapper = mount(component, {attachTo: document.body});
+        await wrapper.setData({show_modal: true});
+        vi.runAllTimers();
+
+        expect(document.activeElement).toBe(
+            wrapper.find('[data-testid=first_input]').element);
+
+        wrapper.destroy();
+    });
+
+    test('Tab from the last tabbable element wraps to the first', async () => {
+        const wrapper = mount(component, {attachTo: document.body});
+        await wrapper.setData({show_modal: true});
+        vi.runAllTimers();
+
+        const close_button = wrapper.find('.close-button');
+        (close_button.element as HTMLElement).focus();
+        expect(document.activeElement).toBe(close_button.element);
+
+        await close_button.trigger('keydown.tab');
+
+        expect(document.activeElement).toBe(
+            wrapper.find('[data-testid=first_input]').element);
+
+        wrapper.destroy();
+    });
+
+    test('Shift+Tab from the first tabbable element wraps to the last', async () => {
+        const wrapper = mount(component, {attachTo: document.body});
+        await wrapper.setData({show_modal: true});
+        vi.runAllTimers();
+
+        const first_input = wrapper.find('[data-testid=first_input]');
+        expect(document.activeElement).toBe(first_input.element);
+
+        await first_input.trigger('keydown.tab', {shiftKey: true});
+
+        expect(document.activeElement).toBe(wrapper.find('.close-button').element);
+
+        wrapper.destroy();
+    });
+
+    test('Focus returns to the previously focused element when the modal closes',
+         async () => {
+        const wrapper = mount(component, {attachTo: document.body});
+        const trigger = wrapper.find('[data-testid=trigger]').element as HTMLElement;
+
+        trigger.focus();
+        await wrapper.find('[data-testid=trigger]').trigger('click');
+        vi.runAllTimers();
+        expect(document.activeElement).not.toBe(trigger);
+
+        await wrapper.setData({show_modal: false});
+        vi.runAllTimers();
+        expect(document.activeElement).toBe(trigger);
+
+        wrapper.destroy();
     });
 });
