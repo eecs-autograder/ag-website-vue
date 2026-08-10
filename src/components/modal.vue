@@ -10,31 +10,36 @@
       @keydown.esc="$emit('close')"
     >
       <div
+        ref="container"
         class="modal-container"
         :class="size"
         :style="custom_width ? { width: custom_width } : ''"
         role="dialog"
+        aria-modal="true"
         :aria-label="aria_label"
+        tabindex="-1"
       >
         <slot></slot>
-        <div
+        <button
           v-if="include_closing_x"
-          class="close-button"
-          role="button"
+          type="button"
+          class="close-button unstyled-button"
           @click="$emit('close')"
-          @keydown.enter="$emit('close')"
-          @keydown.space.prevent="$emit('close')"
-          tabindex="0"
-          aria-label="close-dialog"
+          aria-label="Close dialog"
         >
           &#10005;
-        </div>
+        </button>
       </div>
     </div>
   </transition>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+
+import { use_focus_trap } from "@/composables/use_focus_trap";
+import { assert_not_null } from "@/utils";
+
 // Props
 type PropTypes = {
   click_outside_to_close?: boolean;
@@ -55,10 +60,28 @@ const props = withDefaults(defineProps<PropTypes>(), {
 const emit = defineEmits<{
   close: [];
 }>();
+
+const container = ref<HTMLElement | null>(null);
+
+function get_container() {
+  const element = container.value;
+  assert_not_null(element);
+  return element;
+}
+
+use_focus_trap(container, {
+  // If no focusable elements in the modal, focus the modal itself.
+  fallbackFocus: get_container,
+
+  // Escape and outside clicks are handled above.
+  escapeDeactivates: false,
+  allowOutsideClick: true,
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import "@/styles/button_styles.scss";
 @import "@/styles/colors.scss";
 
 * {
@@ -135,8 +158,6 @@ const emit = defineEmits<{
 }
 
 .close-button {
-  cursor: pointer;
-
   position: absolute;
   top: 4px;
   right: 4px;

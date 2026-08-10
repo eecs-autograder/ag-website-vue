@@ -38,6 +38,7 @@
     "chartjs-plugin-zoom": "^1.2.1",
     "dompurify": "^3.1.6",
     "file-saver": "^2.0.5",
+    "focus-trap": "^8.2.2",
     "highlight.js": "^11.9.0",
     "lodash": "^4.17.21",
     "minimatch": "^3.1.2",
