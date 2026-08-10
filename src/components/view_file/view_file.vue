@@ -58,6 +58,7 @@
                 'far fa-copy': !state.d_is_file_copying,
                 'fas fa-check': state.d_is_file_copying,
               }"
+              aria-hidden="true"
             ></i>
           </button>
         </div>

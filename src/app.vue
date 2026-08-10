@@ -74,7 +74,7 @@
               aria-label="GitHub"
               target="_blank"
               href="https://github.com/eecs-autograder/autograder.io">
-            <i class="fab fa-github"></i>
+            <i class="fab fa-github" aria-hidden="true"></i>
           </a>
 
           <div v-if="globals.current_user === null"
