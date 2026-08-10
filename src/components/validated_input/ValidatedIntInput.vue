@@ -11,6 +11,7 @@
         <input
           class="input"
           :id="label_id"
+          aria-required="true"
           :aria-invalid="!is_valid && !hide_errors"
           :aria-describedby="errors_id"
           :style="input_style"

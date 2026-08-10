@@ -12,6 +12,7 @@
           ref="input_element"
           class="input"
           :id="label_id"
+          :aria-required="aria_required"
           :aria-invalid="!is_valid && !hide_errors"
           :aria-describedby="errors_id"
           :style="input_style"
@@ -54,6 +55,7 @@ import { generate_uid } from "@/utils";
 
 type PropTypes = {
   value: string;
+  aria_required: boolean;
   validators: ValidatorFuncType<string>[];
   input_style?: CSSProperties;
   placeholder?: string;

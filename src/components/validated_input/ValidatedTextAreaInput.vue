@@ -8,6 +8,7 @@
         <textarea
           class="input"
           :id="label_id"
+          :aria-required="aria_required"
           :aria-invalid="!is_valid && !hide_errors"
           :aria-describedby="errors_id"
           :rows="num_rows"
@@ -49,6 +50,7 @@ import { generate_uid } from "@/utils";
 
 type PropTypes = {
   value: string;
+  aria_required?: boolean;
   validators: ValidatorFuncType<string>[];
   num_rows?: number;
   input_style?: CSSProperties;
@@ -56,6 +58,7 @@ type PropTypes = {
 };
 const props = withDefaults(defineProps<PropTypes>(), {
   num_rows: 3,
+  aria_required: false,
 });
 
 const label_id = `label-${generate_uid()}`;
