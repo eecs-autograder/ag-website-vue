@@ -31,13 +31,15 @@
                 @input="$e => change_input($e.target.value)"></textarea>
       <slot name="suffix"> </slot>
     </div>
-    <transition name="fade">
-      <slot :d_error_msg="d_error_msg" v-if="show_errors">
-        <ul class="error-ul">
-            <li class="error-text error-li">{{d_error_msg}}</li>
-        </ul>
-      </slot>
-    </transition>
+    <div role="alert" aria-atomic="true">
+      <transition name="fade">
+        <slot :d_error_msg="d_error_msg" v-if="show_errors">
+          <ul class="error-ul">
+              <li class="error-text error-li">{{d_error_msg}}</li>
+          </ul>
+        </slot>
+      </transition>
+    </div>
   </div>
 </template>
 

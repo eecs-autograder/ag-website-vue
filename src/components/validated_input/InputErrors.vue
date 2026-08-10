@@ -1,5 +1,11 @@
 <template>
-  <transition-group name="fade" class="error-ul" tag="ul">
+  <transition-group
+    name="fade"
+    class="error-ul"
+    tag="ul"
+    role="alert"
+    aria-atomic="true"
+  >
     <li
       v-for="error of errors_to_render"
       class="error-text error-li"
