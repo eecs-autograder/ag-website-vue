@@ -41,8 +41,8 @@ const props = withDefaults(defineProps<PropTypes>(), {
   messages: [] as ReadonlyArray<Readonly<Message>>,
 });
 
-const state = reactive<{ to_display: [string, Message][] }>({
-  // Array of [rendered, Message object] tuples
+const state = reactive<{ to_display: Message[] }>({
+  // Array of Message objects
   to_display: [],
 });
 
