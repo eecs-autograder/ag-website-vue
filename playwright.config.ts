@@ -8,6 +8,27 @@ import { defineConfig, devices } from "@playwright/test";
 // import path from 'path';
 // dotenv.config({ path: path.resolve(__dirname, '.env') });
 
+// IMPORTANT: Keep the base url up to date with the value in tests/e2e/utils.ts
+const BASE_URL = "http://127.0.0.1:8080";
+
+const test_mode_storage_state = {
+  cookies: [
+    {
+      // Setting this prevents dev_to_user_messages.vue from displaying
+      // any messages, which would otherwise interfere with e2e tests.
+      name: "E2E_TEST_MODE",
+      value: "true",
+      domain: "127.0.0.1",
+      path: "/",
+      expires: -1,
+      httpOnly: false,
+      secure: false,
+      sameSite: "Lax" as "Strict" | "Lax" | "None",
+    },
+  ],
+  origins: [],
+};
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -28,7 +49,7 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // IMPORTANT: Keep the base url up to date with the value in tests/e2e/utils.ts
-    baseURL: "http://127.0.0.1:8080",
+    baseURL: BASE_URL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
@@ -43,19 +64,28 @@ export default defineConfig({
 
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: test_mode_storage_state,
+      },
       dependencies: ["global setup"],
     },
 
     {
       name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
+      use: {
+        ...devices["Desktop Firefox"],
+        storageState: test_mode_storage_state,
+      },
       dependencies: ["global setup"],
     },
 
     {
       name: "webkit",
-      use: { ...devices["Desktop Safari"] },
+      use: {
+        ...devices["Desktop Safari"],
+        storageState: test_mode_storage_state,
+      },
       dependencies: ["global setup"],
     },
 
