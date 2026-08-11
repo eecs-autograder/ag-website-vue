@@ -65,7 +65,7 @@ function as_markdown(message: Message) {
 
 function dismiss_message(message: Message) {
   localStorage.setItem(get_message_id(message), "dismissed");
-  state.to_display.splice(state.to_display.indexOf(message));
+  state.to_display.splice(state.to_display.indexOf(message), 1);
 }
 
 function was_dismissed(message: Message) {
