@@ -42,7 +42,6 @@ const props = withDefaults(defineProps<PropTypes>(), {
 });
 
 const state = reactive<{ to_display: Message[] }>({
-  // Array of Message objects
   to_display: [],
 });
 
