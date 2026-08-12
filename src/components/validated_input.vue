@@ -82,7 +82,7 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   @Prop({required: true})
   value!: unknown;
 
-  @Prop({required: true})
+  @Prop({default: false})
   aria_required!: boolean;
 
   @Prop({required: true, type: Array})
