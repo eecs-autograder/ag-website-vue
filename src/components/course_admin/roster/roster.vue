@@ -50,11 +50,12 @@
           <td class="email-column email">{{person.username}}</td>
           <td class="name-column name">{{person.first_name}} {{person.last_name}}</td>
           <td class="remove-user-column">
-            <i class="fas fa-user-times remove-user"
-                :title="'Delete ' + person.username"
-                tabindex="0"
-                @click="remove_person_from_roster([person], index)">
-            </i>
+            <button type="button"
+                    class="unstyled-button"
+                    :aria-label="'Remove ' + person.username"
+                    @click="remove_person_from_roster([person], index)">
+              <i class="fas fa-user-times remove-user" aria-hidden="true"></i>
+            </button>
           </td>
         </tr>
       </table>
