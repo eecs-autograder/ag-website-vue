@@ -248,15 +248,15 @@ test('One file panel per submitted file', async () => {
             readonly_handgrading_results: false,
         }
     });
-    let panels = <WrapperArray<FilePanel>> wrapper.findAllComponents({name: 'FilePanel'});
+    let panels = wrapper.findAllComponents(FilePanel);
     expect(panels.length).toEqual(3);
-    expect(panels.at(0).vm.filename).toEqual('file1.txt');
-    expect(panels.at(1).vm.filename).toEqual('file2.cpp');
-    expect(panels.at(2).vm.filename).toEqual('file3.py');
+    expect(panels.at(0).props().filename).toEqual('file1.txt');
+    expect(panels.at(1).props().filename).toEqual('file2.cpp');
+    expect(panels.at(2).props().filename).toEqual('file3.py');
 
-    expect(panels.at(0).vm.handgrading_result).toBe(wrapper.vm.d_handgrading_result);
-    expect(panels.at(1).vm.handgrading_result).toBe(wrapper.vm.d_handgrading_result);
-    expect(panels.at(2).vm.handgrading_result).toBe(wrapper.vm.d_handgrading_result);
+    expect(panels.at(0).props().handgrading_result).toBe(wrapper.vm.d_handgrading_result);
+    expect(panels.at(1).props().handgrading_result).toBe(wrapper.vm.d_handgrading_result);
+    expect(panels.at(2).props().handgrading_result).toBe(wrapper.vm.d_handgrading_result);
 });
 
 describe('Score tests', () => {

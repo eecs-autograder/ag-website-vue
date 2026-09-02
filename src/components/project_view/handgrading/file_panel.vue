@@ -1,96 +1,90 @@
 <template>
-  <div class="file-panel">
+  <div class="file-panel" ref="root">
     <button
+      type="button"
       class="panel unstyled-button"
-      tabindex="0"
       @click="toggle_open"
       :aria-controls="`file-panel-${component_uid}`"
-      :aria-expanded="d_is_open"
+      :aria-expanded="is_open ? 'true' : 'false'"
     >
-      <i class="fas" :class="d_is_open ? 'fa-chevron-down' : 'fa-chevron-right'"
-         aria-hidden="true"></i>
-      <span class="filename">{{filename}}</span>
+      <i
+        class="fas"
+        :class="is_open ? 'fa-chevron-down' : 'fa-chevron-right'"
+        aria-hidden="true"
+      ></i>
+      <span class="filename">{{ filename }}</span>
     </button>
-    <div :id="`file-panel-${component_uid}`" class="body" v-show="d_is_open">
-      <view-file v-if="d_content !== null"
-                 :filename="filename"
-                 :file_contents="d_content"
-                 :progress="d_progress"
-                 :handgrading_result="handgrading_result"
-                 :enable_custom_comments="enable_custom_comments"
-                 :readonly_handgrading_results="readonly_handgrading_results"
-                 :is_code_file="true"></view-file>
+    <div :id="`file-panel-${component_uid}`" class="body" v-show="is_open">
+      <view-file
+        v-if="content !== null"
+        :filename="filename"
+        :file_contents="content"
+        :progress="progress"
+        :handgrading_result="handgrading_result"
+        :enable_custom_comments="enable_custom_comments"
+        :readonly_handgrading_results="readonly_handgrading_results"
+        :is_code_file="true"
+      ></view-file>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { nextTick, ref } from "vue";
 
-import { HandgradingResult } from 'ag-client-typescript';
+import { HandgradingResult } from "ag-client-typescript";
 
-import ViewFile from '@/components/view_file/view_file.vue';
-import { generate_uid } from '@/utils';
+import ViewFile from "@/components/view_file/view_file.vue";
+import { generate_uid } from "@/utils";
 
-@Component({
-  components: {
-    ViewFile
-  }
-})
-export default class FilePanel extends Vue {
-  @Prop({required: true, type: HandgradingResult})
-  handgrading_result!: HandgradingResult;
-
-  @Prop({required: true, type: String})
-  filename!: string;
-
-  @Prop({required: true, type: Boolean})
-  enable_custom_comments!: boolean;
-
+type PropTypes = {
+  handgrading_result: HandgradingResult;
+  filename: string;
+  enable_custom_comments: boolean;
   // When true, editing handgrading results will be disabled.
-  @Prop({required: true, type: Boolean})
-  readonly_handgrading_results!: boolean;
+  readonly_handgrading_results: boolean;
+};
 
-  d_is_open = false;
+const props = defineProps<PropTypes>();
 
-  d_content: Promise<string> | null = null;
-  d_progress: number | null = null;
+const component_uid = generate_uid();
 
-  toggle_open() {
-    let top = this.$el.getBoundingClientRect().top;
+const root = ref<HTMLElement>();
+const is_open = ref(false);
+const content = ref<Promise<string> | null>(null);
+const progress = ref<number | null>(null);
 
-    this.d_progress = null;
-    this.d_is_open = !this.d_is_open;
-    if (this.d_content === null) {
-      this.d_content = HandgradingResult.get_file_from_handgrading_result(
-        this.handgrading_result.group, this.filename,
-        (event: ProgressEvent) => {
-          if (event.lengthComputable) {
-            this.d_progress = 100 * (1.0 * event.loaded / event.total);
-          }
+function toggle_open() {
+  let top = root.value!.getBoundingClientRect().top;
+
+  progress.value = null;
+  is_open.value = !is_open.value;
+  if (content.value === null) {
+    content.value = HandgradingResult.get_file_from_handgrading_result(
+      props.handgrading_result.group,
+      props.filename,
+      (event: ProgressEvent) => {
+        if (event.lengthComputable) {
+          progress.value = 100 * ((1.0 * event.loaded) / event.total);
         }
-      );
-    }
-
-    // This prevents any open files below this one from being pushed
-    // into the top of the viewport due to the size change of the parent.
-    // istanbul ignore next
-    if (!this.d_is_open && top < 0) {
-      this.$nextTick(() => {
-        this.$el.scrollIntoView();
-      });
-    }
+      },
+    );
   }
 
-  get component_uid() {
-    return generate_uid();
+  // This prevents any open files below this one from being pushed
+  // into the top of the viewport due to the size change of the parent.
+  // istanbul ignore next
+  if (!is_open.value && top < 0) {
+    nextTick(() => {
+      root.value!.scrollIntoView();
+    });
   }
 }
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
-@import '@/styles/button_styles.scss';
+@import "@/styles/colors.scss";
+@import "@/styles/button_styles.scss";
 
 * {
   box-sizing: border-box;
@@ -99,7 +93,7 @@ export default class FilePanel extends Vue {
 }
 
 .file-panel {
-  $margin: .375rem;
+  $margin: 0.375rem;
 
   margin: $margin;
   $border-color: $pebble-dark;
@@ -112,7 +106,7 @@ export default class FilePanel extends Vue {
     z-index: 1;
 
     display: flex;
-    padding: .5rem;
+    padding: 0.5rem;
     cursor: pointer;
 
     background-color: $white-gray;
@@ -122,7 +116,7 @@ export default class FilePanel extends Vue {
 
     .filename {
       font-weight: bold;
-      padding-left: .375rem;
+      padding-left: 0.375rem;
     }
   }
 
