@@ -58,7 +58,7 @@ describe('Submission list tests', () => {
         });
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(0);
+        expect(wrapper.findAllComponents(SubmissionPanel).length).toEqual(0);
         expect(wrapper.findAll('.active').length).toEqual(0);
         expect(wrapper.vm.d_selected_submission).toBeNull();
         expect(wrapper.vm.d_ultimate_submission).toBeNull();
@@ -152,7 +152,7 @@ describe('Submission list tests', () => {
 
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(
+        expect(wrapper.findAllComponents(SubmissionPanel).length).toEqual(
             has_ultimate_submission ? submissions.length + 1 : submissions.length);
         expect(wrapper.findAll('.active').length).toEqual(1);
         expect(wrapper.vm.d_selected_submission).toEqual(expected);
@@ -185,7 +185,7 @@ describe('Submission list tests', () => {
         expect(await wait_for_load(wrapper)).toBe(true);
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents(SubmissionPanel).length).toEqual(2);
         expect(
             wrapper.findAll('[data-testid=all_submissions_submission_panel]').length
         ).toEqual(1);
@@ -194,7 +194,7 @@ describe('Submission list tests', () => {
         await wrapper.setProps({group: other_group});
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents(SubmissionPanel).length).toEqual(2);
         expect(
             wrapper.findAll('[data-testid=all_submissions_submission_panel]').length
         ).toEqual(2);
@@ -218,7 +218,7 @@ describe('Submission list tests', () => {
         });
         expect(await wait_for_load(wrapper)).toBe(true);
 
-        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(1);
+        expect(wrapper.findAllComponents(SubmissionPanel).length).toEqual(1);
         expect(wrapper.vm.d_submissions).toEqual([submission]);
 
         // This update can only happen when we create a new submission locally,
@@ -230,7 +230,7 @@ describe('Submission list tests', () => {
         await wrapper.vm.$nextTick();
 
         expect(wrapper.vm.d_submissions).toEqual([new_submission_with_results, submission]);
-        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents(SubmissionPanel).length).toEqual(2);
         expect(wrapper.vm.d_selected_submission).toEqual(new_submission_with_results);
     });
 
@@ -250,7 +250,7 @@ describe('Submission list tests', () => {
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
-        expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(2);
+        expect(wrapper.findAllComponents(SubmissionPanel).length).toEqual(2);
 
         let removed_submission = new ag_cli.Submission(submissions[1]);
         removed_submission.status = ag_cli.GradingStatus.removed_from_queue;
@@ -336,7 +336,7 @@ describe('Ultimate submission tests', () => {
             expect(wrapper.vm.d_ultimate_submission).toEqual(ultimate_submission_with_results);
 
             // Ultimate submission shows up once on its own and once in "All Submissions"
-            expect(wrapper.findAllComponents({name: 'SubmissionPanel'}).length).toEqual(3);
+            expect(wrapper.findAllComponents(SubmissionPanel).length).toEqual(3);
             expect(wrapper.findAll('.active').length).toEqual(2);
             expect(wrapper.vm.d_selected_submission).toEqual(ultimate_submission_with_results);
 
@@ -344,9 +344,8 @@ describe('Ultimate submission tests', () => {
                 [submission, ultimate_submission_with_results]);
 
             let ultimate_submission_regular_panel
-                = <Wrapper<SubmissionPanel>> wrapper.findAllComponents(
-                    {name: 'SubmissionPanel'}).at(2);
-            expect(ultimate_submission_regular_panel.vm.submission).toEqual(
+                = wrapper.findAllComponents(SubmissionPanel).at(2);
+            expect(ultimate_submission_regular_panel.props('submission')).toEqual(
                 ultimate_submission_with_results);
         }
     });
