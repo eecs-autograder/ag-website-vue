@@ -1,118 +1,128 @@
 <template>
   <table class="stats-table">
-    <tr><th scope="row" class="stat-name">Count</th> <td class="stat-value">{{values.length}}</td></tr>
+    <tr>
+      <th scope="row" class="stat-name">Count</th>
+      <td class="stat-value">{{ values.length }}</td>
+    </tr>
     <template v-if="values.length !== 0">
-      <tr><th scope="row" class="stat-name">Min</th> <td class="stat-value">{{to_precision(min)}}</td></tr>
-      <tr><th scope="row" class="stat-name">Q1</th> <td class="stat-value">{{to_precision(q1)}}</td></tr>
+      <tr>
+        <th scope="row" class="stat-name">Min</th>
+        <td class="stat-value">{{ to_precision(min) }}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="stat-name">Q1</th>
+        <td class="stat-value">{{ to_precision(q1) }}</td>
+      </tr>
       <tr>
         <th scope="row" class="stat-name">Median</th>
-        <td class="stat-value">{{median}}</td>
-      </tr>
-      <tr><th scope="row" class="stat-name">Q3</th> <td class="stat-value">{{to_precision(q3)}}</td></tr>
-      <tr><th scope="row" class="stat-name">Max</th> <td class="stat-value">{{to_precision(max)}}</td></tr>
-      <tr>
-        <th scope="row" class="stat-name">Mean</th> <td class="stat-value">{{to_precision(mean)}}</td>
+        <td class="stat-value">{{ median }}</td>
       </tr>
       <tr>
-        <th scope="row" class="stat-name">Stdev</th> <td class="stat-value">{{to_precision(stdev)}}</td>
+        <th scope="row" class="stat-name">Q3</th>
+        <td class="stat-value">{{ to_precision(q3) }}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="stat-name">Max</th>
+        <td class="stat-value">{{ to_precision(max) }}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="stat-name">Mean</th>
+        <td class="stat-value">{{ to_precision(mean) }}</td>
+      </tr>
+      <tr>
+        <th scope="row" class="stat-name">Stdev</th>
+        <td class="stat-value">{{ to_precision(stdev) }}</td>
       </tr>
     </template>
   </table>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from "vue";
 
-@Component
-export default class DescriptiveStatsTable extends Vue {
-    @Prop({required: true})
-    values!: number[];
+type PropTypes = {
+  values: number[];
+  precision?: number;
+};
 
-    @Prop({default: 2})
-    precision!: number;
+const props = withDefaults(defineProps<PropTypes>(), {
+  precision: 2,
+});
 
-    get mean() {
-      let sum = this.values.reduce((total, current_val) => total + current_val, 0);
-      return sum / this.values.length;
-    }
+const sorted_values = computed(() =>
+  props.values.slice().sort((first, second) => first - second),
+);
 
-    get median() {
-      let sorted = this.sorted_values;
+const mean = computed(() => {
+  let sum = props.values.reduce((total, current_val) => total + current_val, 0);
+  return sum / props.values.length;
+});
 
-      if (sorted.length % 2 !== 0) {
-        return sorted[Math.floor(sorted.length / 2)];
-      }
+const median = computed(() => {
+  let sorted = sorted_values.value;
 
-      let left = Math.floor(sorted.length / 2);
-      let right = left - 1;
-      return (sorted[left] + sorted[right]) / 2;
-    }
+  if (sorted.length % 2 !== 0) {
+    return sorted[Math.floor(sorted.length / 2)];
+  }
 
-    get stdev() {
-      let sum_of_squares = this.values.reduce(
-        (sum, current_value) => sum + Math.pow((current_value - this.mean), 2),
-        0
-      );
-      return Math.sqrt(sum_of_squares / this.values.length);
-    }
+  let left = Math.floor(sorted.length / 2);
+  let right = left - 1;
+  return (sorted[left] + sorted[right]) / 2;
+});
 
-    get min() {
-      return Math.min(...this.values);
-    }
+const stdev = computed(() => {
+  let sum_of_squares = props.values.reduce(
+    (sum, current_value) => sum + Math.pow(current_value - mean.value, 2),
+    0,
+  );
+  return Math.sqrt(sum_of_squares / props.values.length);
+});
 
-    get max() {
-      return Math.max(...this.values);
-    }
+const min = computed(() => Math.min(...props.values));
+const max = computed(() => Math.max(...props.values));
 
-    get q1() {
-        return this.percentile(25);
-    }
+function percentile(p: number) {
+  let rank = (p / 100) * (sorted_values.value.length - 1) + 1;
+  let int_part = Math.floor(rank);
+  let float_part = rank % 1;
 
-    get q3() {
-      return this.percentile(75);
-    }
+  if (rank === 0) {
+    // istanbul ignore next
+    return 0;
+  }
+  if (rank === sorted_values.value.length) {
+    return sorted_values.value[sorted_values.value.length - 1];
+  }
+  return (
+    sorted_values.value[int_part - 1] +
+    float_part *
+      (sorted_values.value[int_part] - sorted_values.value[int_part - 1])
+  );
+}
 
-    private percentile(p: number) {
-      let rank = (p / 100) * (this.sorted_values.length - 1) + 1;
-      let int_part = Math.floor(rank);
-      let float_part = rank % 1;
+const q1 = computed(() => percentile(25));
+const q3 = computed(() => percentile(75));
 
-      if (rank === 0) {
-        // istanbul ignore next
-        return 0;
-      }
-      if (rank === this.sorted_values.length) {
-        return this.sorted_values[this.sorted_values.length - 1];
-      }
-      return this.sorted_values[int_part - 1]
-        + float_part
-        * (this.sorted_values[int_part] - this.sorted_values[int_part - 1]);
-    }
+function to_precision(value: number) {
+  if (Math.floor(value) === value) {
+    return value;
+  }
 
-    get sorted_values() {
-      return this.values.slice().sort((first, second) => first - second);
-    }
-
-    to_precision(value: number) {
-      if (Math.floor(value) === value) {
-        return value;
-      }
-
-      return value.toFixed(this.precision);
-    }
+  return value.toFixed(props.precision);
 }
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 .stats-table {
   border-collapse: collapse;
-  font-size: .875rem;
+  font-size: 0.875rem;
 
-  th, td {
+  th,
+  td {
     border: 1px solid $pebble-dark;
-    padding: .375rem;
+    padding: 0.375rem;
   }
 
   .stat-name {
@@ -120,9 +130,7 @@ export default class DescriptiveStatsTable extends Vue {
   }
 }
 
-
 .stat-value {
   text-align: right;
 }
-
 </style>
