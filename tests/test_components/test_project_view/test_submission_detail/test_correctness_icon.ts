@@ -1,10 +1,11 @@
 import { mount, Wrapper } from '@vue/test-utils';
+import Vue from 'vue';
 
 import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
 import CorrectnessIcon from '@/components/project_view/submission_detail/correctness_icon.vue';
 
 describe('CorrectnessIcon tests', () => {
-    let wrapper: Wrapper<CorrectnessIcon>;
+    let wrapper: Wrapper<Vue>;
 
     test('Correctness_level = all_correct', async () => {
         wrapper = mount(CorrectnessIcon, {
