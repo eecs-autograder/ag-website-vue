@@ -1,4 +1,5 @@
 import { Wrapper } from '@vue/test-utils';
+import Vue from 'vue';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -15,7 +16,7 @@ let filename: string;
 let content: string;
 let result: ag_cli.HandgradingResult;
 let get_file_stub: sinon.SinonStub;
-let wrapper: Wrapper<FilePanel>;
+let wrapper: Wrapper<Vue>;
 
 beforeEach(() => {
     filename = 'an_filename.txt';
@@ -51,14 +52,13 @@ beforeEach(() => {
 test('File loaded on open', async () => {
     expect(wrapper.find('.body').element).not.toBeVisible();
     wrapper.find('.panel').trigger('click');
-    expect(await wait_until(wrapper, w => w.vm.d_content !== null));
+    expect(await wait_until(wrapper, w => w.findComponent(ViewFile).exists()));
 
     expect(wrapper.find('.body').isVisible()).toBe(true);
-    expect(await wrapper.vm.d_content).toEqual(content);
 
     let view_file = wrapper.findComponent(ViewFile);
     await vi.runAllTimersAsync();
-    expect(view_file.vm.state.d_file_contents).toEqual(await wrapper.vm.d_content);
+    expect(view_file.vm.state.d_file_contents).toEqual(content);
     expect(view_file.vm.get_props().filename).toEqual(filename);
 
     wrapper.find('.panel').trigger('click');
@@ -73,7 +73,7 @@ test('File loaded on open', async () => {
 
 test('Handgrading props passed through to view file', async () => {
     await wrapper.find('.panel').trigger('click');
-    expect(await wait_until(wrapper, w => w.vm.d_content !== null));
+    expect(await wait_until(wrapper, w => w.findComponent(ViewFile).exists()));
 
     let view_file = wrapper.findComponent(ViewFile);
     expect(view_file.vm.get_props().enable_custom_comments).toBe(false);
