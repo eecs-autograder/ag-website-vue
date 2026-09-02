@@ -1,4 +1,5 @@
-import { mount, Wrapper } from '@vue/test-utils';
+import { Wrapper } from '@vue/test-utils';
+import Vue from 'vue';
 
 import { AGTestSuiteFeedbackConfig } from 'ag-client-typescript';
 
@@ -6,11 +7,11 @@ import AGTestSuiteAdvancedFdbkSettings from '@/components/project_admin/ag_tests
 
 import { make_ag_test_suite_fdbk_config } from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, set_data, find_collapsible_section_header } from '@/tests/utils';
+import { checkbox_is_checked, emitted, find_collapsible_section_header } from '@/tests/utils';
 
 
 describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
-    let wrapper: Wrapper<AGTestSuiteAdvancedFdbkSettings>;
+    let wrapper: Wrapper<Vue>;
     let feedback_config: AGTestSuiteFeedbackConfig;
 
     beforeEach(() => {
@@ -26,188 +27,86 @@ describe('AGTestSuiteAdvancedFdbkSettings tests', () => {
         });
     });
 
+    function last_emitted_config(): AGTestSuiteFeedbackConfig {
+        let events = emitted(wrapper, 'input');
+        return events[events.length - 1][0];
+    }
+
+    // Checking a box must emit the new config, and a new "value" prop must be
+    // reflected back in the box's checked state.
+    async function expect_two_way_binding(
+        testid: string, field: keyof AGTestSuiteFeedbackConfig
+    ) {
+        await wrapper.setProps({value: make_ag_test_suite_fdbk_config({[field]: false})});
+
+        let input = wrapper.find(`[data-testid=${testid}]`);
+        expect(checkbox_is_checked(input)).toEqual(false);
+
+        await input.setChecked(true);
+        expect(last_emitted_config()[field]).toEqual(true);
+
+        await input.setChecked(false);
+        expect(last_emitted_config()[field]).toEqual(false);
+
+        await input.setChecked(true);
+        expect(last_emitted_config()[field]).toEqual(true);
+        expect(checkbox_is_checked(input)).toEqual(true);
+
+        await wrapper.setProps({value: make_ag_test_suite_fdbk_config({[field]: false})});
+        expect(checkbox_is_checked(input)).toEqual(false);
+
+        await wrapper.setProps({value: make_ag_test_suite_fdbk_config({[field]: true})});
+        expect(checkbox_is_checked(input)).toEqual(true);
+    }
+
     test('visible binding', async () => {
-        let visible_input = wrapper.find('[data-testid=suite_is_visible]');
-
-        await visible_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.visible).toEqual(true);
-
-        await visible_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.visible).toEqual(false);
-
-        await visible_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.visible).toEqual(true);
-
-        expect(checkbox_is_checked(visible_input)).toEqual(true);
-
-        wrapper.vm.d_feedback_config!.visible = false;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(visible_input)).toEqual(false);
-
-        wrapper.vm.d_feedback_config!.visible = true;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(visible_input)).toEqual(true);
+        await expect_two_way_binding('suite_is_visible', 'visible');
     });
 
     test('Toggle show_student_description', async () => {
-        let show_student_description_input = wrapper.find('[data-testid=show_student_description]');
-
-        await show_student_description_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
-
-        await show_student_description_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(false);
-
-        await show_student_description_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
-
-        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
-
-        wrapper.vm.d_feedback_config!.show_student_description = false;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_student_description_input)).toEqual(false);
-
-        wrapper.vm.d_feedback_config!.show_student_description = true;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
+        await expect_two_way_binding('show_student_description', 'show_student_description');
     });
 
     test('show_individual_tests binding', async () => {
         await find_collapsible_section_header(wrapper).trigger('click');
-
-        let show_individual_tests_input = wrapper.find('[data-testid=show_individual_tests]');
-
-        await show_individual_tests_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_individual_tests).toEqual(true);
-
-        await show_individual_tests_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_individual_tests).toEqual(false);
-
-        await show_individual_tests_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_individual_tests).toEqual(true);
-
-        expect(checkbox_is_checked(show_individual_tests_input)).toEqual(true);
-
-        wrapper.vm.d_feedback_config!.show_individual_tests = false;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_individual_tests_input)).toEqual(false);
-
-        wrapper.vm.d_feedback_config!.show_individual_tests = true;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_individual_tests_input)).toEqual(true);
+        await expect_two_way_binding('show_individual_tests', 'show_individual_tests');
     });
 
     test('Toggle show_setup_return_code', async () => {
         await find_collapsible_section_header(wrapper).trigger('click');
-
-        let show_setup_return_code_input = wrapper.find('[data-testid=show_setup_return_code]');
-
-        await show_setup_return_code_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_setup_return_code).toEqual(true);
-
-        await show_setup_return_code_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_setup_return_code).toEqual(false);
-
-        await show_setup_return_code_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_setup_return_code).toEqual(true);
-
-        expect(checkbox_is_checked(show_setup_return_code_input)).toEqual(true);
-
-        wrapper.vm.d_feedback_config!.show_setup_return_code = false;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_setup_return_code_input)).toEqual(false);
-
-        wrapper.vm.d_feedback_config!.show_setup_return_code = true;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_setup_return_code_input)).toEqual(true);
+        await expect_two_way_binding('show_setup_return_code', 'show_setup_return_code');
     });
 
     test('Toggle show_setup_timed_out', async () => {
         await find_collapsible_section_header(wrapper).trigger('click');
-
-        let show_setup_timed_out_input = wrapper.find('[data-testid=show_setup_timed_out]');
-
-        await show_setup_timed_out_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_setup_timed_out).toEqual(true);
-
-        await show_setup_timed_out_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_setup_timed_out).toEqual(false);
-
-        await show_setup_timed_out_input.setChecked(true);
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_feedback_config!.show_setup_timed_out).toEqual(true);
-
-        expect(checkbox_is_checked(show_setup_timed_out_input)).toEqual(true);
-
-        wrapper.vm.d_feedback_config!.show_setup_timed_out = false;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_setup_timed_out_input)).toEqual(false);
-
-        wrapper.vm.d_feedback_config!.show_setup_timed_out = true;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_setup_timed_out_input)).toEqual(true);
+        await expect_two_way_binding('show_setup_timed_out', 'show_setup_timed_out');
     });
 
     test('Toggle show_setup_stdout', async () => {
         await find_collapsible_section_header(wrapper).trigger('click');
-
-        let show_setup_stdout_input = wrapper.find('[data-testid=show_setup_stdout]');
-
-        await show_setup_stdout_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_setup_stdout).toEqual(true);
-
-        await show_setup_stdout_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_setup_stdout).toEqual(false);
-
-        await show_setup_stdout_input.setChecked(true);
-        await wrapper.vm.$nextTick();
-        expect(wrapper.vm.d_feedback_config!.show_setup_stdout).toEqual(true);
-        expect(checkbox_is_checked(show_setup_stdout_input)).toEqual(true);
-
-        wrapper.vm.d_feedback_config!.show_setup_stdout = false;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_setup_stdout_input)).toEqual(false);
-
-        wrapper.vm.d_feedback_config!.show_setup_stdout = true;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_setup_stdout_input)).toEqual(true);
+        await expect_two_way_binding('show_setup_stdout', 'show_setup_stdout');
     });
 
     test('Toggle show_setup_stderr', async () => {
         await find_collapsible_section_header(wrapper).trigger('click');
-
-        let show_setup_stderr_input = wrapper.find('[data-testid=show_setup_stderr]');
-
-        await show_setup_stderr_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_setup_stderr).toEqual(true);
-
-        await show_setup_stderr_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_setup_stderr).toEqual(false);
-
-        await show_setup_stderr_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_setup_stderr).toEqual(true);
-
-        expect(checkbox_is_checked(show_setup_stderr_input)).toEqual(true);
-
-        wrapper.vm.d_feedback_config!.show_setup_stderr = false;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_setup_stderr_input)).toEqual(false);
-
-        wrapper.vm.d_feedback_config!.show_setup_stderr = true;
-        await wrapper.vm.$nextTick();
-        expect(checkbox_is_checked(show_setup_stderr_input)).toEqual(true);
+        await expect_two_way_binding('show_setup_stderr', 'show_setup_stderr');
     });
 
     test('value Watcher', async () => {
-        expect(wrapper.vm.d_feedback_config!).toEqual(feedback_config);
+        await find_collapsible_section_header(wrapper).trigger('click');
+
+        let stdout_input = wrapper.find('[data-testid=show_setup_stdout]');
+        let stderr_input = wrapper.find('[data-testid=show_setup_stderr]');
+        expect(checkbox_is_checked(stdout_input)).toEqual(feedback_config.show_setup_stdout);
+        expect(checkbox_is_checked(stderr_input)).toEqual(feedback_config.show_setup_stderr);
 
         let new_val = make_ag_test_suite_fdbk_config({
             show_setup_stdout: !feedback_config.show_setup_stdout,
             show_setup_stderr: !feedback_config.show_setup_stderr,
         });
-        await wrapper.setProps({'value': new_val});
-        await wrapper.vm.$nextTick();
+        await wrapper.setProps({value: new_val});
 
-        expect(wrapper.vm.d_feedback_config!).toEqual(new_val);
+        expect(checkbox_is_checked(stdout_input)).toEqual(new_val.show_setup_stdout);
+        expect(checkbox_is_checked(stderr_input)).toEqual(new_val.show_setup_stderr);
     });
 });

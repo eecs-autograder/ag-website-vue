@@ -287,9 +287,9 @@ describe('AG test suite feedback tests', () => {
         expect(normal_config_panel.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
 
         let normal_advanced_settings
-            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.findComponent({
+            = wrapper.findComponent({
                 ref: 'normal_edit_feedback_settings'});
-        expect(normal_advanced_settings.vm.value).toEqual(ag_test_suite.normal_fdbk_config);
+        expect(normal_advanced_settings.props().value).toEqual(ag_test_suite.normal_fdbk_config);
 
         let new_val = data_ut.make_ag_test_suite_fdbk_config({
             show_setup_return_code: false,
@@ -328,9 +328,9 @@ describe('AG test suite feedback tests', () => {
             ag_test_suite.ultimate_submission_fdbk_config);
 
         let final_graded_advanced_settings
-            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.findComponent({
+            = wrapper.findComponent({
                 ref: 'final_graded_edit_feedback_settings'});
-        expect(final_graded_advanced_settings.vm.value).toEqual(
+        expect(final_graded_advanced_settings.props().value).toEqual(
             ag_test_suite.ultimate_submission_fdbk_config);
 
         let new_val = data_ut.make_ag_test_suite_fdbk_config({
@@ -370,9 +370,9 @@ describe('AG test suite feedback tests', () => {
             ag_test_suite.past_limit_submission_fdbk_config);
 
         let past_limit_advanced_settings
-            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.findComponent({
+            = wrapper.findComponent({
                 ref: 'past_limit_edit_feedback_settings'});
-        expect(past_limit_advanced_settings.vm.value).toEqual(
+        expect(past_limit_advanced_settings.props().value).toEqual(
             ag_test_suite.past_limit_submission_fdbk_config);
 
         let new_val = data_ut.make_ag_test_suite_fdbk_config({
@@ -412,9 +412,9 @@ describe('AG test suite feedback tests', () => {
             ag_test_suite.staff_viewer_fdbk_config);
 
         let student_lookup_advanced_settings
-            = <Wrapper<AGTestSuiteAdvancedFdbkSettings>> wrapper.findComponent({
+            = wrapper.findComponent({
                 ref: 'student_lookup_edit_feedback_settings'});
-        expect(student_lookup_advanced_settings.vm.value).toEqual(
+        expect(student_lookup_advanced_settings.props().value).toEqual(
             ag_test_suite.staff_viewer_fdbk_config);
 
         let new_val = data_ut.make_ag_test_suite_fdbk_config({
