@@ -30,7 +30,6 @@ beforeEach(() => {
 
 describe('GroupLookup tests', () => {
     let wrapper: Wrapper<GroupLookup>;
-    let component: GroupLookup;
 
     beforeEach(() => {
         wrapper = managed_mount(GroupLookup, {
@@ -39,36 +38,28 @@ describe('GroupLookup tests', () => {
             },
             mocks: get_router_mocks(),
         });
-        component = wrapper.vm;
-    });
-
-    afterEach(() => {
-        if (wrapper.exists()) {
-            wrapper.destroy();
-        }
     });
 
     test('filter text matches username (case_insensitive)', async () => {
-        await component.$nextTick();
+        await wrapper.vm.$nextTick();
 
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'group_typeahead'}).vm;
-        expect(dropdown_typeahead.choices).toEqual(groups);
+        let dropdown_typeahead = wrapper.findComponent(DropdownTypeahead);
+        expect(dropdown_typeahead.props('choices')).toEqual(groups);
 
-        dropdown_typeahead.filter_text = "ILTERm";
-        await component.$nextTick();
+        await dropdown_typeahead.find('input').setValue('ILTERm');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(2);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(groups[2]);
-        expect(dropdown_typeahead.filtered_choices[1]).toEqual(groups[3]);
+        let rows = wrapper.findAll('.dropdown-row');
+        expect(rows.length).toEqual(2);
+        expect(rows.at(0).text()).toContain('filterme1');
+        expect(rows.at(1).text()).toContain('userrr');
+        expect(rows.at(1).text()).toContain('filtermee2');
     });
 
     test('When a group is selected from the typeahead, an event is emitted', () => {
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'group_typeahead'}).vm;
-        expect(dropdown_typeahead.choices).toEqual(groups);
+        let dropdown_typeahead = wrapper.findComponent(DropdownTypeahead);
+        expect(dropdown_typeahead.props('choices')).toEqual(groups);
 
-        dropdown_typeahead.$emit('item_selected', groups[3]);
+        dropdown_typeahead.vm.$emit('item_selected', groups[3]);
 
         expect(emitted(wrapper, 'update_group_selected').length).toEqual(1);
         expect(emitted(wrapper, 'update_group_selected')[0][0]).toEqual(groups[3]);
@@ -107,13 +98,16 @@ function get_router_mocks(group_pk?: number) {
             query: {other_param: 'other_param'}
         },
         $router: <VueRouter> <unknown> {
-            replace: router_replace
+            replace: router_replace,
+            currentRoute: {query: {other_param: 'other_param'}}
         }
     };
     if (group_pk !== undefined) {
-        mocks.$route.query = {
+        let query = {
             other_param: 'other_param', current_student_lookup: group_pk.toString()
         };
+        mocks.$route.query = query;
+        mocks.$router.currentRoute.query = query;
     }
     return mocks;
 }

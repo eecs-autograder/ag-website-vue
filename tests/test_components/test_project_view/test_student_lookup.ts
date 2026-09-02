@@ -38,8 +38,8 @@ beforeEach(async () => {
 });
 
 test('Group lookup and submission list input and event bindings', async () => {
-    let group_lookup = find_by_name<GroupLookup>(wrapper, 'GroupLookup');
-    expect(group_lookup.vm.groups).toEqual(groups);
+    let group_lookup = wrapper.findComponent(GroupLookup);
+    expect(group_lookup.props('groups')).toEqual(groups);
     let submission_list = find_by_name<SubmissionList>(wrapper, 'SubmissionList');
     expect(submission_list.exists()).toBe(false);
 
