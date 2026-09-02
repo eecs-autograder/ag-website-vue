@@ -212,11 +212,11 @@ test('Pass fail counts and bugs exposed', async () => {
     expect(test_rows.at(3).find('.num-fail').text()).toEqual('');
 
     let mutation_suite_stats_tables = find_all_components(wrapper, DescriptiveStatsTable);
-    expect(Array.from(mutation_suite_stats_tables.at(0).vm.values)).toEqual([
+    expect(Array.from(mutation_suite_stats_tables.at(0).props().values)).toEqual([
         3, 1,
     ]);
 
-    expect(Array.from(mutation_suite_stats_tables.at(1).vm.values)).toEqual([
+    expect(Array.from(mutation_suite_stats_tables.at(1).props().values)).toEqual([
         2, 0
     ]);
 

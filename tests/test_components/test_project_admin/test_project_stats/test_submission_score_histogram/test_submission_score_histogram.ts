@@ -1,5 +1,3 @@
-import { WrapperArray } from '@vue/test-utils';
-
 import { FullUltimateSubmissionResult } from 'ag-client-typescript';
 
 import DescriptiveStatsTable from '@/components/project_admin/project_stats/descriptive_stats_table.vue';
@@ -108,11 +106,10 @@ test('All, individuals, and group percentages', () => {
         }
     });
 
-    let stats_tables
-        = <WrapperArray<DescriptiveStatsTable>> wrapper.findAllComponents(DescriptiveStatsTable);
-    expect(stats_tables.at(0).vm.values).toEqual(expected_all_percentages);
-    expect(stats_tables.at(1).vm.values).toEqual(expected_individuals_percentages);
-    expect(stats_tables.at(2).vm.values).toEqual(expected_groups_percentages);
+    let stats_tables = wrapper.findAllComponents(DescriptiveStatsTable);
+    expect(stats_tables.at(0).props().values).toEqual(expected_all_percentages);
+    expect(stats_tables.at(1).props().values).toEqual(expected_individuals_percentages);
+    expect(stats_tables.at(2).props().values).toEqual(expected_groups_percentages);
 
     let submission_score_histogram_chart
         = find_by_name<SubmissionScoreHistogramChart>(wrapper, 'SubmissionScoreHistogramChart');
