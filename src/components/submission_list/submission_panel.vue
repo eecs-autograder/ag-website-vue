@@ -1,7 +1,7 @@
 <template>
   <div class="submission-list-item">
     <div class="submission-timestamp">
-      {{format_datetime_short(submission.timestamp)}}
+      {{ format_datetime_short(submission.timestamp) }}
     </div>
     <div class="submission-status" role="status">
       <template v-if="submission.status === GradingStatus.queued">
@@ -11,22 +11,48 @@
         <i class="fas fa-list" role="img" aria-label="Being graded"></i>
       </template>
 
-      <template v-else-if="submission.status === GradingStatus.waiting_for_deferred">
-        <div v-if="Number(submission.results.total_points_possible) !== 0" class="score"
-             aria-label="Score">
-          {{submission.results.total_points}}/{{submission.results.total_points_possible}}
+      <template
+        v-else-if="submission.status === GradingStatus.waiting_for_deferred"
+      >
+        <div
+          v-if="Number(submission.results.total_points_possible) !== 0"
+          class="score"
+          aria-label="Score"
+        >
+          {{ submission.results.total_points }}/{{
+            submission.results.total_points_possible
+          }}
         </div>
-        <i v-else class="far fa-check-circle" role="img" aria-label="Core tests finished"></i>
+        <i
+          v-else
+          class="far fa-check-circle"
+          role="img"
+          aria-label="Core tests finished"
+        ></i>
       </template>
-      <template v-else-if="submission.status === GradingStatus.finished_grading">
-        <div v-if="Number(submission.results.total_points_possible) !== 0" class="score"
-             aria-label="Score">
-          {{submission.results.total_points}}/{{submission.results.total_points_possible}}
+      <template
+        v-else-if="submission.status === GradingStatus.finished_grading"
+      >
+        <div
+          v-if="Number(submission.results.total_points_possible) !== 0"
+          class="score"
+          aria-label="Score"
+        >
+          {{ submission.results.total_points }}/{{
+            submission.results.total_points_possible
+          }}
         </div>
-        <i v-else class="far fa-check-circle" role="img" aria-label="Finished grading"></i>
+        <i
+          v-else
+          class="far fa-check-circle"
+          role="img"
+          aria-label="Finished grading"
+        ></i>
       </template>
 
-      <template v-else-if="submission.status === GradingStatus.removed_from_queue">
+      <template
+        v-else-if="submission.status === GradingStatus.removed_from_queue"
+      >
         <i class="fas fa-eject" role="img" aria-label="Removed from queue"></i>
       </template>
       <template v-else-if="submission.status === GradingStatus.rejected">
@@ -39,25 +65,18 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { GradingStatus, SubmissionWithResults } from "ag-client-typescript";
 
-import { GradingStatus, Submission, SubmissionWithResults } from 'ag-client-typescript';
+import { format_datetime_short } from "@/utils";
 
-import { format_datetime_short } from '@/utils';
-
-@Component
-export default class SubmissionPanel extends Vue {
-  @Prop({required: true})
-  submission!: SubmissionWithResults;
-
-  readonly GradingStatus = GradingStatus;
-  readonly format_datetime_short = format_datetime_short;
-}
+defineProps<{
+  submission: SubmissionWithResults;
+}>();
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 * {
   box-sizing: border-box;
@@ -70,7 +89,7 @@ export default class SubmissionPanel extends Vue {
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  font-size: .9rem;
+  font-size: 0.9rem;
 
   .submission-timestamp {
     padding-right: 25px;
@@ -94,7 +113,8 @@ export default class SubmissionPanel extends Vue {
       color: $orange;
     }
 
-    .fa-skull, .fa-ban {
+    .fa-skull,
+    .fa-ban {
       color: crimson;
     }
   }
@@ -108,5 +128,4 @@ export default class SubmissionPanel extends Vue {
 .submission-list-item:hover {
   background-color: $pebble-light;
 }
-
 </style>
