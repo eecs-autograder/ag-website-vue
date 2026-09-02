@@ -53,18 +53,50 @@
         </select-object>
       </div>
 
-      <div class="toggle-container form-field-wrapper">
-        <toggle v-model="d_suite.allow_network_access"
-                @input="$emit('field_change', d_suite)"
-                ref="allow_network_access">
-          <div slot="on">
-            Allow network access
-          </div>
-          <div slot="off">
-            Block network access
-          </div>
-        </toggle>
+      <div class="checkbox-input-container allow-network-access">
+        <label class="checkbox-label">
+          <input data-testid="allow_network_access"
+                 type="checkbox"
+                 class="checkbox"
+                 ref="allow_network_access"
+                 :checked="d_suite.allow_network_access"
+                 @change="on_allow_network_access_change($event)"/>
+          Allow network access
+        </label>
+        <tooltip v-if="d_suite.allow_network_access" width="large" placement="right">
+          <template v-slot:trigger>
+            <i class="fas fa-exclamation-triangle warning-tip"
+               aria-label="Network access warning"></i>
+          </template>
+          {{WARNING_MESSAGE}}
+        </tooltip>
       </div>
+
+      <modal v-if="d_show_allow_network_access_modal"
+             @close="d_show_allow_network_access_modal = false"
+             ref="allow_network_access_modal"
+             size="large"
+             :click_outside_to_close="true"
+             aria_label="Confirm network access modal">
+        <div class="modal-header"> Confirm network access </div>
+
+        {{WARNING_MESSAGE}}
+
+        <div class="modal-button-footer">
+          <button type="button"
+                  data-testid="confirm_allow_network_access_button"
+                  class="red-button"
+                  @click="allow_network_access">
+            Allow network access
+          </button>
+          <button type="button"
+                  data-testid="cancel_allow_network_access_button"
+                  class="white-button"
+                  @click="d_show_allow_network_access_modal = false">
+            Cancel
+          </button>
+        </div>
+      </modal>
 
       <div class="checkbox-input-container">
         <label class="checkbox-label">
@@ -173,8 +205,8 @@ import {
 
 import BatchSelect from '@/components/batch_select.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+import Modal from '@/components/modal.vue';
 import SelectObject from '@/components/select_object.vue';
-import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { is_not_empty } from '@/validators';
@@ -204,8 +236,8 @@ class Suite {
   components: {
     DropdownTypeahead,
     BatchSelect,
+    Modal,
     SelectObject,
-    Toggle,
     Tooltip,
     ValidatedInput,
   }
@@ -221,11 +253,43 @@ export default class SuiteSettings extends Vue {
   docker_images!: SandboxDockerImageData[];
 
   d_suite: Suite | null = null;
+  d_show_allow_network_access_modal = false;
 
   readonly is_not_empty = is_not_empty;
 
+  readonly WARNING_MESSAGE
+    = "Allowing network access means that student code could steal sensitive "
+    + "files or other information present in the sandbox (e.g., test cases, "
+    + "solution files) with a simple network request. If network access is "
+    + "required for your test cases to work, you may be able to mitigate the "
+    + "risk by deleting sensitive files at the end of the test suite setup "
+    + "phase. If there are sensitive files that cannot be deleted from the "
+    + "sandbox, then you should be aware of the risks associated with this "
+    + "setting.";
+
   created() {
     this.d_suite = new Suite(this.suite);
+  }
+
+  on_allow_network_access_change(event: Event) {
+    let checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      // Don't enable network access until the user confirms in the modal.
+      // Revert the checkbox in the meantime so that cancelling (or closing
+      // the modal) leaves it unchecked.
+      (event.target as HTMLInputElement).checked = false;
+      this.d_show_allow_network_access_modal = true;
+    }
+    else {
+      this.d_suite!.allow_network_access = false;
+      this.$emit('field_change', this.d_suite);
+    }
+  }
+
+  allow_network_access() {
+    this.d_suite!.allow_network_access = true;
+    this.$emit('field_change', this.d_suite);
+    this.d_show_allow_network_access_modal = false;
   }
 
   @Watch('suite', {deep: true})
@@ -283,15 +347,21 @@ export default class SuiteSettings extends Vue {
 @import '@/styles/button_styles.scss';
 @import '@/styles/colors.scss';
 @import '@/styles/forms.scss';
+@import '@/styles/modal.scss';
 
 * {
   box-sizing: border-box;
   padding: 0;
 }
 
-.toggle-container {
-  font-size: .875rem;
-  margin: 1rem 0;
+.allow-network-access {
+  display: flex;
+  align-items: center;
+}
+
+.warning-tip {
+  color: $warning-red;
+  font-size: 1.25rem;
 }
 
 .instructor-files, .student-files {
