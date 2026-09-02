@@ -143,10 +143,10 @@ export function ag_test_case_result_custom_scoring_correctness(case_result: AGTe
         return CorrectnessLevel.all_correct;
     }
 
-    const none_correct = !case_result.ag_test_command_results.some(
+    const none_correct = case_result.ag_test_command_results.every(
         (cmd_result) => (
             cmd_result.custom_scoring_used === false
-            || cmd_result.custom_scoring_points === cmd_result.custom_scoring_points_possible
+            || cmd_result.custom_scoring_points <= 0
         )
     );
     if (none_correct) {
