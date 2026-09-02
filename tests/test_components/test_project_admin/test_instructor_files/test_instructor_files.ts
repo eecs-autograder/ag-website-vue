@@ -4,7 +4,7 @@ import { HttpError, InstructorFile, Project } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
 import APIErrors from "@/components/api_errors.vue";
-import FileUpload from '@/components/file_upload.vue';
+import { FileUploadExposed } from '@/exposed_component_types/file_upload_exposed';
 import InstructorFiles from '@/components/project_admin/instructor_files/instructor_files.vue';
 import ViewFile from '@/components/view_file/view_file.vue';
 
@@ -24,7 +24,7 @@ describe('InstructorFiles.vue', () => {
     let file_same_name_as_1: File;
     let uniquely_named_file: File;
     let new_uniquely_named_instructor_file: InstructorFile;
-    let file_upload_component: FileUpload;
+    let file_upload_component: FileUploadExposed;
 
     beforeEach(async () => {
         project = data_ut.make_project(data_ut.make_course().pk);
@@ -108,8 +108,8 @@ describe('InstructorFiles.vue', () => {
 
         let final_upload_button = wrapper.find('.upload-files-button');
         file_upload_component
-            = <FileUpload> wrapper.findComponent({ref: 'instructor_files_upload'}).vm;
-        file_upload_component.d_files.insert(file_same_name_as_1);
+            = wrapper.findComponent({ref: 'instructor_files_upload'}).vm as FileUploadExposed;
+        file_upload_component.state.files.insert(file_same_name_as_1);
 
         final_upload_button.trigger('click');
         await wrapper.vm.$nextTick();
@@ -136,8 +136,8 @@ describe('InstructorFiles.vue', () => {
     test('Upload new instructor file', async () => {
         let final_upload_button = wrapper.find('.upload-files-button');
         file_upload_component
-            = <FileUpload> wrapper.findComponent({ref: 'instructor_files_upload'}).vm;
-        file_upload_component.d_files.insert(uniquely_named_file);
+            = wrapper.findComponent({ref: 'instructor_files_upload'}).vm as FileUploadExposed;
+        file_upload_component.state.files.insert(uniquely_named_file);
 
         let create_stub = sinon.stub(InstructorFile, 'create');
         create_stub.callsFake((project_pk, name, content, on_upload_progress) => {
@@ -162,8 +162,8 @@ describe('InstructorFiles.vue', () => {
     test('Error uploading instructor file', async () => {
         let final_upload_button = wrapper.find('.upload-files-button');
         file_upload_component
-            = <FileUpload> wrapper.findComponent({ref: 'instructor_files_upload'}).vm;
-        file_upload_component.d_files.insert(uniquely_named_file);
+            = wrapper.findComponent({ref: 'instructor_files_upload'}).vm as FileUploadExposed;
+        file_upload_component.state.files.insert(uniquely_named_file);
 
         sinon.stub(InstructorFile, 'create').rejects(
             new HttpError(413, 'Too large'));
