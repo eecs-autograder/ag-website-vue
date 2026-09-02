@@ -1,11 +1,11 @@
 <template>
   <div class="file-panel" ref="root">
     <button
+      type="button"
       class="panel unstyled-button"
-      tabindex="0"
       @click="toggle_open"
       :aria-controls="`file-panel-${component_uid}`"
-      :aria-expanded="is_open"
+      :aria-expanded="is_open ? 'true' : 'false'"
     >
       <i
         class="fas"

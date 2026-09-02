@@ -51,10 +51,12 @@ beforeEach(() => {
 
 test('File loaded on open', async () => {
     expect(wrapper.find('.body').element).not.toBeVisible();
+    expect(wrapper.find('.panel').attributes('aria-expanded')).toEqual('false');
     wrapper.find('.panel').trigger('click');
     expect(await wait_until(wrapper, w => w.findComponent(ViewFile).exists()));
 
     expect(wrapper.find('.body').isVisible()).toBe(true);
+    expect(wrapper.find('.panel').attributes('aria-expanded')).toEqual('true');
 
     let view_file = wrapper.findComponent(ViewFile);
     await vi.runAllTimersAsync();
@@ -65,6 +67,7 @@ test('File loaded on open', async () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.find('.body').element).not.toBeVisible();
+    expect(wrapper.find('.panel').attributes('aria-expanded')).toEqual('false');
     wrapper.find('.panel').trigger('click');
     await wrapper.vm.$nextTick();
 
