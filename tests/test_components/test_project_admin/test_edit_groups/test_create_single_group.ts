@@ -8,7 +8,6 @@ import {
 } from 'ag-client-typescript';
 import * as sinon from "sinon";
 
-import APIErrors from '@/components/api_errors.vue';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import CreateSingleGroup from '@/components/project_admin/edit_groups/create_single_group.vue';
 
@@ -18,7 +17,6 @@ import { wait_until } from '@/tests/utils';
 
 describe('CreateSingleGroup tests', () => {
     let wrapper: Wrapper<CreateSingleGroup>;
-    let component: CreateSingleGroup;
     let course: Course;
     let project: Project;
 
@@ -32,7 +30,6 @@ describe('CreateSingleGroup tests', () => {
                 project: project
             }
         });
-        component = wrapper.vm;
     });
 
     afterEach(() => {
@@ -40,16 +37,18 @@ describe('CreateSingleGroup tests', () => {
     });
 
     test('Successful creation of a group', async () => {
-        let create_group_stub = sinon.stub(Group, 'create');
+        let create_group_stub = sinon.stub(Group, 'create').resolves();
         let group_members = ["abernard@cornell.edu", "amartin@cornell.edu"];
 
-        let group_form
-            = <Wrapper<GroupMembersForm>> wrapper.findComponent({ref: 'create_group_form'});
-        group_form.vm.$emit('submit', group_members);
-        await component.$nextTick();
-        expect(await wait_until(wrapper, w => !w.vm.d_creating_group)).toBe(true);
+        wrapper.findComponent(GroupMembersForm).vm.$emit('submit', group_members);
+        expect(await wait_until(
+            wrapper, w => w.find('.create-group-button').attributes('disabled') === undefined
+        )).toBe(true);
 
-        expect(create_group_stub.firstCall.calledWith(project.pk, {member_names: group_members}));
+        expect(create_group_stub.calledOnceWith(
+            project.pk, {member_names: group_members})).toBe(true);
+        expect(wrapper.find('.create-group-button').attributes('disabled')).toBeUndefined();
+        expect(wrapper.findAll('.error-msg').length).toBe(0);
     });
 
     test('Handle API create group error', async () => {
@@ -62,14 +61,15 @@ describe('CreateSingleGroup tests', () => {
             )
         ));
 
-        let group_form
-            = <Wrapper<GroupMembersForm>> wrapper.findComponent({ref: 'create_group_form'});
-        group_form.vm.$emit('submit', ["abernard@cornell.edu", "amartin@cornell.edu"]);
-        await component.$nextTick();
-        expect(await wait_until(wrapper, w => !w.vm.d_creating_group)).toBe(true);
-        await component.$nextTick();
+        wrapper.findComponent(GroupMembersForm).vm.$emit(
+            'submit', ["abernard@cornell.edu", "amartin@cornell.edu"]);
+        expect(await wait_until(
+            wrapper, w => w.find('.create-group-button').attributes('disabled') === undefined
+        )).toBe(true);
 
-        let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
-        expect(api_errors.state.api_errors.length).toBe(1);
+        let error_messages = wrapper.findAll('.error-msg');
+        expect(error_messages.length).toBe(1);
+        expect(error_messages.at(0).text()).toContain(
+            'This project only accepts submissions from enrolled students.');
     });
 });

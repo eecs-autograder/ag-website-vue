@@ -19,6 +19,8 @@ lint_paths=(
     'src/components/modal.vue'
     'src/components/MoveButtons.vue'
     'src/components/project_admin/ag_tests/ag_test_command_panel.vue'
+    'src/components/project_admin/edit_groups/create_single_group.vue'
+    'src/components/project_admin/edit_groups/create_single_group_types.ts'
     'src/components/project_admin/edit_groups/edit_single_group.vue'
     'src/components/project_admin/project_settings.vue'
     'src/components/project_admin/rerun_submissions/rerun_select_suite.vue'
