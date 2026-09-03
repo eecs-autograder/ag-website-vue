@@ -21,6 +21,7 @@ lint_paths=(
     'src/components/project_admin/ag_tests/ag_test_command_panel.vue'
     'src/components/project_admin/edit_groups/edit_single_group.vue'
     'src/components/project_admin/project_settings.vue'
+    'src/components/project_admin/project_stats/score_table.vue'
     'src/components/project_admin/rerun_submissions/rerun_select_suite.vue'
     'src/components/toggle.vue'
     'src/components/tooltip.vue'
@@ -34,6 +35,7 @@ lint_paths=(
     'tests/test_components/test_collapsible_section.ts'
     'tests/test_components/test_new_validated_form.ts'
     'tests/test_components/test_new_validated_input.ts'
+    'tests/test_components/test_project_admin/test_project_stats/test_score_table.ts'
     'tests/test_composables/**/*.ts'
     'tests/test_order_syncer.ts'
 )
