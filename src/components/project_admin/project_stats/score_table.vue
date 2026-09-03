@@ -7,6 +7,9 @@
       first_non_null_submission_results !== undefined
     "
   >
+    <caption class="sr-only">
+      Scores
+    </caption>
     <thead>
       <tr>
         <th scope="col">Username</th>
@@ -47,7 +50,7 @@
         v-for="submission_result of submission_results"
         :key="`result-${submission_result.username}`"
       >
-        <td>{{ submission_result.username }}</td>
+        <th scope="row">{{ submission_result.username }}</th>
         <td>{{ submission_result.group.member_names.join(",") }}</td>
         <template v-if="submission_result.ultimate_submission !== null">
           <td>
