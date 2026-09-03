@@ -19,7 +19,7 @@
         <template v-slot:label>Second operand</template>
       </validated-int-input>
     </div>
-    <input-errors :errors="errors" visible></input-errors>
+    <input-errors :errors="errors" :hide_errors="false"></input-errors>
   </div>
 </template>
 

@@ -109,6 +109,7 @@
           <label class="label" :for="`new-command-name-${label_uid}`"> Command name </label>
           <validated-input ref="new_ag_test_command_name"
                            v-model="d_new_command_name"
+                           :aria_required="true"
                            :validators="[is_not_empty]"
                            :input_id="`new-command-name-${label_uid}`">
           </validated-input>
@@ -117,6 +118,7 @@
           <label class="label" :for="`new-command-${label_uid}`">Command</label>
           <validated-input ref="new_ag_test_command"
                            v-model="d_new_command"
+                           :aria_required="true"
                            :validators="[is_not_empty]"
                            :input_id="`new-command-${label_uid}`">
           </validated-input>
@@ -151,6 +153,7 @@
           <label class="label" :for="`clone-case-name-${label_uid}`">Case Name</label>
           <validated-input ref="ag_test_case_clone_name"
                            v-model="d_cloned_case_name"
+                           :aria_required="true"
                            :validators="[is_not_empty]"
                            :input_id="`clone-case-name-${label_uid}`">
           </validated-input>

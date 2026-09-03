@@ -12,6 +12,7 @@
         <validated-input ref="new_project_name"
                          v-model="new_project_name"
                          :validators="[is_not_empty]"
+                         :aria_required="true"
                          :num_rows="1"
                          input_id="new-project-name"
                          input_style="width: 100%;

@@ -1,13 +1,17 @@
 <template>
-  <transition-group name="fade" class="error-ul" tag="ul">
-    <li
-      v-for="error of errors_to_render"
-      class="error-text error-li"
-      :key="error.uid"
-    >
-      {{ error.error_msg }}
-    </li>
-  </transition-group>
+  <div role="alert" aria-atomic="true">
+    <transition-group name="fade" class="error-ul" tag="ul">
+      <template v-if="!hide_errors">
+        <li
+          v-for="error of errors_to_render"
+          class="error-text error-li"
+          :key="error.uid"
+        >
+          {{ error.error_msg }}
+        </li>
+      </template>
+    </transition-group>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -18,6 +22,7 @@ import { generate_uid } from "@/utils";
 
 type PropTypes = {
   errors: string[];
+  hide_errors: boolean;
   max_errors_to_show?: number;
 };
 const props = withDefaults(defineProps<PropTypes>(), {

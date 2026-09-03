@@ -7,17 +7,22 @@
       <h3>Validated Input 1</h3>
       <p>Has to be a number</p>
       <validated-input v-model="d_data.id"
+                       :aria_required="true"
                        :validators="[is_number]"
                        :from_string_fn="(val) => parseInt(val, 10)"></validated-input>
 
       <h3>Validated Input 2</h3>
       <p>Has to be the string "mars"</p>
-      <validated-input v-model="d_data.name" :validators="[(val) => {
-                                                          return {
-                                                            is_valid: val === 'mars',
-                                                            error_msg: 'not mars'
-                                                          }
-                                                         }]"></validated-input>
+      <validated-input
+        v-model="d_data.name"
+        :aria_required="true"
+        :validators="[(val) => {
+          return {
+            is_valid: val === 'mars',
+            error_msg: 'not mars'
+          }
+        }]"
+      ></validated-input>
 
       <h3>Toggleable Validated Input</h3>
       <p>
@@ -31,6 +36,7 @@
       </toggle>
       <validated-input v-model="toggleable_input_value"
                        v-if="show_toggleable_input"
+                       :aria_required="true"
                        :validators="[is_number]"
                        :from_string_fn="(val) => parseInt(val, 10)"></validated-input>
 
@@ -57,6 +63,7 @@
       </p>
 
       <validated-input v-model="d_empty_val"
+                       :aria_required="true"
                        :validators="[is_not_empty]"></validated-input>
 
       <button type="submit" class="enabled">Submit</button>

@@ -17,6 +17,7 @@
       <validated-input ref="suite_name"
                        input_id="suite-settings-name"
                        v-model="d_suite.name"
+                       :aria_required="true"
                        @input="$emit('field_change', d_suite)"
                        :validators="[is_not_empty]">
       </validated-input>

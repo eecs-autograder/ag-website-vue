@@ -123,7 +123,10 @@
           <label class="label">
             Image Name
             <validated-input
-              ref="edit_image_name" v-model="d_edited_image_name" :validators="[is_not_empty]"/>
+              ref="edit_image_name"
+              v-model="d_edited_image_name"
+              :aria_required="true"
+              :validators="[is_not_empty]"/>
           </label>
 
           <APIErrors ref="api_errors"/>

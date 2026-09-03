@@ -6,6 +6,7 @@
       <validated-input ref="points_per_exposed_bug"
                        input_id="points-per-exposed-bug"
                        v-model="d_mutation_test_suite.points_per_exposed_bug"
+                       :aria_required="true"
                        :validators="[
                            is_not_empty,
                            is_number,
@@ -35,6 +36,7 @@
       <validated-input ref="max_points"
                        input_id="mutation-suite-max-points"
                        v-model="d_mutation_test_suite.max_points"
+                       :aria_required="true"
                        :validators="[
                            is_not_empty,
                            is_integer,
@@ -51,6 +53,7 @@
       <validated-input ref="max_num_student_tests"
                        input_id="max-num-student-tests"
                        v-model="d_mutation_test_suite.max_num_student_tests"
+                       :aria_required="true"
                        :validators="[
                            is_not_empty,
                            is_integer,

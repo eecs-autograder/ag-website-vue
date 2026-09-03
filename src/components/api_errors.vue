@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div role="alert" aria-atomic="true">
     <div
       v-for="(error, index) of state.api_errors"
       :key="index"

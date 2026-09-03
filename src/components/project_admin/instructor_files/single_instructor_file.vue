@@ -10,6 +10,7 @@
         </label>
         <validated-input ref="file_name"
                          v-model="new_file_name"
+                         :aria_required="true"
                          :validators="[is_not_empty]"
                          input_style="width: 200px;
                                      padding: 3px 5px;

@@ -8,6 +8,9 @@
         <textarea
           class="input"
           :id="label_id"
+          :aria-required="aria_required"
+          :aria-invalid="!is_valid && !hide_errors"
+          :aria-describedby="errors_id"
           :rows="num_rows"
           :style="input_style"
           :class="{
@@ -21,7 +24,8 @@
     </div>
 
     <input-errors
-      v-if="!hide_errors"
+      :id="errors_id"
+      :hide_errors="hide_errors"
       :errors="errors"
       @has_rendered_errors="
         (val) => {
@@ -46,6 +50,7 @@ import { generate_uid } from "@/utils";
 
 type PropTypes = {
   value: string;
+  aria_required?: boolean;
   validators: ValidatorFuncType<string>[];
   num_rows?: number;
   input_style?: CSSProperties;
@@ -53,9 +58,11 @@ type PropTypes = {
 };
 const props = withDefaults(defineProps<PropTypes>(), {
   num_rows: 3,
+  aria_required: false,
 });
 
 const label_id = `label-${generate_uid()}`;
+const errors_id = `errors-${generate_uid()}`;
 const input = ref("");
 
 // Don't show errors until input changes or on_blur

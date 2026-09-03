@@ -7,6 +7,7 @@
     <br/><br/>
     <validated-input ref='input_1'
                      v-model="number_input"
+                     :aria_required="true"
                      :validators="[is_number, is_negative, is_even]"
                      :from_string_fn="(val) => parseInt(val, 10)"
                      placeholder="Enter a negative, even integer"
@@ -37,6 +38,7 @@
     <br/><br/>
     <validated-input ref='validated_input_2'
                      v-model="custom_obj_input"
+                     :aria_required="true"
                      input_style="background-color: lightblue; color: green;"
                      :validators="[obj_is_json, obj_has_only_field1_and_val_is_a_number]"
                      :from_string_fn="string_to_obj"
@@ -48,6 +50,7 @@
     <br/>
     <validated-input ref='validated_input_2'
                      v-model="custom_obj_input"
+                     :aria_required="true"
                      :input_style="obj_input_style"
                      :validators="[obj_is_json, obj_has_only_field1_and_val_is_a_number]"
                      :from_string_fn="string_to_obj"
@@ -73,6 +76,7 @@
     <br/><br/>
     <validated-input ref='validated_input_3'
                      v-model="mario_character_input"
+                     :aria_required="true"
                      :validators="[is_mario_or_luigi]"
                      @input_validity_changed="validated_input_3_valid = $event">
 
@@ -105,6 +109,7 @@
     <br/><br/>
     <validated-input ref='validated_input_4'
                      v-model="textarea_input"
+                     :aria_required="true"
                      num_rows="3"
                      placeholder="Response must contain > 30 characters and a new line character"
                      :validators="[is_30_chars_or_longer, has_newline_char]"
@@ -128,6 +133,7 @@
     <div class="constrict">
       <validated-input ref='input_5'
                        v-model="number_input_2"
+                       :aria_required="true"
                        :num_rows="1"
                        input_style="width: 450px;"
                        :validators="[is_number, is_in_range_1_to_10]">
