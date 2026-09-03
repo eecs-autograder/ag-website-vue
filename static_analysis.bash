@@ -18,6 +18,7 @@ lint_paths=(
     'src/components/last_saved.vue'
     'src/components/modal.vue'
     'src/components/MoveButtons.vue'
+    'src/components/project_admin/ag_tests/ag_test_command_advanced_fdbk_settings.vue'
     'src/components/project_admin/ag_tests/ag_test_command_panel.vue'
     'src/components/project_admin/edit_groups/edit_single_group.vue'
     'src/components/project_admin/project_settings.vue'

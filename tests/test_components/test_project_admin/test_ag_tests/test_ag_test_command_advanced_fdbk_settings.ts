@@ -6,11 +6,11 @@ import AGTestCommandAdvancedFdbkSettings from '@/components/project_admin/ag_tes
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { checkbox_is_checked, set_data, set_props, find_collapsible_section_header } from '@/tests/utils';
+import { checkbox_is_checked, emitted, set_props, find_collapsible_section_header } from '@/tests/utils';
 
 
 describe('AGTestCommandAdvancedFdbkSettings tests', () => {
-    let wrapper: Wrapper<AGTestCommandAdvancedFdbkSettings>;
+    let wrapper: Wrapper<Vue>;
     let ag_test_suite: AGTestSuite;
     let ag_test_case: AGTestCase;
     let feedback_config: AGTestCommandFeedbackConfig;
@@ -35,15 +35,17 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
     });
 
     test('visible binding - case has only one command', async () => {
-        let visible_input = wrapper.find('[data-testid=cmd_is_visible]');
+        expect(ag_test_case.ag_test_commands.length).toEqual(1);
 
-        expect(wrapper.vm.ag_test_case.ag_test_commands.length).toEqual(1);
-        expect(wrapper.vm.d_feedback_config!.visible).toEqual(false);
+        let visible_input = wrapper.find('[data-testid=cmd_is_visible]');
         expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(1);
+        expect(checkbox_is_checked(visible_input)).toEqual(false);
 
         await visible_input.setChecked(true);
 
-        expect(wrapper.vm.d_feedback_config!.visible).toEqual(true);
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(
+            expect.objectContaining({visible: true})
+        );
         expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(0);
     });
 
@@ -56,26 +58,22 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         await set_props(wrapper, {ag_test_case: case_with_more_than_one_command});
 
         let visible_input = wrapper.find('[data-testid=cmd_is_visible]');
-
-        expect(wrapper.vm.d_feedback_config!.visible).toEqual(false);
+        expect(checkbox_is_checked(visible_input)).toEqual(false);
         expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(1);
 
         await visible_input.setChecked(true);
 
-        expect(wrapper.vm.d_feedback_config!.visible).toEqual(true);
         expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(1);
+        expect(checkbox_is_checked(wrapper.find('[data-testid=cmd_is_visible]'))).toEqual(true);
 
-        expect(checkbox_is_checked(visible_input)).toEqual(true);
+        await set_props(wrapper, {value: data_ut.make_ag_test_command_fdbk_config({visible: false})});
+        expect(checkbox_is_checked(wrapper.find('[data-testid=cmd_is_visible]'))).toEqual(false);
 
-        await set_data(wrapper, {d_feedback_config: {visible: false}});
-        expect(checkbox_is_checked(visible_input)).toEqual(false);
-
-        await set_data(wrapper, {d_feedback_config: {visible: true}});
-        expect(checkbox_is_checked(visible_input)).toEqual(true);
+        await set_props(wrapper, {value: data_ut.make_ag_test_command_fdbk_config({visible: true})});
+        expect(checkbox_is_checked(wrapper.find('[data-testid=cmd_is_visible]'))).toEqual(true);
 
         await set_props(wrapper, {ag_test_case: ag_test_case});
 
-        expect(wrapper.vm.d_feedback_config?.visible).toEqual(true);
         expect(wrapper.findAll('[data-testid=cmd_is_visible]').length).toEqual(0);
     });
 
@@ -83,20 +81,26 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         let show_student_description_input = wrapper.find('[data-testid=show_student_description]');
 
         await show_student_description_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(
+            expect.objectContaining({show_student_description: true})
+        );
 
         await show_student_description_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(false);
+        expect(emitted(wrapper, 'input')[1][0]).toEqual(
+            expect.objectContaining({show_student_description: false})
+        );
 
         await show_student_description_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_student_description).toEqual(true);
-
         expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
 
-        await set_data(wrapper, {d_feedback_config: {show_student_description: false}});
+        await set_props(
+            wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_student_description: false})}
+        );
         expect(checkbox_is_checked(show_student_description_input)).toEqual(false);
 
-        await set_data(wrapper, {d_feedback_config: {show_student_description: true}});
+        await set_props(
+            wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_student_description: true})}
+        );
         expect(checkbox_is_checked(show_student_description_input)).toEqual(true);
     });
 
@@ -106,18 +110,18 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         let return_code_fdbk_level_input = wrapper.find('[data-testid=return_code_fdbk_level]');
 
         await return_code_fdbk_level_input.setValue(ValueFeedbackLevel.correct_or_incorrect);
-        expect(wrapper.vm.d_feedback_config!.return_code_fdbk_level).toEqual(
-            ValueFeedbackLevel.correct_or_incorrect
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(
+            expect.objectContaining({return_code_fdbk_level: ValueFeedbackLevel.correct_or_incorrect})
         );
 
         await return_code_fdbk_level_input.setValue(ValueFeedbackLevel.expected_and_actual);
-        expect(wrapper.vm.d_feedback_config!.return_code_fdbk_level).toEqual(
-            ValueFeedbackLevel.expected_and_actual
+        expect(emitted(wrapper, 'input')[1][0]).toEqual(
+            expect.objectContaining({return_code_fdbk_level: ValueFeedbackLevel.expected_and_actual})
         );
 
         await return_code_fdbk_level_input.setValue(ValueFeedbackLevel.no_feedback);
-        expect(wrapper.vm.d_feedback_config!.return_code_fdbk_level).toEqual(
-            ValueFeedbackLevel.no_feedback
+        expect(emitted(wrapper, 'input')[2][0]).toEqual(
+            expect.objectContaining({return_code_fdbk_level: ValueFeedbackLevel.no_feedback})
         );
     });
 
@@ -127,18 +131,18 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         let stdout_fdbk_level_input = wrapper.find('[data-testid=stdout_fdbk_level]');
 
         await stdout_fdbk_level_input.setValue(ValueFeedbackLevel.correct_or_incorrect);
-        expect(wrapper.vm.d_feedback_config!.stdout_fdbk_level).toEqual(
-            ValueFeedbackLevel.correct_or_incorrect
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(
+            expect.objectContaining({stdout_fdbk_level: ValueFeedbackLevel.correct_or_incorrect})
         );
 
         await stdout_fdbk_level_input.setValue(ValueFeedbackLevel.expected_and_actual);
-        expect(wrapper.vm.d_feedback_config!.stdout_fdbk_level).toEqual(
-            ValueFeedbackLevel.expected_and_actual
+        expect(emitted(wrapper, 'input')[1][0]).toEqual(
+            expect.objectContaining({stdout_fdbk_level: ValueFeedbackLevel.expected_and_actual})
         );
 
         await stdout_fdbk_level_input.setValue(ValueFeedbackLevel.no_feedback);
-        expect(wrapper.vm.d_feedback_config!.stdout_fdbk_level).toEqual(
-            ValueFeedbackLevel.no_feedback
+        expect(emitted(wrapper, 'input')[2][0]).toEqual(
+            expect.objectContaining({stdout_fdbk_level: ValueFeedbackLevel.no_feedback})
         );
     });
 
@@ -148,18 +152,18 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         let stderr_fdbk_level_input = wrapper.find('[data-testid=stderr_fdbk_level]');
 
         await stderr_fdbk_level_input.setValue(ValueFeedbackLevel.correct_or_incorrect);
-        expect(wrapper.vm.d_feedback_config!.stderr_fdbk_level).toEqual(
-            ValueFeedbackLevel.correct_or_incorrect
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(
+            expect.objectContaining({stderr_fdbk_level: ValueFeedbackLevel.correct_or_incorrect})
         );
 
         await stderr_fdbk_level_input.setValue(ValueFeedbackLevel.expected_and_actual);
-        expect(wrapper.vm.d_feedback_config!.stderr_fdbk_level).toEqual(
-            ValueFeedbackLevel.expected_and_actual
+        expect(emitted(wrapper, 'input')[1][0]).toEqual(
+            expect.objectContaining({stderr_fdbk_level: ValueFeedbackLevel.expected_and_actual})
         );
 
         await stderr_fdbk_level_input.setValue(ValueFeedbackLevel.no_feedback);
-        expect(wrapper.vm.d_feedback_config!.stderr_fdbk_level).toEqual(
-            ValueFeedbackLevel.no_feedback
+        expect(emitted(wrapper, 'input')[2][0]).toEqual(
+            expect.objectContaining({stderr_fdbk_level: ValueFeedbackLevel.no_feedback})
         );
     });
 
@@ -169,20 +173,18 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         let show_points_input = wrapper.find('[data-testid=show_points]');
 
         await show_points_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_points).toEqual(true);
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(expect.objectContaining({show_points: true}));
 
         await show_points_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_points).toEqual(false);
+        expect(emitted(wrapper, 'input')[1][0]).toEqual(expect.objectContaining({show_points: false}));
 
         await show_points_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_points).toEqual(true);
-
         expect(checkbox_is_checked(show_points_input)).toEqual(true);
 
-        await set_data(wrapper, {d_feedback_config: {show_points: false}});
+        await set_props(wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_points: false})});
         expect(checkbox_is_checked(show_points_input)).toEqual(false);
 
-        await set_data(wrapper, {d_feedback_config: {show_points: true}});
+        await set_props(wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_points: true})});
         expect(checkbox_is_checked(show_points_input)).toEqual(true);
     });
 
@@ -192,20 +194,26 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         let show_actual_stdout_input = wrapper.find('[data-testid=show_actual_stdout]');
 
         await show_actual_stdout_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_actual_stdout).toEqual(true);
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(
+            expect.objectContaining({show_actual_stdout: true})
+        );
 
         await show_actual_stdout_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_actual_stdout).toEqual(false);
+        expect(emitted(wrapper, 'input')[1][0]).toEqual(
+            expect.objectContaining({show_actual_stdout: false})
+        );
 
         await show_actual_stdout_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_actual_stdout).toEqual(true);
-
         expect(checkbox_is_checked(show_actual_stdout_input)).toEqual(true);
 
-        await set_data(wrapper, {d_feedback_config: {show_actual_stdout: false}});
+        await set_props(
+            wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_actual_stdout: false})}
+        );
         expect(checkbox_is_checked(show_actual_stdout_input)).toEqual(false);
 
-        await set_data(wrapper, {d_feedback_config: {show_actual_stdout: true}});
+        await set_props(
+            wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_actual_stdout: true})}
+        );
         expect(checkbox_is_checked(show_actual_stdout_input)).toEqual(true);
     });
 
@@ -213,22 +221,28 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         await find_collapsible_section_header(wrapper).trigger('click');
 
         let show_actual_stderr_input = wrapper.find('[data-testid=show_actual_stderr]');
-
-        await show_actual_stderr_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_actual_stderr).toEqual(true);
+        expect(checkbox_is_checked(show_actual_stderr_input)).toEqual(true);
 
         await show_actual_stderr_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_actual_stderr).toEqual(false);
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(
+            expect.objectContaining({show_actual_stderr: false})
+        );
 
         await show_actual_stderr_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_actual_stderr).toEqual(true);
+        expect(emitted(wrapper, 'input')[1][0]).toEqual(
+            expect.objectContaining({show_actual_stderr: true})
+        );
 
         expect(checkbox_is_checked(show_actual_stderr_input)).toEqual(true);
 
-        await set_data(wrapper, {d_feedback_config: {show_actual_stderr: false}});
+        await set_props(
+            wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_actual_stderr: false})}
+        );
         expect(checkbox_is_checked(show_actual_stderr_input)).toEqual(false);
 
-        await set_data(wrapper, {d_feedback_config: {show_actual_stderr: true}});
+        await set_props(
+            wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_actual_stderr: true})}
+        );
         expect(checkbox_is_checked(show_actual_stderr_input)).toEqual(true);
     });
 
@@ -238,33 +252,42 @@ describe('AGTestCommandAdvancedFdbkSettings tests', () => {
         let show_whether_timed_out_input = wrapper.find('[data-testid=show_whether_timed_out]');
 
         await show_whether_timed_out_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_whether_timed_out).toEqual(true);
+        expect(emitted(wrapper, 'input')[0][0]).toEqual(
+            expect.objectContaining({show_whether_timed_out: true})
+        );
 
         await show_whether_timed_out_input.setChecked(false);
-        expect(wrapper.vm.d_feedback_config!.show_whether_timed_out).toEqual(false);
+        expect(emitted(wrapper, 'input')[1][0]).toEqual(
+            expect.objectContaining({show_whether_timed_out: false})
+        );
 
         await show_whether_timed_out_input.setChecked(true);
-        expect(wrapper.vm.d_feedback_config!.show_whether_timed_out).toEqual(true);
-
         expect(checkbox_is_checked(show_whether_timed_out_input)).toEqual(true);
 
-        await set_data(wrapper, {d_feedback_config: {show_whether_timed_out: false}});
+        await set_props(
+            wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_whether_timed_out: false})}
+        );
         expect(checkbox_is_checked(show_whether_timed_out_input)).toEqual(false);
 
-        await set_data(wrapper, {d_feedback_config: {show_whether_timed_out: true}});
+        await set_props(
+            wrapper, {value: data_ut.make_ag_test_command_fdbk_config({show_whether_timed_out: true})}
+        );
         expect(checkbox_is_checked(show_whether_timed_out_input)).toEqual(true);
     });
 
-    test('value Watcher', async () => {
+    test('value prop change updates rendered feedback config', async () => {
         await find_collapsible_section_header(wrapper).trigger('click');
 
-        expect(wrapper.vm.d_feedback_config!).toEqual(feedback_config);
+        expect(checkbox_is_checked(wrapper.find('[data-testid=show_actual_stdout]'))).toEqual(false);
+        expect(checkbox_is_checked(wrapper.find('[data-testid=show_actual_stderr]'))).toEqual(true);
 
         let new_config = data_ut.make_ag_test_command_fdbk_config({
             show_actual_stdout: !feedback_config.show_actual_stdout,
             show_actual_stderr: !feedback_config.show_actual_stderr
         });
-        await set_props(wrapper, {'value': new_config});
-        expect(wrapper.vm.d_feedback_config).toEqual(new_config);
+        await set_props(wrapper, {value: new_config});
+
+        expect(checkbox_is_checked(wrapper.find('[data-testid=show_actual_stdout]'))).toEqual(true);
+        expect(checkbox_is_checked(wrapper.find('[data-testid=show_actual_stderr]'))).toEqual(false);
     });
 });
