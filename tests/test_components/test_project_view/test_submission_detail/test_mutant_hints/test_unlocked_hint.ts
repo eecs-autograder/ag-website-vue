@@ -114,6 +114,12 @@ describe("UnlockedHint tests", () => {
     );
   });
 
+  test("Comment textarea is labeled", () => {
+    const label = wrapper.find(".comment-box label");
+    const textarea = wrapper.find("textarea");
+    expect(label.attributes("for")).toEqual(textarea.attributes("id"));
+  });
+
   test("Updating the hint prop refreshes the comment shown in the form", async () => {
     expect((<HTMLTextAreaElement>wrapper.find("textarea").element).value).toBe(
       "",

@@ -55,8 +55,11 @@
       </div>
 
       <div class="comment-box">
-        <div>Any comments?</div>
+        <label class="label" :for="`hint-comment-${d_radio_button_uid}`">
+          Any comments?
+        </label>
         <textarea
+          :id="`hint-comment-${d_radio_button_uid}`"
           v-model="d_user_comment"
           cols="30"
           rows="2"
