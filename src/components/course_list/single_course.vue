@@ -11,17 +11,15 @@
       </router-link>
 
       <div class="toolbox" v-if="is_admin">
-        <div
+        <button
+          type="button"
           class="clone-course tool-icon"
-          role="button"
           @click="open_clone_course_modal"
-          @keydown.enter="open_clone_course_modal"
-          @keydown.space.prevent="open_clone_course_modal"
+          :aria-label="'Clone ' + course.name"
           :title="'Clone ' + course.name"
-          tabindex="0"
         >
           <i class="fas fa-copy" aria-hidden="true"> </i>
-        </div>
+        </button>
         <router-link
           :to="`/web/course_admin/${course.pk}`"
           :title="'Edit ' + course.name"
@@ -193,6 +191,13 @@ async function make_copy_of_course() {
 
 * {
   box-sizing: border-box;
+}
+
+.clone-course {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .course-subtitle {
