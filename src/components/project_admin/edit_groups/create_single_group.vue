@@ -1,18 +1,21 @@
 <template>
   <div id="create-group-component">
-    <group-members-form ref="create_group_form"
-                        :project="project"
-                        :course="course"
-                        @submit="create_group"
-                        :ignore_group_size_limits="true">
+    <group-members-form
+      :project="project"
+      :course="course"
+      @submit="create_group"
+      :ignore_group_size_limits="true"
+    >
       <template v-slot:header>
         <div class="label">Group members</div>
       </template>
       <template v-slot:footer>
         <APIErrors ref="api_errors"> </APIErrors>
-        <button class="create-group-button"
-                type="submit"
-                :disabled="d_creating_group">
+        <button
+          class="create-group-button"
+          type="submit"
+          :disabled="creating_group"
+        >
           Create Group
         </button>
       </template>
@@ -20,70 +23,49 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref } from "vue";
 
-import { Course, Group, NewGroupData, Project } from 'ag-client-typescript';
+import { Course, Group, Project } from "ag-client-typescript";
 
-import APIErrors from '@/components/api_errors.vue';
-import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
-import GroupMembersForm from '@/components/group_members_form.vue';
-import ValidatedForm from '@/components/validated_form.vue';
-import { handle_api_errors_async } from '@/error_handling';
+import APIErrors from "@/components/api_errors.vue";
+import { APIErrorsExposed } from "@/exposed_component_types/api_errors_exposed";
+import GroupMembersForm from "@/components/group_members_form.vue";
+import { new_toggle } from "@/utils";
 
-export interface GroupMember {
-  id: number;
-  username: string;
-}
+type PropTypes = {
+  course: Course;
+  project: Project;
+};
 
-@Component({
-  components: {
-    APIErrors,
-    GroupMembersForm,
-    ValidatedForm,
-  }
-})
-export default class CreateSingleGroup extends Vue {
-  @Prop({required: true, type: Course})
-  course!: Course;
+const props = defineProps<PropTypes>();
 
-  @Prop({required: true, type: Project})
-  project!: Project;
+const api_errors = ref<APIErrorsExposed>();
+const creating_group = ref(false);
 
-  d_creating_group = false;
-
-  @handle_api_errors_async(handle_create_group_error)
-  async create_group(usernames: string[]) {
+const create_group = (usernames: string[]) => {
+  return new_toggle(creating_group, async () => {
     try {
-      this.d_creating_group = true;
-      const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
-      api_errors?.clear();
-
-      await Group.create(this.project.pk, {member_names: usernames});
+      api_errors.value?.clear();
+      await Group.create(props.project.pk, { member_names: usernames });
+    } catch (error: unknown) {
+      api_errors.value?.show_errors_from_response(error);
     }
-    finally {
-      this.d_creating_group = false;
-    }
-  }
-}
-
-function handle_create_group_error(component: CreateSingleGroup, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+  });
+};
 </script>
 
 <style scoped lang="scss">
 @import "@/styles/button_styles.scss";
-@import '@/styles/colors.scss';
-@import '@/styles/forms.scss';
+@import "@/styles/colors.scss";
+@import "@/styles/forms.scss";
 
 .label {
-  margin-top: .625rem;
+  margin-top: 0.625rem;
 }
 
 .create-group-button {
   @extend .teal-button;
-  margin-top: .875rem;
+  margin-top: 0.875rem;
 }
 </style>
