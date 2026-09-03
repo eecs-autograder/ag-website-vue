@@ -72,8 +72,8 @@ test('Search for student', async () => {
     let other_username = 'usery';
     sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, other_username).resolves({late_days_remaining: 2});
-    find_component(
-        wrapper, DropdownTypeahead).vm.filter_text = '  ' + other_username + '   ';
+    await find_component(wrapper, DropdownTypeahead).find('input').setValue(
+        '  ' + other_username + '   ');
     await wrapper.find('[data-testid=search_button]').trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 
@@ -97,7 +97,7 @@ test('Usernames sorted', async () => {
 test('404 handled on search', async () => {
     let stub = sinon.stub(ag_cli.User, 'get_num_late_days').withArgs(
         course.pk, 'steve').rejects(new ag_cli.HttpError(404, ''));
-    find_component(wrapper, DropdownTypeahead).vm.filter_text = 'steve';
+    await find_component(wrapper, DropdownTypeahead).find('input').setValue('steve');
     wrapper.find('[data-testid=search_button]').trigger('click');
     await wrapper.vm.$nextTick();
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
@@ -106,7 +106,7 @@ test('404 handled on search', async () => {
 
     stub.withArgs(
         course.pk, 'stove').resolves({late_days_remaining: 2});
-    find_component(wrapper, DropdownTypeahead).vm.filter_text = 'stove';
+    await find_component(wrapper, DropdownTypeahead).find('input').setValue('stove');
     await wrapper.find('[data-testid=search_button]').trigger('click');
     expect(await wait_until(wrapper, w => !w.vm.d_saving)).toBe(true);
 

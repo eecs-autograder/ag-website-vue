@@ -10,7 +10,6 @@ import {
     SandboxDockerImageData,
 } from 'ag-client-typescript';
 
-import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -269,15 +268,14 @@ describe('Field binding tests', () => {
     });
 
     test('InstructorFile filter function on dropdown typeahead', async () => {
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'instructor_files_typeahead'}).vm;
-        expect(dropdown_typeahead.choices).toEqual([instructor_file_3]);
+        let dropdown_typeahead = wrapper.findComponent({ref: 'instructor_files_typeahead'});
+        expect(dropdown_typeahead.props('choices')).toEqual([instructor_file_3]);
 
-        dropdown_typeahead.filter_text = "a";
-        await wrapper.vm.$nextTick();
+        await dropdown_typeahead.find('input').setValue('a');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_3);
+        let dropdown_rows = dropdown_typeahead.findAll('.dropdown-row');
+        expect(dropdown_rows.length).toEqual(1);
+        expect(dropdown_rows.at(0).text()).toContain(instructor_file_3.name);
 
         let instructor_files_section = wrapper.find('.instructor-files');
         instructor_files_section.findAll('.file').at(0).find(
@@ -285,13 +283,15 @@ describe('Field binding tests', () => {
         ).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(dropdown_typeahead.choices).toEqual([instructor_file_1, instructor_file_3]);
+        expect(dropdown_typeahead.props('choices')).toEqual(
+            [instructor_file_1, instructor_file_3]
+        );
 
-        dropdown_typeahead.filter_text = "ui";
-        await wrapper.vm.$nextTick();
+        await dropdown_typeahead.find('input').setValue('ui');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(instructor_file_1);
+        dropdown_rows = dropdown_typeahead.findAll('.dropdown-row');
+        expect(dropdown_rows.length).toEqual(1);
+        expect(dropdown_rows.at(0).text()).toContain(instructor_file_1.name);
 
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
@@ -348,15 +348,14 @@ describe('Field binding tests', () => {
     });
 
     test('ExpectedStudentFile filter function on dropdown typeahead',  async () => {
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'student_files_typeahead'}).vm;
-        expect(dropdown_typeahead.choices).toEqual([student_file_3]);
+        let dropdown_typeahead = wrapper.findComponent({ref: 'student_files_typeahead'});
+        expect(dropdown_typeahead.props('choices')).toEqual([student_file_3]);
 
-        dropdown_typeahead.filter_text = "e";
-        await wrapper.vm.$nextTick();
+        await dropdown_typeahead.find('input').setValue('e');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_3);
+        let dropdown_rows = dropdown_typeahead.findAll('.dropdown-row');
+        expect(dropdown_rows.length).toEqual(1);
+        expect(dropdown_rows.at(0).text()).toContain(student_file_3.pattern);
 
         let student_files_section = wrapper.find('.student-files');
         student_files_section.findAll('.file').at(0).find(
@@ -364,13 +363,13 @@ describe('Field binding tests', () => {
         ).trigger('click');
         await wrapper.vm.$nextTick();
 
-        expect(dropdown_typeahead.choices).toEqual([student_file_1, student_file_3]);
+        expect(dropdown_typeahead.props('choices')).toEqual([student_file_1, student_file_3]);
 
-        dropdown_typeahead.filter_text = "ep";
-        await wrapper.vm.$nextTick();
+        await dropdown_typeahead.find('input').setValue('ep');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
-        expect(dropdown_typeahead.filtered_choices[0]).toEqual(student_file_1);
+        dropdown_rows = dropdown_typeahead.findAll('.dropdown-row');
+        expect(dropdown_rows.length).toEqual(1);
+        expect(dropdown_rows.at(0).text()).toContain(student_file_1.pattern);
 
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
