@@ -1,16 +1,7 @@
 <template>
   <div id="app">
     <dev-to-user-messages
-      :messages="[
-        {
-          for_version: '2026.08.0',
-          text: `Welcome to version 2026.08.0!
-            Release notes can be found on our [GitHub page](https://github.com/eecs-autograder/autograder-full-stack/releases).<br>
-            **CLI users:** Please update to the [latest CLI version](https://github.com/eecs-autograder/autograder-cli/releases),
-            as this release has some backwards-incompatible changes.
-          `
-        }
-      ]"
+      :messages="[]"
     />
     <div id="global-error-banner" v-show="d_global_error_count !== 0">
       <APIErrors
