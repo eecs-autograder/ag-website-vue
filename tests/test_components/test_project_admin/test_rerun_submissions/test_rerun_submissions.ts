@@ -4,6 +4,7 @@ import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
+import GroupLookup from '@/components/group_lookup.vue';
 import RerunSubmissions from '@/components/project_admin/rerun_submissions/rerun_submissions.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -206,8 +207,8 @@ describe('Rerun list tests', () => {
 
 test('Selecting and unselecting submissions', async () => {
     let wrapper = await make_wrapper();
-    wrapper.findComponent({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[0]);
-    wrapper.findComponent({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[1]);
+    wrapper.findComponent(GroupLookup).vm.$emit('update_group_selected', groups[0]);
+    wrapper.findComponent(GroupLookup).vm.$emit('update_group_selected', groups[1]);
     await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(0);
@@ -254,8 +255,8 @@ test('Selecting and unselecting submissions', async () => {
 
 test('Removing group unselects submissions', async () => {
     let wrapper = await make_wrapper();
-    wrapper.findComponent({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[0]);
-    wrapper.findComponent({name: 'GroupLookup'}).vm.$emit('update_group_selected', groups[1]);
+    wrapper.findComponent(GroupLookup).vm.$emit('update_group_selected', groups[0]);
+    wrapper.findComponent(GroupLookup).vm.$emit('update_group_selected', groups[1]);
     await wrapper.vm.$nextTick();
 
     expect(wrapper.vm.d_selected_submissions.size()).toEqual(0);
