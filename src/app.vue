@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <dev-to-user-messages
+      :messages="[]"
+    />
     <div id="global-error-banner" v-show="d_global_error_count !== 0">
       <APIErrors
         ref="global_errors"
@@ -139,6 +142,7 @@ import {
 } from 'ag-client-typescript';
 
 import APIErrors from '@/components/api_errors.vue';
+import DevToUserMessages from '@/components/dev_to_user_messages.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import { GlobalErrorsObserver, GlobalErrorsSubject, handle_global_errors_async } from '@/error_handling';
 
@@ -201,6 +205,7 @@ export class GlobalData {
 @Component({
   components: {
     APIErrors,
+    DevToUserMessages,
   }
 })
 export default class App extends Vue implements GlobalErrorsObserver, Created, BeforeDestroy {
