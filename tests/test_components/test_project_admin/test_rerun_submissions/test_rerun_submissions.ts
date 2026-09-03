@@ -5,6 +5,7 @@ import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
 import RerunSubmissions from '@/components/project_admin/rerun_submissions/rerun_submissions.vue';
+import RerunTaskDetail from '@/components/project_admin/rerun_submissions/rerun_task_detail.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
@@ -110,12 +111,12 @@ describe('Rerun list tests', () => {
         await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun)).toBe(true);
         expect(wrapper.vm.d_rerun_tasks).toEqual(new_tasks);
-        expect(wrapper.findAllComponents({name: 'RerunTaskDetail'}).length).toBe(1);
+        expect(wrapper.findAllComponents(RerunTaskDetail).length).toBe(1);
 
         await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
         expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun)).toBe(true);
         expect(wrapper.vm.d_rerun_tasks).toEqual(new_tasks);
-        expect(wrapper.findAllComponents({name: 'RerunTaskDetail'}).length).toBe(2);
+        expect(wrapper.findAllComponents(RerunTaskDetail).length).toBe(2);
     });
 
     test('Manual refresh', async () => {
