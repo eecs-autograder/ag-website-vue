@@ -1,25 +1,32 @@
 <template>
   <div id="ag-case-setup-result">
-
-    <div class="fieldset"
-         role="region"
-         :aria-label="`${ag_test_suite_result.ag_test_suite_name} test suite setup result`"
-         v-if="(ag_test_suite_result.setup_timed_out !== null
-                 && ag_test_suite_result.setup_timed_out)
-                 || ag_test_suite_result.setup_return_code !== null">
-      <div class="legend"> Correctness </div>
+    <div
+      class="fieldset"
+      role="region"
+      :aria-label="`${ag_test_suite_result.ag_test_suite_name} test suite setup result`"
+      v-if="
+        (ag_test_suite_result.setup_timed_out !== null &&
+          ag_test_suite_result.setup_timed_out) ||
+        ag_test_suite_result.setup_return_code !== null
+      "
+    >
+      <div class="legend">Correctness</div>
       <div id="exit-status-section">
         <div class="feedback-row">
-          <div class="feedback-label"> Exit status: </div>
+          <div class="feedback-label">Exit status:</div>
           <div class="feedback">
             <div class="correctness-output">
-              <span v-if="ag_test_suite_result.setup_timed_out !== null
-                          && this.ag_test_suite_result.setup_timed_out === true">
+              <span
+                v-if="
+                  ag_test_suite_result.setup_timed_out !== null &&
+                  ag_test_suite_result.setup_timed_out === true
+                "
+              >
                 <i class="far fa-clock timed-out-icon" aria-hidden="true"></i>
                 <span class="timed-out-msg"> (Timed out) </span>
               </span>
               <span v-else>
-                {{ag_test_suite_result.setup_return_code}}
+                {{ ag_test_suite_result.setup_return_code }}
               </span>
             </div>
           </div>
@@ -27,149 +34,159 @@
       </div>
     </div>
 
-    <div v-if="d_output_size !== null
-                    && (d_output_size.setup_stdout_size !== null
-                        || d_output_size.setup_stderr_size !== null)"
-         class="fieldset"
-         role="region"
-         :aria-label="`${ag_test_suite_result.ag_test_suite_name} test suite setup output`"
-         ref="actual_output">
-      <div class="legend"> Actual Output </div>
+    <div
+      v-if="
+        output_size !== null &&
+        (output_size.setup_stdout_size !== null ||
+          output_size.setup_stderr_size !== null)
+      "
+      class="fieldset"
+      role="region"
+      :aria-label="`${ag_test_suite_result.ag_test_suite_name} test suite setup output`"
+      ref="actual_output"
+    >
+      <div class="legend">Actual Output</div>
 
-      <div v-if="d_output_size.setup_stdout_size !== null"
-           ref="setup_stdout_section"
-           class="feedback-row">
-        <div class="feedback-label"> Output: </div>
+      <div
+        v-if="output_size.setup_stdout_size !== null"
+        ref="setup_stdout_section"
+        class="feedback-row"
+      >
+        <div class="feedback-label">Output:</div>
         <div class="feedback">
-          <div v-if="d_output_size.setup_stdout_size === 0" class="short-output">No output</div>
-          <div v-else-if="d_setup_stdout_content !== null" class="lengthy-output">
-            <view-file :file_contents="d_setup_stdout_content"
-                        view_file_max_height="50vh"
-                        :progress="d_setup_stdout_load_progress"
-                        ref="setup_stdout"></view-file>
+          <div v-if="output_size.setup_stdout_size === 0" class="short-output">
+            No output
+          </div>
+          <div v-else-if="setup_stdout_content !== null" class="lengthy-output">
+            <view-file
+              :file_contents="setup_stdout_content"
+              view_file_max_height="50vh"
+              :progress="setup_stdout_load_progress"
+              ref="setup_stdout"
+            ></view-file>
           </div>
         </div>
       </div>
 
-      <div v-if="d_output_size.setup_stderr_size !== null"
-           ref="setup_stderr_section"
-           class="feedback-row">
-        <div class="feedback-label"> Error output: </div>
+      <div
+        v-if="output_size.setup_stderr_size !== null"
+        ref="setup_stderr_section"
+        class="feedback-row"
+      >
+        <div class="feedback-label">Error output:</div>
         <div class="feedback">
-            <div v-if="d_output_size.setup_stderr_size === 0" class="short-output">No output</div>
-            <div v-else-if="d_setup_stderr_content !== null" class="lengthy-output">
-              <view-file :file_contents="d_setup_stderr_content"
-                         view_file_max_height="50vh"
-                         :progress="d_setup_stderr_load_progress"
-                         ref="setup_stderr"></view-file>
-            </div>
+          <div v-if="output_size.setup_stderr_size === 0" class="short-output">
+            No output
+          </div>
+          <div v-else-if="setup_stderr_content !== null" class="lengthy-output">
+            <view-file
+              :file_contents="setup_stderr_content"
+              view_file_max_height="50vh"
+              :progress="setup_stderr_load_progress"
+              ref="setup_stderr"
+            ></view-file>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, watch } from "vue";
 
 import {
-    AGTestSuiteResultFeedback,
-    FeedbackCategory,
-    ResultOutput,
-    Submission
+  AGTestSuiteResultFeedback,
+  FeedbackCategory,
+  ResultOutput,
+  Submission,
 } from "ag-client-typescript";
 
 import ViewFile from "@/components/view_file/view_file.vue";
-import { handle_global_errors_async } from '@/error_handling';
+import { new_handle_global_errors_async } from "@/error_handling";
 
-@Component({
-  components: {
-    ViewFile
-  }
-})
-export default class AGTestSuiteSetupResultDetail extends Vue {
-  @Prop({required: true, type: Submission})
-  submission!: Submission;
+const props = defineProps<{
+  submission: Submission;
+  ag_test_suite_result: AGTestSuiteResultFeedback;
+  fdbk_category: FeedbackCategory;
+}>();
 
-  @Prop({required: true, type: Object})
-  ag_test_suite_result!: AGTestSuiteResultFeedback;
+const setup_stdout_content = ref<Promise<string> | null>(null);
+const setup_stderr_content = ref<Promise<string> | null>(null);
+const setup_stdout_load_progress = ref<number | null>(null);
+const setup_stderr_load_progress = ref<number | null>(null);
+const output_size = ref<ResultOutput.AGTestSuiteResultOutputSize | null>(null);
 
-  @Prop({required: true, type: String})
-  fdbk_category!: FeedbackCategory;
+const get_output = new_handle_global_errors_async(async () => {
+  setup_stdout_content.value = null;
+  setup_stderr_content.value = null;
+  output_size.value = await ResultOutput.get_ag_test_suite_result_output_size(
+    props.submission.pk,
+    props.ag_test_suite_result.pk,
+    props.fdbk_category,
+  );
+  load_setup_stdout();
+  load_setup_stderr();
+});
 
-  d_setup_stdout_content: Promise<string> | null = null;
-  d_setup_stderr_content: Promise<string> | null = null;
-  d_setup_stdout_load_progress: number | null = null;
-  d_setup_stderr_load_progress: number | null = null;
-  d_output_size: ResultOutput.AGTestSuiteResultOutputSize | null = null;
+watch(
+  () => props.fdbk_category,
+  () => get_output(),
+);
 
-  @Watch('fdbk_category')
-  on_fdbk_category_change(new_value: FeedbackCategory, old_value: FeedbackCategory) {
-    return this.get_output();
-  }
+void get_output();
 
-  async created() {
-    await this.get_output();
-  }
-
-  @handle_global_errors_async
-  async get_output() {
-    this.d_setup_stdout_content = null;
-    this.d_setup_stderr_content = null;
-    this.d_output_size = await ResultOutput.get_ag_test_suite_result_output_size(
-      this.submission.pk,
-      this.ag_test_suite_result.pk,
-      this.fdbk_category
-    );
-    this.load_setup_stdout();
-    this.load_setup_stderr();
+function load_setup_stdout() {
+  if (
+    output_size.value!.setup_stdout_size === null ||
+    output_size.value!.setup_stdout_size === 0
+  ) {
+    return;
   }
 
-  load_setup_stdout() {
-    if (this.d_output_size!.setup_stdout_size === null
-        || this.d_output_size!.setup_stdout_size === 0) {
-      return;
-    }
-
-    this.d_setup_stdout_load_progress = null;
-    this.d_setup_stdout_content = ResultOutput.get_ag_test_suite_result_setup_stdout(
-      this.submission.pk,
-      this.ag_test_suite_result.pk,
-      this.fdbk_category,
+  setup_stdout_load_progress.value = null;
+  setup_stdout_content.value =
+    ResultOutput.get_ag_test_suite_result_setup_stdout(
+      props.submission.pk,
+      props.ag_test_suite_result.pk,
+      props.fdbk_category,
       (event: ProgressEvent) => {
         if (event.lengthComputable) {
-          this.d_setup_stdout_load_progress = 100 * (1.0 * event.loaded / event.total);
+          setup_stdout_load_progress.value =
+            100 * ((1.0 * event.loaded) / event.total);
         }
-      }
+      },
     );
+}
+
+function load_setup_stderr() {
+  if (
+    output_size.value!.setup_stderr_size === null ||
+    output_size.value!.setup_stderr_size === 0
+  ) {
+    return;
   }
 
-  load_setup_stderr() {
-    if (this.d_output_size!.setup_stderr_size === null
-        || this.d_output_size!.setup_stderr_size === 0) {
-      return;
-    }
-
-    this.d_setup_stderr_load_progress = null;
-    this.d_setup_stderr_content = ResultOutput.get_ag_test_suite_result_setup_stderr(
-      this.submission.pk,
-      this.ag_test_suite_result.pk,
-      this.fdbk_category,
+  setup_stderr_load_progress.value = null;
+  setup_stderr_content.value =
+    ResultOutput.get_ag_test_suite_result_setup_stderr(
+      props.submission.pk,
+      props.ag_test_suite_result.pk,
+      props.fdbk_category,
       (event: ProgressEvent) => {
         if (event.lengthComputable) {
-          this.d_setup_stderr_load_progress = 100 * (1.0 * event.loaded / event.total);
+          setup_stderr_load_progress.value =
+            100 * ((1.0 * event.loaded) / event.total);
         }
-      }
+      },
     );
-  }
 }
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/components/submission_detail.scss';
+@import "@/styles/components/submission_detail.scss";
 
 .timed-out-icon {
-  padding: 0 .125rem 0 .375rem;
+  padding: 0 0.125rem 0 0.375rem;
 }
-
 </style>

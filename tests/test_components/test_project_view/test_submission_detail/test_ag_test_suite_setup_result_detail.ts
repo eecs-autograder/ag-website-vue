@@ -1,4 +1,5 @@
 import { mount, Wrapper } from '@vue/test-utils';
+import Vue from 'vue';
 
 import * as ag_cli from 'ag-client-typescript';
 import * as sinon from 'sinon';
@@ -8,7 +9,7 @@ import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { wait_fixed, wait_until } from '@/tests/utils';
+import { wait_fixed } from '@/tests/utils';
 
 let submission: ag_cli.Submission;
 let ag_test_suite_result: ag_cli.AGTestSuiteResultFeedback;
@@ -64,7 +65,7 @@ async function make_wrapper() {
             fdbk_category: ag_cli.FeedbackCategory.max
         }
     });
-    expect(await wait_until(wrapper, w => w.vm.d_output_size !== null));
+    await wait_fixed(wrapper, 5);
     return wrapper;
 }
 
@@ -96,11 +97,10 @@ describe('Setup output tests', () => {
             submission.pk, ag_test_suite_result.pk, setup_stdout_stub, stdout_content);
 
         let wrapper = await make_wrapper();
-        await wrapper.vm.$nextTick();
 
-        let stdout_viewer = <ViewFile> wrapper.findComponent({ref: 'setup_stdout'}).vm;
-        expect(await stdout_viewer.file_contents).toEqual(stdout_content);
-        expect(stdout_viewer.progress).not.toBeNull();
+        let stdout_viewer = wrapper.findComponent({ref: 'setup_stdout'});
+        expect(await stdout_viewer.props('file_contents')).toEqual(stdout_content);
+        expect(stdout_viewer.props('progress')).not.toBeNull();
 
         expect(wrapper.findComponent({ref: 'setup_stderr'}).exists()).toBe(false);
     });
@@ -113,11 +113,10 @@ describe('Setup output tests', () => {
             submission.pk, ag_test_suite_result.pk, setup_stderr_stub, stderr_content);
 
         let wrapper = await make_wrapper();
-        await wrapper.vm.$nextTick();
 
-        let stderr_viewer = <ViewFile> wrapper.findComponent({ref: 'setup_stderr'}).vm;
-        expect(await stderr_viewer.file_contents).toEqual(stderr_content);
-        expect(stderr_viewer.progress).not.toBeNull();
+        let stderr_viewer = wrapper.findComponent({ref: 'setup_stderr'});
+        expect(await stderr_viewer.props('file_contents')).toEqual(stderr_content);
+        expect(stderr_viewer.props('progress')).not.toBeNull();
 
         expect(wrapper.findComponent({ref: 'setup_stdout'}).exists()).toBe(false);
     });
@@ -134,22 +133,20 @@ describe('Setup output tests', () => {
             submission.pk, ag_test_suite_result.pk, setup_stderr_stub, stderr_content);
 
         let wrapper = await make_wrapper();
-        await wrapper.vm.$nextTick();
 
-        let stdout_viewer = <ViewFile> wrapper.findComponent({ref: 'setup_stdout'}).vm;
-        expect(await stdout_viewer.file_contents).toEqual(stdout_content);
-        expect(stdout_viewer.progress).not.toBeNull();
+        let stdout_viewer = wrapper.findComponent({ref: 'setup_stdout'});
+        expect(await stdout_viewer.props('file_contents')).toEqual(stdout_content);
+        expect(stdout_viewer.props('progress')).not.toBeNull();
 
-        let stderr_viewer = <ViewFile> wrapper.findComponent({ref: 'setup_stderr'}).vm;
-        expect(await stderr_viewer.file_contents).toEqual(stderr_content);
-        expect(stderr_viewer.progress).not.toBeNull();
+        let stderr_viewer = wrapper.findComponent({ref: 'setup_stderr'});
+        expect(await stderr_viewer.props('file_contents')).toEqual(stderr_content);
+        expect(stderr_viewer.props('progress')).not.toBeNull();
     });
 
     test('Setup stdout empty', async () => {
         output_size_resolves(submission.pk, ag_test_suite_result.pk,
                              {setup_stdout_size: 0, setup_stderr_size: null});
         let wrapper = await make_wrapper();
-        await wait_fixed(wrapper, 5);
 
         expect(wrapper.findComponent({ref: 'setup_stderr_section'}).exists()).toBe(false);
         expect(
@@ -162,7 +159,6 @@ describe('Setup output tests', () => {
         output_size_resolves(submission.pk, ag_test_suite_result.pk,
                              {setup_stdout_size: null, setup_stderr_size: 0});
         let wrapper = await make_wrapper();
-        await wait_fixed(wrapper, 5);
 
         expect(wrapper.findComponent({ref: 'setup_stdout_section'}).exists()).toBe(false);
         expect(
@@ -173,7 +169,7 @@ describe('Setup output tests', () => {
 });
 
 describe('AGTestSuiteSetupResultDetail exit_status tests', () => {
-    let wrapper: Wrapper<AGTestSuiteSetupResultDetail>;
+    let wrapper: Wrapper<Vue>;
 
     beforeEach(() => {
         output_size_resolves(submission.pk, ag_test_suite_result.pk);
@@ -188,8 +184,6 @@ describe('AGTestSuiteSetupResultDetail exit_status tests', () => {
             }
         });
 
-        expect(wrapper.vm.ag_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.vm.ag_test_suite_result!.setup_return_code).toBeNull();
         expect(wrapper.find('#exit-status-section').exists()).toBe(false);
     });
 
@@ -204,9 +198,6 @@ describe('AGTestSuiteSetupResultDetail exit_status tests', () => {
             }
         });
 
-        expect(wrapper.vm.ag_test_suite_result!.setup_timed_out).toBeNull();
-        expect(wrapper.vm.ag_test_suite_result!.setup_return_code).toBe(1);
-        expect(wrapper.vm.ag_test_suite_result.setup_return_code).not.toBeNull();
         expect(wrapper.find('#exit-status-section').exists()).toBe(true);
         expect(wrapper.find('#exit-status-section').text()).toContain("1");
     });
@@ -222,8 +213,6 @@ describe('AGTestSuiteSetupResultDetail exit_status tests', () => {
             }
         });
 
-        expect(wrapper.vm.ag_test_suite_result!.setup_timed_out).toBe(false);
-        expect(wrapper.vm.ag_test_suite_result!.setup_return_code).toBeNull();
         expect(wrapper.find('#exit-status-section').exists()).toBe(false);
     });
 
@@ -238,8 +227,6 @@ describe('AGTestSuiteSetupResultDetail exit_status tests', () => {
             }
         });
 
-        expect(wrapper.vm.ag_test_suite_result!.setup_timed_out).toBe(true);
-        expect(wrapper.vm.ag_test_suite_result!.setup_return_code).toBeNull();
         expect(wrapper.find('#exit-status-section').text()).toContain('(Timed out)');
     });
 });
@@ -264,18 +251,19 @@ test('Output reloaded on fdbk_category change', async () => {
     });
     await wait_fixed(wrapper, 4);
 
-    expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.max);
     expect(setup_stdout_stub.callCount).toEqual(0);
     expect(setup_stderr_stub.callCount).toEqual(0);
-    expect(wrapper.vm.d_setup_stdout_content).toBeNull();
-    expect(wrapper.vm.d_setup_stderr_content).toBeNull();
+    expect(wrapper.findAll('.short-output').length).toEqual(2);
+    expect(wrapper.findComponent(ViewFile).exists()).toBe(false);
 
     wrapper.setProps({fdbk_category: ag_cli.FeedbackCategory.normal});
     await wait_fixed(wrapper, 4);
 
-    expect(wrapper.vm.fdbk_category).toEqual(ag_cli.FeedbackCategory.normal);
     expect(setup_stdout_stub.callCount).toEqual(1);
     expect(setup_stderr_stub.callCount).toEqual(1);
-    expect(await wrapper.vm.d_setup_stdout_content).toEqual(setup_stdout_content);
-    expect(await wrapper.vm.d_setup_stderr_content).toEqual(setup_stderr_content);
+
+    let stdout_viewer = wrapper.findComponent({ref: 'setup_stdout'});
+    let stderr_viewer = wrapper.findComponent({ref: 'setup_stderr'});
+    expect(await stdout_viewer.props('file_contents')).toEqual(setup_stdout_content);
+    expect(await stderr_viewer.props('file_contents')).toEqual(setup_stderr_content);
 });
