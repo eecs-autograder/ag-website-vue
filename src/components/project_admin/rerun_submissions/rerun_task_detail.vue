@@ -1,30 +1,33 @@
 <template>
   <tr ref="task_row">
-    <td class="started-at-cell">{{format_datetime(task.created_at)}}</td>
+    <td class="started-at-cell">{{ format_datetime(task.created_at) }}</td>
     <td class="progress-cell">
       <template v-if="task.has_error">
         ERROR
         <tooltip placement="top" width="large">
-          An unexpected error occurred. Please contact <b>{{SYSADMIN_CONTACT}}</b>
-          and include the information <b>"Rerun task ID: {{task.pk}}"</b> in your email.
+          An unexpected error occurred. Please contact
+          <b>{{ SYSADMIN_CONTACT }}</b> and include the information
+          <b>"Rerun task ID: {{ task.pk }}"</b> in your email.
         </tooltip>
       </template>
-      <template v-else-if="task.is_cancelled">
-        Cancelled
-      </template>
+      <template v-else-if="task.is_cancelled"> Cancelled </template>
       <template v-else>
-        <span class="progress-value" role="status">{{task.progress}}%</span>
-        <button v-if="task.progress !== 100"
-                type="button"
-                class="refresh-button"
-                aria-label="Refresh task progress"
-                @click="refresh_task(task)">
+        <span class="progress-value" role="status">{{ task.progress }}%</span>
+        <button
+          v-if="task.progress !== 100"
+          type="button"
+          class="refresh-button"
+          aria-label="Refresh task progress"
+          @click="refresh_task(task)"
+        >
           <i class="fas fa-sync-alt" aria-hidden="true"></i>
         </button>
-        <button v-if="task.progress !== 100"
-                type="button"
-                class="orange-button cancel-button"
-                @click="$emit('request-cancel', task)">
+        <button
+          v-if="task.progress !== 100"
+          type="button"
+          class="orange-button cancel-button"
+          @click="$emit('request-cancel', task)"
+        >
           Cancel
         </button>
       </template>
@@ -32,39 +35,33 @@
   </tr>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import * as ag_cli from "ag-client-typescript";
 
-import * as ag_cli from 'ag-client-typescript';
+import Tooltip from "@/components/tooltip.vue";
+import { SYSADMIN_CONTACT } from "@/constants";
+import { new_handle_global_errors_async } from "@/error_handling";
+import { format_datetime, safe_assign } from "@/utils";
 
-import Tooltip from '@/components/tooltip.vue';
-import { SYSADMIN_CONTACT } from '@/constants';
-import { handle_global_errors_async } from '@/error_handling';
-import { format_datetime, safe_assign } from '@/utils';
+defineProps<{
+  task: ag_cli.RerunSubmissionTask;
+}>();
 
-@Component({
-  components: {
-    Tooltip,
-  }
-})
-export default class RerunTaskDetail extends Vue {
-  @Prop({required: true, type: ag_cli.RerunSubmissionTask})
-  task!: ag_cli.RerunSubmissionTask;
+defineEmits<{
+  "request-cancel": [task: ag_cli.RerunSubmissionTask];
+}>();
 
-  readonly format_datetime = format_datetime;
-  readonly SYSADMIN_CONTACT = SYSADMIN_CONTACT;
-
-  @handle_global_errors_async
-  async refresh_task(task: ag_cli.RerunSubmissionTask) {
+const refresh_task = new_handle_global_errors_async(
+  async (task: ag_cli.RerunSubmissionTask) => {
     let refreshed = await ag_cli.RerunSubmissionTask.get_by_pk(task.pk);
     safe_assign(task, refreshed);
-  }
-}
+  },
+);
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/button_styles.scss';
-@import '@/styles/forms.scss';
+@import "@/styles/button_styles.scss";
+@import "@/styles/forms.scss";
 
 .refresh-button {
   background: none;
@@ -73,7 +70,7 @@ export default class RerunTaskDetail extends Vue {
   cursor: pointer;
   color: inherit;
   font-size: inherit;
-  margin-left: 1rem
+  margin-left: 1rem;
 }
 
 .started-at-cell,
@@ -90,7 +87,7 @@ export default class RerunTaskDetail extends Vue {
   text-align: right;
 
   &::before {
-    content: '100%';
+    content: "100%";
     display: block;
     max-height: 0;
     overflow: hidden;
@@ -99,8 +96,8 @@ export default class RerunTaskDetail extends Vue {
 }
 
 .orange-button.cancel-button {
-  padding: .125rem .375rem;
-  font-size: .875rem;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.875rem;
   margin-left: 4rem;
 }
 </style>
