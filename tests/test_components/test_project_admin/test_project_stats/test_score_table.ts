@@ -1,3 +1,5 @@
+import Vue from "vue";
+
 import * as ag_cli from "ag-client-typescript";
 
 import ScoreTable from "@/components/project_admin/project_stats/score_table.vue";
@@ -16,36 +18,45 @@ function make_entry(
   };
 }
 
+// ScoreTable is always rendered as a child of project_stats, never as a root
+// component. Mount it that way so the test exercises the same prop-update path
+// the app does.
+async function make_wrapper(
+  submission_results: ag_cli.FullUltimateSubmissionResult[] | null,
+) {
+  const Parent = Vue.extend({
+    components: { ScoreTable },
+    props: { results: { default: null } },
+    template: `<score-table :submission_results="results" />`,
+  });
+
+  const wrapper = managed_mount(Parent, { propsData: { results: null } });
+  await wrapper.setProps({ results: submission_results });
+  return wrapper;
+}
+
 describe("ScoreTable tests", () => {
-  test("Does not render a table when submission_results is null", () => {
-    const wrapper = managed_mount(ScoreTable, {
-      propsData: { submission_results: null },
-    });
+  test("Does not render a table when submission_results is null", async () => {
+    const wrapper = await make_wrapper(null);
     expect(wrapper.find("table").exists()).toBe(false);
   });
 
-  test("Does not render a table when submission_results is empty", () => {
-    const wrapper = managed_mount(ScoreTable, {
-      propsData: { submission_results: [] },
-    });
+  test("Does not render a table when submission_results is empty", async () => {
+    const wrapper = await make_wrapper([]);
     expect(wrapper.find("table").exists()).toBe(false);
   });
 
-  test("Does not render a table when every ultimate submission is null", () => {
+  test("Does not render a table when every ultimate submission is null", async () => {
     const group1 = data_ut.make_group(1);
     const group2 = data_ut.make_group(1);
-    const wrapper = managed_mount(ScoreTable, {
-      propsData: {
-        submission_results: [
-          make_entry(group1, null),
-          make_entry(group2, null),
-        ],
-      },
-    });
+    const wrapper = await make_wrapper([
+      make_entry(group1, null),
+      make_entry(group2, null),
+    ]);
     expect(wrapper.find("table").exists()).toBe(false);
   });
 
-  test("Renders column headers from the first result with a non-null ultimate submission", () => {
+  test("Renders column headers from the first result with a non-null ultimate submission", async () => {
     const group1 = data_ut.make_group(1);
     const group2 = data_ut.make_group(1);
 
@@ -68,20 +79,16 @@ describe("ScoreTable tests", () => {
       total_points_possible: 5,
     });
 
-    const wrapper = managed_mount(ScoreTable, {
-      propsData: {
-        submission_results: [
-          make_entry(group1, null),
-          make_entry(
-            group2,
-            data_ut.make_submission_with_results(group2, undefined, {
-              ag_test_suite_results: [suite],
-              mutation_test_suite_results: [mutation_suite],
-            }),
-          ),
-        ],
-      },
-    });
+    const wrapper = await make_wrapper([
+      make_entry(group1, null),
+      make_entry(
+        group2,
+        data_ut.make_submission_with_results(group2, undefined, {
+          ag_test_suite_results: [suite],
+          mutation_test_suite_results: [mutation_suite],
+        }),
+      ),
+    ]);
 
     const headers = wrapper.findAll("thead th");
     expect(headers.length).toEqual(7);
@@ -94,7 +101,7 @@ describe("ScoreTable tests", () => {
     expect(headers.at(6).text()).toEqual("Mutation Suite 1 (5)");
   });
 
-  test("Renders a row per submission result with scores for non-null ultimate submissions", () => {
+  test("Renders a row per submission result with scores for non-null ultimate submissions", async () => {
     const group1 = data_ut.make_group(1);
     const group2 = data_ut.make_group(1);
 
@@ -109,22 +116,18 @@ describe("ScoreTable tests", () => {
       total_points: 2,
     });
 
-    const wrapper = managed_mount(ScoreTable, {
-      propsData: {
-        submission_results: [
-          make_entry(
-            group1,
-            data_ut.make_submission_with_results(group1, undefined, {
-              total_points: 10,
-              total_points_possible: 15,
-              ag_test_suite_results: [suite],
-              mutation_test_suite_results: [mutation_suite],
-            }),
-          ),
-          make_entry(group2, null),
-        ],
-      },
-    });
+    const wrapper = await make_wrapper([
+      make_entry(
+        group1,
+        data_ut.make_submission_with_results(group1, undefined, {
+          total_points: 10,
+          total_points_possible: 15,
+          ag_test_suite_results: [suite],
+          mutation_test_suite_results: [mutation_suite],
+        }),
+      ),
+      make_entry(group2, null),
+    ]);
 
     const rows = wrapper.findAll("tbody tr");
     expect(rows.length).toEqual(2);
@@ -144,18 +147,14 @@ describe("ScoreTable tests", () => {
     expect(row2_cells.at(1).text()).toEqual(group2.member_names.join(","));
   });
 
-  test("Table has a caption and row headers for accessibility", () => {
+  test("Table has a caption and row headers for accessibility", async () => {
     const group = data_ut.make_group(1);
-    const wrapper = managed_mount(ScoreTable, {
-      propsData: {
-        submission_results: [
-          make_entry(
-            group,
-            data_ut.make_submission_with_results(group, undefined, {}),
-          ),
-        ],
-      },
-    });
+    const wrapper = await make_wrapper([
+      make_entry(
+        group,
+        data_ut.make_submission_with_results(group, undefined, {}),
+      ),
+    ]);
 
     expect(wrapper.find("table > caption").exists()).toBe(true);
 
