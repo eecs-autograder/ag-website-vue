@@ -6,6 +6,7 @@ import * as sinon from 'sinon';
 
 import CriterionForm, { CriterionFormData } from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import SingleCriterion from "@/components/project_admin/handgrading_settings/single_criterion.vue";
+import { deep_copy } from "@/utils";
 
 import { managed_mount } from "@/tests/setup";
 import { wait_until } from "@/tests/utils";
@@ -24,26 +25,22 @@ beforeEach(() => {
 });
 
 describe('SingleCriterion tests', () => {
-    test('Displays criterion values, updates when prop changes', async () => {
+    test('Input value and watcher', async () => {
         const wrapper = managed_mount(
             SingleCriterion, {propsData: {criterion, index: 0, count: 1}});
-        expect(wrapper.find('.short-description').text()).toEqual('Spam');
-        expect(wrapper.find('.points').text()).toEqual('4 points');
-        expect(wrapper.find('.long-description').text()).toEqual('Egg');
 
         let other = new Criterion({
             pk: 3,
             handgrading_rubric: 41,
             short_description: 'Waa',
             long_description: '',
-            points: 1,
+            points: 5,
             last_modified: ''
         });
         wrapper.setProps({criterion: other});
         await wrapper.vm.$nextTick();
-
-        expect(wrapper.find('.short-description').text()).toEqual('Waa');
-        expect(wrapper.find('.points').text()).toEqual('1 point');
+        expect(wrapper.find('.short-description').text()).toEqual(other.short_description);
+        expect(wrapper.find('.points').text()).toEqual('5 points');
         expect(wrapper.find('.long-description').exists()).toEqual(false);
     });
 
@@ -57,6 +54,36 @@ describe('SingleCriterion tests', () => {
 
         await wrapper.find('.white-button').trigger('click');
         expect(wrapper.findComponent(CriterionForm).exists()).toEqual(false);
+    });
+
+    test('Short description displyed', () => {
+        const wrapper = managed_mount(
+            SingleCriterion, {propsData: {criterion, index: 0, count: 1}});
+        expect(wrapper.find('.short-description').text()).toEqual(criterion.short_description);
+    });
+
+    test('Points displayed', async () => {
+        const wrapper = managed_mount(
+            SingleCriterion, {propsData: {criterion, index: 0, count: 1}});
+        expect(wrapper.find('.points').text()).toEqual('4 points');
+
+        let updated = deep_copy(criterion, Criterion);
+        updated.points = 1;
+        wrapper.setProps({criterion: updated});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('.points').text()).toEqual('1 point');
+    });
+
+    test('Long description displayed when not empty', async () => {
+        const wrapper = managed_mount(
+            SingleCriterion, {propsData: {criterion, index: 0, count: 1}});
+        expect(wrapper.find('.long-description').text()).toEqual(criterion.long_description);
+
+        let updated = deep_copy(criterion, Criterion);
+        updated.long_description = '';
+        wrapper.setProps({criterion: updated});
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('.long-description').exists()).toEqual(false);
     });
 });
 
