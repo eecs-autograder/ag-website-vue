@@ -1,7 +1,12 @@
+import { vi } from 'vitest';
+import { Wrapper } from '@vue/test-utils';
+import Vue from 'vue';
+
 import { Course, HttpError, Semester } from 'ag-client-typescript';
 import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
+import InputErrors from '@/components/validated_input/InputErrors.vue';
 import Modal from '@/components/modal.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
 import ValidatedIntInput from '@/components/validated_input/ValidatedIntInput.vue';
@@ -38,11 +43,23 @@ describe('SingleCourse.vue', () => {
         return wrapper.find('.clone-course').trigger('click');
     }
 
+    // Error visibility on the new validated inputs is debounced.
+    async function shown_errors(wrapper: ReturnType<typeof make_wrapper>, field: Wrapper<Vue>) {
+        vi.runAllTimers();
+        await wrapper.vm.$nextTick();
+        let errors = field.findComponent(InputErrors);
+        return errors.exists() ? errors.text() : '';
+    }
+
     function clone_form_inputs(wrapper: ReturnType<typeof make_wrapper>) {
+        let name_field = wrapper.findComponent(ValidatedTextInput);
+        let year_field = wrapper.findComponent(ValidatedIntInput);
         return {
-            name_input: wrapper.findComponent(ValidatedTextInput).find('input'),
+            name_field: name_field,
+            name_input: name_field.find('input'),
             semester_select: wrapper.find('[data-testid=semester]'),
-            year_input: wrapper.findComponent(ValidatedIntInput).find('input'),
+            year_field: year_field,
+            year_input: year_field.find('input'),
             submit_button: wrapper.find('.create-clone-button'),
         };
     }
@@ -100,60 +117,67 @@ describe('SingleCourse.vue', () => {
     test('The newly cloned course name cannot be an empty string', async () => {
         let wrapper = make_wrapper();
         await open_clone_modal(wrapper);
-        let {name_input, submit_button} = clone_form_inputs(wrapper);
+        let {name_field, name_input, submit_button} = clone_form_inputs(wrapper);
 
         await set_validated_input_text(name_input, "");
         expect(wrapper.findComponent(Modal).exists()).toBe(true);
         expect(submit_button.element).toBeDisabled();
+        expect(await shown_errors(wrapper, name_field)).toContain("This field is required.");
 
         await set_validated_input_text(name_input, "    ");
         expect(submit_button.element).toBeDisabled();
         expect(wrapper.findComponent(Modal).exists()).toBe(true);
+        expect(await shown_errors(wrapper, name_field)).toContain("This field is required.");
     });
 
     test('The newly cloned course year must be greater >= 2000 - violates condition',
          async () => {
         let wrapper = make_wrapper();
         await open_clone_modal(wrapper);
-        let {year_input, submit_button} = clone_form_inputs(wrapper);
+        let {year_field, year_input, submit_button} = clone_form_inputs(wrapper);
 
         expect(submit_button.element).not.toBeDisabled();
 
         await set_validated_input_text(year_input, "1999");
         expect(submit_button.element).toBeDisabled();
+        expect(await shown_errors(wrapper, year_field)).toContain(
+            "Input must be greater than or equal to 2000");
     });
 
     test('The newly cloned course year must be greater >= 2000 - meets condition', async () => {
         let wrapper = make_wrapper();
         await open_clone_modal(wrapper);
-        let {year_input, submit_button} = clone_form_inputs(wrapper);
+        let {year_field, year_input, submit_button} = clone_form_inputs(wrapper);
 
         expect(submit_button.element).not.toBeDisabled();
 
         await set_validated_input_text(year_input, "2000");
         expect(submit_button.element).not.toBeDisabled();
+        expect(await shown_errors(wrapper, year_field)).toEqual('');
     });
 
     test('The newly cloned course year must be a number - violates condition', async () => {
         let wrapper = make_wrapper();
         await open_clone_modal(wrapper);
-        let {year_input, submit_button} = clone_form_inputs(wrapper);
+        let {year_field, year_input, submit_button} = clone_form_inputs(wrapper);
 
         expect(submit_button.element).not.toBeDisabled();
 
         await set_validated_input_text(year_input, "spoon");
         expect(submit_button.element).toBeDisabled();
+        expect(await shown_errors(wrapper, year_field)).not.toEqual('');
     });
 
     test('The newly cloned course year cannot be empty - violates condition', async () => {
         let wrapper = make_wrapper();
         await open_clone_modal(wrapper);
-        let {year_input, submit_button} = clone_form_inputs(wrapper);
+        let {year_field, year_input, submit_button} = clone_form_inputs(wrapper);
 
         expect(submit_button.element).not.toBeDisabled();
 
         await set_validated_input_text(year_input, "    ");
         expect(submit_button.element).toBeDisabled();
+        expect(await shown_errors(wrapper, year_field)).not.toEqual('');
     });
 
     test("Successful clone", async () => {
