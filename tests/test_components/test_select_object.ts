@@ -34,10 +34,17 @@ describe('select-object tests', () => {
     });
 
     test('Initial value', () => {
+        let options = wrapper.findAll('option');
+        expect(options.length).toBe(things.length);
+        things.forEach((thing, index) => {
+            expect(options.at(index).attributes('value')).toEqual(thing.id.toString());
+        });
         expect_html_element_has_value(wrapper.find('select'), things[1].id.toString());
     });
 
     test('Input value changed', async () => {
+        expect_html_element_has_value(wrapper.find('select'), things[1].id.toString());
+
         await wrapper.setProps({value: things[0]});
         expect_html_element_has_value(wrapper.find('select'), things[0].id.toString());
     });
@@ -55,6 +62,7 @@ describe('select-object tests', () => {
 
     test('New option selected', async () => {
         await wrapper.findAll('option').at(3).setSelected();
+        expect_html_element_has_value(wrapper.find('select'), things[3].id.toString());
         expect(emitted(wrapper, 'change')[0][0]).toEqual(things[3]);
     });
 });
