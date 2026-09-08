@@ -2,74 +2,76 @@
   <!-- This outer div insulates the wrapped select tag from attribute
        and event bindings on the component. -->
   <div>
-    <select :id="input_id"
-            class="select" v-model="d_value" @change="update_value">
+    <select
+      :id="input_id"
+      class="select"
+      v-model="selected_id"
+      @change="update_value"
+    >
       <slot></slot>
-      <option v-for="item of d_items"
-              :key="item[id_field]"
-              :value="item[id_field]">
-        <slot name="option-text" v-bind:item="item">{{item[id_field]}}</slot>
+      <option
+        v-for="item of items"
+        :key="item[id_field]"
+        :value="item[id_field]"
+      >
+        <slot name="option-text" v-bind:item="item">{{ item[id_field] }}</slot>
       </option>
     </select>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Model, Prop, Vue, Watch } from 'vue-property-decorator';
+// Vue 2.7 <script setup> has no defineModel, so the custom v-model event
+// ("change" instead of the default "input") is declared here.
+export default {
+  model: { prop: "value", event: "change" },
+};
+</script>
 
-type ItemType = {[key: string]: unknown};
+<script setup lang="ts">
+import { ref, watch } from "vue";
 
-@Component
-export default class SelectObject extends Vue {
-  @Prop({default: [], type: Array})
-  items!: ItemType[];
+type ItemType = { [key: string]: unknown };
 
-  d_items: ItemType[] = [];
+const props = withDefaults(
+  defineProps<{
+    items?: ItemType[];
+    /** The selected item, identified by its `id_field`. */
+    value?: ItemType | null;
+    /** The name of the field used to uniquely identify the items. */
+    id_field: string;
+    input_id?: string;
+  }>(),
+  {
+    items: () => [],
+    value: null,
+    input_id: "",
+  },
+);
 
-  @Model('change', {required: false, type: Object, default: null})
-  value!: ItemType | null;
+const emit = defineEmits<{
+  change: [selected: ItemType | undefined];
+}>();
 
-  d_value: unknown = null;
+const selected_id = ref<unknown>(
+  props.value === null ? null : props.value[props.id_field],
+);
 
-  // The name of the field used to uniquely identify the items.
-  @Prop({type: String})
-  id_field!: string;
+watch(
+  () => props.value,
+  (new_value) => {
+    selected_id.value = new_value === null ? null : new_value[props.id_field];
+  },
+);
 
-  @Prop({type: String, default: ''})
-  input_id!: string;
-
-  @Watch('items')
-  on_items_changed(new_items: ItemType[], old_items: ItemType[]) {
-    this.d_items = new_items;
-  }
-
-  @Watch('value')
-  on_value_changed(new_value: ItemType | null, old_value: ItemType | null) {
-    this.set_d_value(new_value);
-  }
-
-  created() {
-    this.d_items = this.items;
-    this.set_d_value(this.value);
-  }
-
-  private set_d_value(value: ItemType | null) {
-    if (value === null) {
-      this.d_value = null;
-    }
-    else {
-      this.d_value = value[this.id_field];
-    }
-  }
-
-  private update_value() {
-    let selected = this.d_items.find(
-      (item) => item[this.id_field] === this.d_value);
-    this.$emit('change', selected);
-  }
+function update_value() {
+  emit(
+    "change",
+    props.items.find((item) => item[props.id_field] === selected_id.value),
+  );
 }
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/forms.scss';
+@import "@/styles/forms.scss";
 </style>
