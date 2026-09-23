@@ -14,6 +14,7 @@ lint_paths=(
     'src/components/context_menu/context_menu.vue'
     'src/components/context_menu/context_menu_item.vue'
     'src/components/dropdown.vue'
+    'src/components/group_lookup.vue'
     'src/components/group_members_form.vue'
     'src/components/last_saved.vue'
     'src/components/modal.vue'
