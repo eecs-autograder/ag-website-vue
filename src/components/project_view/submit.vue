@@ -178,6 +178,7 @@ import { GlobalData } from '@/app.vue';
 import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import FileUpload from '@/components/file_upload.vue';
+import { FileUploadExposed } from '@/exposed_component_types/file_upload_exposed';
 import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
@@ -451,7 +452,7 @@ export default class Submit extends Vue {
         }
       );
 
-      (<FileUpload> this.$refs.submit_file_upload).clear_files();
+      (this.$refs.submit_file_upload as FileUploadExposed).clear_files();
       this.d_show_confirm_submit_modal = false;
       this.d_honor_pledge_signature = '';
       this.$emit('submitted');

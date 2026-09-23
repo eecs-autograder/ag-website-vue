@@ -7,7 +7,6 @@ import * as sinon from 'sinon';
 import { vi } from 'vitest';
 
 import APIErrors from "@/components/api_errors.vue";
-import FileUpload from "@/components/file_upload.vue";
 import ExpectedStudentFilesList from '@/components/project_view/expected_student_files_list.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
 import Submit from '@/components/project_view/submit.vue';
@@ -1005,8 +1004,8 @@ describe('Honor pledge tests', () => {
         expect(wrapper.find('.honor-pledge-text').text().includes(text)).toBe(true);
         expect(wrapper.find('.confirm-pledge').text().includes(`"${username_part}"`));
 
-        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
-        expect(file_upload.vm.disable_upload_button).toBe(true);
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.props('disable_upload_button')).toBe(true);
     });
 
     test('Pledge text non-empty but Project.use_honor_pledge is false', async () => {
@@ -1014,8 +1013,8 @@ describe('Honor pledge tests', () => {
         project.honor_pledge_text = 'nrosteanoieafoinwf';
         let wrapper = make_wrapper();
         expect(wrapper.find('.honor-pledge-text').exists()).toBe(false);
-        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
-        expect(file_upload.vm.disable_upload_button).toBe(false);
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.props('disable_upload_button')).toBe(false);
     });
 
     test('Staff not required to sign pledge', async () => {
@@ -1023,8 +1022,8 @@ describe('Honor pledge tests', () => {
         project.use_honor_pledge = true;
         project.honor_pledge_text = 'norfutofnrt';
         let wrapper = make_wrapper();
-        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
-        expect(file_upload.vm.disable_upload_button).toBe(false);
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.props('disable_upload_button')).toBe(false);
     });
 
     test('Pledge signed with username part only', async () => {
@@ -1035,8 +1034,8 @@ describe('Honor pledge tests', () => {
         await set_data(
             wrapper, {d_honor_pledge_signature: '  ' + username_part.toUpperCase() + '   '});
 
-        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
-        expect(file_upload.vm.disable_upload_button).toBe(false);
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.props('disable_upload_button')).toBe(false);
     });
 
     test('Pledge signed with full email', async () => {
@@ -1046,8 +1045,8 @@ describe('Honor pledge tests', () => {
 
         await set_data(wrapper, {d_honor_pledge_signature: current_user.username});
 
-        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
-        expect(file_upload.vm.disable_upload_button).toBe(false);
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.props('disable_upload_button')).toBe(false);
     });
 
     test('Pledge signed with almost full email', async () => {
@@ -1058,8 +1057,8 @@ describe('Honor pledge tests', () => {
         let slice = current_user.username.slice(0, current_user.username.length - 2);
         await set_data(wrapper, {d_honor_pledge_signature: slice});
 
-        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
-        expect(file_upload.vm.disable_upload_button).toBe(false);
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.props('disable_upload_button')).toBe(false);
     });
 
     test('Pledge signed incorrectly', async () => {
@@ -1069,7 +1068,7 @@ describe('Honor pledge tests', () => {
 
         await set_data(wrapper, {d_honor_pledge_signature: current_user.username.slice(1)});
 
-        let file_upload = <Wrapper<FileUpload>> wrapper.findComponent({ref: 'submit_file_upload'});
-        expect(file_upload.vm.disable_upload_button).toBe(true);
+        let file_upload = wrapper.findComponent({ref: 'submit_file_upload'});
+        expect(file_upload.props('disable_upload_button')).toBe(true);
     });
 });
