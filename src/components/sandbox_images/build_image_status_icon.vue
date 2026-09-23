@@ -1,36 +1,59 @@
 <template>
-  <span v-if="status === BuildImageStatus.queued"
-        role="img" aria-label="Queued" class="queued-symbol">Q</span>
-  <i v-else-if="status === BuildImageStatus.in_progress" role="img" aria-label="In progress"
-     class="fas fa-wrench"></i>
-  <i v-else-if="status === BuildImageStatus.done" role="img" aria-label="Done"
-     class="fas fa-check"></i>
-  <i v-else-if="status === BuildImageStatus.failed" role="img" aria-label="Failed"
-     class="fas fa-times"></i>
-  <i v-else-if="status === BuildImageStatus.image_invalid" role="img" aria-label="Image invalid"
-     class="fas fa-times"></i>
-  <i v-else-if="status === BuildImageStatus.cancelled" role="img" aria-label="Cancelled"
-     class="fas fa-eject"></i>
-  <i v-else-if="status === BuildImageStatus.internal_error" role="img" aria-label="Internal error"
-     class="fas fa-skull"></i>
+  <span
+    v-if="status === BuildImageStatus.queued"
+    role="img"
+    aria-label="Queued"
+    class="queued-symbol"
+    >Q</span
+  >
+  <i
+    v-else-if="status === BuildImageStatus.in_progress"
+    role="img"
+    aria-label="In progress"
+    class="fas fa-wrench"
+  ></i>
+  <i
+    v-else-if="status === BuildImageStatus.done"
+    role="img"
+    aria-label="Done"
+    class="fas fa-check"
+  ></i>
+  <i
+    v-else-if="status === BuildImageStatus.failed"
+    role="img"
+    aria-label="Failed"
+    class="fas fa-times"
+  ></i>
+  <i
+    v-else-if="status === BuildImageStatus.image_invalid"
+    role="img"
+    aria-label="Image invalid"
+    class="fas fa-times"
+  ></i>
+  <i
+    v-else-if="status === BuildImageStatus.cancelled"
+    role="img"
+    aria-label="Cancelled"
+    class="fas fa-eject"
+  ></i>
+  <i
+    v-else-if="status === BuildImageStatus.internal_error"
+    role="img"
+    aria-label="Internal error"
+    class="fas fa-skull"
+  ></i>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { BuildImageStatus } from "ag-client-typescript";
 
-import { BuildImageStatus } from 'ag-client-typescript';
-
-@Component
-export default class BuildStatusIcon extends Vue {
-  @Prop({required: true, type: String})
-  status!: BuildImageStatus;
-
-  readonly BuildImageStatus = BuildImageStatus;
-}
+defineProps<{
+  status: BuildImageStatus;
+}>();
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 .queued-symbol {
   font-weight: bold;
@@ -49,7 +72,8 @@ export default class BuildStatusIcon extends Vue {
   color: $orange;
 }
 
-.fa-skull, .fa-times {
+.fa-skull,
+.fa-times {
   color: crimson;
 }
 </style>
