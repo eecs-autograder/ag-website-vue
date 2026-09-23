@@ -3,8 +3,9 @@ import Component from 'vue-class-component';
 
 import { mount } from '@vue/test-utils';
 
-import Dropdown from '@/components/dropdown.vue';
 import DropdownTypeahead from '@/components/dropdown_typeahead.vue';
+
+import { emitted, find_component } from '@/tests/utils';
 
 
 describe('DropdownTypeahead.vue', () => {
@@ -15,8 +16,7 @@ describe('DropdownTypeahead.vue', () => {
                   typeahead_class="custom-style"
                   placeholder_text="Enter a State"
                   :choices="states"
-                  :filter_fn="states_filter_fn"
-                  @item_selected="add_item($event)">
+                  :filter_fn="states_filter_fn">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -32,32 +32,26 @@ describe('DropdownTypeahead.vue', () => {
             states_filter_fn(item: string, filter_text: string) {
                 return item.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                console.log(item);
-            }
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead = find_component(wrapper, DropdownTypeahead);
 
-        expect(dropdown_typeahead.choices).toEqual(wrapper.vm.states);
+        expect(dropdown_typeahead.props('choices')).toEqual([]);
 
         let search_bar = wrapper.find('input');
-        search_bar.trigger("click");
-        await dropdown_typeahead.$nextTick();
+        await search_bar.trigger('click');
 
         let dropdown_no_matches_message = wrapper.find('.no-matching-results');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(0);
         expect(dropdown_no_matches_message.text()).toContain(
             "We couldn't find any results containing: ''"
         );
-        dropdown_typeahead.filter_text = "word";
-        await dropdown_typeahead.$nextTick();
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        await search_bar.setValue('word');
+
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(0);
         expect(dropdown_no_matches_message.text()).toContain(
             "We couldn't find any results containing: 'word'"
         );
@@ -70,8 +64,7 @@ describe('DropdownTypeahead.vue', () => {
                   typeahead_class="custom-style"
                   placeholder_text="Enter a State"
                   :choices="states"
-                  :filter_fn="states_filter_fn"
-                  @item_selected="add_item($event)">
+                  :filter_fn="states_filter_fn">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -87,27 +80,20 @@ describe('DropdownTypeahead.vue', () => {
             states_filter_fn(item: string, filter_text: string) {
                 return item.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                console.log(item);
-            }
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead = find_component(wrapper, DropdownTypeahead);
         let search_bar = wrapper.find('input');
-        search_bar.trigger("click");
+        await search_bar.trigger('click');
 
-        dropdown_typeahead.filter_text = "word";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('word');
+        expect((search_bar.element as HTMLInputElement).value).toEqual('word');
 
-        expect(dropdown_typeahead.filter_text).toEqual("word");
+        dropdown_typeahead.vm.clear_filter_text();
+        await wrapper.vm.$nextTick();
 
-        dropdown_typeahead.clear_filter_text();
-        await dropdown_typeahead.$nextTick();
-
-        expect(dropdown_typeahead.filter_text).toEqual("");
+        expect((search_bar.element as HTMLInputElement).value).toEqual('');
     });
 
     test('DropdownTypeahead data set to values passed in by parent', () => {
@@ -117,8 +103,7 @@ describe('DropdownTypeahead.vue', () => {
                   typeahead_class="custom-style"
                   placeholder_text="Enter a State"
                   :choices="states"
-                  :filter_fn="states_filter_fn"
-                  @item_selected="add_item($event)">
+                  :filter_fn="states_filter_fn">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -135,20 +120,15 @@ describe('DropdownTypeahead.vue', () => {
             states_filter_fn(item: string, filter_text: string) {
                 return item.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                console.log(item);
-            }
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead = find_component(wrapper, DropdownTypeahead);
+        let search_bar = wrapper.find('input');
 
-        expect(dropdown_typeahead.choices).toEqual(wrapper.vm.$data.states);
-        expect(dropdown_typeahead.placeholder_text).toEqual("Enter a State");
-        expect(dropdown_typeahead.filter_fn).toBeDefined();
-        expect(dropdown_typeahead.typeahead_class).toEqual("custom-style");
+        expect(dropdown_typeahead.props('choices')).toEqual(wrapper.vm.states);
+        expect(search_bar.attributes('placeholder')).toEqual('Enter a State');
+        expect(search_bar.classes()).toContain('custom-style');
     });
 
     test('Different values of "filter_text" produce different filtered_choices',
@@ -158,8 +138,7 @@ describe('DropdownTypeahead.vue', () => {
               <dropdown-typeahead ref="dropdown_typeahead"
                   placeholder_text="Enter a State"
                   :choices="states"
-                  :filter_fn="states_filter_fn"
-                  @item_selected="add_item($event)">
+                  :filter_fn="states_filter_fn">
                   <template slot-scope="{ item }">
                     <span> {{ item }}</span>
                   </template>
@@ -176,22 +155,16 @@ describe('DropdownTypeahead.vue', () => {
             states_filter_fn(item: string, filter_text: string) {
                 return item.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                console.log(item);
-            }
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
-        search_bar.trigger("click");
+        await search_bar.trigger('click');
 
         let dropdown_menu_content = wrapper.find('.dropdown-content');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(8);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(8);
         expect(dropdown_menu_content.text()).toContain("Missouri");
         expect(dropdown_menu_content.text()).toContain("Mississippi");
         expect(dropdown_menu_content.text()).toContain("Minnesota");
@@ -201,44 +174,38 @@ describe('DropdownTypeahead.vue', () => {
         expect(dropdown_menu_content.text()).toContain("Michigan");
         expect(dropdown_menu_content.text()).toContain("Maryland");
 
-        dropdown_typeahead.filter_text = "Mi";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('Mi');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(4);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(4);
         expect(dropdown_menu_content.text()).toContain("Missouri");
         expect(dropdown_menu_content.text()).toContain("Mississippi");
         expect(dropdown_menu_content.text()).toContain("Minnesota");
         expect(dropdown_menu_content.text()).toContain("Michigan");
 
-        dropdown_typeahead.filter_text = "Mis";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('Mis');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(2);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(2);
         expect(dropdown_menu_content.text()).toContain("Missouri");
         expect(dropdown_menu_content.text()).toContain("Mississippi");
 
-        dropdown_typeahead.filter_text = "Miss";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('Miss');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(2);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(2);
         expect(dropdown_menu_content.text()).toContain("Missouri");
         expect(dropdown_menu_content.text()).toContain("Mississippi");
 
-        dropdown_typeahead.filter_text = "Missi";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('Missi');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(1);
         expect(dropdown_menu_content.text()).toContain("Mississippi");
 
-        dropdown_typeahead.filter_text = "Missiz";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('Missiz');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(0);
 
-        dropdown_typeahead.filter_text = "Missi";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('Missi');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(1);
         expect(dropdown_menu_content.text()).toContain("Mississippi");
     });
 
@@ -249,16 +216,11 @@ describe('DropdownTypeahead.vue', () => {
           <dropdown-typeahead ref="dropdown_typeahead"
               placeholder_text="Enter a State"
               :choices="states"
-              :filter_fn="states_filter_fn"
-              @item_selected="add_item($event)">
+              :filter_fn="states_filter_fn">
               <template slot-scope="{ item }">
                 <span> {{ item.state }}</span>
               </template>
           </dropdown-typeahead>
-          <div class="typeahead-1-selections">
-            <h3> Chosen from Typeahead: </h3>
-            <p v-for="item of chosen_items"> {{item.state}} </p>
-          </div>
         </div>`,
             components: {
                 'dropdown-typeahead': DropdownTypeahead
@@ -279,35 +241,27 @@ describe('DropdownTypeahead.vue', () => {
             states_filter_fn(item: {state: string}, filter_text: string) {
                 return item.state.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                this.chosen_items.push(item);
-            }
-
-            chosen_items: object[] = [];
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead = find_component(wrapper, DropdownTypeahead);
         let search_bar = wrapper.find('input');
 
-        search_bar.trigger("click");
+        await search_bar.trigger('click');
 
         let dropdown_menu_content = wrapper.find('.dropdown-content');
 
-        dropdown_typeahead.filter_text = "an";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('an');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(3);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(3);
         expect(dropdown_menu_content.text()).toContain("Montana");
         expect(dropdown_menu_content.text()).toContain("Michigan");
         expect(dropdown_menu_content.text()).toContain("Maryland");
 
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
+        await search_bar.trigger('keydown', { code: 'Enter' });
 
-        expect(wrapper.vm.$data.chosen_items.length).toEqual(1);
+        expect(emitted(dropdown_typeahead, 'item_selected').length).toEqual(1);
+        expect(emitted(dropdown_typeahead, 'item_selected')[0][0]).toEqual({state: "Montana"});
     });
 
     test('Pressing any key but enter after pressing enter to select an entry will reopen ' +
@@ -318,16 +272,11 @@ describe('DropdownTypeahead.vue', () => {
           <dropdown-typeahead ref="dropdown_typeahead"
                               placeholder_text="Enter a Name"
                               :choices="strangers"
-                              :filter_fn="stranger_things_filter_fn"
-                              @item_selected="add_item($event)">
+                              :filter_fn="stranger_things_filter_fn">
               <template slot-scope="{ item }">
                 <span> {{ item.first_name }} {{ item.last_name}}</span>
               </template>
           </dropdown-typeahead>
-          <div class="typeahead-1-selections">
-            <h3> Chosen from Typeahead: </h3>
-            <p v-for="item of chosen_items"> {{item.last_name}}, {{item.first_name}} </p>
-          </div>
         </div>`,
                 components: {
                     'dropdown-typeahead': DropdownTypeahead
@@ -349,57 +298,43 @@ describe('DropdownTypeahead.vue', () => {
                 let full_name: string = item.first_name + " " + item.last_name;
                 return full_name.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                this.chosen_items.push(item);
-            }
-
-            chosen_items: object[] = [];
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead = find_component(wrapper, DropdownTypeahead);
         let search_bar = wrapper.find('input');
 
-        search_bar.trigger("click");
+        await search_bar.trigger('click');
 
         let dropdown_menu_content = wrapper.find('.dropdown-content');
 
-        dropdown_typeahead.filter_text = "y";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('y');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(4);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(4);
         expect(dropdown_menu_content.text()).toContain("Joyce Byers");
         expect(dropdown_menu_content.text()).toContain("Will Byers");
         expect(dropdown_menu_content.text()).toContain("Jonathan Byers");
         expect(dropdown_menu_content.text()).toContain("Nancy Wheeler");
 
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
+        await search_bar.trigger('keydown', { code: 'Enter' });
 
-        expect(wrapper.vm.$data.chosen_items.length).toEqual(1);
-        expect(wrapper.vm.$data.chosen_items[0]).toEqual(
+        expect(emitted(dropdown_typeahead, 'item_selected')[0][0]).toEqual(
             {first_name: "Joyce", last_name: "Byers"}
         );
+        expect(dropdown_menu_content.element.style.display).toEqual('none');
 
-        let dropdown_component = <Dropdown> dropdown_typeahead.$refs.dropdown_component;
-        expect(dropdown_component.state.is_open).toBe(false);
+        await search_bar.trigger('keydown', { code: 'Space' });
+        expect(dropdown_menu_content.element.style.display).toEqual('block');
 
-        search_bar.trigger('keydown', { code: 'Space' });
-        expect(dropdown_component.state.is_open).toBe(true);
+        await search_bar.setValue('y ');
 
-        dropdown_typeahead.filter_text = "y ";
-        await dropdown_typeahead.$nextTick();
-
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(1);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(1);
         expect(dropdown_menu_content.text()).toContain("Nancy Wheeler");
 
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
+        await search_bar.trigger('keydown', { code: 'Enter' });
 
-        expect(wrapper.vm.$data.chosen_items.length).toEqual(2);
-        expect(wrapper.vm.$data.chosen_items[1]).toEqual(
+        expect(emitted(dropdown_typeahead, 'item_selected').length).toEqual(2);
+        expect(emitted(dropdown_typeahead, 'item_selected')[1][0]).toEqual(
             {first_name: "Nancy", last_name: "Wheeler"}
         );
     });
@@ -412,16 +347,11 @@ describe('DropdownTypeahead.vue', () => {
       <dropdown-typeahead ref="dropdown_typeahead"
                           placeholder_text="Enter a Name"
                           :choices="strangers"
-                          :filter_fn="stranger_things_filter_fn"
-                          @item_selected="add_item($event)">
+                          :filter_fn="stranger_things_filter_fn">
           <template slot-scope="{ item }">
             <span> {{ item.first_name }} {{ item.last_name}}</span>
           </template>
       </dropdown-typeahead>
-      <div class="typeahead-1-selections">
-        <h3> Chosen from Typeahead: </h3>
-        <p v-for="item of chosen_items"> {{item.last_name}}, {{item.first_name}} </p>
-      </div>
     </div>`,
             components: {
                 'dropdown-typeahead': DropdownTypeahead
@@ -443,48 +373,36 @@ describe('DropdownTypeahead.vue', () => {
                 let full_name: string = item.first_name + " " + item.last_name;
                 return full_name.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                this.chosen_items.push(item);
-            }
-
-            chosen_items: object[] = [];
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
+        let dropdown_typeahead = find_component(wrapper, DropdownTypeahead);
         let search_bar = wrapper.find('input');
 
-        search_bar.trigger("click");
+        await search_bar.trigger('click');
 
         let dropdown_menu_content = wrapper.find('.dropdown-content');
 
-        dropdown_typeahead.filter_text = "y";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('y');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(4);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(4);
         expect(dropdown_menu_content.text()).toContain("Joyce Byers");
         expect(dropdown_menu_content.text()).toContain("Will Byers");
         expect(dropdown_menu_content.text()).toContain("Jonathan Byers");
         expect(dropdown_menu_content.text()).toContain("Nancy Wheeler");
 
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
+        await search_bar.trigger('keydown', { code: 'Enter' });
 
-        expect(wrapper.vm.$data.chosen_items.length).toEqual(1);
-        expect(wrapper.vm.$data.chosen_items[0]).toEqual(
+        expect(emitted(dropdown_typeahead, 'item_selected').length).toEqual(1);
+        expect(emitted(dropdown_typeahead, 'item_selected')[0][0]).toEqual(
             {first_name: "Joyce", last_name: "Byers"}
         );
+        expect(dropdown_menu_content.element.style.display).toEqual('none');
 
-        let dropdown_component = <Dropdown> dropdown_typeahead.$refs.dropdown_component;
-        expect(dropdown_component.state.is_open).toBe(false);
+        await search_bar.trigger('keydown', { code: 'Enter' });
 
-        search_bar.trigger('keydown', { code: 'Enter' });
-        await dropdown_typeahead.$nextTick();
-
-        expect(dropdown_component.state.is_open).toBe(false);
-        expect(wrapper.vm.$data.chosen_items.length).toEqual(1);
+        expect(dropdown_menu_content.element.style.display).toEqual('none');
+        expect(emitted(dropdown_typeahead, 'item_selected').length).toEqual(1);
     });
 
 
@@ -496,8 +414,7 @@ describe('DropdownTypeahead.vue', () => {
                         <dropdown-typeahead ref="dropdown_typeahead"
                           placeholder_text="Enter a Name"
                           :choices="strangers"
-                          :filter_fn="stranger_things_filter_fn"
-                          @item_selected="add_item($event)">
+                          :filter_fn="stranger_things_filter_fn">
                         </dropdown-typeahead>
                       </div>`,
             components: {
@@ -520,28 +437,19 @@ describe('DropdownTypeahead.vue', () => {
                 let full_name: string = item.first_name + " " + item.last_name;
                 return full_name.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                this.chosen_items.push(item);
-            }
-
-            chosen_items: object[] = [];
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
-        search_bar.trigger("click");
+        await search_bar.trigger('click');
 
-        dropdown_typeahead.filter_text = "J";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('J');
 
         let dropdown_menu_content = wrapper.find('.dropdown-content');
         let dropdown_entries = dropdown_menu_content.findAll('.dropdown-row');
 
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(3);
+        expect(dropdown_entries.length).toEqual(3);
         expect(dropdown_entries.at(0).text()).toContain("{");
         expect(dropdown_entries.at(0).text()).toContain("}");
         expect(dropdown_entries.at(0).text()).toContain("\"first_name\":");
@@ -559,8 +467,7 @@ describe('DropdownTypeahead.vue', () => {
                     <dropdown-typeahead ref="dropdown_typeahead"
                       placeholder_text="Enter a Name"
                       :choices="strangers"
-                      :filter_fn="stranger_things_filter_fn"
-                      @item_selected="add_item($event)">
+                      :filter_fn="stranger_things_filter_fn">
                     </dropdown-typeahead>
                   </div>`,
             components: {
@@ -583,26 +490,17 @@ describe('DropdownTypeahead.vue', () => {
                 let full_name: string = item.first_name + " " + item.last_name;
                 return full_name.indexOf(filter_text) >= 0;
             }
-
-            add_item(item: object) {
-                this.chosen_items.push(item);
-            }
-
-            chosen_items: object[] = [];
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
-        search_bar.trigger("click");
+        await search_bar.trigger('click');
 
-        dropdown_typeahead.filter_text = "q";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('q');
 
         let dropdown_no_matches_message = wrapper.find('.no-matching-results');
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(0);
         expect(dropdown_no_matches_message.text()).toContain(
             "We couldn't find any results containing: 'q'"
         );
@@ -616,7 +514,6 @@ describe('DropdownTypeahead.vue', () => {
                           <dropdown-typeahead ref="dropdown_typeahead"
                             placeholder_text="Enter a Season"
                             :choices="seasons"
-                            @item_selected="add_item_3($event)"
                             :filter_fn="seasons_filter_fn">
                             <template slot="no_matching_results">
                               No Matching Results
@@ -638,24 +535,17 @@ describe('DropdownTypeahead.vue', () => {
             seasons_filter_fn(item: string, filter_text: string) {
                 return item.indexOf(filter_text) >= 0;
             }
-
-            add_item_3(item: object) {
-                console.log(item);
-            }
         }
 
         let wrapper = mount(WrapperComponent);
-        let dropdown_typeahead
-            = <DropdownTypeahead> wrapper.findComponent({ref: 'dropdown_typeahead'}).vm;
         let search_bar = wrapper.find('input');
 
-        search_bar.trigger("click");
+        await search_bar.trigger('click');
 
-        dropdown_typeahead.filter_text = "y";
-        await dropdown_typeahead.$nextTick();
+        await search_bar.setValue('y');
 
         let dropdown_no_matches_message = wrapper.find('.no-matching-results');
-        expect(dropdown_typeahead.filtered_choices.length).toEqual(0);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(0);
         expect(dropdown_no_matches_message.text()).toContain(
             "No Matching Results"
         );
@@ -676,12 +566,13 @@ describe('DropdownTypeahead.vue', () => {
             }
         });
 
-        expect(wrapper.vm.filtered_choices).toEqual(choices);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(3);
 
         choices.push('4');
-        expect(wrapper.vm.filtered_choices).toEqual(choices);
+        await wrapper.vm.$nextTick();
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(4);
 
         await wrapper.setProps({choices: ['new1', 'new2']});
-        expect(wrapper.vm.filtered_choices).toEqual(['new1', 'new2']);
+        expect(wrapper.findAll('.dropdown-row').length).toEqual(2);
     });
 });

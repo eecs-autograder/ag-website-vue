@@ -1,99 +1,99 @@
 <template>
   <div class="dropdown-typeahead-container">
-    <Dropdown ref="dropdown_component"
-              :items="filtered_choices"
-              @item_selected="$emit('item_selected', $event)">
+    <Dropdown
+      ref="dropdown_component"
+      :items="filtered_choices"
+      @item_selected="$emit('item_selected', $event)"
+    >
       <template slot="header">
-        <input :class="typeahead_class"
-               type=text
-               :placeholder="placeholder_text"
-               :aria-label="aria_label"
-               name="filtered_search"
-               v-model="filter_text"
-               @keydown="resume_search($event)">
+        <input
+          :class="typeahead_class"
+          type="text"
+          :placeholder="placeholder_text"
+          :aria-label="aria_label"
+          name="filtered_search"
+          v-model="filter_text"
+          @keydown="resume_search($event)"
+        />
       </template>
-      <template slot-scope="{item}">
+      <template slot-scope="{ item }">
         <slot v-bind:item="item">
-            {{item}}
+          {{ item }}
         </slot>
       </template>
     </Dropdown>
-    <div v-if="filtered_choices.length === 0
-               && d_mounted_called && $refs.dropdown_component.state.is_open"
-         class="no-matching-results">
+    <div
+      v-if="filtered_choices.length === 0 && is_dropdown_open"
+      class="no-matching-results"
+    >
       <div class="no-matching-results-row">
         <slot name="no_matching_results" v-bind:filter_text="filter_text">
-          We couldn't find any results containing: '{{filter_text}}'
+          We couldn't find any results containing: '{{ filter_text }}'
         </slot>
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed, ref } from "vue";
 
-import Dropdown from '@/components/dropdown.vue';
-import { DropdownExposed } from '@/exposed_component_types/dropdown_exposed';
+import Dropdown from "@/components/dropdown.vue";
+import { DropdownExposed } from "@/exposed_component_types/dropdown_exposed";
 
-@Component({
-  components: { Dropdown }
-})
-export default class DropdownTypeahead extends Vue {
+const props = withDefaults(
+  defineProps<{
+    choices: object[];
+    placeholder_text: string;
+    filter_fn: (item: object, filter: string) => boolean;
+    typeahead_class?: string;
+    aria_label?: string;
+  }>(),
+  {
+    typeahead_class: "search-field",
+    aria_label: "",
+  },
+);
 
-  @Prop({required: true, type: Array})
-  choices!: object[];
+const emit = defineEmits<{
+  item_selected: [item: unknown];
+}>();
 
-  @Prop({required: true, type: String})
-  placeholder_text!: string;
+const filter_text = ref("");
+const dropdown_component = ref<DropdownExposed>();
 
-  @Prop({required: true, type: Function})
-  filter_fn!: (item: object, filter: string) => boolean;
-
-  @Prop({default: "search-field", type: String})
-  typeahead_class!: string;
-
-  @Prop({default: "", type: String})
-  aria_label!: string;
-
-  filter_text: string = "";
-  private _filtered_choices: object[] = [];
-  private d_mounted_called = false;
-
-  mounted() {
-    // When this is true, we can safely access $refs in the template.
-    this.d_mounted_called = true;
+const filtered_choices = computed(() => {
+  if (filter_text.value === "") {
+    return props.choices;
   }
+  return props.choices.filter((item) =>
+    props.filter_fn(item, filter_text.value),
+  );
+});
 
-  resume_search(key: KeyboardEvent) {
-    const dropdown = this.$refs.dropdown_component as DropdownExposed | undefined;
-    if (!dropdown?.state.is_open) {
-      // don't want to automatically select what was previously selected
-      if (key.code !== "Enter") {
-        dropdown?.show();
-      }
+const is_dropdown_open = computed(
+  () => dropdown_component.value?.state.is_open ?? false,
+);
+
+function resume_search(key: KeyboardEvent) {
+  if (!dropdown_component.value?.state.is_open) {
+    // don't want to automatically select what was previously selected
+    if (key.code !== "Enter") {
+      dropdown_component.value?.show();
     }
   }
-
-  clear_filter_text() {
-    this.filter_text = "";
-  }
-
-  get filtered_choices() {
-    if (this.filter_text === "") {
-      return this.choices;
-    }
-    this._filtered_choices = this.choices.filter(
-      (item) => this.filter_fn(item, this.filter_text));
-    return this._filtered_choices;
-  }
-
 }
+
+function clear_filter_text() {
+  filter_text.value = "";
+}
+
+defineExpose({ filter_text, clear_filter_text });
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
-@import '@/styles/components/dropdown_styles.scss';
+@import "@/styles/colors.scss";
+@import "@/styles/components/dropdown_styles.scss";
 
 .dropdown-typeahead-container {
   position: relative;
@@ -108,7 +108,7 @@ export default class DropdownTypeahead extends Vue {
   font-size: 1rem;
   line-height: 1.5;
   margin: 0;
-  padding: .375rem .75rem;
+  padding: 0.375rem 0.75rem;
   width: 100%;
 }
 
@@ -127,5 +127,4 @@ export default class DropdownTypeahead extends Vue {
 .no-matching-results-row {
   @extend %dropdown-row;
 }
-
 </style>
