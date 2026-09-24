@@ -193,25 +193,59 @@ describe('Field binding tests', () => {
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
     });
 
-    test('Toggle allow_network_access', async () => {
-        let allow_network_access_toggle = wrapper.findComponent({ref: 'allow_network_access'});
-
-        wrapper.vm.d_suite!.allow_network_access = true;
-        await wrapper.vm.$nextTick();
-
-        expect(wrapper.vm.d_suite!.allow_network_access).toEqual(true);
-
-        allow_network_access_toggle.find('.off-border').trigger('click');
-        await wrapper.vm.$nextTick();
-
+    test('Allowing network access requires confirming the warning modal', async () => {
+        let checkbox = wrapper.find('[data-testid=allow_network_access]');
         expect(wrapper.vm.d_suite!.allow_network_access).toEqual(false);
+        expect(wrapper.vm.d_show_allow_network_access_modal).toEqual(false);
 
-        allow_network_access_toggle.find('.on-border').trigger('click');
-        await wrapper.vm.$nextTick();
+        // Checking the box opens the confirmation modal but does not enable
+        // network access yet, and the checkbox reverts to unchecked.
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_show_allow_network_access_modal).toEqual(true);
+        expect(wrapper.vm.d_suite!.allow_network_access).toEqual(false);
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+        expect(wrapper.emitted('field_change')).toBeUndefined();
 
+        // Confirming enables network access and closes the modal.
+        await wrapper.find('[data-testid=confirm_allow_network_access_button]').trigger('click');
         expect(wrapper.vm.d_suite!.allow_network_access).toEqual(true);
-
+        expect(wrapper.vm.d_show_allow_network_access_modal).toEqual(false);
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
         expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
+    });
+
+    test('Cancelling the warning modal leaves network access disabled', async () => {
+        let checkbox = wrapper.find('[data-testid=allow_network_access]');
+
+        await checkbox.setChecked(true);
+        expect(wrapper.vm.d_show_allow_network_access_modal).toEqual(true);
+
+        await wrapper.find('[data-testid=cancel_allow_network_access_button]').trigger('click');
+
+        expect(wrapper.vm.d_show_allow_network_access_modal).toEqual(false);
+        expect(wrapper.vm.d_suite!.allow_network_access).toEqual(false);
+        expect(checkbox_is_checked(checkbox)).toEqual(false);
+        expect(wrapper.emitted('field_change')).toBeUndefined();
+    });
+
+    test('Disabling network access does not open the modal', async () => {
+        await set_data(wrapper, {d_suite: {allow_network_access: true}});
+        let checkbox = wrapper.find('[data-testid=allow_network_access]');
+        expect(checkbox_is_checked(checkbox)).toEqual(true);
+
+        await checkbox.setChecked(false);
+
+        expect(wrapper.vm.d_show_allow_network_access_modal).toEqual(false);
+        expect(wrapper.vm.d_suite!.allow_network_access).toEqual(false);
+        expect(emitted(wrapper, 'field_change')[0][0]).toEqual(wrapper.vm.d_suite);
+    });
+
+    test('Warning triangle is only shown when network access is allowed', async () => {
+        expect(wrapper.vm.d_suite!.allow_network_access).toEqual(false);
+        expect(wrapper.find('.warning-tip').exists()).toEqual(false);
+
+        await set_data(wrapper, {d_suite: {allow_network_access: true}});
+        expect(wrapper.find('.warning-tip').exists()).toEqual(true);
     });
 
     test('Read-only instructor files binding', async () => {
