@@ -1,6 +1,7 @@
 import { Vue } from 'vue-property-decorator';
 import { APIErrorsExposed } from './exposed_component_types/api_errors_exposed';
-import { SafePromise } from './utils';
+import { assert_not_null, SafePromise } from './utils';
+import { Ref } from 'vue';
 
 // utility error
 export class DiffPrefixError extends Error {}
@@ -29,11 +30,38 @@ export function handle_api_errors_async(
     return decorator;
 }
 
+
+export function new_handle_api_errors_async(
+    error_handler_func: (response: unknown) => void) {
+    function decorator<TArgs extends unknown[], TReturn>(
+        fn: (...args: TArgs) => Promise<TReturn>,
+    ): (...args: TArgs) => SafePromise<TReturn | undefined> {
+        const handler = async (...args: TArgs): Promise<TReturn | undefined> => {
+            try {
+                return await fn(...args);
+            }
+            catch (e) {
+                error_handler_func(e);
+                return undefined;
+            }
+        };
+        return (...args: TArgs) => handler(...args) as SafePromise<TReturn | undefined>;
+    }
+    return decorator;
+}
+
 export function make_error_handler_func(api_errors_ref: string = 'api_errors') {
     // tslint:disable-next-line:no-any
     return function(component: Vue, response: unknown) {
         const api_errors = component.$refs[api_errors_ref] as APIErrorsExposed | undefined
         api_errors?.show_errors_from_response(response);
+    };
+}
+
+export function new_make_error_handler_func(api_errors_ref: Ref<APIErrorsExposed | null>) {
+    return function(response: unknown) {
+        assert_not_null(api_errors_ref.value);
+        api_errors_ref.value.show_errors_from_response(response);
     };
 }
 
