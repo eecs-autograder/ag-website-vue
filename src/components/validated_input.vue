@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { Ref } from 'vue';
+import Vue, { Ref } from 'vue';
 
 export default {
   name: "ValidatedInput",
@@ -67,25 +67,34 @@ export interface ValidatorResponse {
   error_msg: string;
 }
 
-export interface ValidatedInputExposed {
+interface ValidatedInputMethods {
   uid: number;
 
   enable_warnings(): void;
 
-  focus(args?: {cursor_to_front: boolean, select: boolean}): void;
-
-  is_valid: Ref<boolean>;
+  focus(args?: {cursor_to_front?: boolean, select?: boolean}): void;
 
   reset_warning_state(): void;
 
   rerun_validators(): void;
+}
+
+// What a ValidatedInput passes to its ValidatedForm's register() and unregister().
+export interface RegisteredValidatedInput extends ValidatedInputMethods {
+  is_valid: Ref<boolean>;
+}
+
+// What a template ref to a ValidatedInput resolves to. The component instance
+// unwraps exposed refs, so is_valid is a plain boolean here.
+export interface ValidatedInputExposed extends Vue, ValidatedInputMethods {
+  is_valid: boolean;
 }
 </script>
 
 <script setup lang="ts">
 import { debounce } from 'lodash';
 
-import { computed, inject, onMounted, onUnmounted, ref, watch } from 'vue';
+import { computed, inject, onUnmounted, ref, watch } from 'vue';
 import { generate_uid } from '@/utils';
 // import { ValidatedInputExposed } from './validated_input_exposed';
 
@@ -126,12 +135,12 @@ const d_is_valid = ref(false);
 const d_error_msg = ref("");
 const d_show_warnings = ref(false);
 
-const register = inject<(input: ValidatedInputExposed) => void>('register', do_nothing);
-const unregister = inject<(input: ValidatedInputExposed) => void>('unregister', do_nothing);
+const register = inject<(input: RegisteredValidatedInput) => void>('register', do_nothing);
+const unregister = inject<(input: RegisteredValidatedInput) => void>('unregister', do_nothing);
 
 const input = ref<HTMLInputElement | null>(null);
 
-const self: ValidatedInputExposed = {
+const self: RegisteredValidatedInput = {
   uid: generate_uid(),
 
   enable_warnings() {
@@ -143,17 +152,17 @@ const self: ValidatedInputExposed = {
   // - cursor_to_front: If true, will put the cursor at the beginning of the
   //   input text.
   // - select: If true, will highlight the input text.
-  focus(args = {cursor_to_front: false, select: false}) {
+  focus({cursor_to_front = false, select = false} = {}) {
     if (input.value === null) {
       return;
     }
     input.value.focus();
 
-    if (args.cursor_to_front) {
+    if (cursor_to_front) {
       input.value.setSelectionRange(0, 0);
     }
 
-    if (args.select) {
+    if (select) {
       input.value.select();
     }
   },
@@ -171,20 +180,18 @@ const self: ValidatedInputExposed = {
 
 const debounced_enable_warnings = debounce(() => d_show_warnings.value = true, 500);
 
-onMounted(() => {
-  // Note: This assumes "value" provided will not throw exception when running props.to_string_fn
-  // Add ValidatedInput to list of inputs stored in parent ValidatedForm component
-  register(self);
-  update_and_validate(props.to_string_fn(props.value));
-  // We always want this event to fire on creation.
-  emit('input_validity_changed', self.is_valid.value);
-});
+// Note: This assumes "value" provided will not throw exception when running props.to_string_fn
+// Add ValidatedInput to list of inputs stored in parent ValidatedForm component
+register(self);
+update_and_validate(props.to_string_fn(props.value));
+// We always want this event to fire on creation.
+emit('input_validity_changed', self.is_valid.value);
 
 onUnmounted(() => {
   unregister(self);
 });
 
-watch(props.value, (new_value) => {
+watch(() => props.value, (new_value) => {
   const str_value = props.to_string_fn(new_value);
 
   if (str_value !== d_input_value.value) {
@@ -218,19 +225,21 @@ function update_and_validate(new_value: string) {
 }
 
 function run_validators() {
-  d_is_valid.value = true;
-  d_error_msg.value = "";
-
   // Display error message of first validator that fails
+  let is_valid = true;
+  let error_msg = "";
   for (const validator of props.validators) {
     let response: ValidatorResponse = validator(d_input_value.value);
 
     if (!response.is_valid) {
-      d_is_valid.value = false;
-      d_error_msg.value = response.error_msg;
-      return;
+      is_valid = false;
+      error_msg = response.error_msg;
+      break;
     }
   }
+
+  d_is_valid.value = is_valid;
+  d_error_msg.value = error_msg;
 }
 
 const show_errors = computed(() => {

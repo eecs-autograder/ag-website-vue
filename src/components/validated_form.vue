@@ -5,63 +5,48 @@
 </template>
 
 <script lang="ts">
+import { markRaw, watch } from 'vue';
 import { Component, Provide, Vue, Watch } from 'vue-property-decorator';
 
-import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
+import { RegisteredValidatedInput } from '@/components/validated_input.vue';
 
 @Component
 export default class ValidatedForm extends Vue {
-  d_validated_inputs: ValidatedInputExposed[] = [];
+  d_validated_inputs: RegisteredValidatedInput[] = [];
 
-  private d_is_valid: boolean = false;
+  private d_emitted_is_valid: boolean = false;
+
+  created() {
+    watch(() => this.is_valid, (value) => {
+      if (value !== this.d_emitted_is_valid) {
+        this.d_emitted_is_valid = value;
+        this.$emit('form_validity_changed', value);
+      }
+    }, {flush: 'sync'});
+  }
 
   // We want the created hooks for all the validated inputs to
   // run before we check form validity for the first time.
   mounted() {
-    this.d_is_valid = this.all_inputs_valid();
+    this.d_emitted_is_valid = this.is_valid;
     this.$emit('form_validity_changed', this.is_valid);
   }
 
   @Provide()
-  register = (validated_input: ValidatedInputExposed): void => {
-    this.d_validated_inputs.push(validated_input);
-    validated_input.$on('input_validity_changed',
-                        () => this.set_is_valid(this.all_inputs_valid()));
-    // Note: ValidatedInputs emit a validity change event after they register themselves.
+  register = (validated_input: RegisteredValidatedInput): void => {
+    // Without markRaw, Vue's observer would redefine validated_input's properties as
+    // getters that unwrap is_valid, breaking the input's own is_valid.value reads.
+    this.d_validated_inputs.push(markRaw(validated_input));
   }
 
   @Provide()
-  unregister = (validated_input: ValidatedInputExposed): void => {
+  unregister = (validated_input: RegisteredValidatedInput): void => {
     let index = this.d_validated_inputs.findIndex((input) => input.uid === validated_input.uid);
     this.d_validated_inputs.splice(index, 1);
-
-    // Since ValidatedInputs unregister themselves when they're destroyed, we know that they
-    // won't emit any input_validity_changed events after they unregister.
-    //
-    // We do, however, need to re-evaluate the form validity in case the unregistered input
-    // was making the form invalid.
-    this.set_is_valid(this.all_inputs_valid());
   }
 
   get is_valid(): boolean {
-    return this.d_is_valid;
-  }
-
-  private set_is_valid(value: boolean) {
-    let value_changed = value !== this.d_is_valid;
-    if (value_changed) {
-      this.d_is_valid = value;
-      this.$emit('form_validity_changed', this.d_is_valid);
-    }
-  }
-
-  private all_inputs_valid() {
-    for (const validated_input of this.d_validated_inputs) {
-      if (!validated_input.is_valid) {
-        return false;
-      }
-    }
-    return true;
+    return this.d_validated_inputs.every((input) => input.is_valid.value);
   }
 
   enable_warnings() {
