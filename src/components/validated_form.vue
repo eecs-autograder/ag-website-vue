@@ -7,11 +7,11 @@
 <script lang="ts">
 import { Component, Provide, Vue, Watch } from 'vue-property-decorator';
 
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 
 @Component
 export default class ValidatedForm extends Vue {
-  d_validated_inputs: ValidatedInput[] = [];
+  d_validated_inputs: ValidatedInputExposed[] = [];
 
   private d_is_valid: boolean = false;
 
@@ -23,7 +23,7 @@ export default class ValidatedForm extends Vue {
   }
 
   @Provide()
-  register = (validated_input: ValidatedInput): void => {
+  register = (validated_input: ValidatedInputExposed): void => {
     this.d_validated_inputs.push(validated_input);
     validated_input.$on('input_validity_changed',
                         () => this.set_is_valid(this.all_inputs_valid()));
@@ -31,7 +31,7 @@ export default class ValidatedForm extends Vue {
   }
 
   @Provide()
-  unregister = (validated_input: ValidatedInput): void => {
+  unregister = (validated_input: ValidatedInputExposed): void => {
     let index = this.d_validated_inputs.findIndex((input) => input.uid === validated_input.uid);
     this.d_validated_inputs.splice(index, 1);
 

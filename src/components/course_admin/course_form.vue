@@ -110,7 +110,7 @@ import { Course, Semester } from 'ag-client-typescript';
 import { GlobalData } from '@/app.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import { format_datetime_short, generate_uid } from '@/utils';
 import {
   is_integer,
@@ -194,7 +194,7 @@ export default class CourseForm extends Vue {
     }
 
     this.$nextTick(() => {
-      (<ValidatedInput> this.$refs.course_name_input).focus();
+      (<ValidatedInputExposed> this.$refs.course_name_input).focus();
     });
   }
 

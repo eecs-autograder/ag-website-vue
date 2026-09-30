@@ -309,7 +309,7 @@ import MutationTestSuiteAdvancedFdbkSettings from '@/components/project_admin/mu
 import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import Tooltip from "@/components/tooltip.vue";
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import {
     GlobalErrorsSubject,
     handle_api_errors_async,
@@ -442,7 +442,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     this.d_new_mutation_test_suite_name = "";
     this.d_show_new_mutation_test_suite_modal = true;
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_mutation_test_suite_name).focus();
+      (<ValidatedInputExposed> this.$refs.new_mutation_test_suite_name).focus();
     });
   }
 

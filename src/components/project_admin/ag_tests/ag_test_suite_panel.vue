@@ -166,7 +166,7 @@ import MoveButtons from '@/components/MoveButtons.vue';
 import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed, ValidatorResponse } from '@/components/validated_input.vue';
 import {
   GlobalErrorsSubject,
   handle_api_errors_async,
@@ -311,7 +311,7 @@ export default class AGTestSuitePanel extends Vue {
     this.d_new_case_name = "";
     this.d_show_new_ag_test_case_modal = true;
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_case_name).focus();
+      (<ValidatedInputExposed> this.$refs.new_case_name).focus();
     });
   }
 

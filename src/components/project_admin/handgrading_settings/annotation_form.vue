@@ -50,7 +50,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Annotation } from 'ag-client-typescript';
 
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import { Created } from '@/lifecycle';
 import {
   is_integer,
@@ -97,7 +97,7 @@ export default class AnnotationForm extends Vue implements Created {
     this.d_form_data = new AnnotationFormData(this.annotation);
 
     this.$nextTick(() => {
-      (<ValidatedInput> this.$refs.short_description).focus();
+      (<ValidatedInputExposed> this.$refs.short_description).focus();
     });
   }
 

@@ -40,7 +40,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Criterion } from 'ag-client-typescript';
 
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import { Created } from '@/lifecycle';
 import { is_integer, is_not_empty, string_to_num } from '@/validators';
 import { generate_uid } from '@/utils';
@@ -83,7 +83,7 @@ export default class CriterionForm extends Vue implements Created {
     this.d_form_data = new CriterionFormData(this.criterion);
 
     this.$nextTick(() => {
-      (<ValidatedInput> this.$refs.short_description).focus();
+      (<ValidatedInputExposed> this.$refs.short_description).focus();
     });
   }
 

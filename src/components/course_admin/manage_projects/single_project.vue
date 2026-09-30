@@ -104,7 +104,7 @@ import Modal from '@/components/modal.vue';
 import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { format_course_name, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -163,7 +163,7 @@ export default class SingleProject extends Vue {
       let new_project = await this.project.copy_to_course(
         this.course_to_clone_to!.pk, this.cloned_project_name
       );
-      (<ValidatedInput> this.$refs.cloned_project_name).reset_warning_state();
+      (<ValidatedInputExposed> this.$refs.cloned_project_name).reset_warning_state();
       this.d_show_clone_project_modal = false;
     });
   }

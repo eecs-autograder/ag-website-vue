@@ -73,7 +73,7 @@ import { User } from 'ag-client-typescript';
 
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed, ValidatorResponse } from '@/components/validated_input.vue';
 import { generate_uid, is_email } from '@/utils';
 
 @Component({
@@ -148,7 +148,7 @@ export default class Roster extends Vue {
 
   reset_form() {
     this.d_form_text = "";
-    let validated_input = <ValidatedInput> this.$refs.add_users_textarea;
+    let validated_input = <ValidatedInputExposed> this.$refs.add_users_textarea;
     validated_input.reset_warning_state();
     this.d_form_is_valid = false;
   }

@@ -150,7 +150,7 @@ import AGTestCommandSettings from '@/components/project_admin/ag_tests/ag_test_c
 import AGTestSuitePanel from '@/components/project_admin/ag_tests/ag_test_suite_panel.vue';
 import AGTestSuiteSettings from '@/components/project_admin/ag_tests/ag_test_suite_settings.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import {
   GlobalErrorsSubject,
   handle_api_errors_async,
@@ -277,7 +277,7 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
   open_new_ag_test_suite_modal() {
     this.d_show_new_ag_test_suite_modal = true;
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_ag_test_suite_name).focus();
+      (<ValidatedInputExposed> this.$refs.new_ag_test_suite_name).focus();
     });
   }
 

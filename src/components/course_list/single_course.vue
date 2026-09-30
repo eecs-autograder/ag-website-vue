@@ -99,7 +99,7 @@ import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import { handle_api_errors_async } from '@/error_handling';
 import { format_course_name } from '@/utils';
 import { is_not_empty, is_number, make_min_value_validator } from '@/validators';
@@ -147,7 +147,7 @@ export default class SingleCourse extends Vue {
   show_clone_course_modal() {
     this.d_show_clone_course_modal = true;
     this.$nextTick(() => {
-      (<ValidatedInput> this.$refs.copy_of_course_name).focus();
+      (<ValidatedInputExposed> this.$refs.copy_of_course_name).focus();
     });
   }
 

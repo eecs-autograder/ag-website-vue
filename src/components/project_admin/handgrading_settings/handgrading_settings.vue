@@ -320,7 +320,7 @@ import SelectObject from '@/components/select_object.vue';
 import Toggle from '@/components/toggle.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import {
   GlobalErrorsSubject,
   handle_api_errors_async,
@@ -481,7 +481,7 @@ export default class HandgradingSettings extends Vue implements Created,
   on_points_style_changed() {
     let max_points_input = this.$refs.max_points;
     if (max_points_input !== undefined) {
-      (<ValidatedInput> max_points_input).rerun_validators();
+      (<ValidatedInputExposed> max_points_input).rerun_validators();
     }
   }
 
