@@ -165,7 +165,7 @@ import Modal from '@/components/modal.vue';
 import MoveButtons from '@/components/MoveButtons.vue';
 import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
 import Tooltip from '@/components/tooltip.vue';
-import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedForm, { ValidatedFormExposed } from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatedInputExposed, ValidatorResponse } from '@/components/validated_input.vue';
 import {
   GlobalErrorsSubject,
@@ -361,7 +361,7 @@ export default class AGTestSuitePanel extends Vue {
           created_case.pk, {name: this.d_new_commands[i].name, cmd: this.d_new_commands[i].cmd}
         );
       }
-      (<ValidatedForm> this.$refs.create_ag_test_case_form).reset_warning_state();
+      (<ValidatedFormExposed> this.$refs.create_ag_test_case_form).reset_warning_state();
       this.d_show_new_ag_test_case_modal = false;
     }
     finally {
