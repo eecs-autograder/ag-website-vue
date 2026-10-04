@@ -1,45 +1,44 @@
 <template>
-  <div class="total-progress"
-       role="progressbar"
-       aria-label="Loading progress"
-       :aria-valuenow="processed_progress"
-       aria-valuemin="0"
-       aria-valuemax="100"
+  <div
+    class="total-progress"
+    role="progressbar"
+    aria-label="Loading progress"
+    :aria-valuenow="processed_progress"
+    aria-valuemin="0"
+    aria-valuemax="100"
   >
-    <div class="completed-progress"
-         :class="{'fully-round': processed_progress === 100}"
-         :style="{'width': `${processed_progress}%`}"></div>
+    <div
+      class="completed-progress"
+      :class="{ 'fully-round': processed_progress === 100 }"
+      :style="{ width: `${processed_progress}%` }"
+    ></div>
     <div class="progress-text">
       <template v-if="processed_progress === 100">
-        <slot>
-          Please wait...
-        </slot>
+        <slot> Please wait... </slot>
       </template>
-      <template v-else>{{processed_progress}}%</template>
+      <template v-else>{{ processed_progress }}%</template>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+<script setup lang="ts">
+import { computed } from "vue";
 
-@Component
-export default class ProgressBar extends Vue {
-  @Prop({required: true, type: Number})
-  progress!: number;
+const props = defineProps<{
+  progress: number;
+}>();
 
-  get processed_progress() {
-    // In some cases (e.g. downloading files), the Content-Length response
-    // header is not set properly. In those cases we fall back on the size
-    // of the file, which is probably smaller than the size of the
-    // full response. For those cases, we cap progress here at 100%.
-    return Math.min(100, Math.round(this.progress));
-  }
-}
+const processed_progress = computed(() => {
+  // In some cases (e.g. downloading files), the Content-Length response
+  // header is not set properly. In those cases we fall back on the size
+  // of the file, which is probably smaller than the size of the
+  // full response. For those cases, we cap progress here at 100%.
+  return Math.min(100, Math.round(props.progress));
+});
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
+@import "@/styles/colors.scss";
 
 $border-radius: 4px;
 
@@ -72,7 +71,6 @@ $border-radius: 4px;
 
 .progress-text {
   z-index: 1;
-  padding: .25rem;
+  padding: 0.25rem;
 }
-
 </style>
