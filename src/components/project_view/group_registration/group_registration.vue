@@ -161,7 +161,7 @@ import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import Modal from '@/components/modal.vue';
-import { GroupMember } from "@/components/project_admin/edit_groups/create_single_group.vue";
+import { GroupMember } from '@/components/project_admin/edit_groups/create_single_group_types';
 import InvitationReceived from '@/components/project_view/group_registration/invitation_received.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
