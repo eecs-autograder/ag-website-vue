@@ -83,36 +83,61 @@ function get_wrapper({
 
 describe('BatchSelect', () => {
     let wrapper: Wrapper<WrapperComponent>;
-    let batch_select_wrapper: Wrapper<BatchSelect>;
+    let batch_select_wrapper: Wrapper<Vue>;
     let on_input_spy: sinon.SinonSpy;
     let objects: TestObj[];
     let selected: TestObj[];
+
+    function modal_is_open(w: Wrapper<Vue>) {
+        return w.find('.batch-search-field').exists();
+    }
 
     beforeEach(() => {
         objects = [obj1, obj2, obj3];
         selected = [obj1];
         wrapper = get_wrapper({ selected });
         on_input_spy = sinon.spy(wrapper.vm, 'on_input');
-        batch_select_wrapper = wrapper.findComponent({ref: 'batch_select'}) as Wrapper<BatchSelect>;
+        batch_select_wrapper = wrapper.findComponent({ref: 'batch_select'}) as Wrapper<Vue>;
     });
 
-    test('sets d_selected_items to a deep copy of value', async () => {
-        expect(batch_select_wrapper.vm.d_selected_items).toEqual(selected);
-        expect(batch_select_wrapper.vm.d_selected_items).not.toBe(selected);
+    test('reflects the value prop\'s initial selection when opened', async () => {
+        batch_select_wrapper.findAll('.batch-select-button').at(0).trigger('click');
+        await batch_select_wrapper.vm.$nextTick();
+
+        expect(batch_select_wrapper.find('.modal-header').text()).toContain(
+            '1 out of 3 items selected'
+        );
+        const cards = batch_select_wrapper.findAll('.batch-select-card');
+        expect(cards.at(0).attributes('aria-selected')).toBe('true');
+        expect(cards.at(1).attributes('aria-selected')).toBe('false');
+        expect(cards.at(2).attributes('aria-selected')).toBe('false');
+    });
+
+    test('does not mutate the original value array when toggling selection', async () => {
+        batch_select_wrapper.findAll('.batch-select-button').at(0).trigger('click');
+        await batch_select_wrapper.vm.$nextTick();
+
+        batch_select_wrapper.findAll('.batch-select-card').at(1).trigger('click');
+        await batch_select_wrapper.vm.$nextTick();
+
+        expect(batch_select_wrapper.find('.modal-header').text()).toContain(
+            '2 out of 3 items selected'
+        );
+        expect(selected.length).toBe(1);
     });
 
     test('closes the modal after cancelling', async () => {
-        expect(batch_select_wrapper.vm.d_show_batch_select_modal).toBe(false);
+        expect(modal_is_open(batch_select_wrapper)).toBe(false);
 
         batch_select_wrapper.findAll('.batch-select-button').at(0).trigger('click');
         await batch_select_wrapper.vm.$nextTick();
 
-        expect(batch_select_wrapper.vm.d_show_batch_select_modal).toBe(true);
+        expect(modal_is_open(batch_select_wrapper)).toBe(true);
 
         batch_select_wrapper.findAll('.modal-cancel-button').at(0).trigger('click');
         await batch_select_wrapper.vm.$nextTick();
 
-        expect(batch_select_wrapper.vm.d_show_batch_select_modal).toBe(false);
+        expect(modal_is_open(batch_select_wrapper)).toBe(false);
     });
 
     test('closes the modal after clicking close', async () => {
@@ -122,7 +147,7 @@ describe('BatchSelect', () => {
         batch_select_wrapper.findAll('.close-button').at(0).trigger('click');
         await batch_select_wrapper.vm.$nextTick();
 
-        expect(batch_select_wrapper.vm.d_show_batch_select_modal).toBe(false);
+        expect(modal_is_open(batch_select_wrapper)).toBe(false);
     });
 
     test('adds the item after selected', async () => {
@@ -172,29 +197,32 @@ describe('BatchSelect', () => {
         batch_select_wrapper.find('.batch-select-button').trigger('click');
         await batch_select_wrapper.vm.$nextTick();
 
-        expect(batch_select_wrapper.vm.batch_filtered_items).toEqual(objects);
+        let cards = batch_select_wrapper.findAll('.batch-select-card');
+        _.each(_.range(objects.length), (index) => {
+            expect(cards.at(index).text()).toEqual(objects[index].value);
+        });
 
         await batch_select_wrapper.find('.batch-search-field').setValue(filter_param);
         await batch_select_wrapper.vm.$nextTick();
 
-        const cards = batch_select_wrapper.findAll('.batch-select-card');
-        await batch_select_wrapper.vm.$nextTick();
-
-        expect(batch_select_wrapper.vm.batch_filtered_items).toEqual(filter_objs);
+        cards = batch_select_wrapper.findAll('.batch-select-card');
+        expect(cards.length).toBe(filter_objs.length);
         _.each(_.range(filter_objs.length), (index) => {
             expect(cards.at(index).text()).toEqual(filter_objs[index].value);
         });
     });
 
     test('updates selected after the prop value is updated', async () => {
-       wrapper.find('.change-selected').trigger('click');
-       await wrapper.vm.$nextTick();
+        batch_select_wrapper.find('.batch-select-button').trigger('click');
+        await batch_select_wrapper.vm.$nextTick();
 
-       expect(batch_select_wrapper.vm.d_selected_items).toEqual([obj3]);
-    });
+        wrapper.find('.change-selected').trigger('click');
+        await wrapper.vm.$nextTick();
 
-    test("Selected elements have aria-selected=true", async () => {
-
+        const cards = batch_select_wrapper.findAll('.batch-select-card');
+        expect(cards.at(0).attributes('aria-selected')).toBe('false');
+        expect(cards.at(1).attributes('aria-selected')).toBe('false');
+        expect(cards.at(2).attributes('aria-selected')).toBe('true');
     });
 });
 

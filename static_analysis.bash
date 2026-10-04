@@ -9,6 +9,7 @@ lint_paths=(
     '*.ts'
     'src/components/api_errors.vue'
     'src/components/api_token.vue'
+    'src/components/batch_select.vue'
     'src/components/CollapsibleContent.vue'
     'src/components/CollapsibleSection.vue'
     'src/components/context_menu/context_menu.vue'
