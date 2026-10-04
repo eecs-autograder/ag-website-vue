@@ -5,6 +5,7 @@ import * as sinon from 'sinon';
 
 import APIErrors from '@/components/api_errors.vue';
 import CourseList from '@/components/course_list/course_list.vue';
+import SingleCourse from '@/components/course_list/single_course.vue';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
@@ -249,7 +250,7 @@ describe('CourseList tests', () => {
         expect(component.d_all_courses!.courses_is_admin_for.length).toEqual(1);
         expect(component.d_all_courses!.courses_is_admin_for[0]).toEqual(fall18_eecs280);
 
-        let all_displayed_courses = wrapper.findAllComponents({name: 'SingleCourse'});
+        let all_displayed_courses = wrapper.findAllComponents(SingleCourse);
         expect(all_displayed_courses.length).toEqual(3);
         expect(wrapper.findAll('.edit-course-settings').length).toEqual(1);
 
@@ -331,7 +332,7 @@ describe('CourseList tests', () => {
         expect(await wait_for_load(wrapper)).toBe(true);
 
         expect(wrapper.findAll('.single-semester-container').length).toEqual(1);
-        let fall_2018_courses = wrapper.findAllComponents({name: 'SingleCourse'});
+        let fall_2018_courses = wrapper.findAllComponents(SingleCourse);
 
         expect(fall_2018_courses.length).toEqual(3);
         expect(fall_2018_courses.at(0).html()).toContain("EECS 280");
