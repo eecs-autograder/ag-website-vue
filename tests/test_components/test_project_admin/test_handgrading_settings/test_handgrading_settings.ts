@@ -17,6 +17,7 @@ import AnnotationForm from "@/components/project_admin/handgrading_settings/anno
 import CriterionForm from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import HandgradingSettings from "@/components/project_admin/handgrading_settings/handgrading_settings.vue";
 import SelectObject from "@/components/select_object.vue";
+import SingleCriterion from "@/components/project_admin/handgrading_settings/single_criterion.vue";
 import { deep_copy } from '@/utils';
 
 import * as data_ut from "@/tests/data_utils";
@@ -451,7 +452,7 @@ describe('Criteria and annotation tests', () => {
         expect(await wait_for_load(wrapper)).toBe(true);
         expect(wrapper.vm.d_handgrading_rubric).toEqual(rubric);
 
-        expect(wrapper.findAllComponents({name: 'SingleCriterion'}).length).toEqual(2);
+        expect(wrapper.findAllComponents(SingleCriterion).length).toEqual(2);
         expect(wrapper.findAllComponents({name: 'SingleAnnotation'}).length).toEqual(2);
     });
 
@@ -481,7 +482,7 @@ describe('Criteria and annotation tests', () => {
         expect(wrapper.findComponent({ref: 'create_criterion_modal'}).exists()).toBe(false);
 
         expect(wrapper.vm.d_handgrading_rubric!.criteria.length).toEqual(3);
-        expect(wrapper.findAllComponents({name: 'SingleCriterion'}).length).toEqual(3);
+        expect(wrapper.findAllComponents(SingleCriterion).length).toEqual(3);
 
         expect(wrapper.vm.d_handgrading_rubric!.criteria[2]).toEqual(new_criterion);
     });
@@ -521,7 +522,7 @@ describe('Criteria and annotation tests', () => {
         Criterion.notify_criterion_deleted(rubric.criteria[0]);
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.findAllComponents({name: 'SingleCriterion'}).length).toEqual(1);
+        expect(wrapper.findAllComponents(SingleCriterion).length).toEqual(1);
         expect(wrapper.vm.d_handgrading_rubric!.criteria).toEqual(expected);
     });
 
@@ -827,7 +828,7 @@ describe('Move button focus management', () => {
         await wrapper.vm.$nextTick();
         await vi.runAllTimersAsync();
 
-        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(1)
+        const find_expected = () => wrapper.findAllComponents(SingleCriterion).at(1)
             .find('[aria-label="Move up"]').element;
         await wait_until(wrapper, () => document.activeElement === find_expected());
         expect(document.activeElement).toBe(find_expected());
@@ -839,7 +840,7 @@ describe('Move button focus management', () => {
         await wrapper.vm.$nextTick();
         await vi.runAllTimersAsync();
 
-        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(0)
+        const find_expected = () => wrapper.findAllComponents(SingleCriterion).at(0)
             .find('[aria-label="Move down"]').element;
         await wait_until(wrapper, () => document.activeElement === find_expected());
         expect(document.activeElement).toBe(find_expected());
@@ -851,7 +852,7 @@ describe('Move button focus management', () => {
         await wrapper.vm.$nextTick();
         await vi.runAllTimersAsync();
 
-        const find_expected = () => wrapper.findAllComponents({name: 'SingleCriterion'}).at(2)
+        const find_expected = () => wrapper.findAllComponents(SingleCriterion).at(2)
             .find('[aria-label="Move up"]').element;
         await wait_until(wrapper, () => document.activeElement === find_expected());
         expect(document.activeElement).toBe(find_expected());

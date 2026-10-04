@@ -2,169 +2,175 @@
   <div class="rubric-item">
     <template v-if="!d_edit_mode">
       <div class="header row">
-        <span class="short-description">{{d_criterion.short_description}}</span>
+        <span class="short-description">{{
+          d_criterion.short_description
+        }}</span>
         <span class="header-icons">
           <i class="fas fa-arrows-alt handle" aria-hidden="true"></i>
-          <MoveButtons :index="index"
-                       :count="count"
-                       @move_up="$emit('move_up')"
-                       @move_down="$emit('move_down')" />
-          <button type="button"
-                  class="edit-criterion-button"
-                  aria-label="Edit criterion"
-                  @click="d_edit_mode = true">
+          <MoveButtons
+            :index="index"
+            :count="count"
+            @move_up="emit('move_up')"
+            @move_down="emit('move_down')"
+          />
+          <button
+            type="button"
+            class="edit-criterion-button"
+            aria-label="Edit criterion"
+            @click="d_edit_mode = true"
+          >
             <i class="edit-icon fas fa-pencil-alt" aria-hidden="true"></i>
           </button>
-          <button type="button"
-                  class="delete-criterion-button"
-                  aria-label="Delete criterion"
-                  @click="d_delete_modal_is_open = true">
+          <button
+            type="button"
+            class="delete-criterion-button"
+            aria-label="Delete criterion"
+            @click="d_delete_modal_is_open = true"
+          >
             <i class="delete-icon fas fa-trash-alt" aria-hidden="true"></i>
           </button>
         </span>
       </div>
       <div class="points row">
-        {{d_criterion.points}} {{Math.abs(d_criterion.points) === 1 ? 'point' : 'points'}}
+        {{ d_criterion.points }}
+        {{ Math.abs(d_criterion.points) === 1 ? "point" : "points" }}
       </div>
-      <div class="long-description"
-           v-if="d_criterion.long_description !== ''">{{d_criterion.long_description}}</div>
+      <div class="long-description" v-if="d_criterion.long_description !== ''">
+        {{ d_criterion.long_description }}
+      </div>
     </template>
-    <criterion-form v-else
-                    ref="criterion_form"
-                    :criterion="d_criterion"
-                    @form_validity_changed="d_criterion_form_is_valid = $event"
-                    @submit="save">
+    <criterion-form
+      v-else
+      ref="criterion_form"
+      :criterion="d_criterion"
+      @form_validity_changed="d_criterion_form_is_valid = $event"
+      @submit="save"
+    >
       <APIErrors ref="save_criterion_errors"></APIErrors>
       <div class="button-footer">
-        <button type="submit" class="save-button"
-                :disabled="d_saving || !d_criterion_form_is_valid">Save</button>
-        <button type="button" class="white-button"
-                @click="d_edit_mode = false">Cancel</button>
+        <button
+          type="submit"
+          class="save-button"
+          :disabled="d_saving || !d_criterion_form_is_valid"
+        >
+          Save
+        </button>
+        <button type="button" class="white-button" @click="d_edit_mode = false">
+          Cancel
+        </button>
       </div>
     </criterion-form>
 
-    <modal ref="delete_criterion_modal" size="large" click_outside_to_close
-           aria_label="Confirm delete criterion"
-           v-if="d_delete_modal_is_open"
-           @close="d_delete_modal_is_open = false">
+    <modal
+      ref="delete_criterion_modal"
+      size="large"
+      click_outside_to_close
+      aria_label="Confirm delete criterion"
+      v-if="d_delete_modal_is_open"
+      @close="d_delete_modal_is_open = false"
+    >
       <div class="modal-header">Confirm Delete</div>
-      Are you sure you want to delete the checkbox
-      "<b>{{this.d_criterion.short_description}}</b>"? <br><br>
-      This will delete all associated results. <br>
+      Are you sure you want to delete the checkbox "<b>{{
+        d_criterion.short_description
+      }}</b
+      >"? <br /><br />
+      This will delete all associated results. <br />
       <b>THIS ACTION CANNOT BE UNDONE.</b>
       <APIErrors ref="delete_criterion_errors"></APIErrors>
       <div class="modal-button-footer button-footer-right">
-        <button type="button" class="delete-button red-button"
-                @click="delete_criterion"
-                :disabled="d_deleting">Delete</button>
-        <button type="button" class="cancel-delete-button white-button"
-                @click="d_delete_modal_is_open = false">Cancel</button>
+        <button
+          type="button"
+          class="delete-button red-button"
+          @click="delete_criterion"
+          :disabled="d_deleting"
+        >
+          Delete
+        </button>
+        <button
+          type="button"
+          class="cancel-delete-button white-button"
+          @click="d_delete_modal_is_open = false"
+        >
+          Cancel
+        </button>
       </div>
     </modal>
   </div>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+<script setup lang="ts">
+import { ref, watch } from "vue";
 
 import { Criterion } from "ag-client-typescript";
 
 import APIErrors from "@/components/api_errors.vue";
-import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
+import { APIErrorsExposed } from "@/exposed_component_types/api_errors_exposed";
 import Modal from "@/components/modal.vue";
 import MoveButtons from "@/components/MoveButtons.vue";
-import CriterionForm, { CriterionFormData } from "@/components/project_admin/handgrading_settings/criterion_form.vue";
-import { handle_api_errors_async } from '@/error_handling';
-import { deep_copy, format_datetime, safe_assign } from "@/utils";
+import CriterionForm, {
+  CriterionFormData,
+} from "@/components/project_admin/handgrading_settings/criterion_form.vue";
+import { deep_copy, new_toggle, safe_assign } from "@/utils";
 
-@Component({
-  components: {
-    APIErrors,
-    CriterionForm,
-    Modal,
-    MoveButtons,
-  }
-})
-export default class SingleCriterion extends Vue {
-  @Prop({type: Criterion})
-  criterion!: Criterion;
+type PropTypes = {
+  criterion?: Criterion;
+  index: number;
+  count: number;
+};
 
-  @Prop({required: true, type: Number})
-  index!: number;
+const props = defineProps<PropTypes>();
 
-  @Prop({required: true, type: Number})
-  count!: number;
+const emit = defineEmits<{
+  move_up: [];
+  move_down: [];
+}>();
 
-  d_criterion: Criterion = new Criterion({
-    pk: 0,
-    handgrading_rubric: 0,
-    last_modified: '',
-    short_description: '',
-    long_description: '',
-    points: 0
+const save_criterion_errors = ref<APIErrorsExposed>();
+const delete_criterion_errors = ref<APIErrorsExposed>();
+
+const d_criterion = ref(deep_copy(props.criterion!, Criterion));
+const d_deleting = ref(false);
+const d_delete_modal_is_open = ref(false);
+const d_edit_mode = ref(false);
+const d_saving = ref(false);
+const d_criterion_form_is_valid = ref(false);
+
+watch(
+  () => props.criterion,
+  (new_val) => {
+    d_criterion.value = deep_copy(new_val!, Criterion);
+  },
+);
+
+function save(form_data: CriterionFormData) {
+  return new_toggle(d_saving, async () => {
+    try {
+      safe_assign(d_criterion.value, form_data);
+      await d_criterion.value.save();
+      d_edit_mode.value = false;
+    } catch (error: unknown) {
+      save_criterion_errors.value?.show_errors_from_response(error);
+    }
   });
+}
 
-  d_deleting = false;
-  d_delete_modal_is_open = false;
-
-  d_edit_mode = false;
-  d_saving = false;
-  d_criterion_form_is_valid = false;
-
-  readonly format_datetime = format_datetime;
-
-  created() {
-    this.d_criterion = deep_copy(this.criterion, Criterion);
-  }
-
-  @Watch('criterion')
-  on_criterion_changed(new_val: Criterion, old_val: Criterion) {
-    this.d_criterion = deep_copy(new_val, Criterion);
-  }
-
-  @handle_api_errors_async(handle_save_criterion_error)
-  async save(form_data: CriterionFormData) {
+function delete_criterion() {
+  return new_toggle(d_deleting, async () => {
     try {
-      this.d_saving = true;
-      safe_assign(this.d_criterion, form_data);
-      await this.d_criterion.save();
-      this.d_edit_mode = false;
+      await d_criterion.value.delete();
+      d_delete_modal_is_open.value = false;
+    } catch (error: unknown) {
+      delete_criterion_errors.value?.show_errors_from_response(error);
     }
-    finally {
-      this.d_saving = false;
-    }
-  }
-
-  @handle_api_errors_async(handle_delete_criterion_error)
-  async delete_criterion() {
-    try {
-      this.d_deleting = true;
-      await this.d_criterion.delete();
-      this.d_delete_modal_is_open = false;
-    }
-    finally {
-      this.d_deleting = false;
-    }
-  }
+  });
 }
-
-export function handle_save_criterion_error(component: SingleCriterion, error: unknown) {
-  const api_errors = component.$refs.save_criterion_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
-export function handle_delete_criterion_error(component: SingleCriterion, error: unknown) {
-  const api_errors = component.$refs.delete_criterion_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
 </script>
 
 <style scoped lang="scss">
-@import '@/styles/colors.scss';
-@import '@/styles/button_styles.scss';
-@import '@/styles/forms.scss';
-@import '@/styles/modal.scss';
+@import "@/styles/colors.scss";
+@import "@/styles/button_styles.scss";
+@import "@/styles/forms.scss";
+@import "@/styles/modal.scss";
 
 * {
   margin: 0;
@@ -173,13 +179,13 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
 }
 
 .rubric-item {
-  padding: .625rem .875rem;
+  padding: 0.625rem 0.875rem;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
-  margin: .5rem 0;
+  margin: 0.5rem 0;
 }
 
 .short-description {
@@ -192,15 +198,16 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
 
   .handle {
     cursor: grabbing;
-    padding: 0 .25rem;
+    padding: 0 0.25rem;
   }
 
-  .edit-criterion-button, .delete-criterion-button {
+  .edit-criterion-button,
+  .delete-criterion-button {
     background: none;
     border: none;
     cursor: pointer;
     font-size: inherit;
-    padding: 0 .25rem;
+    padding: 0 0.25rem;
   }
 
   .edit-icon {
@@ -220,8 +227,9 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
   }
 }
 
-.points, .long-description {
-  font-size: .875rem;
+.points,
+.long-description {
+  font-size: 0.875rem;
 }
 
 .points {
@@ -229,8 +237,7 @@ export function handle_delete_criterion_error(component: SingleCriterion, error:
 }
 
 .long-description {
-  padding-top: .25rem;
+  padding-top: 0.25rem;
   white-space: pre-wrap;
 }
 </style>
-
