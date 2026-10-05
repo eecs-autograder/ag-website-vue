@@ -37,7 +37,7 @@ import { handle_global_errors_async } from '@/error_handling';
 
 @Component({})
 export default class GroupMembers extends Vue {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

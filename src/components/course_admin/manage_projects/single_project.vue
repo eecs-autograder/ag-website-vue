@@ -120,7 +120,7 @@ import { is_not_empty } from '@/validators';
   }
 })
 export default class SingleProject extends Vue {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

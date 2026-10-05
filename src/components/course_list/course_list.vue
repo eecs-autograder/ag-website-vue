@@ -106,7 +106,7 @@ interface TermCourses {
   }
 })
 export default class CourseList extends Vue implements CourseObserver {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

@@ -140,7 +140,7 @@ import { assert_not_null, format_datetime, get_query_param } from '@/utils';
   }
 })
 export default class ProjectView extends Vue implements GroupObserver {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

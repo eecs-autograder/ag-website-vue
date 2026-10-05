@@ -140,7 +140,7 @@ export class UnratedMutantHintData {
 export default class SubmissionList extends Vue implements SubmissionObserver,
                                                            MutantHintObserver,
                                                            Created, BeforeDestroy {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

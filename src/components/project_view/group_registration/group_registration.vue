@@ -178,7 +178,7 @@ import { handle_api_errors_async, handle_global_errors_async } from '@/error_han
   }
 })
 export default class GroupRegistration extends Vue {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

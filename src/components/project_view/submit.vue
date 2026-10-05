@@ -206,7 +206,7 @@ interface ExpectedFilePatternMismatch {
   }
 })
 export default class Submit extends Vue {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

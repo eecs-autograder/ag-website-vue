@@ -152,7 +152,7 @@ export interface DownloadTask {
   }
 })
 export default class DownloadGrades extends Vue implements Created, BeforeDestroy {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

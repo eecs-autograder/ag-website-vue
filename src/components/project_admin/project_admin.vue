@@ -188,7 +188,7 @@ export default class ProjectAdmin extends CurrentTabMixin implements ProjectObse
                                                           Created,
                                                           Mounted,
                                                           BeforeDestroy {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

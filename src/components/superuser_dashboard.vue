@@ -16,7 +16,7 @@ import SandboxImages from '@/components/sandbox_images/sandbox_images.vue';
   }
 })
 export default class SuperuserDashboardView extends Vue {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

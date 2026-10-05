@@ -149,7 +149,7 @@ import { get_query_param, safe_assign } from "@/utils";
 export default class CourseAdmin extends CurrentTabMixin implements CourseObserver,
                                                                     Mounted,
                                                                     BeforeDestroy {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
 
   d_loading = true;

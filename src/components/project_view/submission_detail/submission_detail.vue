@@ -283,7 +283,7 @@ import { format_datetime, toggle } from '@/utils';
 })
 export default class SubmissionDetail extends OpenFilesMixin {
 
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

@@ -361,7 +361,7 @@ export default class HandgradingSettings extends Vue implements Created,
                                                                 BeforeDestroy,
                                                                 AnnotationObserver,
                                                                 CriterionObserver {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

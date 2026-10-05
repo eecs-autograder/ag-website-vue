@@ -154,7 +154,7 @@ export class CourseFormData {
   }
 })
 export default class CourseForm extends Vue {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

@@ -124,7 +124,7 @@ import BuildImageStatusIcon from './build_image_status_icon.vue';
   }
 })
 export default class BuildImageTaskDetail extends Vue {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 

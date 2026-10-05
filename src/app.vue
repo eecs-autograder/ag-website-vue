@@ -151,7 +151,7 @@ import { BeforeDestroy, Created } from './lifecycle';
 
 
 /* IMPORTANT! How to use the provided globals:
-@Inject({from: 'globals'})
+@Inject({from: 'globals', default: new GlobalData()})
 globals!: GlobalData;
 // We need the provided globals to be one of our reactive data members,
 // so we alias it here.
@@ -210,7 +210,7 @@ export class GlobalData {
 })
 export default class App extends Vue implements GlobalErrorsObserver, Created, BeforeDestroy {
   /* IMPORTANT! How to use the provided globals:
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   // We need the provided globals to be one of our reactive data members,
   // so we alias it here.

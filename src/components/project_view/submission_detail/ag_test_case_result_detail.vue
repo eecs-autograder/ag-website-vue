@@ -71,7 +71,7 @@ import { Created } from '@/lifecycle';
   }
 })
 export default class AGTestCaseResultDetail extends Vue implements Created {
-  @Inject({from: 'globals'})
+  @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
   d_globals = this.globals;
 
