@@ -3,6 +3,7 @@
     <div class="validated-input-wrapper">
       <slot name="prefix"> </slot>
       <input class="input"
+             ref="input"
              :id="input_id"
              data-testid="input"
              v-if="num_rows === 1"
@@ -18,6 +19,7 @@
              @input="$e => change_input($e.target.value)"/>
 
       <textarea v-else
+                 ref="input"
                 :id="input_id"
                 :rows="num_rows"
                 :style="input_style"
@@ -46,20 +48,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Prop, Vue, Watch } from 'vue-property-decorator';
+import Vue, { Ref } from 'vue';
 
-import { debounce } from 'lodash';
-
-import { Created, Destroyed } from "@/lifecycle";
-
-export interface ValidatorResponse {
-  is_valid: boolean;
-  error_msg: string;
+export default {
+  name: "ValidatedInput",
 }
-
-type ValidatorFuncType = (value: string) => ValidatorResponse;
-type FromStringFuncType = (value: string) => unknown;
-type ToStringFuncType = (value: unknown) => string;
 
 function default_to_string_func(value: unknown): string {
   return "" + value;
@@ -69,77 +62,90 @@ function default_from_string_func(value: string): unknown {
   return value;
 }
 
+export interface ValidatorResponse {
+  is_valid: boolean;
+  error_msg: string;
+}
+
+interface ValidatedInputMethods {
+  uid: number;
+
+  enable_warnings(): void;
+
+  focus(args?: {cursor_to_front?: boolean, select?: boolean}): void;
+
+  reset_warning_state(): void;
+
+  rerun_validators(): void;
+}
+
+// What a ValidatedInput passes to its ValidatedForm's register() and unregister().
+export interface RegisteredValidatedInput extends ValidatedInputMethods {
+  is_valid: Ref<boolean>;
+}
+
+// What a template ref to a ValidatedInput resolves to. The component instance
+// unwraps exposed refs, so is_valid is a plain boolean here.
+export interface ValidatedInputExposed extends Vue, ValidatedInputMethods {
+  is_valid: boolean;
+}
+</script>
+
+<script setup lang="ts">
+import { debounce } from 'lodash';
+
+import { computed, inject, onUnmounted, ref, watch } from 'vue';
+import { generate_uid } from '@/utils';
+// import { ValidatedInputExposed } from './validated_input_exposed';
+
+
+type ValidatorFuncType = (value: string) => ValidatorResponse;
+type FromStringFuncType = (value: string) => unknown;
+type ToStringFuncType = (value: unknown) => string;
+
+
 function do_nothing(...args: unknown[]): void {}
 
-@Component
-export default class ValidatedInput extends Vue implements Created, Destroyed {
-  @Inject({from: 'register', default: () => do_nothing})
-  register!: (input: ValidatedInput) => void;
+const props = withDefaults(defineProps<{
+  value: any, // eslint-disable no-any
+  aria_required?: boolean,
+  validators: ValidatorFuncType[],
+  to_string_fn?: ToStringFuncType,
+  from_string_fn?: FromStringFuncType,
+  num_rows?: number,
+  input_style?: string | object,
+  input_id?: string,
+  placeholder?: string,
+  show_warnings_on_blur?: boolean,
+}>(), {
+  aria_required: false,
+  to_string_fn: default_to_string_func,
+  from_string_fn: default_from_string_func,
+  num_rows: 1,
+  input_style: "",
+  input_id: "",
+  placeholder: "",
+  show_warnings_on_blur: false,
+});
 
-  @Inject({from: 'unregister', default: () => do_nothing})
-  unregister!: (input: ValidatedInput) => void;
+const emit = defineEmits(['input', 'input_validity_changed']);
 
-  @Prop({required: true})
-  value!: unknown;
+const d_input_value = ref("");
+const d_is_valid = ref(false);
+const d_error_msg = ref("");
+const d_show_warnings = ref(false);
 
-  @Prop({default: false})
-  aria_required!: boolean;
+const register = inject<(input: RegisteredValidatedInput) => void>('register', do_nothing);
+const unregister = inject<(input: RegisteredValidatedInput) => void>('unregister', do_nothing);
 
-  @Prop({required: true, type: Array})
-  validators!: ValidatorFuncType[];
+const input = ref<HTMLInputElement | null>(null);
 
-  @Prop({required: false, default: () => default_to_string_func})
-  to_string_fn!: ToStringFuncType;
-
-  @Prop({required: false, default: () => default_from_string_func})
-  from_string_fn!: FromStringFuncType;
-
-  @Prop({required: false, default: 1})
-  num_rows!: number;
-
-  @Prop({required: false, default: ""})
-  input_style!: string | object;
-
-  @Prop({required: false, default: ""})
-  input_id!: string;
-
-  @Prop({required: false, type: String, default: ""})
-  placeholder!: string;
-
-  @Prop({default: false})
-  show_warnings_on_blur!: boolean;
-
-  d_input_value: string = "";
-  private d_is_valid: boolean = false;
-  d_error_msg: string = "";
-  d_show_warnings: boolean = false;
-
-  private debounced_enable_warnings!: (...args: unknown[]) => unknown;
-
-  // We need a way to uniquely identify validated inputs for registering and unregistering
-  // them with validated forms.
-  private static _NEXT_UID = 1;
-  get uid() {
-    return this.input_uid;
-  }
-  private input_uid!: number;
-
-  // Note: This assumes "value" provided will not throw exception when running this.to_string_fn
-  created() {
-    this.input_uid = ValidatedInput._NEXT_UID++;
-
-    // Add ValidatedInput to list of inputs stored in parent ValidatedForm component
-    this.register(this);
-    this.update_and_validate(this.to_string_fn(this.value));
-    // We always want this event to fire on creation.
-    this.$emit('input_validity_changed', this.is_valid);
-
-    this.debounced_enable_warnings = debounce(() => this.d_show_warnings = true, 500);
-  }
+const self: RegisteredValidatedInput = {
+  uid: generate_uid(),
 
   enable_warnings() {
-    this.d_show_warnings = true;
-  }
+    d_show_warnings.value = true;
+  },
 
   // Calls .focus() on the underlying input/textarea element.
   // Options object:
@@ -147,96 +153,113 @@ export default class ValidatedInput extends Vue implements Created, Destroyed {
   //   input text.
   // - select: If true, will highlight the input text.
   focus({cursor_to_front = false, select = false} = {}) {
-    let class_name = this.num_rows === 1 ? 'input' : 'textarea';
-    let element = <HTMLInputElement> this.$el.getElementsByClassName(class_name)[0];
-    element.focus();
+    if (input.value === null) {
+      return;
+    }
+    input.value.focus();
 
     if (cursor_to_front) {
-      element.setSelectionRange(0, 0);
+      input.value.setSelectionRange(0, 0);
     }
 
     if (select) {
-      element.select();
+      input.value.select();
     }
-  }
+  },
 
-  destroyed() {
-    this.unregister(this);
-  }
-
-  get is_valid(): boolean {
-    return this.d_is_valid;
-  }
+  is_valid: computed(() => d_is_valid.value),
 
   reset_warning_state() {
-    this.d_show_warnings = false;
-  }
-
-  // Note: This assumes "value" provided will not throw exception when running this.to_string_fn
-  @Watch('value')
-  on_value_change(new_value: unknown, old_value: unknown) {
-    const str_value = this.to_string_fn(new_value);
-
-    if (str_value !== this.d_input_value) {
-      this.update_and_validate(str_value);
-    }
-  }
+    d_show_warnings.value = false;
+  },
 
   rerun_validators() {
-    this.change_input(this.d_input_value);
+    change_input(d_input_value.value);
+  },
+};
+
+const debounced_enable_warnings = debounce(() => d_show_warnings.value = true, 500);
+
+// Note: This assumes "value" provided will not throw exception when running props.to_string_fn
+// Add ValidatedInput to list of inputs stored in parent ValidatedForm component
+register(self);
+update_and_validate(props.to_string_fn(props.value));
+// We always want this event to fire on creation.
+emit('input_validity_changed', self.is_valid.value);
+
+onUnmounted(() => {
+  unregister(self);
+});
+
+watch(() => props.value, (new_value) => {
+  const str_value = props.to_string_fn(new_value);
+
+  if (str_value !== d_input_value.value) {
+    update_and_validate(str_value);
   }
+});
 
-  private change_input(new_value: string) {
-    // If the input is invalid, don't turn off warnings.
-    if (this.is_valid) {
-      this.d_show_warnings = false;
-    }
-    this.update_and_validate(new_value);
-    this.debounced_enable_warnings();
 
-    // Only if there are no errors should the value be emitted to the parent component
-    if (this.d_error_msg === "") {
-      const value: unknown = this.from_string_fn(this.d_input_value);
-      this.$emit('input', value);
-    }
+function change_input(new_value: string) {
+  // If the input is invalid, don't turn off warnings.
+  if (self.is_valid.value) {
+    d_show_warnings.value = false;
   }
+  update_and_validate(new_value);
+  debounced_enable_warnings();
 
-  private update_and_validate(new_value: string) {
-    this.d_input_value = new_value;
-    let original_is_valid = this.is_valid;
-    this.run_validators();
-    if (original_is_valid !== this.is_valid) {
-        this.$emit('input_validity_changed', this.is_valid);
-    }
-  }
-
-  private run_validators() {
-    let original_is_valid = this.is_valid;
-    this.d_is_valid = true;
-    this.d_error_msg = "";
-
-    // Display error message of first validator that fails
-    for (const validator of this.validators) {
-      let response: ValidatorResponse = validator(this.d_input_value);
-
-      if (!response.is_valid) {
-        this.d_is_valid = false;
-        this.d_error_msg = response.error_msg;
-        return;
-      }
-    }
-  }
-
-  private get show_errors(): boolean {
-    return this.d_error_msg !== '' && this.d_show_warnings;
-  }
-
-  private on_blur() {
-    if (this.show_warnings_on_blur) {
-      this.d_show_warnings = true;
-    }
+  // Only if there are no errors should the value be emitted to the parent component
+  if (d_error_msg.value === "") {
+    const value: unknown = props.from_string_fn(d_input_value.value);
+    emit('input', value);
   }
 }
+
+function update_and_validate(new_value: string) {
+  d_input_value.value = new_value;
+  let original_is_valid = self.is_valid.value;
+  run_validators();
+  if (original_is_valid !== self.is_valid.value) {
+      emit('input_validity_changed', self.is_valid.value);
+  }
+}
+
+function run_validators() {
+  // Display error message of first validator that fails
+  let is_valid = true;
+  let error_msg = "";
+  for (const validator of props.validators) {
+    let response: ValidatorResponse = validator(d_input_value.value);
+
+    if (!response.is_valid) {
+      is_valid = false;
+      error_msg = response.error_msg;
+      break;
+    }
+  }
+
+  d_is_valid.value = is_valid;
+  d_error_msg.value = error_msg;
+}
+
+const show_errors = computed(() => {
+  return d_error_msg.value !== '' && d_show_warnings.value;
+});
+
+function on_blur() {
+  if (props.show_warnings_on_blur) {
+    d_show_warnings.value = true;
+  }
+}
+
+defineExpose({
+  d_input_value,
+  d_is_valid,
+  d_error_msg,
+  d_show_warnings,
+
+  ...self,
+});
 </script>
 
 <style scoped lang="scss">

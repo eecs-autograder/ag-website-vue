@@ -60,7 +60,7 @@ import APIErrors from "@/components/api_errors.vue";
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import SingleProject from '@/components/course_admin/manage_projects/single_project.vue';
 import Tooltip from '@/components/tooltip.vue';
-import ValidatedForm from '@/components/validated_form.vue';
+import ValidatedForm, { ValidatedFormExposed } from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
 import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
@@ -118,7 +118,7 @@ export default class ManageProjects extends Vue implements ProjectObserver,
         }
       );
       this.new_project_name = "";
-      (<ValidatedForm> this.$refs.new_project_form).reset_warning_state();
+      (<ValidatedFormExposed> this.$refs.new_project_form).reset_warning_state();
     });
   }
 

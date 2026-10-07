@@ -77,7 +77,7 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import ProgressOverlay from '@/components/progress_overlay.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import {
   handle_api_errors_async,
   handle_global_errors_async,
@@ -123,7 +123,7 @@ export default class SingleInstructorFile extends Vue {
   begin_renaming_file() {
     this.editing = true;
     this.new_file_name = this.file.name;
-    this.$nextTick(() => {(this.$refs.file_name as ValidatedInput).focus({select: true})})
+    this.$nextTick(() => {(this.$refs.file_name as ValidatedInputExposed).focus({select: true})})
   }
 
   cancel_renaming_file() {

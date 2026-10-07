@@ -84,8 +84,8 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { NewExpectedStudentFileData } from 'ag-client-typescript';
 
 import Tooltip from '@/components/tooltip.vue';
-import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput from '@/components/validated_input.vue';
+import ValidatedForm, { ValidatedFormExposed } from '@/components/validated_form.vue';
+import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
 import { generate_uid } from '@/utils';
 import { is_non_negative, is_not_empty, is_number } from '@/validators';
 
@@ -133,7 +133,7 @@ export default class ExpectedStudentFileForm extends Vue {
   }
 
   focus() {
-    (<ValidatedInput> this.$refs.pattern).focus({select: true});
+    (<ValidatedInputExposed> this.$refs.pattern).focus({select: true});
   }
 
   get wildcard_is_present() {
@@ -156,7 +156,7 @@ export default class ExpectedStudentFileForm extends Vue {
   }
 
   reset() {
-    (<ValidatedForm> this.$refs.expected_student_file_form).reset_warning_state();
+    (<ValidatedFormExposed> this.$refs.expected_student_file_form).reset_warning_state();
     this.d_expected_student_file = new ExpectedStudentFileFormData(this.expected_student_file);
   }
 }

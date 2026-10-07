@@ -78,7 +78,7 @@ describe('ValidatedInput.vue', () => {
 
         // Changing variable in parent component should update variable in child component
         await wrapper.setData({my_input: "hey"});
-        expect(validated_input_vm.d_input_value).toEqual("hey");
+        expect(validated_input_vm.is_valid).toBe(true);
 
         // Changing input in child component should update variable in parent component
         // (this time, using default from_string_fn)

@@ -165,8 +165,8 @@ import Modal from '@/components/modal.vue';
 import MoveButtons from '@/components/MoveButtons.vue';
 import AGTestCasePanel from '@/components/project_admin/ag_tests/ag_test_case_panel.vue';
 import Tooltip from '@/components/tooltip.vue';
-import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedForm, { ValidatedFormExposed } from '@/components/validated_form.vue';
+import ValidatedInput, { ValidatedInputExposed, ValidatorResponse } from '@/components/validated_input.vue';
 import {
   GlobalErrorsSubject,
   handle_api_errors_async,
@@ -311,7 +311,7 @@ export default class AGTestSuitePanel extends Vue {
     this.d_new_case_name = "";
     this.d_show_new_ag_test_case_modal = true;
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_case_name).focus();
+      (<ValidatedInputExposed> this.$refs.new_case_name).focus();
     });
   }
 
@@ -361,7 +361,7 @@ export default class AGTestSuitePanel extends Vue {
           created_case.pk, {name: this.d_new_commands[i].name, cmd: this.d_new_commands[i].cmd}
         );
       }
-      (<ValidatedForm> this.$refs.create_ag_test_case_form).reset_warning_state();
+      (<ValidatedFormExposed> this.$refs.create_ag_test_case_form).reset_warning_state();
       this.d_show_new_ag_test_case_modal = false;
     }
     finally {

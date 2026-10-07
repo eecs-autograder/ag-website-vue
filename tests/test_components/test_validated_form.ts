@@ -183,37 +183,6 @@ describe('ValidatedForm.vue', () => {
         expect(form_vm.is_valid).toBe(false);
     });
 
-    test('register is defined and called in nested validated-input elements', () => {
-        const component = {
-            template:  `<validated-form ref="form">
-                          <validated-input ref="validated_input_1" v-model="value1"
-                                           :validators="[is_number]"/>
-                        </validated-form>`,
-            components: {
-                'validated-form': ValidatedForm,
-                'validated-input': ValidatedInput
-            },
-            data: () => {
-                return {
-                    value1: 32,
-                };
-            },
-            methods: {
-                is_number: (value: string): ValidatorResponse => {
-                    return {
-                        is_valid: value !== "" && !isNaN(Number(value)),
-                        error_msg: "Invalid number!"
-                    };
-                }
-            }
-        };
-
-        const wrapper = mount(component);
-        const validated_input = <ValidatedInput> wrapper.findComponent(
-            {ref: 'validated_input_1'}).vm;
-        expect(validated_input.register).toBeDefined();
-    });
-
     test('form_validity_changed gets triggered when is_valid changes', async () => {
         const component = {
             template: `<validated-form ref="form" @form_validity_changed="form_is_valid = $event">

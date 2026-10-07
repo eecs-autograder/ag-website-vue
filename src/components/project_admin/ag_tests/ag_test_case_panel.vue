@@ -226,7 +226,7 @@ import MoveButtons from '@/components/MoveButtons.vue';
 import AGTestCaseSettings from '@/components/project_admin/ag_tests/ag_test_case_settings.vue';
 import AGTestCommandPanel from '@/components/project_admin/ag_tests/ag_test_command_panel.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import ValidatedInput, { ValidatorResponse } from '@/components/validated_input.vue';
+import ValidatedInput, { ValidatedInputExposed, ValidatorResponse } from '@/components/validated_input.vue';
 import {
   GlobalErrorsSubject,
   handle_api_errors_async,
@@ -336,7 +336,7 @@ export default class AGTestCasePanel extends Vue {
     this.d_new_command_name = "";
     this.d_show_new_ag_test_command_modal = true;
     Vue.nextTick(() => {
-      (<ValidatedInput> this.$refs.new_ag_test_command_name).focus();
+      (<ValidatedInputExposed> this.$refs.new_ag_test_command_name).focus();
     });
   }
 
@@ -344,7 +344,7 @@ export default class AGTestCasePanel extends Vue {
     this.d_cloned_case_name = this.ag_test_case.name;
     this.d_show_clone_ag_test_case_modal = true;
     Vue.nextTick(() => {
-        (<ValidatedInput> this.$refs.ag_test_case_clone_name).focus({select: true});
+        (<ValidatedInputExposed> this.$refs.ag_test_case_clone_name).focus({select: true});
     });
   }
 
