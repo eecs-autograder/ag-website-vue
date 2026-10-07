@@ -265,7 +265,7 @@ import ResultPanel from '@/components/project_view/submission_detail/result_pane
 import CodeThemeToggle from '@/components/view_file/code_theme_toggle.vue';
 import ViewFile from '@/components/view_file/view_file.vue';
 import { SYSADMIN_CONTACT } from '@/constants';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { OpenFilesMixin } from '@/open_files_mixin';
 import { format_datetime, toggle } from '@/utils';
 
@@ -409,7 +409,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
     });
   }
 
-  @handle_api_errors_async(handle_remove_submission_from_queue_error)
+  @handle_api_errors_async(make_error_handler_func())
   private remove_submission_from_queue() {
     return toggle(this, 'd_removing_from_queue', async () => {
       await this.submission.remove_from_queue();
@@ -418,11 +418,7 @@ export default class SubmissionDetail extends OpenFilesMixin {
   }
 }
 
-export function handle_remove_submission_from_queue_error(component: SubmissionDetail,
-                                                          error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">

@@ -29,7 +29,7 @@ import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import GroupMembersForm from '@/components/group_members_form.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import { handle_api_errors_async } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 
 export interface GroupMember {
   id: number;
@@ -52,7 +52,7 @@ export default class CreateSingleGroup extends Vue {
 
   d_creating_group = false;
 
-  @handle_api_errors_async(handle_create_group_error)
+  @handle_api_errors_async(make_error_handler_func())
   async create_group(usernames: string[]) {
     try {
       this.d_creating_group = true;
@@ -67,10 +67,7 @@ export default class CreateSingleGroup extends Vue {
   }
 }
 
-function handle_create_group_error(component: CreateSingleGroup, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">

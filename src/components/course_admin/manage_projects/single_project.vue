@@ -105,7 +105,7 @@ import SelectObject from '@/components/select_object.vue';
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { format_course_name, toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -157,7 +157,7 @@ export default class SingleProject extends Vue {
     (<HTMLElement> this.$refs.cloned_project_name).focus();
   }
 
-  @handle_api_errors_async(handle_add_cloned_project_error)
+  @handle_api_errors_async(make_error_handler_func())
   clone_project() {
     return toggle(this, 'd_cloning', async () => {
       let new_project = await this.project.copy_to_course(
@@ -169,10 +169,7 @@ export default class SingleProject extends Vue {
   }
 }
 
-export function handle_add_cloned_project_error(component: SingleProject, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 
 </script>
 

@@ -239,7 +239,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
     this.open_file(file.name, (progress_callback) => file.get_content(progress_callback));
   }
 
-  @handle_api_errors_async(handle_file_upload_errors)
+  @handle_api_errors_async(make_error_handler_func())
   add_instructor_files(files: File[]) {
     this.d_upload_progress = null;
     const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
@@ -290,10 +290,7 @@ export default class InstructorFiles extends OpenFilesMixin implements Instructo
   update_instructor_file_created(instructor_file: InstructorFile) {}
 }
 
-function handle_file_upload_errors(component: InstructorFiles, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">

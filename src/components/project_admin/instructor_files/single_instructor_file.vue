@@ -112,7 +112,7 @@ export default class SingleInstructorFile extends Vue {
   d_download_progress: number | null = null;
   d_downloading = false;
 
-  @handle_api_errors_async(handle_rename_file_error)
+  @handle_api_errors_async(make_error_handler_func())
   async rename_file() {
     if (this.new_file_name !== this.file.name) {
       await this.file.rename(this.new_file_name);
@@ -151,10 +151,7 @@ export default class SingleInstructorFile extends Vue {
   }
 }
 
-export function handle_rename_file_error(component: SingleInstructorFile, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">

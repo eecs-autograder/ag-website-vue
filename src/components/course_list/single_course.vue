@@ -100,7 +100,7 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { format_course_name } from '@/utils';
 import { is_not_empty, is_number, make_min_value_validator } from '@/validators';
 
@@ -151,7 +151,7 @@ export default class SingleCourse extends Vue {
     });
   }
 
-  @handle_api_errors_async(handle_add_copied_course_error)
+  @handle_api_errors_async(make_error_handler_func())
   async make_copy_of_course() {
     try {
       this.d_cloning = true;
@@ -166,10 +166,7 @@ export default class SingleCourse extends Vue {
   }
 }
 
-function handle_add_copied_course_error(component: SingleCourse, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 
 </script>
 

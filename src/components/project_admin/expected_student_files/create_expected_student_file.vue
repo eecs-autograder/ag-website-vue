@@ -22,7 +22,7 @@ import { ExpectedStudentFile, NewExpectedStudentFileData, Project } from 'ag-cli
 import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
-import { handle_api_errors_async } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 
 @Component({
   components: {
@@ -38,7 +38,7 @@ export default class CreateExpectedStudentFile extends Vue {
   d_create_pending = false;
   pattern_is_valid = false;
 
-  @handle_api_errors_async(handle_add_expected_student_file_error)
+  @handle_api_errors_async(make_error_handler_func())
   async create_expected_student_file(
     new_expected_student_file_data: NewExpectedStudentFileData) {
     try {
@@ -54,11 +54,7 @@ export default class CreateExpectedStudentFile extends Vue {
   }
 }
 
-export function handle_add_expected_student_file_error(component: CreateExpectedStudentFile,
-                                                       error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">

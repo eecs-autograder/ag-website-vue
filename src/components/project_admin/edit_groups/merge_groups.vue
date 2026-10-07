@@ -53,7 +53,7 @@ import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import GroupLookup from '@/components/group_lookup.vue';
 import ValidatedForm from '@/components/validated_form.vue';
-import { handle_api_errors_async } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 
 @Component({
   components: {
@@ -87,7 +87,7 @@ export default class MergeGroups extends Vue {
                                        && group.pk !== this.group_2!.pk);
   }
 
-  @handle_api_errors_async(handle_merge_groups_error)
+  @handle_api_errors_async(make_error_handler_func())
   async merge_groups() {
     try {
       this.d_merging = true;
@@ -99,10 +99,7 @@ export default class MergeGroups extends Vue {
   }
 }
 
-function handle_merge_groups_error(component: MergeGroups, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">

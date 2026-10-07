@@ -125,7 +125,7 @@ import { FeedbackConfigLabel, FeedbackDescriptions } from '@/components/project_
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { deep_copy } from '@/utils';
 import { is_not_empty } from '@/validators';
 
@@ -160,7 +160,7 @@ export default class AGTestCaseSettings extends Vue {
     this.d_ag_test_case = deep_copy(this.ag_test_case, AGTestCase);
   }
 
-  @handle_api_errors_async(handle_save_ag_test_case_settings_error)
+  @handle_api_errors_async(make_error_handler_func())
   async save_ag_test_case_settings() {
     try {
       this.d_saving = true;
@@ -174,10 +174,7 @@ export default class AGTestCaseSettings extends Vue {
   }
 }
 
-function handle_save_ag_test_case_settings_error(component: AGTestCaseSettings, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">

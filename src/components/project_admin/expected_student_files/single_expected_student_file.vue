@@ -98,7 +98,7 @@ import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
 import ExpectedStudentFileForm, { ExpectedStudentFileFormData } from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { generate_uid, safe_assign } from '@/utils';
 
 @Component({
@@ -146,7 +146,7 @@ export default class SingleExpectedStudentFile extends Vue {
     return this.expected_student_file.pattern.match('[*?![\\]]') !== null;
   }
 
-  @handle_api_errors_async(handle_edit_expected_student_file_error)
+  @handle_api_errors_async(make_error_handler_func())
   async update_expected_student_file(file: ExpectedStudentFileFormData) {
     try {
       this.d_saving = true;
@@ -196,11 +196,7 @@ export default class SingleExpectedStudentFile extends Vue {
   }
 }
 
-export function handle_edit_expected_student_file_error(component: SingleExpectedStudentFile,
-                                                        error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">

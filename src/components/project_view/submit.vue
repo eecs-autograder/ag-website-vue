@@ -183,7 +183,7 @@ import Modal from '@/components/modal.vue';
 import ProgressBar from '@/components/progress_bar.vue';
 import GroupMembers from '@/components/project_view/group_members.vue';
 import Tooltip from '@/components/tooltip.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { assert_not_null, format_datetime, toggle } from '@/utils';
 
 import ExpectedStudentFilesList from './expected_student_files_list.vue';
@@ -436,7 +436,7 @@ export default class Submit extends Vue {
            && expected_file.max_num_matches === 1;
   }
 
-  @handle_api_errors_async(handle_submit_error)
+  @handle_api_errors_async(make_error_handler_func())
   submit() {
     const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
     api_errors?.clear();
@@ -483,10 +483,7 @@ export default class Submit extends Vue {
   }
 }
 
-function handle_submit_error(component: Submit, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 
 const MINIMATCH_ARGS = {
   nobrace: true,

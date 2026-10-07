@@ -154,7 +154,8 @@ import ValidatedInput, { ValidatedInputExposed } from '@/components/validated_in
 import {
   GlobalErrorsSubject,
   handle_api_errors_async,
-  handle_global_errors_async
+  handle_global_errors_async,
+  make_error_handler_func
 } from '@/error_handling';
 import { OrderSyncer } from '@/order_syncer';
 import { deep_copy } from '@/utils';
@@ -423,7 +424,7 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
     return this.d_active_ag_test_command !== null;
   }
 
-  @handle_api_errors_async(handle_add_ag_test_suite_error)
+  @handle_api_errors_async(make_error_handler_func())
   async add_ag_test_suite() {
     try {
       this.d_adding_suite = true;
@@ -615,10 +616,7 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
                                         ag_test_command_order: number[]) { }
 }
 
-function handle_add_ag_test_suite_error(component: AGTestSuites, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 
 </script>
 

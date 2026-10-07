@@ -62,7 +62,7 @@ import SingleProject from '@/components/course_admin/manage_projects/single_proj
 import Tooltip from '@/components/tooltip.vue';
 import ValidatedForm, { ValidatedFormExposed } from '@/components/validated_form.vue';
 import ValidatedInput from '@/components/validated_input.vue';
-import { handle_api_errors_async, handle_global_errors_async } from '@/error_handling';
+import { handle_api_errors_async, handle_global_errors_async, make_error_handler_func } from '@/error_handling';
 import { BeforeDestroy, Created } from '@/lifecycle';
 import { toggle } from '@/utils';
 import { is_not_empty } from '@/validators';
@@ -105,7 +105,7 @@ export default class ManageProjects extends Vue implements ProjectObserver,
     this.projects.sort((first, second) => first.name.localeCompare(second.name));
   }
 
-  @handle_api_errors_async(handle_add_project_error)
+  @handle_api_errors_async(make_error_handler_func())
   add_project() {
     return toggle(this, 'd_adding_project', async () => {
       this.d_adding_project = true;
@@ -133,10 +133,7 @@ export default class ManageProjects extends Vue implements ProjectObserver,
   }
 }
 
-export function handle_add_project_error(component: ManageProjects, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 
 </script>
 

@@ -315,7 +315,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
     });
   }
 
-  @handle_api_errors_async(handle_start_rerun_error)
+  @handle_api_errors_async(make_error_handler_func())
   start_rerun() {
     return toggle(this, 'd_starting_rerun', async () => {
         let rerun = await ag_cli.RerunSubmissionTask.create(this.project.pk, {
@@ -583,10 +583,7 @@ export default class RerunSubmissions extends Vue implements ag_cli.GroupObserve
   }
 }
 
-function handle_start_rerun_error(component: RerunSubmissions, error: unknown) {
-  const api_errors = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
+
 </script>
 
 <style scoped lang="scss">
