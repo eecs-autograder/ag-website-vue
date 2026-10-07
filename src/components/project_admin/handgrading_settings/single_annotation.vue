@@ -78,7 +78,7 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from "@/components/modal.vue";
 import MoveButtons from "@/components/MoveButtons.vue";
 import AnnotationForm, { AnnotationFormData } from "@/components/project_admin/handgrading_settings/annotation_form.vue";
-import { handle_api_errors_async } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { deep_copy, format_datetime, safe_assign } from "@/utils";
 
 @Component({
@@ -127,7 +127,7 @@ export default class SingleAnnotation extends Vue {
     this.d_annotation = deep_copy(new_val, Annotation);
   }
 
-  @handle_api_errors_async(handle_save_annotation_error)
+  @handle_api_errors_async(make_error_handler_func('save_annotation_errors'))
   async save(form_data: AnnotationFormData) {
     try {
       this.d_saving = true;
@@ -140,7 +140,7 @@ export default class SingleAnnotation extends Vue {
     }
   }
 
-  @handle_api_errors_async(handle_delete_annotation_error)
+  @handle_api_errors_async(make_error_handler_func('delete_annotation_errors'))
   async delete_annotation() {
     try {
       this.d_deleting = true;
@@ -152,17 +152,6 @@ export default class SingleAnnotation extends Vue {
     }
   }
 }
-
-export function handle_save_annotation_error(component: SingleAnnotation, error: unknown) {
-  const api_errors = component.$refs.save_annotation_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
-export function handle_delete_annotation_error(component: SingleAnnotation, error: unknown) {
-  const api_errors = component.$refs.delete_annotation_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
 </script>
 
 <style scoped lang="scss">

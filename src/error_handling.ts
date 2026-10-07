@@ -50,18 +50,26 @@ export function new_handle_api_errors_async(
     return decorator;
 }
 
-export function make_error_handler_func(api_errors_ref: string = 'api_errors') {
+export function make_error_handler_func(api_errors_ref: string = 'api_errors', scroll_into_view: boolean = false) {
     // tslint:disable-next-line:no-any
     return function(component: Vue, response: unknown) {
         const api_errors = component.$refs[api_errors_ref] as APIErrorsExposed | undefined
         api_errors?.show_errors_from_response(response);
+
+        if (api_errors?.has_errors && scroll_into_view) {
+            api_errors?.$el.scrollIntoView({behavior: 'smooth'});
+        }
     };
 }
 
-export function new_make_error_handler_func(api_errors_ref: Ref<APIErrorsExposed | null>) {
+export function new_make_error_handler_func(api_errors_ref: Ref<APIErrorsExposed | null>, scroll_into_view: boolean = false) {
     return function(response: unknown) {
         assert_not_null(api_errors_ref.value);
         api_errors_ref.value.show_errors_from_response(response);
+
+        if (api_errors_ref.value.has_errors && scroll_into_view) {
+            api_errors_ref.value.$el.scrollIntoView({behavior: 'smooth'});
+        }
     };
 }
 

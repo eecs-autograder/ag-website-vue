@@ -1023,7 +1023,7 @@ export default class AGTestCommandSettings extends Vue {
     }
   }
 
-  @handle_api_errors_async(handle_save_ag_test_case_error)
+  @handle_api_errors_async(make_error_handler_func('ag_test_case_api_errors'))
   save_ag_test_case() {
     let to_save = new AGTestCase(this.ag_test_case);
     to_save.name = this.d_new_test_name;
@@ -1046,7 +1046,7 @@ export default class AGTestCommandSettings extends Vue {
     });
   }
 
-  @handle_api_errors_async(handle_save_ag_test_cmd_settings_error)
+  @handle_api_errors_async(make_error_handler_func('api_errors', true))
   save_ag_test_command_settings() {
     return toggle(this, 'd_saving', () => {
       const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
@@ -1155,19 +1155,6 @@ export default class AGTestCommandSettings extends Vue {
       }
     ]
   ]);
-}
-
-function handle_save_ag_test_case_error(component: AGTestCommandSettings, error: unknown) {
-  let api_errors_elt = component.$refs.ag_test_case_api_errors as APIErrorsExposed | undefined;
-  api_errors_elt?.show_errors_from_response(error);
-}
-
-function handle_save_ag_test_cmd_settings_error(component: AGTestCommandSettings, error: unknown) {
-  let api_errors_elt = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors_elt?.show_errors_from_response(error);
-  if (component.d_num_api_errors !== 0) {
-    api_errors_elt?.$el.scrollIntoView({behavior: 'smooth'});
-  }
 }
 </script>
 

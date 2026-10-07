@@ -325,6 +325,7 @@ import {
   GlobalErrorsSubject,
   handle_api_errors_async,
   handle_global_errors_async,
+  make_error_handler_func,
 } from '@/error_handling';
 import { OrderSyncer } from '@/order_syncer';
 import { BeforeDestroy, Created, Mounted } from "@/lifecycle";
@@ -523,7 +524,7 @@ export default class HandgradingSettings extends Vue implements Created,
     }
   }
 
-  @handle_api_errors_async(handle_save_rubric_settings_error)
+  @handle_api_errors_async(make_error_handler_func('settings_form_errors'))
   async save_rubric_settings() {
     try {
       this.d_saving = true;
@@ -540,7 +541,7 @@ export default class HandgradingSettings extends Vue implements Created,
 
   // ----------------------------------------------------------------------------------------------
 
-  @handle_api_errors_async(handle_create_criterion_error)
+  @handle_api_errors_async(make_error_handler_func('create_criterion_errors'))
   async create_criterion(form_data: CriterionFormData) {
     try {
       this.d_creating_criterion = true;
@@ -596,7 +597,7 @@ export default class HandgradingSettings extends Vue implements Created,
 
   // ----------------------------------------------------------------------------------------------
 
-  @handle_api_errors_async(handle_create_annotation_error)
+  @handle_api_errors_async(make_error_handler_func('create_annotation_errors'))
   async create_annotation(form_data: AnnotationFormData) {
     try {
       this.d_creating_annotation = true;
@@ -652,21 +653,6 @@ export default class HandgradingSettings extends Vue implements Created,
       }
     }
   }
-}
-
-export function handle_save_rubric_settings_error(component: HandgradingSettings, error: unknown) {
-  const api_errors = component.$refs.settings_form_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
-export function handle_create_criterion_error(component: HandgradingSettings, error: unknown) {
-  const api_errors = component.$refs.create_criterion_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
-export function handle_create_annotation_error(component: HandgradingSettings, error: unknown) {
-  const api_errors = component.$refs.create_annotation_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
 }
 
 </script>

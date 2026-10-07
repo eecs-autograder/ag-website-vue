@@ -98,7 +98,7 @@ import { GlobalData } from '@/app.vue';
 import APIErrors from '@/components/api_errors.vue';
 import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from '@/components/modal.vue';
-import { handle_api_errors_async } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { deep_copy } from '@/utils';
 
 @Component({
@@ -142,7 +142,7 @@ export default class InvitationReceived extends Vue {
        (name: string) => username === name) !== -1 ? 'Accepted' : 'Pending';
   }
 
-  @handle_api_errors_async(handle_accept_invitation_error)
+  @handle_api_errors_async(make_error_handler_func('accept_invitation_api_errors'))
   async accept_invitation() {
     try {
       this.d_accepting = true;
@@ -174,7 +174,7 @@ export default class InvitationReceived extends Vue {
     return other_invitees;
   }
 
-  @handle_api_errors_async(handle_reject_invitation_error)
+  @handle_api_errors_async(make_error_handler_func('reject_invitation_api_errors'))
   async reject_invitation() {
     const api_errors = this.$refs.reject_invitation_api_errors as APIErrorsExposed | undefined;
     api_errors?.clear();
@@ -184,16 +184,6 @@ export default class InvitationReceived extends Vue {
     this.$emit('invitation_rejected');
     this.d_rejecting = false;
   }
-}
-
-function handle_reject_invitation_error(component: InvitationReceived, error: unknown) {
-  const api_errors = component.$refs.reject_invitation_api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
-function handle_accept_invitation_error(component: InvitationReceived, error: unknown) {
-  const api_errors = component.$refs.accept_invitation_api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
 }
 
 </script>

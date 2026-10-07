@@ -348,7 +348,7 @@ export default class AGTestSuiteSettings extends Vue {
     });
   }
 
-  @handle_api_errors_async(handle_save_ag_test_suite_settings_error)
+  @handle_api_errors_async(make_error_handler_func('api_errors', true))
   save_ag_test_suite_settings() {
     return toggle(this, 'd_saving', () => {
       const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
@@ -389,14 +389,6 @@ export default class AGTestSuiteSettings extends Vue {
       }
     ]
   ]);
-}
-
-function handle_save_ag_test_suite_settings_error(component: AGTestSuiteSettings, error: unknown) {
-  const api_errors_elt = component.$refs.api_errors as APIErrorsExposed | undefined;
-  api_errors_elt?.show_errors_from_response(error);
-  if (component.d_num_api_errors !== 0) {
-    api_errors_elt?.$el.scrollIntoView({behavior: 'smooth'});
-  }
 }
 </script>
 

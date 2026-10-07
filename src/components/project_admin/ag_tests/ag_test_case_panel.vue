@@ -380,7 +380,7 @@ export default class AGTestCasePanel extends Vue {
     });
   }
 
-  @handle_api_errors_async(handle_clone_ag_test_case_error)
+  @handle_api_errors_async(make_error_handler_func('clone_case_api_errors'))
   async clone_ag_test_case() {
     try {
       this.d_cloning = true;
@@ -399,7 +399,7 @@ export default class AGTestCasePanel extends Vue {
     this.command_order_syncer.schedule(cmds, prev_order);
   }
 
-  @handle_api_errors_async(handle_add_ag_test_command_error)
+  @handle_api_errors_async(make_error_handler_func('new_command_api_errors'))
   async add_ag_test_command() {
     try {
       this.d_adding_command = true;
@@ -414,15 +414,7 @@ export default class AGTestCasePanel extends Vue {
   }
 }
 
-function handle_add_ag_test_command_error(component: AGTestCasePanel, error: unknown) {
-  const api_errors = component.$refs.new_command_api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
 
-function handle_clone_ag_test_case_error(component: AGTestCasePanel, error: unknown) {
-  const api_errors = component.$refs.clone_case_api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
 
 
 </script>

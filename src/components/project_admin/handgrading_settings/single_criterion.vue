@@ -74,7 +74,7 @@ import { APIErrorsExposed } from '@/exposed_component_types/api_errors_exposed';
 import Modal from "@/components/modal.vue";
 import MoveButtons from "@/components/MoveButtons.vue";
 import CriterionForm, { CriterionFormData } from "@/components/project_admin/handgrading_settings/criterion_form.vue";
-import { handle_api_errors_async } from '@/error_handling';
+import { handle_api_errors_async, make_error_handler_func } from '@/error_handling';
 import { deep_copy, format_datetime, safe_assign } from "@/utils";
 
 @Component({
@@ -122,7 +122,7 @@ export default class SingleCriterion extends Vue {
     this.d_criterion = deep_copy(new_val, Criterion);
   }
 
-  @handle_api_errors_async(handle_save_criterion_error)
+  @handle_api_errors_async(make_error_handler_func('save_criterion_errors'))
   async save(form_data: CriterionFormData) {
     try {
       this.d_saving = true;
@@ -135,7 +135,7 @@ export default class SingleCriterion extends Vue {
     }
   }
 
-  @handle_api_errors_async(handle_delete_criterion_error)
+  @handle_api_errors_async(make_error_handler_func('delete_criterion_errors'))
   async delete_criterion() {
     try {
       this.d_deleting = true;
@@ -147,17 +147,6 @@ export default class SingleCriterion extends Vue {
     }
   }
 }
-
-export function handle_save_criterion_error(component: SingleCriterion, error: unknown) {
-  const api_errors = component.$refs.save_criterion_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
-export function handle_delete_criterion_error(component: SingleCriterion, error: unknown) {
-  const api_errors = component.$refs.delete_criterion_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
-}
-
 </script>
 
 <style scoped lang="scss">

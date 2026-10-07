@@ -407,7 +407,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     void this.suite_order_syncer.flush();
   }
 
-  @handle_api_errors_async(handle_add_mutation_test_suite_error)
+  @handle_api_errors_async(make_error_handler_func('create_errors'))
   async add_mutation_test_suite() {
     try {
       this.d_adding_suite = true;
@@ -659,7 +659,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
     ],
   ]);
 
-  @handle_api_errors_async(handle_save_mutation_test_suite_error)
+  @handle_api_errors_async(make_error_handler_func('save_errors', true))
   async save_mutation_test_suite() {
     try {
       this.d_saving = true;
@@ -671,19 +671,6 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
       this.d_saving = false;
     }
   }
-}
-
-function handle_save_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-  let api_errors_elt = component.$refs.save_errors as APIErrorsExposed | undefined;
-  api_errors_elt?.show_errors_from_response(error);
-  if (component.d_num_save_api_errors !== 0) {
-    api_errors_elt?.$el.scrollIntoView({behavior: 'smooth'});
-  }
-}
-
-function handle_add_mutation_test_suite_error(component: MutationSuites, error: unknown) {
-    const api_errors = component.$refs.create_errors as APIErrorsExposed | undefined;
-    api_errors?.show_errors_from_response(error);
 }
 </script>
 

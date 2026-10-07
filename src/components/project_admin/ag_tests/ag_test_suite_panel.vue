@@ -170,6 +170,7 @@ import ValidatedInput, { ValidatedInputExposed, ValidatorResponse } from '@/comp
 import {
   GlobalErrorsSubject,
   handle_api_errors_async,
+  make_error_handler_func,
 } from '@/error_handling';
 import { OrderSyncer } from '@/order_syncer';
 import { generate_uid } from '@/utils';
@@ -334,7 +335,7 @@ export default class AGTestSuitePanel extends Vue {
     this.case_order_syncer.schedule(cases, prev_order);
   }
 
-  @handle_api_errors_async(handle_create_ag_test_case_error)
+  @handle_api_errors_async(make_error_handler_func('new_ag_test_case_api_errors'))
   async create_ag_test_case() {
     try {
       this.d_creating_case = true;
@@ -368,11 +369,6 @@ export default class AGTestSuitePanel extends Vue {
       this.d_creating_case = false;
     }
   }
-}
-
-function handle_create_ag_test_case_error(component: AGTestSuitePanel, error: unknown) {
-  const api_errors = component.$refs.new_ag_test_case_api_errors as APIErrorsExposed | undefined;
-  api_errors?.show_errors_from_response(error);
 }
 </script>
 

@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
 import { HttpError } from "ag-client-typescript";
 import { SYSADMIN_CONTACT } from "@/constants";
 
@@ -34,6 +34,8 @@ const emit = defineEmits<{
 const state = reactive({
   api_errors: [] as string[],
 });
+
+const has_errors = computed(() => state.api_errors.length !== 0);
 
 // Methods
 const show_errors_from_response = (
@@ -117,6 +119,7 @@ defineExpose({
   state,
   show_errors_from_response,
   clear,
+  has_errors,
 });
 </script>
 
