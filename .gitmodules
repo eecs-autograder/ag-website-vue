@@ -6,3 +6,6 @@
 	path = ag-client-typescript
 	url = ../ag-client-typescript
 	branch = develop
+[submodule "vue-class-to-composition"]
+	path = vue-class-to-composition
+	url = ./vue-class-to-composition
