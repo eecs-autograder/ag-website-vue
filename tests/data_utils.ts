@@ -1,5 +1,7 @@
 import * as vue_test_utils from '@vue/test-utils';
 
+import { reactive } from 'vue';
+
 import {
     AGCommand,
     AGTestCase,
@@ -84,7 +86,7 @@ export function reset_provided_global_data() {
 
 function provided_global_data(): GlobalData {
     if (vue_test_utils.config.provide!['globals'] === undefined) {
-        vue_test_utils.config.provide!['globals'] = new GlobalData();
+        vue_test_utils.config.provide!['globals'] = reactive(new GlobalData());
     }
     return vue_test_utils.config.provide!['globals'];
 }
