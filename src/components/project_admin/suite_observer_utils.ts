@@ -28,6 +28,23 @@ export function update_changed_ag_test_case(
     );
 }
 
+// Note: This function mutates its "ag_test_suites" argument.
+// The caller is responsible for making any necessary copies.
+export function new_update_changed_ag_test_case(
+    to_update: ag_cli.AGTestCase, ag_test_suites: ag_cli.AGTestSuite[]
+) {
+    let parent_suite = find_parent_suite(to_update, ag_test_suites);
+    if (parent_suite === null) {
+        // Test case could belong to another project
+        return;
+    }
+
+    let case_index = parent_suite.ag_test_cases.findIndex(
+      (test_case: ag_cli.AGTestCase) => test_case.pk === to_update.pk
+    );
+    parent_suite.ag_test_cases[case_index] = to_update;
+}
+
 // Sorts the items in to_sort using the ordering defined by ordering (a list of PKs)
 export function sort_by_ordering(to_sort: HasPK[], ordering: number[]) {
     return to_sort.sort((first, second) => {
