@@ -151,10 +151,11 @@ export default class CourseAdmin extends CurrentTabMixin implements CourseObserv
                                                                     BeforeDestroy {
   @Inject({from: 'globals', default: new GlobalData()})
   globals!: GlobalData;
+  d_globals = this.globals;
 
   d_loading = true;
   role_selected = "";
-  roles = [
+  readonly roles = [
     RosterChoice.admin,
     RosterChoice.staff,
     RosterChoice.student,
@@ -167,7 +168,7 @@ export default class CourseAdmin extends CurrentTabMixin implements CourseObserv
   @handle_global_errors_async
   async mounted() {
     this.d_course = await Course.get_by_pk(Number(this.$route.params.course_id));
-    await this.globals.set_current_course(this.d_course);
+    await this.d_globals.set_current_course(this.d_course);
 
     let requested_tab = get_query_param(this.$route.query, "current_tab");
     if (requested_tab === 'late_days' && this.d_course!.num_late_days === 0) {
