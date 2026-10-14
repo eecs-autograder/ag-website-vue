@@ -438,8 +438,7 @@ export default class Submit extends Vue {
 
   @handle_api_errors_async(make_error_handler_func())
   submit() {
-    const api_errors = this.$refs.api_errors as APIErrorsExposed | undefined;
-    api_errors?.clear();
+    (this.$refs.api_errors as APIErrorsExposed)?.clear();
     this.d_submit_progress = 0;
 
     return toggle(this, 'd_submitting', async () => {
