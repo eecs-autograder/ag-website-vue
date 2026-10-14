@@ -38,8 +38,8 @@
     box-shadow: none;
 }
 
-@mixin focus_state($color: white) {
-    box-shadow: 0 0 4px 2px $color;
+@mixin focus_state($color) {
+    outline: thick double $color;
 }
 
 @mixin disabled_state($lighter-color: white, $darker-color: white,
@@ -67,8 +67,8 @@ $base-red: hsl(0, 80%, 46%);
     @include active_state($base-red, darken($base-red, 4));
 }
 
-.red-button:focus {
-    @include focus_state(lighten($base-red, 40));
+.red-button:focus-visible {
+    @include focus_state(lighten($base-red, 10));
 }
 
 .red-button:disabled {
@@ -94,8 +94,8 @@ $base-orange: hsl(20, 100%, 51%);
     @include active_state($base-orange, darken($base-orange, 4));
 }
 
-.orange-button:focus {
-    @include focus_state(lighten($base-orange, 34));
+.orange-button:focus-visible {
+    @include focus_state(lighten($base-orange, 10));
 }
 
 .orange-button:disabled {
@@ -121,8 +121,8 @@ $base-green: darken($save-green, 4);
     @include active_state($base-green, darken($base-green, 4));
 }
 
-.green-button:focus {
-    @include focus_state(lighten($base-green, 45));
+.green-button:focus-visible {
+    @include focus_state(lighten($base-green, 10));
 }
 
 .green-button:disabled {
@@ -148,8 +148,8 @@ $base-blue: hsl(208, 59%, 45%);
     @include active_state($base-blue, darken($base-blue, 4));
 }
 
-.blue-button:focus {
-    @include focus_state(lighten($base-blue, 40));
+.blue-button:focus-visible {
+    @include focus_state(lighten($base-blue, 10));
 }
 
 .blue-button:disabled {
@@ -175,8 +175,8 @@ $base-teal: hsl(180, 100%, 24%);
     @include active_state($base-teal, darken($base-teal, 4));
 }
 
-.teal-button:focus {
-    @include focus_state(lighten($base-teal, 65));
+.teal-button:focus-visible {
+    @include focus_state(lighten($base-teal, 10));
 }
 
 .teal-button:disabled {
@@ -202,8 +202,8 @@ $base-purple: hsl(275, 48%, 56%);
     @include active_state($base-purple, darken($base-purple, 4));
 }
 
-.purple-button:focus {
-    @include focus_state(lighten($base-purple, 34));
+.purple-button:focus-visible {
+    @include focus_state(lighten($base-purple, 10));
 }
 
 .purple-button:disabled {
@@ -229,8 +229,8 @@ $base-periwinkle: hsl(220, 30%, 56%);
     @include active_state($base-periwinkle, darken($base-periwinkle, 4));
 }
 
-.periwinkle-button:focus {
-    @include focus_state(lighten($base-periwinkle, 29));
+.periwinkle-button:focus-visible {
+    @include focus_state(lighten($base-periwinkle, 10));
 }
 
 .periwinkle-button:disabled {
@@ -242,7 +242,7 @@ $base-periwinkle: hsl(220, 30%, 56%);
 // Gray Button ---------------------------------------------------------------------
 
 $base-gray: darken($stormy-gray-light, 10);
-$blue-outline: hsl(208, 59%, 86%);
+$blue-outline: hsl(208, 59%, 50%);
 
 .gray-button {
     @extend .button;
@@ -257,7 +257,7 @@ $blue-outline: hsl(208, 59%, 86%);
     @include active_state($base-gray, darken($base-gray, 4));
 }
 
-.gray-button:focus {
+.gray-button:focus-visible {
     @include focus_state($blue-outline);
 }
 
@@ -287,7 +287,7 @@ $base-light-gray: hsl(220, 30%, 85%);
     @include active_state(lighten($base-light-gray, 1), darken($base-light-gray, 3));
 }
 
-.light-gray-button:focus {
+.light-gray-button:focus-visible {
     @include focus_state($blue-outline);
 }
 
@@ -316,7 +316,7 @@ $white-button-text: hsl(220, 12%, 20%);
     box-shadow: none;
 }
 
-.white-button:focus {
+.white-button:focus-visible {
     @include focus_state($blue-outline);
 }
 
