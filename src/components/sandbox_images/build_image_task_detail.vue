@@ -171,7 +171,7 @@ export default class BuildImageTaskDetail extends Vue {
   private download_files() {
     this.d_files_download_progress = null;
     return toggle(this, 'd_downloading_files', async () => {
-      let content = this.build_task.get_files(event => {
+      let content = this.build_task.get_files((event: ProgressEvent) => {
           if (event.lengthComputable) {
               this.d_files_download_progress = 100 * (1.0 * event.loaded / event.total);
           }
@@ -189,7 +189,7 @@ export default class BuildImageTaskDetail extends Vue {
     }
 
     this.d_output_download_progress = null;
-    let output = this.build_task.get_output((event) => {
+    let output = this.build_task.get_output((event: ProgressEvent) => {
       if (event.lengthComputable) {
         this.d_output_download_progress = 100 * (1.0 * event.loaded / event.total);
       }
