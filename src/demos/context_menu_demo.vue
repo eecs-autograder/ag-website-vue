@@ -1,7 +1,7 @@
 <template>
-  <div class="context-menu-demo-outer">
+  <div class="context-menu-demo-outer" ref="context_menu_demo">
     <div class="context-menu-demo-1">
-      <div class="area-of-focus-1 menu-parent"
+      <div class="area-of-focus-1 menu-parent" :style="{'color': color}"
            @click="menu_1_coordinates = {x: $event.clientX, y: $event.clientY};
                    menu_1_is_open = true">
         Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
@@ -120,13 +120,14 @@ export default class ContextMenuDemo extends Vue {
   empty_menu_is_open = false;
   empty_menu_coordinates = {x: 0, y: 0};
 
+  color = 'black';
+
   choice_alert(word: string) {
     alert('You have clicked on: ' + word);
   }
 
   change_color(word: string) {
-    let text = <HTMLElement> this.$el.getElementsByClassName('area-of-focus-1')[0];
-    text.style.color = word;
+    this.color = word;
   }
 
   items = [

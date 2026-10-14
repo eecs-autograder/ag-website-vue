@@ -1,5 +1,5 @@
 <template>
-  <div class="file-panel">
+  <div class="file-panel" ref="file_panel">
     <button
       class="panel unstyled-button"
       tabindex="0"
@@ -57,7 +57,7 @@ export default class FilePanel extends Vue {
   d_progress: number | null = null;
 
   toggle_open() {
-    let top = this.$el.getBoundingClientRect().top;
+    let top = (<HTMLElement> this.$refs.file_panel).getBoundingClientRect().top;
 
     this.d_progress = null;
     this.d_is_open = !this.d_is_open;
@@ -77,7 +77,7 @@ export default class FilePanel extends Vue {
     // istanbul ignore next
     if (!this.d_is_open && top < 0) {
       this.$nextTick(() => {
-        this.$el.scrollIntoView();
+        (<HTMLElement> this.$refs.file_panel).scrollIntoView();
       });
     }
   }

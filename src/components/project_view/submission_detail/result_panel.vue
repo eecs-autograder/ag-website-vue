@@ -1,5 +1,5 @@
 <template>
-  <div class="panel">
+  <div class="panel" ref="result_panel">
     <div :class="[`${panel_correctness}-panel-header`,
                   {'command-panel-header-open': d_is_open && is_command },
                   {'panel-header-open': d_is_open && !is_command },
@@ -123,7 +123,7 @@ export default class ResultPanel extends Vue {
   }
 
   toggle_d_is_open() {
-    let top = this.$el.getBoundingClientRect().top;
+    let top = (<HTMLElement> this.$refs.result_panel).getBoundingClientRect().top;
     if (this.can_open) {
       this.d_is_open = !this.d_is_open;
     }
@@ -132,7 +132,7 @@ export default class ResultPanel extends Vue {
     // istanbul ignore next
     if (!this.d_is_open && top < 0) {
       this.$nextTick(() => {
-        this.$el.scrollIntoView();
+        (<HTMLElement> this.$refs.result_panel).scrollIntoView();
       });
     }
   }
