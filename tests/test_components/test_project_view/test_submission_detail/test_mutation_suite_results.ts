@@ -2,7 +2,10 @@ import { mount, Wrapper } from '@vue/test-utils';
 
 import * as ag_cli from 'ag-client-typescript';
 
-import { CorrectnessLevel } from '@/components/project_view/submission_detail/correctness';
+import {
+    CorrectnessLevel,
+    setup_return_code_correctness as get_setup_return_code_correctness
+} from '@/components/project_view/submission_detail/correctness';
 import MutationSuiteResults from '@/components/project_view/submission_detail/mutation_suite_results.vue';
 
 import * as data_ut from '@/tests/data_utils';
@@ -19,8 +22,12 @@ let submission: ag_cli.Submission;
 let user: ag_cli.User;
 let mutation_suite_1_result: ag_cli.MutationTestSuiteResultFeedback;
 
-let setup_return_code_correctness:
-    (suite_result: ag_cli.MutationTestSuiteResultFeedback) => CorrectnessLevel;
+function setup_return_code_correctness(suite_result: ag_cli.MutationTestSuiteResultFeedback) {
+    return get_setup_return_code_correctness(
+        suite_result.setup_return_code,
+        suite_result.setup_timed_out,
+    );
+}
 let student_tests_correctness:
     (suite_result: ag_cli.MutationTestSuiteResultFeedback) => CorrectnessLevel;
 let bugs_exposed_correctness:
@@ -114,8 +121,6 @@ describe('setup_return_code_correctness tests', () => {
                 fdbk_category: ag_cli.FeedbackCategory.past_limit_submission
             }
         });
-
-        setup_return_code_correctness = wrapper.vm.setup_return_code_correctness;
     });
 
     test('setup_return_code_correctness - has_setup_command === true && setup_return_code === 0',
@@ -173,7 +178,7 @@ describe('student_tests_correctness tests', () => {
             }
         });
 
-        student_tests_correctness = wrapper.vm.student_tests_correctness;
+        student_tests_correctness = wrapper.vm.get_student_tests_validity_correctness;
     });
 
     test('student_tests_correctness - invalid_tests === null && discarded_tests.length === 0',
@@ -246,7 +251,7 @@ describe('bugs_exposed_correctness tests', () => {
             }
         });
 
-        bugs_exposed_correctness = wrapper.vm.bugs_exposed_correctness;
+        bugs_exposed_correctness = wrapper.vm.get_bugs_exposed_correctness;
     });
 
     test('bugs_exposed_correctness - num_bugs_exposed === null', () => {
@@ -430,9 +435,8 @@ describe('mutation_suite_correctness tests', () => {
         });
 
         mutation_suite_1_result.setup_timed_out = false;
-        setup_return_code_correctness = wrapper.vm.setup_return_code_correctness;
-        student_tests_correctness = wrapper.vm.student_tests_correctness;
-        bugs_exposed_correctness = wrapper.vm.bugs_exposed_correctness;
+        student_tests_correctness = wrapper.vm.get_student_tests_validity_correctness;
+        bugs_exposed_correctness = wrapper.vm.get_bugs_exposed_correctness;
         mutation_suite_correctness = wrapper.vm.mutation_suite_correctness;
     });
 

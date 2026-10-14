@@ -54,12 +54,12 @@ export default class MutationSuiteResults extends Vue {
   @Prop({required: true, type: String})
   fdbk_category!: string;
 
-  setup_return_code_correctness(suite_result: MutationTestSuiteResultFeedback) {
-    return setup_return_code_correctness(suite_result.setup_return_code,
-                                         suite_result.setup_timed_out);
-  }
+  // setup_return_code_correctness(suite_result: MutationTestSuiteResultFeedback) {
+  //   return setup_return_code_correctness(suite_result.setup_return_code,
+  //                                        suite_result.setup_timed_out);
+  // }
 
-  student_tests_correctness(suite_result: MutationTestSuiteResultFeedback) {
+  get_student_tests_validity_correctness(suite_result: MutationTestSuiteResultFeedback) {
     if (suite_result.invalid_tests === null) {
       return suite_result.discarded_tests.length === 0
             ? CorrectnessLevel.not_available : CorrectnessLevel.some_correct;
@@ -76,7 +76,7 @@ export default class MutationSuiteResults extends Vue {
     return CorrectnessLevel.some_correct;
   }
 
-  bugs_exposed_correctness(suite_result: MutationTestSuiteResultFeedback) {
+  get_bugs_exposed_correctness(suite_result: MutationTestSuiteResultFeedback) {
     if (suite_result.num_bugs_exposed === null) {
       return CorrectnessLevel.not_available;
     }
@@ -101,16 +101,20 @@ export default class MutationSuiteResults extends Vue {
   }
 
   mutation_suite_correctness(suite_result: MutationTestSuiteResultFeedback) {
-    let return_code_correctness = this.setup_return_code_correctness(suite_result);
-    let points_correctness = this.bugs_exposed_correctness(suite_result);
-    let student_tests_correctness = this.student_tests_correctness(suite_result);
+    let return_code_correctness = setup_return_code_correctness(
+      suite_result.setup_return_code,
+      suite_result.setup_timed_out
+    );
+    let points_correctness = this.get_bugs_exposed_correctness(suite_result);
+    let student_tests_validity_correctness
+      = this.get_student_tests_validity_correctness(suite_result);
 
     // received no points
     if (points_correctness === CorrectnessLevel.none_correct) {
       return CorrectnessLevel.none_correct;
     }
 
-    let correctnesses = [return_code_correctness, points_correctness, student_tests_correctness];
+    let correctnesses = [return_code_correctness, points_correctness, student_tests_validity_correctness];
     correctnesses = correctnesses.filter(val => val !== CorrectnessLevel.not_available);
 
     if (correctnesses.length === 0) {  // All 3 were not_available
