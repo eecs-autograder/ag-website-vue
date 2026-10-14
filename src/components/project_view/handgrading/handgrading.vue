@@ -509,7 +509,7 @@ export default class Handgrading extends Vue implements AppliedAnnotationObserve
   delete_comment(comment: Comment | HandgradingComment) {
     if (this.saving) {
       // istanbul ignore next
-      return;
+      return Promise.resolve();
     }
 
     return this.d_saving.process(() => {
