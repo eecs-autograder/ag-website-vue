@@ -180,8 +180,9 @@ export default class BuildImageTaskDetail extends Vue {
     });
   }
 
-  @handle_global_errors_async
-  load_output() {
+  // Note: This function never awaits on any promises, so it
+  // doesn't need a global error handler decorator.
+  load_output(): void {
     if (this.build_task.status === BuildImageStatus.queued) {
       // Output file might not exist yet.
       return;
