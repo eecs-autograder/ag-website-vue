@@ -5,9 +5,9 @@ export class Poller {
     private delay_seconds: number;
 
     get continue() {
-        return this._continue;
+        return this.continue_;
     }
-    private _continue: boolean = false;
+    private continue_: boolean = false;
 
     constructor(poll_fn: () => Promise<void>, delay_seconds: number) {
         this.poll_fn = poll_fn;
@@ -15,20 +15,20 @@ export class Poller {
     }
 
     async start_after_delay() {
-        if (this._continue) {
+        if (this.continue_) {
             // istanbul ignore next
             throw new Error('This poller has already been started');
         }
 
-        this._continue = true;
+        this.continue_ = true;
         await sleep(this.delay_seconds);
-        while (this._continue) {
+        while (this.continue_) {
             await this.poll_fn();
             await sleep(this.delay_seconds);
         }
     }
 
     stop() {
-        this._continue = false;
+        this.continue_ = false;
     }
 }

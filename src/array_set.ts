@@ -40,11 +40,11 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
 
     // A "less than" comparator function used to define the ordering
     // of items in data. This defaults to a comparison using the "<" operator.
-    private readonly _less_func: LessFuncType<SentinalType>;
+    private readonly less_func_: LessFuncType<SentinalType>;
 
     // A comparison function suitable for Array.prototype.sort(), defined in the
     // ArraySet constructor using this._less_func().
-    private readonly _compare_func: (first: SentinalType, second: SentinalType) => -1 | 0 | 1;
+    private readonly compare_func_: (first: SentinalType, second: SentinalType) => -1 | 0 | 1;
 
     // this.data is initialized to the same array referenced by data.
     // If sort_initial is true, this.data will be sorted according to less_func
@@ -54,21 +54,21 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
                     sort_initial?: boolean
                 } = {}) {
         this.data = data;
-        this._less_func = less_func;
+        this.less_func_ = less_func;
 
         // We define this._compare_func here to more easily avoid "this" binding issues later.
-        this._compare_func = (first, second) => {
-            if (this._less_func(first, second)) {
+        this.compare_func_ = (first, second) => {
+            if (this.less_func_(first, second)) {
                 return -1;
             }
-            if (this._less_func(second, first)) {
+            if (this.less_func_(second, first)) {
                 return 1;
             }
             return 0;
         };
 
         if (sort_initial) {
-            this._mutable_data.sort(this._compare_func);
+            this.mutable_data_.sort(this.compare_func_);
         }
     }
 
@@ -89,19 +89,19 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
 
         // Find the first element that's greater than to_insert.
         // -1 indicates there's no element that's greater than to_insert.
-        let insert_before = this.data.findIndex((element) => this._less_func(to_insert, element));
+        let insert_before = this.data.findIndex((element) => this.less_func_(to_insert, element));
         if (insert_before === -1) {
-            this._mutable_data.push(to_insert);
+            this.mutable_data_.push(to_insert);
         }
         else {
-            this._mutable_data.splice(insert_before, 0, to_insert);
+            this.mutable_data_.splice(insert_before, 0, to_insert);
         }
 
         return true;
     }
 
     has(item: SentinalType): boolean {
-        return this._index_of(item, false) !== -1;
+        return this.index_of_(item, false) !== -1;
     }
 
     // Returns the element in the ArraySet identified by sentinal.
@@ -110,7 +110,7 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
     get(sentinal: SentinalType, throw_if_not_found?: true): ElementType;
     get(sentinal: SentinalType, throw_if_not_found?: false): ElementType | null;
     get(sentinal: SentinalType, throw_if_not_found: boolean = true): ElementType | null {
-        let index = this._index_of(sentinal, throw_if_not_found);
+        let index = this.index_of_(sentinal, throw_if_not_found);
         if (index === -1) {
             return null;
         }
@@ -121,26 +121,26 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
     // If the element is not found, ArraySetElementNotFoundError is thrown if
     // throw_if_not_found is true, otherwise returns false.
     remove(sentinal: SentinalType, throw_if_not_found: boolean = true): boolean {
-        let index = this._index_of(sentinal, throw_if_not_found);
+        let index = this.index_of_(sentinal, throw_if_not_found);
         if (index === -1) {
             return false;
         }
-        this._mutable_data.splice(index, 1);
+        this.mutable_data_.splice(index, 1);
         return true;
     }
 
     // Returns the index of the element in ArraySet identified by sentinal.
     // Returns -1 if the element is not found.
-    private _index_of(sentinal: SentinalType, throw_if_not_found: boolean): number {
-        let index = this.data.findIndex((elt) => this._items_equal(elt, sentinal));
+    private index_of_(sentinal: SentinalType, throw_if_not_found: boolean): number {
+        let index = this.data.findIndex((elt) => this.items_equal_(elt, sentinal));
         if (index === -1 && throw_if_not_found) {
             throw new ArraySetElementNotFoundError(`Element ${sentinal} not found`);
         }
         return index;
     }
 
-    private _items_equal(first: SentinalType, second: SentinalType): boolean {
-        return this._compare_func(first, second) === 0;
+    private items_equal_(first: SentinalType, second: SentinalType): boolean {
+        return this.compare_func_(first, second) === 0;
     }
 
     // FOR INTERNAL USE ONLY
@@ -150,21 +150,12 @@ export class ArraySet<ElementType extends SentinalType, SentinalType = ElementTy
     // Note that "reversing" this approach (making this.data private and exposing a
     // property that returns this.data as a ReadonlArray) doesn't work with Vue's
     // reactivity.
-    private get _mutable_data() {
+    private get mutable_data_() {
         return <ElementType[]> this.data;
     }
 }
 
-export class ArraySetElementNotFoundError extends Error {
-    // See https://github.com/Microsoft/TypeScript/issues/13965
-    __proto__: Error; // tslint:disable-line
-
-    constructor(msg?: string) {
-        const actual_proto = new.target.prototype;
-        super(msg);
-        this.__proto__ = actual_proto;
-    }
-}
+export class ArraySetElementNotFoundError extends Error {}
 
 // Some sentinal types and comparators
 
