@@ -855,6 +855,61 @@ describe('Submitted file validation tests', () => {
     });
 });
 
+describe('Confirm submit modal accessibility tests', () => {
+    beforeEach(() => {
+        project.expected_student_files = [
+            data_ut.make_expected_student_file(project.pk, 'required'),
+        ];
+
+        // jsdom performs no layout, so focus-trap would consider every element
+        // hidden and refuse to focus the heading.
+        vi.spyOn(Element.prototype, 'getClientRects').mockReturnValue(
+            [{width: 10, height: 10}] as unknown as DOMRectList
+        );
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    async function open_modal(files: File[]) {
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            },
+            attachTo: document.body,
+        });
+        wrapper.findComponent({ref: 'submit_file_upload'}).vm.$emit('upload_files', files);
+        await wrapper.vm.$nextTick();
+        // focus-trap applies initial focus in a setTimeout.
+        vi.advanceTimersByTime(1);
+        return wrapper;
+    }
+
+    function expect_dialog_focuses_heading(wrapper: Wrapper<Submit>) {
+        const dialog = wrapper.get('[role=dialog]').element;
+        expect(dialog).toHaveAccessibleName();
+
+        const heading = document.getElementById(dialog.getAttribute('aria-labelledby')!);
+        expect(heading?.tagName).toMatch(/^H[1-6]$/);
+        expect(heading).toHaveFocus();
+    }
+
+    test('Mismatched files: heading focused, dialog has a description', async () => {
+        const wrapper = await open_modal([new File(['spam'], 'unexpected')]);
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).toHaveAccessibleDescription();
+    });
+
+    test('No mismatched files: heading focused, no description', async () => {
+        const wrapper = await open_modal([new File(['spam'], 'required')]);
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).not.toHaveAccessibleDescription();
+    });
+});
+
 describe('Submit tests', () => {
     let submit_stub: sinon.SinonStub;
 
