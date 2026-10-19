@@ -7,7 +7,12 @@ import APIErrors from "@/components/api_errors.vue";
 import AnnotationForm from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 import SingleAnnotation from "@/components/project_admin/handgrading_settings/single_annotation.vue";
 
-import { wait_until } from "@/tests/utils";
+import { managed_mount } from "@/tests/setup";
+import {
+    expect_dialog_focuses_heading,
+    stub_layout_for_focus_trap,
+    wait_until,
+} from "@/tests/utils";
 
 let annotation: Annotation;
 
@@ -161,6 +166,17 @@ describe('Delete annotation tests', () => {
         await wrapper.vm.$nextTick();
         expect(delete_stub.calledOnce).toEqual(true);
         expect(wrapper.findComponent({ref: 'delete_annotation_modal'}).exists()).toBe(false);
+    });
+
+    test('Delete dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(SingleAnnotation, {
+            propsData: {annotation: annotation},
+            attachTo: document.body,
+        });
+        await attached.find('.delete-icon').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(annotation.short_description));
     });
 
     test('Cancel delete', async () => {

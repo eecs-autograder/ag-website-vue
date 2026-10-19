@@ -66,9 +66,11 @@
            size="large"
            :include_closing_x="true"
            click_outside_to_close
-           aria_label="Delete expected student file modal">
-      <div class="modal-header">Confirm Delete</div>
-      <div> Are you sure you want to delete
+           :aria_labelledby="`delete-expected-file-modal-title-${component_uuid}`"
+           :aria_describedby="`delete-expected-file-modal-description-${component_uuid}`"
+           :initial_focus="`#delete-expected-file-modal-title-${component_uuid}`">
+      <h2 :id="`delete-expected-file-modal-title-${component_uuid}`" class="modal-header" tabindex="-1">Confirm Delete</h2>
+      <div :id="`delete-expected-file-modal-description-${component_uuid}`"> Are you sure you want to delete
         <b class="file-to-delete">{{expected_student_file.pattern}}</b>? <br><br>
         This action cannot be undone. <br>
         Any test cases that rely on this file may have

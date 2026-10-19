@@ -28,6 +28,7 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked, do_input_blank_or_not_integer_test, do_invalid_text_input_test,
+    expect_dialog_focuses_heading,
     expect_html_element_has_value,
     expect_select_object_has_value,
     find_by_name,
@@ -36,6 +37,7 @@ import {
     set_props,
     set_select_object_value,
     set_validated_input_text,
+    stub_layout_for_focus_trap,
     validated_input_is_valid,
     wait_until,
 } from '@/tests/utils';
@@ -1272,6 +1274,26 @@ describe('AGTestCommandSettings tests', () => {
 
         expect(wrapper.find('.sticky-save-button .fa-exclamation-triangle').exists()).toBe(true);
         expect(wrapper.find('.sticky-save-button .fa-save').exists()).toBe(false);
+    });
+
+    test('Delete command dialog focuses its heading', async () => {
+        vi.useFakeTimers();
+        stub_layout_for_focus_trap();
+        let two_cmd_test = data_ut.make_ag_test_case(ag_test_suite.pk);
+        two_cmd_test.ag_test_commands = [
+            ag_test_command, data_ut.make_ag_test_command(two_cmd_test.pk)];
+        const attached = managed_mount(AGTestCommandSettings, {
+            propsData: {
+                ag_test_case: two_cmd_test,
+                ag_test_command: ag_test_command,
+                project: project,
+            },
+            attachTo: document.body,
+        });
+
+        await attached.find('.delete-ag-test-command-button').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(ag_test_command.name));
     });
 
     test('Delete command', async () => {

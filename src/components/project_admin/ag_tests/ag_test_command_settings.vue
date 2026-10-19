@@ -824,20 +824,22 @@
               @close="d_show_delete_ag_test_command_modal = false"
               ref="delete_ag_test_command_modal"
               size="large"
-              aria_label="Confirm delete"
-              click_outside_to_close>
-        <div class="modal-header">
-          Confirm Delete
-        </div>
+              click_outside_to_close
+              aria_labelledby="delete-ag-test-command-modal-title"
+              aria_describedby="delete-ag-test-command-modal-description"
+              initial_focus="#delete-ag-test-command-modal-title">
+        <h2 id="delete-ag-test-command-modal-title" class="modal-header" tabindex="-1">Confirm Delete</h2>
 
         <div class="modal-body">
-          Are you sure you want to delete the
-          {{case_has_exactly_one_command ? 'test case' : 'command'}}:
-          <span class="item-to-delete">
-            "{{case_has_exactly_one_command ? ag_test_case.name : d_ag_test_command.name}}"
-          </span>? <br><br>
-          This will delete all associated run results. <br>
-          THIS ACTION CANNOT BE UNDONE.
+          <div id="delete-ag-test-command-modal-description">
+            Are you sure you want to delete the
+            {{case_has_exactly_one_command ? 'test case' : 'command'}}:
+            <span class="item-to-delete">
+              "{{case_has_exactly_one_command ? ag_test_case.name : d_ag_test_command.name}}"
+            </span>? <br><br>
+            This will delete all associated run results. <br>
+            THIS ACTION CANNOT BE UNDONE.
+          </div>
 
           <APIErrors ref="delete_errors"></APIErrors>
           <div class="modal-button-footer">

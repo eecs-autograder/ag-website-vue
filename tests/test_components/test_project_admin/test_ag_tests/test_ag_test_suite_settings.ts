@@ -12,11 +12,13 @@ import SuiteSettings from '@/components/project_admin/suite_settings.vue';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    expect_dialog_focuses_heading,
     find_by_name,
     get_validated_input_text,
     set_data,
     set_props,
     set_validated_input_text,
+    stub_layout_for_focus_trap,
     validated_input_is_valid,
     wait_for_load,
     wait_until,
@@ -199,6 +201,19 @@ describe('AGTestSuiteSettings tests', () => {
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.state.api_errors.length).toBe(1);
+    });
+
+    test('Delete suite dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(AGTestSuiteSettings, {
+            propsData: {ag_test_suite: ag_test_suite, project: project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(attached)).toBe(true);
+
+        await attached.get('.delete-ag-test-suite-button').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(ag_test_suite.name));
     });
 
     test('Delete a Suite', async () => {

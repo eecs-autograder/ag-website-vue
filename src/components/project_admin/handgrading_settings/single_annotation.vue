@@ -47,14 +47,18 @@
     </annotation-form>
 
     <modal ref="delete_annotation_modal" size="large" click_outside_to_close
-           aria_label="Confirm delete annotation"
            v-if="d_delete_modal_is_open"
-           @close="d_delete_modal_is_open = false">
-      <div class="modal-header">Confirm Delete</div>
-      Are you sure you want to delete the annotation
-      "<b>{{this.d_annotation.short_description}}</b>"? <br><br>
-      This will delete all associated results. <br>
-      <b>THIS ACTION CANNOT BE UNDONE.</b>
+           @close="d_delete_modal_is_open = false"
+           :aria_labelledby="`delete-annotation-modal-title-${modal_uid}`"
+           :aria_describedby="`delete-annotation-modal-description-${modal_uid}`"
+           :initial_focus="`#delete-annotation-modal-title-${modal_uid}`">
+      <h2 :id="`delete-annotation-modal-title-${modal_uid}`" class="modal-header" tabindex="-1">Confirm Delete</h2>
+      <div :id="`delete-annotation-modal-description-${modal_uid}`">
+        Are you sure you want to delete the annotation
+        "<b>{{this.d_annotation.short_description}}</b>"? <br><br>
+        This will delete all associated results. <br>
+        <b>THIS ACTION CANNOT BE UNDONE.</b>
+      </div>
 
       <APIErrors ref="delete_annotation_errors"></APIErrors>
       <div class="modal-button-footer button-footer-right">
@@ -79,7 +83,7 @@ import Modal from "@/components/modal.vue";
 import MoveButtons from "@/components/MoveButtons.vue";
 import AnnotationForm, { AnnotationFormData } from "@/components/project_admin/handgrading_settings/annotation_form.vue";
 import { handle_api_errors_async } from '@/error_handling';
-import { deep_copy, format_datetime, safe_assign } from "@/utils";
+import { deep_copy, format_datetime, generate_uid, safe_assign } from "@/utils";
 
 @Component({
   components: {
@@ -117,6 +121,7 @@ export default class SingleAnnotation extends Vue {
   d_annotation_form_is_valid = false;
 
   readonly format_datetime = format_datetime;
+  readonly modal_uid = generate_uid();
 
   created() {
     this.d_annotation = deep_copy(this.annotation, Annotation);

@@ -123,6 +123,25 @@ describe('Modal.vue', () => {
         expect(modal_container.attributes('aria-label')).toBe('Clone course');
     });
 
+    test('Modal container is labelled and described by elements in its content', () => {
+        const wrapper = mount(Modal, {
+            propsData: {
+                aria_labelledby: "modal-title",
+                aria_describedby: "modal-description",
+            },
+            slots: {
+                default: `<h2 id="modal-title">Submit</h2>
+                          <p id="modal-description">Some files are missing.</p>`
+            },
+        });
+
+        const modal_container = wrapper.find('.modal-container');
+        const title_id = modal_container.attributes('aria-labelledby');
+        const description_id = modal_container.attributes('aria-describedby');
+        expect(wrapper.find(`#${title_id}`).text()).toBe('Submit');
+        expect(wrapper.find(`#${description_id}`).text()).toBe('Some files are missing.');
+    });
+
     test('Modal emits "close" when clicking outside the modal and ' +
          'click_outside_to_close is true',
          async () => {
@@ -342,6 +361,23 @@ describe('Modal.vue focus management', () => {
         await wrapper.setData({show_modal: false});
         vi.runAllTimers();
         expect(document.activeElement).toBe(trigger);
+
+        wrapper.destroy();
+    });
+
+    test('Focus moves to the initial_focus element when the modal opens', async () => {
+        const wrapper = mount({
+            template: `<modal initial_focus="h2">
+                           <input type="text" data-testid="first_input" />
+                           <h2 tabindex="-1">Heading</h2>
+                       </modal>`,
+            components: {
+                'modal': Modal
+            },
+        }, {attachTo: document.body});
+        vi.runAllTimers();
+
+        expect(document.activeElement).toBe(wrapper.find('h2').element);
 
         wrapper.destroy();
     });

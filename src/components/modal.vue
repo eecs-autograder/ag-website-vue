@@ -17,6 +17,8 @@
         role="dialog"
         aria-modal="true"
         :aria-label="aria_label"
+        :aria-labelledby="aria_labelledby"
+        :aria-describedby="aria_describedby"
         tabindex="-1"
       >
         <slot></slot>
@@ -46,8 +48,18 @@ type PropTypes = {
   include_closing_x?: boolean;
   size?: string;
   custom_width?: string;
-  // TODO: Make this required when we think we labelled all of them
+  // It is required to define exactly one of aria_label and aria_labelledby.
+  // When we migrate to vue 3.3+, we can enforce this with a union type.
   aria_label?: string;
+  aria_labelledby?: string;
+  aria_describedby?: string;
+  /**
+   * CSS selector, resolved within the modal, for the element to focus when
+   * the modal opens. Defaults to the first tabbable element. The target must
+   * be focusable (e.g., a heading needs `tabindex="-1"`); otherwise focus
+   * falls back to the default.
+   */
+  initial_focus?: string;
 };
 
 const props = withDefaults(defineProps<PropTypes>(), {
@@ -69,7 +81,22 @@ function get_container() {
   return element;
 }
 
+function get_initial_focus() {
+  if (props.initial_focus === undefined) {
+    return undefined;
+  }
+  const element = get_container().querySelector<HTMLElement>(
+    props.initial_focus,
+  );
+  assert_not_null(
+    element,
+    `initial_focus "${props.initial_focus}" matched no element`,
+  );
+  return element;
+}
+
 use_focus_trap(container, {
+  initialFocus: get_initial_focus,
   // If no focusable elements in the modal, focus the modal itself.
   fallbackFocus: get_container,
 

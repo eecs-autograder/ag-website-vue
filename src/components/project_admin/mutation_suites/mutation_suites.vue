@@ -216,11 +216,13 @@
             @close="d_show_delete_mutation_test_suite_modal = false"
             ref="delete_mutation_test_suite_modal"
             size="large"
-            aria_label="Confirm delete suite"
-            click_outside_to_close>
-      <div class="modal-header"> Confirm Delete </div>
+            click_outside_to_close
+            aria_labelledby="delete-mutation-suite-modal-title"
+            aria_describedby="delete-mutation-suite-modal-description"
+            initial_focus="#delete-mutation-suite-modal-title">
+      <h2 id="delete-mutation-suite-modal-title" class="modal-header" tabindex="-1">Confirm Delete</h2>
       <div class="modal-body" v-if="d_active_mutation_test_suite !== null">
-        <div class="modal-message">
+        <div id="delete-mutation-suite-modal-description" class="modal-message">
           Are you sure you want to delete the suite:
           <span class="item-to-delete">{{d_active_mutation_test_suite.name}}</span>? <br><br>
           This will delete all associated test cases and run results. <br>

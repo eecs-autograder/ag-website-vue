@@ -21,10 +21,12 @@ import { deep_copy } from '@/utils';
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
+    expect_dialog_focuses_heading,
     find_by_name,
     find_collapsible_section_header,
     get_validated_input_text,
     set_validated_input_text,
+    stub_layout_for_focus_trap,
     validated_input_is_valid,
     wait_for_load,
     wait_until,
@@ -340,6 +342,21 @@ describe('MutationSuites tests', () => {
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'save_errors'}).vm;
         expect(api_errors.state.api_errors.length).toBe(1);
         expect(save_stub.callCount).toEqual(1);
+    });
+
+    test('Delete suite dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(MutationSuites, {
+            propsData: {project: project},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(attached)).toBe(true);
+
+        await attached.findAll('.mutation-test-suite-panel').at(1).find('.panel-toggle')
+            .trigger('click');
+        await attached.find('.delete-mutation-test-suite-button').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(mutation_test_suite_2.name));
     });
 
     test('delete_mutation_test_suite - confirm deletion', async () => {

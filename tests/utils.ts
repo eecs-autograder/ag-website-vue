@@ -6,6 +6,7 @@ import APIErrors from "@/components/api_errors.vue";
 import ValidatedInput from "@/components/validated_input.vue";
 import ValidatedIntInput from "@/components/validated_input/ValidatedIntInput.vue";
 import { assert_not_null } from '@/utils';
+import { vi } from 'vitest';
 
 export { sleep } from '@/utils';
 
@@ -254,4 +255,32 @@ export function expect_not_has_class(wrapper: Wrapper<Vue>, class_: string) {
 
 export function find_collapsible_section_header(wrapper: Wrapper<Vue>): Wrapper<Vue> {
     return wrapper.find('[data-testid=collapsible-section-header]');
+}
+
+/**
+ * jsdom performs no layout, so focus-trap considers every element hidden and
+ * won't move focus into a modal. Call this before opening a modal in a test
+ * that checks where focus lands, and mount with `attachTo: document.body`.
+ */
+export function stub_layout_for_focus_trap() {
+    vi.spyOn(Element.prototype, 'getClientRects').mockReturnValue(
+        [{width: 10, height: 10}] as unknown as DOMRectList
+    );
+}
+
+/**
+ * Asserts that the open dialog in `wrapper` has an accessible name, that the
+ * name comes from a heading, and that the heading has focus. Requires fake
+ * timers and the setup described in stub_layout_for_focus_trap().
+ */
+export function expect_dialog_focuses_heading(wrapper: Wrapper<Vue>) {
+    // focus-trap applies initial focus in a setTimeout.
+    vi.advanceTimersByTime(1);
+
+    const dialog = wrapper.get('[role=dialog]').element;
+    expect(dialog).toHaveAccessibleName();
+
+    const heading = document.getElementById(dialog.getAttribute('aria-labelledby')!);
+    expect(heading?.tagName).toMatch(/^H[1-6]$/);
+    expect(heading).toHaveFocus();
 }

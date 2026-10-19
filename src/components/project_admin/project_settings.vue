@@ -508,15 +508,22 @@
         size="large"
         :click_outside_to_close="!state.deleting"
         :show_closing_x="!state.deleting"
+        aria_labelledby="delete-project-modal-title"
+        aria_describedby="delete-project-modal-description"
+        initial_focus="#delete-project-modal-title"
       >
-        <div class="modal-header">Confirm Delete</div>
+        <h2 id="delete-project-modal-title" class="modal-header" tabindex="-1">
+          Confirm Delete
+        </h2>
         <div class="modal-body">
-          Are you sure you want to delete the project
-          <span class="item-to-delete">{{ state.project.name }}</span
-          >? <br /><br />
-          This will delete all associated submissions and handgrading
-          results.<br />
-          <b>THIS ACTION CANNOT BE UNDONE.</b>
+          <div id="delete-project-modal-description">
+            Are you sure you want to delete the project
+            <span class="item-to-delete">{{ state.project.name }}</span
+            >? <br /><br />
+            This will delete all associated submissions and handgrading
+            results.<br />
+            <b>THIS ACTION CANNOT BE UNDONE.</b>
+          </div>
           <APIErrors ref="delete_errors"></APIErrors>
           <div class="modal-button-footer">
             <button

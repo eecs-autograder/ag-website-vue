@@ -15,7 +15,11 @@ import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { wait_until } from '@/tests/utils';
+import {
+    expect_dialog_focuses_heading,
+    stub_layout_for_focus_trap,
+    wait_until,
+} from '@/tests/utils';
 
 describe('InvitationReceived tests', () => {
     let wrapper: Wrapper<InvitationReceived>;
@@ -42,6 +46,23 @@ describe('InvitationReceived tests', () => {
                 project: project
             }
         });
+    });
+
+    test('Accept and reject dialogs focus their headings', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(InvitationReceived, {
+            propsData: {value: invitation, project: project},
+            attachTo: document.body,
+        });
+
+        await attached.find('[data-testid=accept_invitation_button]').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(invitation.sender_username));
+        await attached.find('[data-testid=cancel_accept_button]').trigger('click');
+
+        await attached.find('[data-testid=reject_invitation_button]').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(invitation.sender_username));
     });
 
     test('reject an invitation - cancel action in modal', async () => {

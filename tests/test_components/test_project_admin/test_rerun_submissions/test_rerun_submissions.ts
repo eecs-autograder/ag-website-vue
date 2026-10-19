@@ -11,7 +11,9 @@ import { managed_mount } from '@/tests/setup';
 import {
     checkbox_is_checked,
     compress_whitespace,
+    expect_dialog_focuses_heading,
     find_component,
+    stub_layout_for_focus_trap,
     wait_for_load,
     wait_until,
 } from '@/tests/utils';
@@ -72,14 +74,15 @@ beforeEach(() => {
     ).withArgs(project.pk).resolves(mutation_test_suites);
 });
 
-async function make_wrapper() {
+async function make_wrapper(attach_to?: HTMLElement) {
     let wrapper = managed_mount(RerunSubmissions, {
         propsData: {
             project: project,
         },
         stubs: {
             'submission-selector': true
-        }
+        },
+        attachTo: attach_to,
     });
     expect(await wait_for_load(wrapper)).toBe(true);
     return wrapper;
@@ -145,6 +148,17 @@ describe('Rerun list tests', () => {
         await wrapper.find('.cancel-button').trigger('click');
         await wrapper.vm.$nextTick();
         expect(wrapper.findComponent({ref: 'cancel_task_modal'}).exists()).toBe(true);
+    });
+
+    test('Stop rerun dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        let wrapper = await make_wrapper(document.body);
+        await wrapper.findComponent({ref: 'start_rerun_button'}).trigger('click');
+        expect(await wait_until(wrapper, w => !w.vm.d_starting_rerun));
+
+        await wrapper.find('.cancel-button').trigger('click');
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).not.toHaveAccessibleDescription();
     });
 
     test('Cancel rerun', async () => {

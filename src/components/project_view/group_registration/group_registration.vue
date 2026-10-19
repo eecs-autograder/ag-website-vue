@@ -74,8 +74,10 @@
            @close="d_show_confirm_working_alone_modal = false"
            ref="confirm_working_alone_modal"
            size="medium"
-           click_outside_to_close>
-      <div class="modal-header"> Confirm Working Alone </div>
+           click_outside_to_close
+           aria_labelledby="confirm-working-alone-modal-title"
+           initial_focus="#confirm-working-alone-modal-title">
+      <h2 id="confirm-working-alone-modal-title" class="modal-header" tabindex="-1">Confirm Working Alone</h2>
       <APIErrors ref="work_alone_api_errors"> </APIErrors>
       <div class="modal-button-footer">
         <button id="confirm-working-alone-button"
@@ -126,15 +128,20 @@
            @close="d_show_delete_invitation_modal = false"
            ref="delete_invitation_modal"
            size="large"
-           click_outside_to_close>
-      <div class="modal-header"> Delete Invitation </div>
-      Are you sure you want to <b>delete</b> your invitation to:
-      <ul v-if="invitation_sent !== null" class="list-of-usernames">
-        <li v-for="(username, index) of invitation_sent.recipient_usernames"
-            class="username">
-          {{username}}
-        </li>
-      </ul>
+           click_outside_to_close
+           aria_labelledby="delete-invitation-modal-title"
+           aria_describedby="delete-invitation-modal-description"
+           initial_focus="#delete-invitation-modal-title">
+      <h2 id="delete-invitation-modal-title" class="modal-header" tabindex="-1">Confirm Delete</h2>
+      <div id="delete-invitation-modal-description">
+        Are you sure you want to <b>delete</b> your invitation to:
+        <ul v-if="invitation_sent !== null" class="list-of-usernames">
+          <li v-for="(username, index) of invitation_sent.recipient_usernames"
+              class="username">
+            {{username}}
+          </li>
+        </ul>
+      </div>
       <APIErrors ref="delete_invitation_api_errors"> </APIErrors>
       <div class="modal-button-footer">
         <button id="confirm-delete-invitation-button"
