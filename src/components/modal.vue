@@ -48,7 +48,8 @@ type PropTypes = {
   include_closing_x?: boolean;
   size?: string;
   custom_width?: string;
-  // TODO: Make this required when we think we labelled all of them
+  // It is required to define exactly one of aria_label and aria_labelledby.
+  // When we migrate to vue 3.3+, we can enforce this with a union type.
   aria_label?: string;
   aria_labelledby?: string;
   aria_describedby?: string;
