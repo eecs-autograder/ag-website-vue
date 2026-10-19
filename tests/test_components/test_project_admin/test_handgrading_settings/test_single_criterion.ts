@@ -7,7 +7,12 @@ import APIErrors from "@/components/api_errors.vue";
 import CriterionForm from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import SingleCriterion from "@/components/project_admin/handgrading_settings/single_criterion.vue";
 
-import { wait_until } from "@/tests/utils";
+import { managed_mount } from "@/tests/setup";
+import {
+    expect_dialog_focuses_heading,
+    stub_layout_for_focus_trap,
+    wait_until,
+} from "@/tests/utils";
 
 let criterion: Criterion;
 
@@ -151,6 +156,17 @@ describe('Delete criterion tests', () => {
         await wrapper.vm.$nextTick();
         expect(delete_stub.calledOnce).toEqual(true);
         expect(wrapper.findComponent({ref: 'delete_criterion_modal'}).exists()).toBe(false);
+    });
+
+    test('Delete dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(SingleCriterion, {
+            propsData: {criterion: criterion},
+            attachTo: document.body,
+        });
+        await attached.find('.delete-icon').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(criterion.short_description));
     });
 
     test('Cancel delete', async () => {

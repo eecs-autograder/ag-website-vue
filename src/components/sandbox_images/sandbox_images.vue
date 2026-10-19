@@ -192,19 +192,22 @@
               ref="delete_image_modal"
               size="large"
               :click_outside_to_close="!d_deleting"
-              :show_closing_x="!d_deleting">
-        <div class="modal-header">
-          Confirm Delete
-        </div>
+              :show_closing_x="!d_deleting"
+              aria_labelledby="delete-image-modal-title"
+              aria_describedby="delete-image-modal-description"
+              initial_focus="#delete-image-modal-title">
+        <h2 id="delete-image-modal-title" class="modal-header" tabindex="-1">Confirm Delete</h2>
 
         <div class="modal-body">
-          Are you sure you want to delete the image
-          <span class="item-to-delete">
-            "{{selected_image.display_name}}"
-          </span> and its build history? <br><br>
-          Any test cases that rely on this image may have to be updated
-          before they'll run correctly again.<br>
-          THIS ACTION CANNOT BE UNDONE.
+          <div id="delete-image-modal-description">
+            Are you sure you want to delete the image
+            <span class="item-to-delete">
+              "{{selected_image.display_name}}"
+            </span> and its build history? <br><br>
+            Any test cases that rely on this image may have to be updated
+            before they'll run correctly again.<br>
+            THIS ACTION CANNOT BE UNDONE.
+          </div>
 
           <APIErrors ref="delete_errors"></APIErrors>
           <div class="modal-button-footer">

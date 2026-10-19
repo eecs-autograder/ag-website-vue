@@ -72,10 +72,12 @@
         @close="d_show_delete_modal = false"
         size="large"
         click_outside_to_close
-        aria_label="Delete file modal"
+        aria_labelledby="delete-instructor-files-modal-title"
+        aria_describedby="delete-instructor-files-modal-description"
+        initial_focus="#delete-instructor-files-modal-title"
       >
-        <div class="modal-header">Confirm Delete</div>
-        <div>
+        <h2 id="delete-instructor-files-modal-title" class="modal-header" tabindex="-1">Confirm Delete</h2>
+        <div id="delete-instructor-files-modal-description">
           Are you sure you want to delete the following file(s):
           <ul class="files-to-delete">
             <li v-for="file of d_to_be_deleted" :key="file.pk" class="filename">

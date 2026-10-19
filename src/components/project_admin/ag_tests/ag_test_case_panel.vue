@@ -174,16 +174,18 @@
            @close="d_show_delete_ag_test_case_modal = false"
            ref="delete_ag_test_case_modal"
            size="large"
-           aria_label="Delete test case"
-           click_outside_to_close>
-      <div class="modal-header">
-        Delete "{{ag_test_case.name}}"
-      </div>
+           click_outside_to_close
+           :aria_labelledby="`delete-ag-test-case-modal-title-${label_uid}`"
+           :aria_describedby="`delete-ag-test-case-modal-description-${label_uid}`"
+           :initial_focus="`#delete-ag-test-case-modal-title-${label_uid}`">
+      <h2 :id="`delete-ag-test-case-modal-title-${label_uid}`" class="modal-header" tabindex="-1">Confirm Delete</h2>
 
-      Are you sure you want to delete the test case:
-      <span class="item-to-delete">{{ag_test_case.name}}</span>? <br><br>
-      This will delete all associated run results. <br>
-      <b>THIS ACTION CANNOT BE UNDONE.</b>
+      <div :id="`delete-ag-test-case-modal-description-${label_uid}`">
+        Are you sure you want to delete the test case:
+        <span class="item-to-delete">{{ag_test_case.name}}</span>? <br><br>
+        This will delete all associated run results. <br>
+        <b>THIS ACTION CANNOT BE UNDONE.</b>
+      </div>
 
       <APIErrors ref="delete_errors"></APIErrors>
       <div class="modal-button-footer">

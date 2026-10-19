@@ -14,7 +14,14 @@ import { deep_copy } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { set_validated_input_text, validated_input_is_valid, wait_for_load, wait_until } from '@/tests/utils';
+import {
+    expect_dialog_focuses_heading,
+    set_validated_input_text,
+    stub_layout_for_focus_trap,
+    validated_input_is_valid,
+    wait_for_load,
+    wait_until,
+} from '@/tests/utils';
 
 beforeEach(() => {
     sinon.stub(ag_cli.BuildSandboxDockerImageTask.prototype, 'get_output').resolves(new Blob(['']));
@@ -405,6 +412,18 @@ describe('Edit and delete image tests', () => {
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.state.api_errors.length).toBe(1);
+    });
+
+    test('Delete image dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(SandboxImages, {attachTo: document.body});
+        expect(await wait_for_load(attached)).toBe(true);
+        attached.vm.select_image(images[0]);
+        await attached.vm.$nextTick();
+
+        await attached.find('[data-testid=show_delete_modal_button]').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(images[0].display_name));
     });
 
     test('Delete image', async () => {

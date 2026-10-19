@@ -7,7 +7,13 @@ import APIErrors from '@/components/api_errors.vue';
 import CourseSettings from '@/components/course_admin/course_settings.vue';
 
 import { make_course } from '@/tests/data_utils';
-import { api_error_count, wait_until } from '@/tests/utils';
+import { managed_mount } from '@/tests/setup';
+import {
+    api_error_count,
+    expect_dialog_focuses_heading,
+    stub_layout_for_focus_trap,
+    wait_until,
+} from '@/tests/utils';
 
 describe('Course settings', () => {
     let wrapper: Wrapper<CourseSettings>;
@@ -98,6 +104,18 @@ describe('Delete project tests', () => {
         expect(router_push_stub.calledOnce).toBe(true);
         let args = router_push_stub.firstCall.args[0];
         expect(args.name).toEqual('course_list');
+    });
+
+    test('Delete course dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(CourseSettings, {
+            propsData: {course: course},
+            mocks: {$router: {push: router_push_stub}},
+            attachTo: document.body,
+        });
+        await attached.find('[data-testid=show_delete_course_modal_button]').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(course.name));
     });
 
     test('Delete project API errors handled', async () => {

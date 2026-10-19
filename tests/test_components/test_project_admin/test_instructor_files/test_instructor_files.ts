@@ -9,7 +9,12 @@ import InstructorFiles from '@/components/project_admin/instructor_files/instruc
 import ViewFile from '@/components/view_file/view_file.vue';
 
 import * as data_ut from '@/tests/data_utils';
-import { new_wait_for_load, wait_until } from '@/tests/utils';
+import {
+    expect_dialog_focuses_heading,
+    new_wait_for_load,
+    stub_layout_for_focus_trap,
+    wait_until,
+} from '@/tests/utils';
 import SingleInstructorFile from '@/components/project_admin/instructor_files/single_instructor_file.vue';
 import { vi } from 'vitest';
 
@@ -222,6 +227,13 @@ describe('InstructorFiles.vue', () => {
         await vi.runAllTimersAsync();
 
         expect(view_file.vm.state.d_file_contents).toEqual(expected_content);
+    });
+
+    test('Delete dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        await wrapper.findAll('.delete-file').at(0).trigger('click');
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(instructor_file_1.name));
     });
 
     test('Delete single file', async () => {

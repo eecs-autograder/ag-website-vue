@@ -84,9 +84,18 @@
       data-testid="empty_file_found_in_upload_attempt_modal"
       size="large"
       :include_closing_x="false"
+      :aria_labelledby="`empty-files-modal-title-${uid}`"
+      :aria_describedby="`empty-files-modal-description-${uid}`"
+      :initial_focus="`#empty-files-modal-title-${uid}`"
     >
-      <div class="modal-header">Empty Files detected</div>
-      <div class="modal-body">
+      <h2
+        :id="`empty-files-modal-title-${uid}`"
+        class="modal-header"
+        tabindex="-1"
+      >
+        Empty Files Detected
+      </h2>
+      <div :id="`empty-files-modal-description-${uid}`" class="modal-body">
         <div class="empty-file-list-label">The following files are empty:</div>
         <ul class="list-of-empty-file-names">
           <li
@@ -128,7 +137,7 @@ import { computed, reactive, ref } from "vue";
 import { ArraySet } from "@/array_set";
 import Modal from "@/components/modal.vue";
 
-import { assert_not_null } from "../utils";
+import { assert_not_null, generate_uid } from "../utils";
 
 type HasName = { name: string };
 function name_less(first: HasName, second: HasName) {
@@ -149,6 +158,7 @@ const emit = defineEmits<{
 }>();
 
 const file_input = ref<HTMLInputElement>();
+const uid = generate_uid();
 
 const state = reactive({
   files: new ArraySet<File, HasName>([], { less_func: name_less }),

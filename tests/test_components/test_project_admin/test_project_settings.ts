@@ -16,9 +16,11 @@ import { managed_mount } from "@/tests/setup";
 import {
   api_error_count,
   checkbox_is_checked,
+  expect_dialog_focuses_heading,
   expect_html_element_has_value,
   get_validated_input_text,
   set_validated_input_text,
+  stub_layout_for_focus_trap,
   wait_until,
 } from "@/tests/utils";
 
@@ -685,6 +687,20 @@ describe("Delete project tests", () => {
     let args = router_push_stub.firstCall.args[0];
     expect(args.name).toEqual("course_admin");
     expect(args.params).toEqual({ course_id: project.course.toString() });
+  });
+
+  test("Delete project dialog focuses its heading", async () => {
+    stub_layout_for_focus_trap();
+    const attached = managed_mount(ProjectSettings, {
+      propsData: { project: project },
+      mocks: { $router: { push: router_push_stub } },
+      attachTo: document.body,
+    });
+    await attached
+      .find("[data-testid=show_delete_project_modal_button]")
+      .trigger("click");
+    expect_dialog_focuses_heading(attached);
+    expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(project.name));
   });
 
   test("Delete project API errors handled", async () => {

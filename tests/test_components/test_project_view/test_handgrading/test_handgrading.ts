@@ -15,8 +15,10 @@ import {
     checkbox_is_checked,
     compress_whitespace,
     emitted,
+    expect_dialog_focuses_heading,
     get_validated_input_text,
     set_validated_input_text,
+    stub_layout_for_focus_trap,
     wait_until,
 } from '@/tests/utils';
 import { vi } from 'vitest';
@@ -71,6 +73,21 @@ test('Result changed, new result deep copied', async () => {
 
     expect(wrapper.vm.d_handgrading_result).toEqual(new_result);
     expect(wrapper.vm.d_handgrading_result).not.toBe(new_result);
+});
+
+test('Reset handgrading dialog focuses its heading', async () => {
+    stub_layout_for_focus_trap();
+    let wrapper = managed_mount(Handgrading, {
+        propsData: {
+            handgrading_result: result,
+            readonly_handgrading_results: false,
+        },
+        attachTo: document.body,
+    });
+
+    await wrapper.find('[data-testid=show_reset_handgrading_modal_button]').trigger('click');
+    expect_dialog_focuses_heading(wrapper);
+    expect(wrapper.get('[role=dialog]').element).toHaveAccessibleDescription();
 });
 
 test('Reset handgrading result', async () => {

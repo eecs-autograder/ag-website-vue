@@ -7,7 +7,12 @@ import * as sinon from 'sinon';
 import FileUpload from '@/components/file_upload.vue';
 import { FileUploadExposed } from '@/exposed_component_types/file_upload_exposed';
 
-import { emitted } from '@/tests/utils';
+import { managed_mount } from '@/tests/setup';
+import {
+    emitted,
+    expect_dialog_focuses_heading,
+    stub_layout_for_focus_trap,
+} from '@/tests/utils';
 
 
 interface HTMLInputEvent extends Event {
@@ -371,4 +376,21 @@ describe("File Upload tests concerning the empty files modal", () => {
         ).toBe(false);
         expect(component.state.show_empty_files_found_in_upload_attempt_modal).toBe(false);
     });
+});
+
+test('Empty files dialog focuses its heading', async () => {
+    stub_layout_for_focus_trap();
+    const wrapper = managed_mount(FileUpload, {attachTo: document.body});
+    const empty_file = new File([''], 'empty.cpp');
+
+    let file_input = wrapper.find('.file-input');
+    Object.defineProperty(file_input.element, 'files', {
+        value: new MockFileList([empty_file]),
+        configurable: true
+    });
+    await file_input.trigger('change');
+    await wrapper.find('.upload-files-button').trigger('click');
+
+    expect_dialog_focuses_heading(wrapper);
+    expect(wrapper.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(empty_file.name));
 });

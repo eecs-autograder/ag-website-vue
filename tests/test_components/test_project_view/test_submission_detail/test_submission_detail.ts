@@ -7,7 +7,14 @@ import SubmissionDetail from '@/components/project_view/submission_detail/submis
 
 import * as data_ut from '@/tests/data_utils.ts';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, expect_html_element_has_value, find_by_name, wait_until } from '@/tests/utils';
+import {
+    compress_whitespace,
+    expect_dialog_focuses_heading,
+    expect_html_element_has_value,
+    find_by_name,
+    stub_layout_for_focus_trap,
+    wait_until,
+} from '@/tests/utils';
 import { vi } from 'vitest';
 
 let user: ag_cli.User;
@@ -18,14 +25,15 @@ let submission_with_results: ag_cli.SubmissionWithResults;
 let get_submission_result_stub: sinon.SinonStub;
 let save_as_stub: sinon.SinonStub;
 
-function make_wrapper(is_ultimate_submission: boolean = false) {
+function make_wrapper(is_ultimate_submission: boolean = false, attach_to?: HTMLElement) {
     let wrapper = managed_mount(SubmissionDetail, {
         propsData: {
             submission_with_results: submission_with_results,
             course: course,
             group: group,
             is_ultimate_submission: is_ultimate_submission
-        }
+        },
+        attachTo: attach_to,
     });
 
     return wrapper;
@@ -596,6 +604,16 @@ describe('Remove from queue tests', () => {
         expect(wrapper.find('#remove-submission-from-queue-button').exists()).toBe(false);
         wrapper.destroy();
     }
+
+    test('Remove from queue dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        submission_with_results.status = ag_cli.GradingStatus.queued;
+        let wrapper = make_wrapper(false, document.body);
+
+        await wrapper.find('#remove-submission-from-queue-button').trigger('click');
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).toHaveAccessibleDescription();
+    });
 
     test('Remove submission from queue - cancel action', async () => {
         submission_with_results.status = ag_cli.GradingStatus.queued;

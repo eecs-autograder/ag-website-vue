@@ -14,7 +14,17 @@ import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, emitted, find_by_name, find_component, set_data, wait_fixed, wait_until } from '@/tests/utils';
+import {
+    compress_whitespace,
+    emitted,
+    expect_dialog_focuses_heading,
+    find_by_name,
+    find_component,
+    set_data,
+    stub_layout_for_focus_trap,
+    wait_fixed,
+    wait_until,
+} from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -860,16 +870,7 @@ describe('Confirm submit modal accessibility tests', () => {
         project.expected_student_files = [
             data_ut.make_expected_student_file(project.pk, 'required'),
         ];
-
-        // jsdom performs no layout, so focus-trap would consider every element
-        // hidden and refuse to focus the heading.
-        vi.spyOn(Element.prototype, 'getClientRects').mockReturnValue(
-            [{width: 10, height: 10}] as unknown as DOMRectList
-        );
-    });
-
-    afterEach(() => {
-        vi.restoreAllMocks();
+        stub_layout_for_focus_trap();
     });
 
     async function open_modal(files: File[]) {
@@ -883,18 +884,7 @@ describe('Confirm submit modal accessibility tests', () => {
         });
         wrapper.findComponent({ref: 'submit_file_upload'}).vm.$emit('upload_files', files);
         await wrapper.vm.$nextTick();
-        // focus-trap applies initial focus in a setTimeout.
-        vi.advanceTimersByTime(1);
         return wrapper;
-    }
-
-    function expect_dialog_focuses_heading(wrapper: Wrapper<Submit>) {
-        const dialog = wrapper.get('[role=dialog]').element;
-        expect(dialog).toHaveAccessibleName();
-
-        const heading = document.getElementById(dialog.getAttribute('aria-labelledby')!);
-        expect(heading?.tagName).toMatch(/^H[1-6]$/);
-        expect(heading).toHaveFocus();
     }
 
     test('Mismatched files: heading focused, dialog has a description', async () => {

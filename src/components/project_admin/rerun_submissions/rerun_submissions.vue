@@ -163,13 +163,12 @@
     <modal v-if="d_show_cancel_modal"
            size="large"
            ref="cancel_task_modal"
-           aria_label="Stop rerun confirmation"
            @close="d_show_cancel_modal = false"
            :click_outside_to_close="!d_cancelling"
-           :include_closing_x="!d_cancelling">
-      <div class="modal-header">
-        Stop Rerun
-      </div>
+           :include_closing_x="!d_cancelling"
+           aria_labelledby="stop-rerun-modal-title"
+           initial_focus="#stop-rerun-modal-title">
+      <h2 id="stop-rerun-modal-title" class="modal-header" tabindex="-1">Confirm Stop Rerun</h2>
       <div class="modal-button-footer">
         <button type="button"
                 data-testid="stop_task_button"

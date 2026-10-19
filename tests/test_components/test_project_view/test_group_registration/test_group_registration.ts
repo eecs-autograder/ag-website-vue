@@ -14,7 +14,13 @@ import InvitationReceived from '@/components/project_view/group_registration/inv
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { wait_fixed, wait_for_load, wait_until } from '@/tests/utils';
+import {
+    expect_dialog_focuses_heading,
+    stub_layout_for_focus_trap,
+    wait_fixed,
+    wait_for_load,
+    wait_until,
+} from '@/tests/utils';
 
 describe('GroupRegistration tests', () => {
     let wrapper: Wrapper<GroupRegistration>;
@@ -320,6 +326,21 @@ describe('GroupRegistration tests', () => {
         expect(wrapper.vm.invitation_sent).toEqual(invitation_sent_2);
     });
 
+    test('Work alone dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
+        wrapper = managed_mount(GroupRegistration, {
+            propsData: {project: project, course: course},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        await wrapper.find('#work-alone-button').trigger('click');
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).not.toHaveAccessibleDescription();
+    });
+
     test('work alone - cancel action in modal', async () => {
         sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
         sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([]));
@@ -419,6 +440,29 @@ describe('GroupRegistration tests', () => {
 
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'work_alone_api_errors'}).vm;
         expect(api_errors.state.api_errors.length).toBe(1);
+    });
+
+    test('Delete invitation dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        let group_invitation_sent = data_ut.make_group_invitation(
+            project.pk,
+            "alexis@umich.edu",
+            ["sean@umich.edu", "milo@umich.edu"],
+            []
+        );
+        sinon.stub(user, 'group_invitations_received').returns(Promise.resolve([]));
+        sinon.stub(user, 'group_invitations_sent').returns(Promise.resolve([
+            group_invitation_sent
+        ]));
+        wrapper = managed_mount(GroupRegistration, {
+            propsData: {project: project, course: course},
+            attachTo: document.body,
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        await wrapper.find('#delete-invitation-button').trigger('click');
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(group_invitation_sent.recipient_usernames[0]));
     });
 
     test('delete invitation - cancel action in modal', async () => {

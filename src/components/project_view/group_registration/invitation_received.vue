@@ -32,15 +32,20 @@
            @close="d_show_confirm_accept_invitation_modal = false"
            ref="confirm_accept_modal"
            size="large"
-           click_outside_to_close>
-      <div class="modal-header"> Confirm Accept </div>
-      Are you sure you want to <b>accept</b> the invitation for a group with:
-      <ul class="list-of-usernames">
-        <li v-for="(username, index) of other_group_members"
-            class="username">
-          {{username}}
-        </li>
-      </ul>
+           click_outside_to_close
+           aria_labelledby="accept-invitation-modal-title"
+           aria_describedby="accept-invitation-modal-description"
+           initial_focus="#accept-invitation-modal-title">
+      <h2 id="accept-invitation-modal-title" class="modal-header" tabindex="-1">Confirm Accept</h2>
+      <div id="accept-invitation-modal-description">
+        Are you sure you want to <b>accept</b> the invitation for a group with:
+        <ul class="list-of-usernames">
+          <li v-for="(username, index) of other_group_members"
+              class="username">
+            {{username}}
+          </li>
+        </ul>
+      </div>
       <APIErrors ref="accept_invitation_api_errors"></APIErrors>
       <div class="modal-button-footer">
         <button data-testid="confirm_accept_button"
@@ -59,10 +64,13 @@
            @close="d_show_confirm_reject_invitation_modal = false"
            ref="confirm_reject_modal"
            size="large"
-           click_outside_to_close>
-      <div class="modal-header"> Confirm Reject </div>
+           click_outside_to_close
+           aria_labelledby="reject-invitation-modal-title"
+           aria_describedby="reject-invitation-modal-description"
+           initial_focus="#reject-invitation-modal-title">
+      <h2 id="reject-invitation-modal-title" class="modal-header" tabindex="-1">Confirm Reject</h2>
       <div class="modal-body">
-        <div class="modal-message">
+        <div id="reject-invitation-modal-description" class="modal-message">
           Are you sure you want to <b>reject</b> the invitation for a group with:
           <ul class="list-of-usernames">
             <li v-for="(username, index) of other_group_members"
