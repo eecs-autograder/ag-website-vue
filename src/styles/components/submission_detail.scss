@@ -1,26 +1,44 @@
 @import '@/styles/colors.scss';
 
-%column-padding {
-    padding: 7px 10px;
+.results-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    thead th {
+        padding: 7px 10px;
+        text-align: left;
+        font-weight: normal;
+    }
+
+    .hidden-header th {
+        padding: 0;
+    }
+
+    .name-column {
+        width: 60%;
+    }
+
+    .correctness-column, .points-column {
+        width: 20%;
+    }
 }
 
-.column-1 {
-    @extend %column-padding;
-    box-sizing: border-box;
-    width: 60%;
-    word-wrap: break-word;
-}
+// Command tables are nested inside a case's padded body, so these widths
+// push the command columns somewhat right of the case columns to keep the
+// two kinds of rows visually distinct. Narrower screens don't have room for
+// the score in a column this small.
+@media only screen and (min-width: 700px) {
+    .command-results-table {
+        .name-column {
+            width: 66%;
+        }
 
-.column-2 {
-    @extend %column-padding;
-    box-sizing: border-box;
-    width: 20%;
-}
-
-.column-3 {
-    @extend %column-padding;
-    box-sizing: border-box;
-    width: 20%;
+        .points-column {
+            width: 14%;
+        }
+    }
 }
 
 .suite-result {
