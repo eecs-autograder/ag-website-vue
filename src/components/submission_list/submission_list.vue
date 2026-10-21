@@ -25,7 +25,7 @@
           tabindex="0"
           aria-label="Toggle sidebar"
           aria-controls="my-submissions-sidebar-container"
-          :aria-expanded="!d_collapsed"
+          :aria-expanded="!d_collapsed ? 'true' : 'false'"
           @click="d_collapsed = !d_collapsed"
           @keydown.space.prevent="d_collapsed = !d_collapsed"
           @keydown.enter="d_collapsed = !d_collapsed"

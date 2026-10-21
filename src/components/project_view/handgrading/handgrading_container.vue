@@ -6,7 +6,7 @@
           <button
             class="unstyled-button sidebar-collapse-button"
             :aria-label="`${d_group_sidebar_collapsed ? 'Open' : 'Close'} handgrading sidebar`"
-            :aria-expanded="!d_group_sidebar_collapsed"
+            :aria-expanded="!d_group_sidebar_collapsed ? 'true' : 'false'"
             aria-controls="handgrading-sidebar-content"
             @click="d_group_sidebar_collapsed = !d_group_sidebar_collapsed"
           >

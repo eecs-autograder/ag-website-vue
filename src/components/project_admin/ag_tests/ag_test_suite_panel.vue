@@ -3,7 +3,7 @@
     <div class="panel level-0" :class="{'active': suite_is_active}">
       <button type="button"
               class="panel-toggle unstyled-button"
-              :aria-expanded="is_open"
+              :aria-expanded="is_open ? 'true' : 'false'"
               :aria-controls="`cases-container-${label_uid}`"
               @click="update_ag_test_suite_panel_when_clicked()">
         <div class="text">

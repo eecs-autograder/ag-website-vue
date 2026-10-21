@@ -10,7 +10,7 @@
          @keydown.space.prevent="toggle_d_is_open"
          @keydown.enter="toggle_d_is_open"
          :aria-controls="panel_body_uid"
-         :aria-expanded="d_is_open"
+         :aria-expanded="d_is_open ? 'true' : 'false'"
     >
 
       <template v-if="is_command">

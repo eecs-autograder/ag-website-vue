@@ -12,7 +12,7 @@
           <button type="button"
                   class="unstyled-button sidebar-collapse-button"
                   :aria-label="`${d_collapsed ? 'Open' : 'Close'} mutation test suites sidebar`"
-                  :aria-expanded="!d_collapsed"
+                  :aria-expanded="!d_collapsed ? 'true' : 'false'"
                   aria-controls="mutation-suite-sidebar-content"
                   @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars" aria-hidden="true"></i>
