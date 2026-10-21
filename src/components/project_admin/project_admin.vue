@@ -140,7 +140,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Vue } from 'vue-property-decorator';
+import { Component, Inject, Vue, Watch } from 'vue-property-decorator';
 
 import {
   ExpectedStudentFile,
@@ -163,10 +163,30 @@ import MutationSuites from '@/components/project_admin/mutation_suites/mutation_
 import ProjectSettings from '@/components/project_admin/project_settings.vue';
 import ProjectStats from '@/components/project_admin/project_stats/project_stats.vue';
 import RerunSubmissions from '@/components/project_admin/rerun_submissions/rerun_submissions.vue';
+import { use_title } from '@/composables/use_title';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Created, Destroyed, Mounted } from '@/lifecycle';
-import { assert_not_null, deep_copy, get_query_param, safe_assign } from "@/utils";
+import {
+  assert_not_null,
+  deep_copy,
+  format_course_name,
+  get_query_param,
+  safe_assign,
+} from "@/utils";
+
+const TAB_LABELS: {[tab: string]: string} = {
+  settings: 'Settings',
+  instructor_files: 'Instructor Files',
+  expected_student_files: 'Student Files',
+  test_cases: 'Test Cases',
+  mutation_testing: 'Mutation Testing',
+  edit_groups: 'Groups & Extensions',
+  download_grades: 'Grades & Files',
+  rerun_tests: 'Rerun',
+  handgrading: 'Handgrading',
+  stats: 'Stats (Beta)',
+};
 
 @Component({
   components: {
@@ -180,7 +200,10 @@ import { assert_not_null, deep_copy, get_query_param, safe_assign } from "@/util
     ProjectSettings,
     ProjectStats,
     RerunSubmissions,
-  }
+  },
+  setup() {
+    return { d_title: use_title('Autograder.io') };
+  },
 })
 export default class ProjectAdmin extends CurrentTabMixin implements ProjectObserver,
                                                           InstructorFileObserver,
@@ -194,6 +217,24 @@ export default class ProjectAdmin extends CurrentTabMixin implements ProjectObse
 
   d_loading = true;
   d_project: Project | null = null;
+
+  d_title!: string;
+
+  get page_title() {
+    let course = this.d_globals.current_course;
+    if (this.d_project === null || course === null) {
+      return 'Autograder.io';
+    }
+    let project_title
+      = `${this.d_project.name} Admin – ${format_course_name(course)} | Autograder.io`;
+    let tab_label = this.current_tab === null ? undefined : TAB_LABELS[this.current_tab];
+    return tab_label === undefined ? project_title : `${tab_label} – ${project_title}`;
+  }
+
+  @Watch('page_title')
+  on_page_title_change(new_value: string) {
+    this.d_title = new_value;
+  }
 
   @handle_global_errors_async
   async created() {
