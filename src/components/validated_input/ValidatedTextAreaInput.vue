@@ -9,7 +9,7 @@
           class="input"
           :id="label_id"
           :aria-required="aria_required"
-          :aria-invalid="!is_valid && !hide_errors"
+          :aria-invalid="!is_valid && !hide_errors ? 'true' : 'false'"
           :aria-describedby="errors_id"
           :rows="num_rows"
           :style="input_style"

@@ -14,7 +14,7 @@
       <button
         type="button"
         class="flat-white-button toggle-tests-button"
-        :aria-expanded="is_open"
+        :aria-expanded="is_open ? 'true' : 'false'"
         :aria-controls="`select-test-cases-${component_uid}`"
         @click="is_open = !is_open"
       >

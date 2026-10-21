@@ -8,7 +8,7 @@
         type="button"
         class="panel-toggle unstyled-button"
         :aria-controls="body_id"
-        :aria-expanded="state.is_open"
+        :aria-expanded="state.is_open ? 'true' : 'false'"
         @click="toggle_is_open"
       >
         <i

@@ -189,7 +189,7 @@
             <button class="show-output-button"
                     data-testid="show_test_names_output_button"
                     :aria-controls="`test-names-output-section-${component_uid}`"
-                    :aria-expanded="d_show_student_test_names_output"
+                    :aria-expanded="d_show_student_test_names_output ? 'true' : 'false'"
                     @click="toggle_d_show_student_test_names_output">
               {{d_show_student_test_names_output ? 'Hide' : 'Show'}} Output
             </button>
@@ -259,7 +259,7 @@
                     data-testid="show_validity_check_output_button"
                     @click="toggle_d_show_validity_check_output"
                     :aria-controls="`test-validity-output-section-${component_uid}`"
-                    :aria-expanded="d_show_validity_check_output">
+                    :aria-expanded="d_show_validity_check_output ? 'true' : 'false'">
               {{d_show_validity_check_output ? 'Hide' : 'Show'}} Output
             </button>
           </div>
@@ -357,7 +357,7 @@
                     data-testid="show_buggy_output_button"
                     @click="toggle_d_show_buggy_implementations_output"
                     :aria-controls="`buggy-impl-output-section-${component_uid}`"
-                    :aria-expanded="d_show_buggy_implementations_output">
+                    :aria-expanded="d_show_buggy_implementations_output ? 'true' : 'false'">
               {{d_show_buggy_implementations_output ? 'Hide' : 'Show'}} Output
             </button>
           </div>

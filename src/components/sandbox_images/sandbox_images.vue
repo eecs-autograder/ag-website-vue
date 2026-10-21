@@ -11,7 +11,7 @@
               role="button"
               aria-label="Toggle sidebar"
               aria-controls="sandbox-images-sidebar-content"
-              :aria-expanded="!d_sidebar_collapsed"
+              :aria-expanded="!d_sidebar_collapsed ? 'true' : 'false'"
               @click="d_sidebar_collapsed = !d_sidebar_collapsed"
               @keydown.enter="d_sidebar_collapsed = !d_sidebar_collapsed"
               @keydown.space="d_sidebar_collapsed = !d_sidebar_collapsed"

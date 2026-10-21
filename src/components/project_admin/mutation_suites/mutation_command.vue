@@ -30,7 +30,7 @@
 
       <button type="button"
               class="unstyled-button resource-limits-label"
-              :aria-expanded="d_is_open"
+              :aria-expanded="d_is_open ? 'true' : 'false'"
               :aria-controls="`resource-limits-${label_uid}`"
               @click="toggle_is_open">
         <i v-if="d_is_open" class="fas fa-caret-down caret-down" aria-hidden="true"></i>
