@@ -28,7 +28,7 @@
     <!-- Inner v-if so that the inner component doesn't send requests until
          the panel is open. -->
     <tr v-show="d_is_open" :id="panel_body_uid" ref="body">
-      <td colspan="3"
+      <td colspan="3" :headers="`${name} details`"
           :class="[`${panel_correctness}-panel-body`,
                    {'multiple-command-panel-body': is_multi_command_case}]">
         <div v-if="d_is_open">
