@@ -3,7 +3,7 @@
     <button
       type="button"
       class="show-all unstyled-button"
-      :aria-expanded="show"
+      :aria-expanded="show ? 'true' : 'false'"
       aria-controls="expected-files-to-submit-list"
       @click="show = !show"
     >

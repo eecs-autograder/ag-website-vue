@@ -5,7 +5,7 @@
       tabindex="0"
       @click="toggle_open"
       :aria-controls="`file-panel-${component_uid}`"
-      :aria-expanded="d_is_open"
+      :aria-expanded="d_is_open ? 'true' : 'false'"
     >
       <i class="fas" :class="d_is_open ? 'fa-chevron-down' : 'fa-chevron-right'"
          aria-hidden="true"></i>
