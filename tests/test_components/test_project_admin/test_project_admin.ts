@@ -404,3 +404,62 @@ test('Observer updates from other project ignored', async () => {
 
     expect(wrapper.vm.d_project).toEqual(project);
 });
+
+describe('Page title', () => {
+    let wrapper: Wrapper<ProjectAdmin>;
+    let project: Project;
+
+    beforeEach(() => {
+        project = data_ut.make_project(course.pk);
+        sinon.stub(Project, 'get_by_pk').withArgs(project.pk).resolves(project);
+    });
+
+    async function mount_project_admin(query = {}) {
+        wrapper = managed_shallow_mount(ProjectAdmin, {
+            mocks: {
+                $route: {
+                    params: {
+                        project_id: project.pk.toString()
+                    },
+                    query: query
+                },
+                $router: {
+                    replace: sinon.stub().resolves()
+                }
+            },
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+    }
+
+    function expect_title_matches_page(project_name = project.name) {
+        expect(document.title).toContain(project_name);
+        expect(document.title).toContain(course.name);
+        expect(document.title).toContain(wrapper.find('.nav-link.active').text());
+    }
+
+    test('Title includes project, course, and active tab label', async () => {
+        await mount_project_admin();
+        expect_title_matches_page();
+
+        await wrapper.findAll('.nav-link').at(3).trigger('click');
+        expect_title_matches_page();
+    });
+
+    test('Title reflects tab requested in query param', async () => {
+        await mount_project_admin({current_tab: 'handgrading'});
+        expect_title_matches_page();
+    });
+
+    test('Title updates when project is renamed', async () => {
+        await mount_project_admin();
+        let original_name = project.name;
+
+        let updated = new Project(project);
+        updated.name = 'Renamed';
+        Project.notify_project_changed(updated);
+        await wrapper.vm.$nextTick();
+
+        expect_title_matches_page('Renamed');
+        expect(document.title).not.toContain(original_name);
+    });
+});

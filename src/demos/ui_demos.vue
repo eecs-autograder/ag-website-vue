@@ -106,6 +106,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import Dropdown from '@/components/dropdown.vue';
 import Toggle from '@/components/toggle.vue';
 import ViewFile from '@/components/view_file/view_file.vue';
+import { use_title } from '@/composables/use_title';
 
 import ButtonDemo from './button_demo.vue';
 import ColorPaletteDemo from './color_palette_demo.vue';
@@ -145,7 +146,10 @@ import NewValidatedFormDemo from './new_validated_form_demo/NewValidatedFormDemo
     ViewFileDemo,
     NewValidatedInputDemo,
     NewValidatedFormDemo
-  }
+  },
+  setup() {
+    use_title('UI Demos | Autograder.io');
+  },
 })
 export default class UIDemos extends Vue {
   d_show_sidebar = false;

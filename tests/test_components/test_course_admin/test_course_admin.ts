@@ -294,3 +294,46 @@ test('Component observes course changes', async () => {
 
     expect(wrapper.vm.d_course).toEqual(updated_course);
 });
+
+describe('Page title', () => {
+    test('Title includes course name and active tab label', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {mocks: get_router_mocks()});
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(document.title).toContain(course.name);
+        expect(document.title).toContain(wrapper.find('.nav-link.active').text());
+
+        await wrapper.findAll('.nav-link').at(2).trigger('click');
+        expect(document.title).toContain(course.name);
+        expect(document.title).toContain(wrapper.find('.nav-link.active').text());
+
+        wrapper.find('.roster-tab-header').trigger('mouseenter');
+        await wrapper.vm.$nextTick();
+        let student_roster_item = wrapper.findAll('.dropdown .menu-item').at(2);
+        await student_roster_item.trigger('click');
+        expect(document.title).toContain(course.name);
+        expect(document.title).toContain(student_roster_item.text());
+    });
+
+    test('Title reflects tab requested in query param', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {
+            mocks: get_router_mocks({current_tab: 'sandbox_images'})
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(document.title).toContain(course.name);
+        expect(document.title).toContain(wrapper.find('.nav-link.active').text());
+    });
+
+    test('Title updates when course is renamed', async () => {
+        let wrapper = managed_shallow_mount(CourseAdmin, {mocks: get_router_mocks()});
+        expect(await wait_for_load(wrapper)).toBe(true);
+
+        let original_name = course.name;
+        let updated_course = deep_copy(course, Course);
+        updated_course.name = 'Renamed';
+        Course.notify_course_changed(updated_course);
+        await wrapper.vm.$nextTick();
+
+        expect(document.title).toContain('Renamed');
+        expect(document.title).not.toContain(original_name);
+    });
+});
