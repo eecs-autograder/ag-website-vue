@@ -21,26 +21,35 @@
       ref="student_description"
     ></description-renderer>
 
-    <div class="ag-test-case-results-header">
-      <div class="column-1"> Test Case </div>
-      <div class="column-2"> Passed </div>
-      <div class="column-3"> Score </div>
-    </div>
+    <table class="results-table">
+      <colgroup>
+        <col class="name-column">
+        <col class="correctness-column">
+        <col class="points-column">
+      </colgroup>
 
-    <result-panel
-      v-if="ag_test_suite_result.setup_name !== null"
-      ref="setup_result_panel"
-      :name="ag_test_suite_result.setup_name !== '' ? ag_test_suite_result.setup_name : 'Setup'"
-      :correctness_level="setup_correctness_level"
-      :open_initially="is_first_suite && setup_correctness_level === CorrectnessLevel.none_correct">
-      <AGTestSuiteSetupResultDetail
-        :submission="submission"
-        :ag_test_suite_result="ag_test_suite_result"
-        :fdbk_category="fdbk_category"/>
-    </result-panel>
+      <thead>
+        <tr>
+          <th scope="col"> Test Case </th>
+          <th scope="col"> Passed </th>
+          <th scope="col"> Score </th>
+        </tr>
+      </thead>
 
-    <template v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results">
       <result-panel
+        v-if="ag_test_suite_result.setup_name !== null"
+        ref="setup_result_panel"
+        :name="ag_test_suite_result.setup_name !== '' ? ag_test_suite_result.setup_name : 'Setup'"
+        :correctness_level="setup_correctness_level"
+        :open_initially="is_first_suite && setup_correctness_level === CorrectnessLevel.none_correct">
+        <AGTestSuiteSetupResultDetail
+          :submission="submission"
+          :ag_test_suite_result="ag_test_suite_result"
+          :fdbk_category="fdbk_category"/>
+      </result-panel>
+
+      <result-panel
+        v-for="ag_test_case_result of ag_test_suite_result.ag_test_case_results"
         ref="test_result_panel"
         :key="ag_test_case_result.pk"
         :name="ag_test_case_result.ag_test_case_name"
@@ -57,7 +66,7 @@
           :ag_test_case_row_correctness_level="case_result_correctness(ag_test_case_result)">
         </AGTestCaseResultDetail>
       </result-panel>
-    </template>
+    </table>
 
   </div>
 </template>
@@ -172,12 +181,6 @@ export default class AGTestSuiteResultDetail extends Vue implements Created {
   font-size: 1.25rem;
   font-weight: bold;
   padding: 0 0 10px 0;
-}
-
-.ag-test-case-results-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
 }
 
 </style>

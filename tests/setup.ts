@@ -19,6 +19,14 @@ beforeAll(() => {
     HttpClient.get_instance().set_base_url('http://localhost:9999/api/');
 });
 
+// jsdom doesn't implement IntersectionObserver.
+window.IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() { return []; }
+} as unknown as typeof IntersectionObserver;
+
 let wrappers: Wrapper<Vue>[] = [];
 
 // Creates a vue-test-utils wrapper and ensures that the wrapper is destroyed

@@ -16,8 +16,23 @@
     ></description-renderer>
 
     <template v-if="ag_test_case_result.ag_test_command_results.length > 1">
-      <div v-for="ag_test_command_result of ag_test_case_result.ag_test_command_results">
+      <table class="results-table command-results-table">
+        <colgroup>
+          <col class="name-column">
+          <col class="correctness-column">
+          <col class="points-column">
+        </colgroup>
+
+        <thead class="hidden-header">
+          <tr>
+            <th scope="col"><span class="sr-only">Command</span></th>
+            <th scope="col"><span class="sr-only">Passed</span></th>
+            <th scope="col"><span class="sr-only">Score</span></th>
+          </tr>
+        </thead>
+
         <result-panel
+          v-for="ag_test_command_result of ag_test_case_result.ag_test_command_results"
           ref="ag_test_command_panel"
           :key="ag_test_command_result.pk"
           :name="ag_test_command_result.ag_test_command_name"
@@ -30,7 +45,7 @@
             :ag_test_command_result="ag_test_command_result"
             :fdbk_category="fdbk_category"/>
         </result-panel>
-      </div>
+      </table>
     </template>
     <template v-else>
       <AGTestCommandResultDetail

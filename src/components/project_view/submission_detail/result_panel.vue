@@ -1,61 +1,42 @@
 <template>
-  <div class="panel">
-    <div :class="[`${panel_correctness}-panel-header`,
-                  {'command-panel-header-open': d_is_open && is_command },
-                  {'panel-header-open': d_is_open && !is_command },
-                  {'panel-header-closed': !d_is_open }]"
-         role="button"
-         :tabindex="can_open ? 0 : -1"
-         @click="toggle_d_is_open"
-         @keydown.space.prevent="toggle_d_is_open"
-         @keydown.enter="toggle_d_is_open"
-         :aria-controls="panel_body_uid"
-         :aria-expanded="d_is_open"
-    >
-
-      <template v-if="is_command">
-        <div class="command-name">{{name}}</div>
-        <div class="command-correctness">
-          <correctness-icon :correctness_level="correctness_level">
-          </correctness-icon>
-        </div>
-        <div class="command-points">
-          <span v-if="points_possible !== 0"
-                class="display-points"
-                aria-label="Score">
-            {{points_awarded}}/{{points_possible}}
-          </span>
-        </div>
-      </template>
-      <template v-else>
-        <div class="name">{{name}}</div>
-        <div class="correctness">
-          <correctness-icon :correctness_level="correctness_level">
-          </correctness-icon>
-        </div>
-        <div class="points">
-          <span v-if="points_possible !== 0"
-                class="display-points"
-                aria-label="Score">
-            {{points_awarded}}/{{points_possible}}
-          </span>
-        </div>
-      </template>
-    </div>
+  <tbody class="panel">
+    <tr :class="[`${panel_correctness}-panel-header`,
+                 {'panel-header-open': d_is_open },
+                 {'panel-header-closed': !d_is_open },
+                 {'pinned': d_is_open && !is_command && d_body_is_below_header }]"
+        ref="header"
+        @click="toggle_d_is_open">
+      <th scope="row" class="name">
+        <button type="button"
+                class="toggle-button"
+                :disabled="!can_open"
+                :aria-controls="panel_body_uid"
+                :aria-expanded="d_is_open">{{name}}</button>
+      </th>
+      <td class="correctness">
+        <correctness-icon :correctness_level="correctness_level">
+        </correctness-icon>
+      </td>
+      <td :class="['points', {'command-points': is_command}]">
+        <span v-if="points_possible !== 0" class="display-points">
+          {{points_awarded}}/{{points_possible}}
+        </span>
+      </td>
+    </tr>
 
     <!-- Outer v-show so that aria-controls has something to reference. -->
     <!-- Inner v-if so that the inner component doesn't send requests until
          the panel is open. -->
-    <div v-show="d_is_open"
-         :id="panel_body_uid"
-         :class="[`${panel_correctness}-panel-body`,
-                  {'multiple-command-panel-body': is_multi_command_case},
-                  {'command-panel-body': is_command}]">
-      <div v-if="d_is_open">
-        <slot></slot>
-      </div>
-    </div>
-  </div>
+    <tr v-show="d_is_open" :id="panel_body_uid" ref="body">
+      <td colspan="3" :headers="`${name} details`"
+          :class="[`${panel_correctness}-panel-body`,
+                   {'multiple-command-panel-body': is_multi_command_case}]">
+        <div v-if="d_is_open">
+          <slot></slot>
+        </div>
+      </td>
+    </tr>
+  </tbody>
 </template>
 
 <script lang="ts">
@@ -93,9 +74,44 @@ export default class ResultPanel extends Vue {
   is_multi_command_case!: boolean;
 
   d_is_open = false;
+  d_body_is_below_header = true;
+  d_body_observer: IntersectionObserver | null = null;
 
   created() {
     this.d_is_open = this.open_initially;
+  }
+
+  mounted() {
+    this.update_body_observer();
+  }
+
+  beforeDestroy() {
+    this.d_body_observer?.disconnect();
+  }
+
+  @Watch('d_is_open')
+  on_is_open_changed() {
+    this.update_body_observer();
+  }
+
+  // Sticky table rows are bounded by the whole table rather than their
+  // <tbody>, so without this an open header would stay pinned over the
+  // panels below it after its own body scrolls out of view.
+  private update_body_observer() {
+    this.d_body_observer?.disconnect();
+    this.d_body_observer = null;
+    if (!this.d_is_open || this.is_command) {
+      return;
+    }
+
+    let header_height = (<HTMLElement> this.$refs.header).offsetHeight;
+    this.d_body_observer = new IntersectionObserver(
+      ([entry]) => {
+        this.d_body_is_below_header = entry.isIntersecting;
+      },
+      {rootMargin: `-${header_height}px 0px 0px 0px`}
+    );
+    this.d_body_observer.observe(<HTMLElement> this.$refs.body);
   }
 
   get panel_correctness() {
@@ -142,23 +158,33 @@ export default class ResultPanel extends Vue {
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+$border-radius-value: 3px;
+
 @mixin panel_header($background-color: $white-gray,
                     $border-color: $white-gray,
                     $is_not_available: false) {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-content: center;
-  background-color: $background-color;
-  border: 1px solid $border-color;
   font-weight: bold;
+
+  > th, > td {
+    background-color: $background-color;
+    border-top: 1px solid $border-color;
+    border-bottom: 1px solid $border-color;
+  }
+
+  > :first-child {
+    border-left: 1px solid $border-color;
+  }
+
+  > :last-child {
+    border-right: 1px solid $border-color;
+  }
 
   @if $is_not_available {
     cursor: default;
   }
   @else {
     cursor: pointer;
-    &:hover {
+    &:hover > th, &:hover > td {
       background-color: darken($background-color, 5);
       border-color: darken($background-color, 10);
     }
@@ -173,69 +199,71 @@ export default class ResultPanel extends Vue {
   padding: 7px 10px;
 }
 
-$border-radius-value: 3px;
-
-.panel {
-  margin-bottom: 8px;
+// Table rows can't have margins, so this stands in for the gap between panels.
+.panel::after {
+  content: '';
+  display: table-row;
+  height: 8px;
 }
 
-.panel-header-open {
+.pinned {
   z-index: 2;
-  border-radius: $border-radius-value $border-radius-value 0 0;
   position: sticky;
   top: 0;
 }
 
-.command-panel-header-open {
-  border-radius: $border-radius-value $border-radius-value 0 0;
+.panel-header-open {
+  > :first-child {
+    border-top-left-radius: $border-radius-value;
+  }
+  > :last-child {
+    border-top-right-radius: $border-radius-value;
+  }
 }
 
 .panel-header-closed {
-  border-radius: $border-radius-value;
+  > :first-child {
+    border-radius: $border-radius-value 0 0 $border-radius-value;
+  }
+  > :last-child {
+    border-radius: 0 $border-radius-value $border-radius-value 0;
+  }
 }
 
-%panel-column-padding {
+.toggle-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  overflow-wrap: anywhere;
+  user-select: text;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+tr:has(> th > .toggle-button:focus-visible) {
+  outline-style: auto;
+}
+
+.name, .correctness, .points {
   padding: 7px 10px;
+  text-align: left;
 }
 
-.name {
-  @extend %panel-column-padding;
-  box-sizing: border-box;
-  width: 60%;
-  word-wrap: break-word;
-}
-
-.correctness {
-  @extend %panel-column-padding;
-  box-sizing: border-box;
-  width: 20%;
-}
-
-.points {
-  @extend %panel-column-padding;
-  box-sizing: border-box;
-  width: 20%;
+.command-points {
+  font-weight: normal;
 }
 
 .display-points {
   padding: 0 5px;
-}
-
-.command-name {
-  @extend %panel-column-padding;
-  width: 70%;
-}
-
-.command-correctness {
-  @extend %panel-column-padding;
-  width: 20%;
-}
-
-.command-points {
-  @extend %panel-column-padding;
-  box-sizing: border-box;
-  font-weight: normal;
-  width: 20%;
 }
 
 .multiple-command-panel-body {
