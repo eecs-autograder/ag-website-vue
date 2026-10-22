@@ -2,11 +2,15 @@ FROM ubuntu:jammy
 
 RUN mkdir -p /usr/src/app/src
 RUN apt-get update --fix-missing
+RUN apt-get install -y --only-upgrade ca-certificates
 
 WORKDIR /usr/src/app
 
 RUN apt-get install -y curl gnupg wget
+# Checksums are from https://nodejs.org/dist/v16.9.1/SHASUMS256.txt, verified
+# against the Node.js release signing key.
 RUN wget https://nodejs.org/dist/v16.9.1/node-v16.9.1-linux-x64.tar.gz
+RUN echo "1d48c69e4141792f314d29f081501dc22218cfc22f9992c098f7e3f5e0531139  node-v16.9.1-linux-x64.tar.gz" | sha256sum -c -
 RUN tar -xf node-v16.9.1-linux-x64.tar.gz -C /usr/local --strip-components=1 --no-same-owner
 
 COPY ag-client-typescript ./ag-client-typescript
