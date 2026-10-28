@@ -1,6 +1,6 @@
 import { Vue } from 'vue-property-decorator';
 
-import { mount, shallowMount, VueClass, Wrapper } from '@vue/test-utils';
+import { config, mount, shallowMount, VueClass, Wrapper } from '@vue/test-utils';
 
 import '@testing-library/jest-dom';
 import { HttpClient } from "ag-client-typescript";
@@ -12,6 +12,7 @@ import {
     set_global_current_user
 } from '@/tests/data_utils';
 import { vi } from 'vitest';
+import { Route } from 'vue-router';
 
 beforeAll(() => {
     // IMPORTANT: The port in this url must be the same as the port being listened to
@@ -36,9 +37,27 @@ export function managed_shallow_mount<V extends Vue, U>(component: VueClass<V>, 
     return wrapper;
 }
 
+
 beforeEach(() => {
     set_global_current_user(make_user());
     vi.useFakeTimers();
+
+    const route: Route = {
+        path: '',
+        hash: '',
+        query: {},
+        params: {},
+        fullPath: '',
+        matched: [],
+    }
+    config.mocks = {
+        $route: route,
+        $router: {
+            replace: sinon.stub(),
+            afterEach: () => {},
+            currentRoute: route,
+        }
+    }
 });
 
 afterEach(() => {
@@ -52,4 +71,6 @@ afterEach(() => {
     vi.useRealTimers();
 
     reset_provided_global_data();
+
+    config.mocks = {};
 });
