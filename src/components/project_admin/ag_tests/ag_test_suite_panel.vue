@@ -311,7 +311,7 @@ export default class AGTestSuitePanel extends Vue {
     this.d_duplicate_command_name_in_case = false;
     this.d_new_case_name = "";
     this.d_show_new_ag_test_case_modal = true;
-    Vue.nextTick(() => {
+    this.$nextTick(() => {
       (<ValidatedInputExposed> this.$refs.new_case_name).focus();
     });
   }

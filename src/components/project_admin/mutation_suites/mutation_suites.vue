@@ -441,7 +441,7 @@ export default class MutationSuites extends Vue implements MutationTestSuiteObse
   open_new_mutation_test_suite_modal() {
     this.d_new_mutation_test_suite_name = "";
     this.d_show_new_mutation_test_suite_modal = true;
-    Vue.nextTick(() => {
+    this.$nextTick(() => {
       (<ValidatedInputExposed> this.$refs.new_mutation_test_suite_name).focus();
     });
   }

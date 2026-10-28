@@ -277,7 +277,7 @@ export default class AGTestSuites extends Vue implements AGTestSuiteObserver,
 
   open_new_ag_test_suite_modal() {
     this.d_show_new_ag_test_suite_modal = true;
-    Vue.nextTick(() => {
+    this.$nextTick(() => {
       (<ValidatedInputExposed> this.$refs.new_ag_test_suite_name).focus();
     });
   }

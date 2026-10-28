@@ -335,7 +335,7 @@ export default class AGTestCasePanel extends Vue {
     this.d_new_command = "";
     this.d_new_command_name = "";
     this.d_show_new_ag_test_command_modal = true;
-    Vue.nextTick(() => {
+    this.$nextTick(() => {
       (<ValidatedInputExposed> this.$refs.new_ag_test_command_name).focus();
     });
   }
@@ -343,7 +343,7 @@ export default class AGTestCasePanel extends Vue {
   open_clone_ag_test_case_modal() {
     this.d_cloned_case_name = this.ag_test_case.name;
     this.d_show_clone_ag_test_case_modal = true;
-    Vue.nextTick(() => {
+    this.$nextTick(() => {
         (<ValidatedInputExposed> this.$refs.ag_test_case_clone_name).focus({select: true});
     });
   }

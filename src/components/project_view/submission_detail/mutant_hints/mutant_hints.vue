@@ -298,7 +298,7 @@ export default class MutantHints extends Vue implements MutantHintObserver,
       this.d_unlocked_hints.push(hint);
     }
 
-    Vue.nextTick(() => {
+    this.$nextTick(() => {
       let component = (<Vue[]> this.$refs.unlocked_hint)[this.d_unlocked_hints.length - 1];
       (<HTMLElement> component.$el).focus();
     });
