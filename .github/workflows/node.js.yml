@@ -1,16 +1,38 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: AG Website
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, release* ]
   pull_request:
-    branches: [ develop ]
 
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - run: npm ci
+    - run: npm run lint
+    - run: npm run build
+
+  unit-tests:
+    # Lint is fast. If we wait for it we guarantee a cache hit on dependencies.
+    needs: lint
 
     runs-on: ubuntu-latest
 
@@ -20,13 +42,31 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
-    - run: npm run lint
-    - run: npm run build
+
+    - run: npm ci
     - run: npm test
+
+  # This release line predates the Playwright e2e suite. The job name matches
+  # the check required by the release-branch ruleset; building the images is
+  # the closest end-to-end check available here.
+  e2e-tests:
+    needs: lint
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - run: docker build -f Dockerfile-website-dev .
+    - run: docker build -f Dockerfile-website-prod .
