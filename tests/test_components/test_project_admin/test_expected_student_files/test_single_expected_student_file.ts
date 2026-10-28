@@ -7,7 +7,12 @@ import APIErrors from '@/components/api_errors.vue';
 import ExpectedStudentFileForm from '@/components/project_admin/expected_student_files/expected_student_file_form.vue';
 import SingleExpectedStudentFile from '@/components/project_admin/expected_student_files/single_expected_student_file.vue';
 
-import { wait_until } from '@/tests/utils';
+import { managed_mount } from '@/tests/setup';
+import {
+    expect_dialog_focuses_heading,
+    stub_layout_for_focus_trap,
+    wait_until,
+} from '@/tests/utils';
 
 
 describe('ExpectedStudentFiles tests', () => {
@@ -122,6 +127,17 @@ describe('ExpectedStudentFiles tests', () => {
 
         expect(save_stub.callCount).toEqual(0);
         expect(component.d_expected_student_file!.pattern).toEqual(file_with_wildcard.pattern);
+    });
+
+    test('Delete dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(SingleExpectedStudentFile, {
+            propsData: {expected_student_file: file_with_wildcard},
+            attachTo: document.body,
+        });
+        await attached.find('.delete-file').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(file_with_wildcard.pattern));
     });
 
     test('Delete file', async () => {

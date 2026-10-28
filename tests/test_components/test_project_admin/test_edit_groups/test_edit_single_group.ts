@@ -13,7 +13,12 @@ import { assert_not_null } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { set_validated_input_text, wait_until } from '@/tests/utils';
+import {
+    expect_dialog_focuses_heading,
+    set_validated_input_text,
+    stub_layout_for_focus_trap,
+    wait_until,
+} from '@/tests/utils';
 
 
 describe('EditSingleGroup tests', () => {
@@ -121,6 +126,17 @@ describe('EditSingleGroup tests', () => {
         let api_errors = <APIErrors> wrapper.findComponent({ref: 'api_errors'}).vm;
         expect(api_errors.state.api_errors.length).toBe(1);
         expect(save_group_stub.calledOnce);
+    });
+
+    test('Delete group dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(EditSingleGroup, {
+            propsData: {course: course, project: project, group: group},
+            attachTo: document.body,
+        });
+        await attached.get('[data-testid=show_delete_modal_button]').trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription();
     });
 
     test('Delete group', async () => {

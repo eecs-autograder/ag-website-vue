@@ -90,12 +90,18 @@
       :include_closing_x="!state.deleting"
       :click_outside_to_close="!state.deleting"
       ref="delete_group_modal"
-      aria_label="Delete group modal"
+      aria_labelledby="delete-group-modal-title"
+      aria_describedby="delete-group-modal-description"
+      initial_focus="#delete-group-modal-title"
     >
-      <div class="modal-header">Confirm Delete</div>
+      <h2 id="delete-group-modal-title" class="modal-header" tabindex="-1">
+        Confirm Delete
+      </h2>
 
-      NOTE: This will remove all members from the group, but will preserve the
-      database entry and all submissions associated with the group.
+      <div id="delete-group-modal-description">
+        NOTE: This will remove all members from the group, but will preserve the
+        database entry and all submissions associated with the group.
+      </div>
 
       <APIErrors ref="delete_group_api_errors"></APIErrors>
 

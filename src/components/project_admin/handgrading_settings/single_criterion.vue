@@ -44,14 +44,18 @@
     </criterion-form>
 
     <modal ref="delete_criterion_modal" size="large" click_outside_to_close
-           aria_label="Confirm delete criterion"
            v-if="d_delete_modal_is_open"
-           @close="d_delete_modal_is_open = false">
-      <div class="modal-header">Confirm Delete</div>
-      Are you sure you want to delete the checkbox
-      "<b>{{this.d_criterion.short_description}}</b>"? <br><br>
-      This will delete all associated results. <br>
-      <b>THIS ACTION CANNOT BE UNDONE.</b>
+           @close="d_delete_modal_is_open = false"
+           :aria_labelledby="`delete-criterion-modal-title-${modal_uid}`"
+           :aria_describedby="`delete-criterion-modal-description-${modal_uid}`"
+           :initial_focus="`#delete-criterion-modal-title-${modal_uid}`">
+      <h2 :id="`delete-criterion-modal-title-${modal_uid}`" class="modal-header" tabindex="-1">Confirm Delete</h2>
+      <div :id="`delete-criterion-modal-description-${modal_uid}`">
+        Are you sure you want to delete the checkbox
+        "<b>{{this.d_criterion.short_description}}</b>"? <br><br>
+        This will delete all associated results. <br>
+        <b>THIS ACTION CANNOT BE UNDONE.</b>
+      </div>
       <APIErrors ref="delete_criterion_errors"></APIErrors>
       <div class="modal-button-footer button-footer-right">
         <button type="button" class="delete-button red-button"
@@ -75,7 +79,7 @@ import Modal from "@/components/modal.vue";
 import MoveButtons from "@/components/MoveButtons.vue";
 import CriterionForm, { CriterionFormData } from "@/components/project_admin/handgrading_settings/criterion_form.vue";
 import { handle_api_errors_async } from '@/error_handling';
-import { deep_copy, format_datetime, safe_assign } from "@/utils";
+import { deep_copy, format_datetime, generate_uid, safe_assign } from "@/utils";
 
 @Component({
   components: {
@@ -112,6 +116,7 @@ export default class SingleCriterion extends Vue {
   d_criterion_form_is_valid = false;
 
   readonly format_datetime = format_datetime;
+  readonly modal_uid = generate_uid();
 
   created() {
     this.d_criterion = deep_copy(this.criterion, Criterion);

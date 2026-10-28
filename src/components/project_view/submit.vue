@@ -98,8 +98,15 @@
            v-if="d_show_confirm_submit_modal"
            @close="d_show_confirm_submit_modal = false"
            size="large"
-           :include_closing_x="false">
-      <div class="modal-header">Submit</div>
+           :include_closing_x="false"
+           aria_labelledby="confirm-submit-title"
+           :aria_describedby="file_mismatches_present ? 'confirm-submit-description' : undefined"
+           initial_focus="#confirm-submit-title">
+      <h2 id="confirm-submit-title" class="modal-header" tabindex="-1">Confirm Submit</h2>
+      <p v-if="file_mismatches_present" id="confirm-submit-description" class="mismatch-summary">
+        Some of your files don't match what this project expects.
+        Review the warnings below before submitting.
+      </p>
       <div class="file-list-header">Files to submit</div>
       <ul class="file-list">
         <li v-for="filename of submitted_filenames" class="list-item">{{filename}}</li>
@@ -603,6 +610,10 @@ function num_glob_matches(names: string[], pattern: string): number {
 
 .modal-header {
   font-size: 1.4rem;
+}
+
+.mismatch-summary {
+  margin-top: .5rem;
 }
 
 

@@ -18,8 +18,10 @@ import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
 import {
     emitted,
+    expect_dialog_focuses_heading,
     get_validated_input_text,
     set_validated_input_text,
+    stub_layout_for_focus_trap,
     validated_input_is_valid,
     wait_until
 } from '@/tests/utils';
@@ -498,6 +500,24 @@ describe('AGTestCasePanel tests', () => {
 
         expect(wrapper.vm.d_show_ag_test_case_settings_modal).toBe(true);
         expect(wrapper.findComponent({ref: 'ag_test_case_settings_modal'}).exists()).toBe(true);
+    });
+
+    test('Delete case dialog focuses its heading', async () => {
+        stub_layout_for_focus_trap();
+        const attached = managed_mount(AGTestCasePanel, {
+            propsData: {
+                ag_test_case: ag_case_green,
+                ag_test_suite: ag_suite_colors,
+                active_ag_test_case: null,
+                active_ag_test_command: null,
+                index: 0,
+                case_count: 2,
+            },
+            attachTo: document.body,
+        });
+        await attached.findComponent({ref: 'delete_ag_test_case_menu_item'}).trigger('click');
+        expect_dialog_focuses_heading(attached);
+        expect(attached.get('[role=dialog]').element).toHaveAccessibleDescription(expect.stringContaining(ag_case_green.name));
     });
 
     test('Delete case - successful', async () => {

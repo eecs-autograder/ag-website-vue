@@ -14,7 +14,17 @@ import { format_datetime } from '@/utils';
 
 import * as data_ut from '@/tests/data_utils';
 import { managed_mount } from '@/tests/setup';
-import { compress_whitespace, emitted, find_by_name, find_component, set_data, wait_fixed, wait_until } from '@/tests/utils';
+import {
+    compress_whitespace,
+    emitted,
+    expect_dialog_focuses_heading,
+    find_by_name,
+    find_component,
+    set_data,
+    stub_layout_for_focus_trap,
+    wait_fixed,
+    wait_until,
+} from '@/tests/utils';
 
 let current_user: User;
 let course: Course;
@@ -852,6 +862,41 @@ describe('Submitted file validation tests', () => {
         let submit_button = wrapper.find('[data-testid=submit_button]');
         expect(submit_button.text().trim()).toEqual('Submit Anyway');
         expect(submit_button.element).not.toBeDisabled();
+    });
+});
+
+describe('Confirm submit modal accessibility tests', () => {
+    beforeEach(() => {
+        project.expected_student_files = [
+            data_ut.make_expected_student_file(project.pk, 'required'),
+        ];
+        stub_layout_for_focus_trap();
+    });
+
+    async function open_modal(files: File[]) {
+        const wrapper = managed_mount(Submit, {
+            propsData: {
+                course: course,
+                project: project,
+                group: group,
+            },
+            attachTo: document.body,
+        });
+        wrapper.findComponent({ref: 'submit_file_upload'}).vm.$emit('upload_files', files);
+        await wrapper.vm.$nextTick();
+        return wrapper;
+    }
+
+    test('Mismatched files: heading focused, dialog has a description', async () => {
+        const wrapper = await open_modal([new File(['spam'], 'unexpected')]);
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).toHaveAccessibleDescription();
+    });
+
+    test('No mismatched files: heading focused, no description', async () => {
+        const wrapper = await open_modal([new File(['spam'], 'required')]);
+        expect_dialog_focuses_heading(wrapper);
+        expect(wrapper.get('[role=dialog]').element).not.toHaveAccessibleDescription();
     });
 });
 

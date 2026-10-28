@@ -43,12 +43,15 @@
              ref="reset_handgrading_modal"
              size="large"
              :click_outside_to_close="!d_resetting"
-             :include_closing_x="!d_resetting">
-        <div class="modal-header">
-          Reset Handgrading Result
+             :include_closing_x="!d_resetting"
+             aria_labelledby="reset-handgrading-modal-title"
+             aria_describedby="reset-handgrading-modal-description"
+             initial_focus="#reset-handgrading-modal-title">
+        <h2 id="reset-handgrading-modal-title" class="modal-header" tabindex="-1">Confirm Reset</h2>
+        <div id="reset-handgrading-modal-description">
+          Are you sure you want to reset handgrading for the current
+          group?
         </div>
-        Are you sure you want to reset handgrading for the current
-        group?
 
         <div class="modal-button-footer">
           <button type="button"

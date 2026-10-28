@@ -38,16 +38,19 @@
              ref="delete_course_modal"
              size="large"
              :click_outside_to_close="!d_deleting"
-             :show_closing_x="!d_deleting">
-        <div class="modal-header">
-          Confirm Delete
-        </div>
+             :show_closing_x="!d_deleting"
+             aria_labelledby="delete-course-modal-title"
+             aria_describedby="delete-course-modal-description"
+             initial_focus="#delete-course-modal-title">
+        <h2 id="delete-course-modal-title" class="modal-header" tabindex="-1">Confirm Delete</h2>
         <div class="modal-body">
-          Are you sure you want to pseudo-delete the course
-          <span class="item-to-delete">{{course.name}} {{course.semester}} {{course.year}}</span>?
-          <br><br>
-          All associated projects will become inaccessible.<br>
-          This action can be undone occasionally if you ask your system administrator nicely. :)
+          <div id="delete-course-modal-description">
+            Are you sure you want to pseudo-delete the course
+            <span class="item-to-delete">{{course.name}} {{course.semester}} {{course.year}}</span>?
+            <br><br>
+            All associated projects will become inaccessible.<br>
+            This action can be undone occasionally if you ask your system administrator nicely. :)
+          </div>
           <APIErrors ref="delete_errors"></APIErrors>
           <div class="modal-button-footer">
             <button data-testid="delete_course_button"

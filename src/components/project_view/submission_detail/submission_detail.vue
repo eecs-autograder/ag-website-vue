@@ -204,10 +204,13 @@
            @close="d_show_remove_submission_from_queue_modal = false"
            ref="remove_submission_from_queue_modal"
            size="large"
-           click_outside_to_close>
-      <div class="modal-header">Confirm: Remove Submission from Queue</div>
+           click_outside_to_close
+           aria_labelledby="remove-from-queue-modal-title"
+           aria_describedby="remove-from-queue-modal-description"
+           initial_focus="#remove-from-queue-modal-title">
+      <h2 id="remove-from-queue-modal-title" class="modal-header" tabindex="-1">Confirm Remove from Queue</h2>
       <div class="modal-body">
-        <div>Are you sure you want to remove this submission from the grading queue?
+        <div id="remove-from-queue-modal-description">Are you sure you want to remove this submission from the grading queue?
           <ul>
             <li>This action cannot be undone</li>
             <li>Once removed, the submission will NOT be graded</li>
