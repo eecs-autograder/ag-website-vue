@@ -481,7 +481,7 @@ export default class HandgradingSettings extends Vue implements Created,
   @Watch('d_handgrading_rubric.points_style')
   on_points_style_changed() {
     let max_points_input = this.$refs.max_points;
-    if (max_points_input !== undefined) {
+    if (!!max_points_input) {
       (<ValidatedInputExposed> max_points_input).rerun_validators();
     }
   }
