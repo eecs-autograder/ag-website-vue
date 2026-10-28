@@ -66,15 +66,18 @@ beforeEach(async () => {
 });
 
 function get_router_mocks(query = {}) {
-    return {
-        $route: {
-            params: {
-                project_id: project.pk.toString()
-            },
-            query: query
+    const route = {
+        params: {
+            project_id: project.pk.toString()
         },
+        query: query
+    };
+    return {
+        $route: route,
         $router: {
-            replace: router_replace
+            replace: router_replace,
+            afterEach: () => {},
+            currentRoute: route,
         }
     };
 }

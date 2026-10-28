@@ -34,6 +34,17 @@ beforeEach(() => {
     data_ut.set_global_current_course(course);
 });
 
+function make_route(project_pk: number, current_tab?: string) {
+    return {
+        params: {
+            project_id: project_pk.toString()
+        },
+        query: current_tab !== undefined
+                ? {current_tab: current_tab}
+                : {}
+    };
+}
+
 // As child components of the ProjectAdmin component get merged, their methods that make api calls
 // in created() will need to be stubbed in these tests.
 describe('Changing tabs in project admin', () => {
@@ -48,16 +59,14 @@ describe('Changing tabs in project admin', () => {
         sinon.stub(Project, 'get_by_pk').withArgs(project.pk).returns(Promise.resolve(project));
         router_replace = sinon.stub().resolves();
 
+        const route = make_route(project.pk);
         wrapper = managed_shallow_mount(ProjectAdmin, {
             mocks: {
-                $route: {
-                    params: {
-                        project_id: project.pk.toString()
-                    },
-                    query: {}
-                },
+                $route: route,
                 $router: {
-                    replace: router_replace
+                    replace: router_replace,
+                    afterEach: () => {},
+                    currentRoute: route,
                 }
             },
         });
@@ -75,18 +84,14 @@ describe('Changing tabs in project admin', () => {
     });
 
     test('Requested tab on load', async () => {
+        const route = make_route(project.pk, 'handgrading');
         wrapper = managed_shallow_mount(ProjectAdmin, {
             mocks: {
-                $route: {
-                    params: {
-                        project_id: project.pk.toString()
-                    },
-                    query: {
-                        current_tab: 'handgrading'
-                    }
-                },
+                $route: route,
                 $router: {
-                    replace: router_replace
+                    replace: router_replace,
+                    afterEach: () => {},
+                    currentRoute: route,
                 }
             }
         });
@@ -241,14 +246,14 @@ describe('Changing tabs in project admin', () => {
 test('Project observer', async () => {
     let project = data_ut.make_project(course.pk);
     sinon.stub(Project, 'get_by_pk').withArgs(project.pk).returns(Promise.resolve(project));
+    const route = make_route(project.pk);
     let wrapper = managed_mount(ProjectAdmin, {
         mocks: {
-            $route: {
-                params: {
-                    project_id: project.pk.toString()
-                },
-                query: {}
-            },
+        $route: route,
+            $router: {
+                afterEach: () => {},
+                currentRoute: route,
+            }
         }
     });
     expect(await wait_for_load(wrapper)).toBe(true);
@@ -280,14 +285,14 @@ describe('InstructorFileObserver tests', () => {
             file => deep_copy(file, InstructorFile));
 
         sinon.stub(Project, 'get_by_pk').withArgs(project.pk).resolves(project);
+        const route = make_route(project.pk);
         wrapper = managed_mount(ProjectAdmin, {
             mocks: {
-                $route: {
-                    params: {
-                        project_id: project.pk.toString()
-                    },
-                    query: {}
-                },
+                $route: make_route(project.pk),
+                $router: {
+                    afterEach: () => {},
+                    currentRoute: route,
+                }
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
@@ -335,14 +340,14 @@ describe('ExpectedStudentFileObserver tests', () => {
             file => deep_copy(file, ExpectedStudentFile));
 
         sinon.stub(Project, 'get_by_pk').withArgs(project.pk).resolves(project);
+        const route = make_route(project.pk);
         wrapper = managed_mount(ProjectAdmin, {
             mocks: {
-                $route: {
-                    params: {
-                        project_id: project.pk.toString()
-                    },
-                    query: {}
-                },
+                $route: route,
+                $router: {
+                    afterEach: () => {},
+                    currentRoute: route,
+                }
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
@@ -380,14 +385,14 @@ test('Observer updates from other project ignored', async () => {
     let expected_student_file = data_ut.make_expected_student_file(other_project.pk, 'files');
 
     sinon.stub(Project, 'get_by_pk').withArgs(project.pk).resolves(project);
+    const route = make_route(project.pk);
     let wrapper = managed_mount(ProjectAdmin, {
         mocks: {
-            $route: {
-                params: {
-                    project_id: project.pk.toString()
-                },
-                query: {}
-            },
+            $route: route,
+            $router: {
+                afterEach: () => {},
+                currentRoute: route,
+            }
         }
     });
     expect(await wait_for_load(wrapper)).toBe(true);

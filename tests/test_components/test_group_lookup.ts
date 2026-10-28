@@ -102,19 +102,22 @@ test('Group not selected from query param by default', async () => {
 });
 
 function get_router_mocks(group_pk?: number) {
-    let mocks: {$route: Route, $router: VueRouter} = {
-        $route: <Route> <unknown> {
-            query: {other_param: 'other_param'}
-        },
-        $router: <VueRouter> <unknown> {
-            replace: router_replace
-        }
+    const route = <Route> <unknown> {
+        query: {other_param: 'other_param'}
     };
     if (group_pk !== undefined) {
-        mocks.$route.query = {
-            other_param: 'other_param', current_student_lookup: group_pk.toString()
-        };
+        route.query.current_student_lookup = group_pk.toString()
     }
+    let mocks: {$route: Route, $router: VueRouter} = {
+        $route: route,
+        $router: <VueRouter> <unknown> {
+            replace: router_replace,
+            afterEach: () => {},
+            get currentRoute() {
+                return route;
+            },
+        }
+    };
     return mocks;
 }
 

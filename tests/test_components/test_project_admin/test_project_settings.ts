@@ -37,6 +37,8 @@ beforeEach(() => {
     mocks: {
       $router: {
         push: router_push_stub,
+        afterEach: () => {},
+        currentRoute: sinon.stub(),
       },
     },
   });

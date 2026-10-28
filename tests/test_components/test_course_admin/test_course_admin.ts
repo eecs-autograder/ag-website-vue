@@ -15,15 +15,18 @@ let course: Course;
 let router_replace: sinon.SinonStub;
 
 function get_router_mocks(query = {}) {
-    return {
-        $route: {
-            params: {
-                course_id: course.pk.toString()
-            },
-            query: query
+    const route = {
+        params: {
+            course_id: course.pk.toString()
         },
+        query: query
+    };
+    return {
+        $route: route,
         $router: {
-            replace: router_replace
+            replace: router_replace,
+            afterEach: () => {},
+            currentRoute: route,
         }
     };
 }

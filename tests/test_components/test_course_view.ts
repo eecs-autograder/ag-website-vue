@@ -61,7 +61,11 @@ describe('CourseView tests', () => {
         wrapper = mount(CourseView, {
             stubs: ['router-link', 'router-view'],
             mocks: {
-                $route
+                $route,
+                $router: {
+                    afterEach: () => {},
+                    currentRoute: $route,
+                }
             }
         });
         await wrapper.vm.$nextTick();
@@ -84,7 +88,11 @@ describe('CourseView tests', () => {
         wrapper = mount(CourseView, {
             stubs: ['router-link', 'router-view'],
             mocks: {
-                $route
+                $route,
+                $router: {
+                    afterEach: () => {},
+                    currentRoute: $route,
+                }
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
@@ -99,7 +107,11 @@ describe('CourseView tests', () => {
         wrapper = mount(CourseView, {
             stubs: ['router-link', 'router-view'],
             mocks: {
-                $route
+                $route,
+                $router: {
+                    afterEach: () => {},
+                    currentRoute: $route,
+                }
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
@@ -115,7 +127,11 @@ describe('CourseView tests', () => {
         wrapper = mount(CourseView, {
             stubs: ['router-link', 'router-view'],
             mocks: {
-                $route
+                $route,
+                $router: {
+                    afterEach: () => {},
+                    currentRoute: $route,
+                }
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);
@@ -133,7 +149,11 @@ describe('CourseView tests', () => {
         wrapper = mount(CourseView, {
             stubs: ['router-link', 'router-view'],
             mocks: {
-                $route
+                $route,
+                $router: {
+                    afterEach: () => {},
+                    currentRoute: $route,
+                }
             }
         });
         expect(await wait_for_load(wrapper)).toBe(true);

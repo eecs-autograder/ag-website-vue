@@ -82,7 +82,9 @@ describe('Delete project tests', () => {
             },
             mocks: {
                 $router: {
-                    push: router_push_stub
+                    push: router_push_stub,
+                    afterEach: () => {},
+                    currentRoute: sinon.stub(),
                 }
             }
         });
