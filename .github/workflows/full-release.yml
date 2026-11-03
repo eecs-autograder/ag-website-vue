@@ -44,5 +44,5 @@ jobs:
           gh workflow run \
             --repo eecs-autograder/autograder-full-stack \
             'Finish Release' \
-            --version="${{ inputs.version }}"
+            --raw-field version="${{ inputs.version }}"
             \ --ref actions/release-flow
