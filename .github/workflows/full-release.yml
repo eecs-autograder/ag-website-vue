@@ -55,8 +55,8 @@ jobs:
       - name: 'Update submodules'
         run: |
           branch="${{ steps.make-branch.outputs.release_branch }}"
-          git config --file=.gitmodules submodule.ag-client-typescript.branch $release_branch
-          git config --file=.gitmodules submodule.e2e_test_stack/autograder-server.branch $release_branch
+          git config --file=.gitmodules submodule.ag-client-typescript.branch $branch
+          git config --file=.gitmodules submodule.e2e_test_stack/autograder-server.branch $branch
 
           git submodule update --remote --recursive
           git add -u
