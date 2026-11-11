@@ -363,6 +363,35 @@ describe('ViewFile handgrading tests', () => {
         expect(code_lines.at(5).classes()).not.toContain('hovered-comment-line');
     });
 
+    test('Code lines describe keyboard shortcuts', async () => {
+        let attached = managed_mount(ViewFile, {
+            propsData: {
+                filename: filename,
+                file_contents: content,
+                handgrading_result: result,
+                readonly_handgrading_results: false,
+                enable_custom_comments: true,
+            },
+            attachTo: document.body,
+        });
+        expect(await new_wait_for_load(attached)).toBe(true);
+
+        let code_line = attached.findAll('[data-testid=code_line]').at(0);
+        expect(code_line.element).toHaveAccessibleDescription(
+            expect.stringContaining('add feedback'));
+        expect(code_line.element).toHaveAccessibleDescription(
+            expect.stringContaining('select lines'));
+        expect(code_line.element).not.toHaveAccessibleDescription(
+            expect.stringContaining('cancel'));
+
+        await code_line.trigger('keydown.down', {shiftKey: true});
+        expect(code_line.element).toHaveAccessibleDescription(
+            expect.stringContaining('cancel'));
+
+        await attached.setProps({readonly_handgrading_results: true});
+        expect(code_line.element).not.toHaveAccessibleDescription();
+    });
+
     describe('Add applied annotation tests', () => {
         let create_stub: sinon.SinonStub;
 
