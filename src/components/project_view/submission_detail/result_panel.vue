@@ -97,6 +97,8 @@ export default class ResultPanel extends Vue {
   // Sticky table rows are bounded by the whole table rather than their
   // <tbody>, so without this an open header would stay pinned over the
   // panels below it after its own body scrolls out of view.
+  // The main example of this is a test case with many commands that take up
+  // the height of the screen.
   private update_body_observer() {
     this.d_body_observer?.disconnect();
     this.d_body_observer = null;
