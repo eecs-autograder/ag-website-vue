@@ -2,6 +2,7 @@ FROM ubuntu:jammy
 
 RUN mkdir -p /usr/src/app/src
 RUN apt-get update --fix-missing
+RUN apt-get install -y --only-upgrade ca-certificates
 
 WORKDIR /usr/src/app
 
