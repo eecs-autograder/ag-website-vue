@@ -6,7 +6,7 @@
     <div class="header"
          role="button"
          tabindex="0"
-         :aria-expanded="!d_collapsed"
+         :aria-expanded="!d_collapsed ? 'true' : 'false'"
          @click="d_collapsed = !d_collapsed"
          @keydown.enter="d_collapsed = !d_collapsed"
          @keydown.space.prevent="d_collapsed = !d_collapsed">

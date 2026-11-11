@@ -5,7 +5,7 @@
       class="collapsible-section-label"
       data-testid="collapsible-section-header"
       :aria-controls="`${section_id}-${component_uid}`"
-      :aria-expanded="is_open"
+      :aria-expanded="is_open ? 'true' : 'false'"
       @click="toggle_is_open"
     >
       <i

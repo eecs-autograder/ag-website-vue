@@ -22,7 +22,7 @@
             @keydown.enter="d_collapsed = !d_collapsed"
             @keydown.space.prevent="d_collapsed = !d_collapsed"
             aria-controls="uploaded-instructor-file-sidebar"
-            :aria-expanded="!d_collapsed"
+            :aria-expanded="!d_collapsed ? 'true' : 'false'"
             tabindex=0
           >
             <i class="fas fa-bars" aria-hidden="true"></i>

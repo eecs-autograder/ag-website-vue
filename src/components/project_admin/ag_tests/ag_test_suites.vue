@@ -11,7 +11,7 @@
           <button type="button"
                   class="sidebar-collapse-button"
                   :aria-label="`${d_collapsed ? 'Open' : 'Close'} test suites sidebar`"
-                  :aria-expanded="!d_collapsed"
+                  :aria-expanded="!d_collapsed ? 'true' : 'false'"
                   aria-controls="test-suite-sidebar"
                   @click="d_collapsed = !d_collapsed">
             <i class="fas fa-bars" aria-hidden="true"></i>

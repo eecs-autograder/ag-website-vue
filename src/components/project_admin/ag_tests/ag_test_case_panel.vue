@@ -5,7 +5,7 @@
       <button type="button"
               class="panel-toggle unstyled-button"
               :aria-controls="has_multiple_commands ? `commands-container-${label_uid}` : ''"
-              :aria-expanded="is_open"
+              :aria-expanded="is_open ? 'true' : 'false'"
               @click="update_ag_test_case_panel_when_clicked">
         <div class="text">
           <i v-if="ag_test_case.ag_test_commands.length > 1"

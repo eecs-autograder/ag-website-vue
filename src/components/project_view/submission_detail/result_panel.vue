@@ -11,7 +11,7 @@
                 class="toggle-button"
                 :disabled="!can_open"
                 :aria-controls="panel_body_uid"
-                :aria-expanded="d_is_open">{{name}}</button>
+                :aria-expanded="d_is_open ? 'true' : 'false'">{{name}}</button>
       </th>
       <td class="correctness">
         <correctness-icon :correctness_level="correctness_level">

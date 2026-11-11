@@ -18,7 +18,7 @@
                   :title="'Edit ' + expected_student_file.pattern"
                   @click="edit_expected_student_file"
                   :aria-controls="`edit-single-file-form-${component_uuid}`"
-                  :aria-expanded="editing">
+                  :aria-expanded="editing ? 'true' : 'false'">
             <i class="fas fa-edit edit-file-icon" aria-hidden="true"></i>
           </button>
         </div>
