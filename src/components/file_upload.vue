@@ -35,6 +35,7 @@
             <slot name="file_list_label">Files to Upload</slot>
           </th>
           <th class="size-of-file-label">Size</th>
+          <th class="file-actions-label">File Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -333,7 +334,8 @@ defineExpose({
 }
 
 .name-of-file-label,
-.size-of-file-label {
+.size-of-file-label,
+.file-actions-label {
   border-bottom: none;
   font-size: 1.125rem;
   text-align: left;
