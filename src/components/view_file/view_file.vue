@@ -96,7 +96,9 @@
               @keydown.esc.prevent="cancel_commenting()"
               @keydown.tab.exact="cancel_commenting()"
               @keydown.shift.tab="cancel_commenting()"
-              :aria-keyshortcuts="line_shortcuts"
+              :aria-describedby="
+                can_edit_handgrading ? `line-shortcuts-${uid}` : undefined
+              "
               ref="code_lines"
               data-testid="code_line"
             >
@@ -185,6 +187,14 @@
         </table>
         <div class="sr-only" role="status" aria-live="polite">
           {{ state.d_selection_announcement }}
+        </div>
+        <div
+          v-if="can_edit_handgrading"
+          :id="`line-shortcuts-${uid}`"
+          class="sr-only"
+        >
+          <template v-if="selector !== null">Escape: cancel. </template>
+          Enter: add feedback. Shift plus up or down arrow: select lines.
         </div>
       </div>
 
@@ -278,7 +288,7 @@ import Modal from "@/components/modal.vue";
 import ProgressBar from "@/components/progress_bar.vue";
 import { new_handle_global_errors_async } from "@/error_handling";
 import { SafeMap } from "@/safe_map";
-import { assert_not_null, chain, toggle } from "@/utils";
+import { assert_not_null, chain, generate_uid, toggle } from "@/utils";
 
 import {
   handgrading_comment_factory,
@@ -315,6 +325,7 @@ const props = withDefaults(defineProps<PropTypes>(), {
 });
 
 const num_lines_per_page = 1000;
+const uid = generate_uid();
 
 let selector = ref<LineSelector | null>(null);
 
@@ -663,13 +674,6 @@ function open_annotation_context_menu(menu_coordinates: {
   state.d_context_menu_coordinates = menu_coordinates;
   state.d_context_menu_is_open = true;
 }
-
-const line_shortcuts = computed(() => {
-  if (!can_edit_handgrading.value) {
-    return undefined;
-  }
-  return "Enter Shift+ArrowUp Shift+ArrowDown Escape";
-});
 
 const apply_annotation = new_handle_global_errors_async(
   async (annotation: Annotation) => {
