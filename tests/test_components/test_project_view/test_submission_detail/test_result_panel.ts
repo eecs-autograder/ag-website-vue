@@ -154,38 +154,26 @@ describe('ResultPanel tests', () => {
         expect(wrapper.vm.d_is_open).toBe(true);
     });
 
-    test('is_command is true', async () => {
+    test('open case panel header is pinned', async () => {
         wrapper = mount(ResultPanel, {
             propsData: {
                 name: "Case Name",
                 correctness_level: CorrectnessLevel.some_correct,
-                points_awarded: 0,
-                points_possible: 1,
+                open_initially: true
+            }
+        });
+        expect(wrapper.find('tr').classes()).toContain('pinned');
+    });
+
+    test('open command panel header is not pinned', async () => {
+        wrapper = mount(ResultPanel, {
+            propsData: {
+                name: "Command Name",
+                correctness_level: CorrectnessLevel.some_correct,
+                open_initially: true,
                 is_command: true
             }
         });
-        expect(wrapper.find('.command-name').exists()).toBe(true);
-        expect(wrapper.find('.command-correctness').exists()).toBe(true);
-        expect(wrapper.find('.command-points').exists()).toBe(true);
-        expect(wrapper.find('.name').exists()).toBe(false);
-        expect(wrapper.find('.correctness').exists()).toBe(false);
-        expect(wrapper.find('.points').exists()).toBe(false);
-    });
-
-    test('is_command is false', async () => {
-        wrapper = mount(ResultPanel, {
-            propsData: {
-                name: "Case Name",
-                correctness_level: CorrectnessLevel.some_correct,
-                points_awarded: 0,
-                points_possible: 1
-            }
-        });
-        expect(wrapper.find('.command-name').exists()).toBe(false);
-        expect(wrapper.find('.command-correctness').exists()).toBe(false);
-        expect(wrapper.find('.command-points').exists()).toBe(false);
-        expect(wrapper.find('.name').exists()).toBe(true);
-        expect(wrapper.find('.correctness').exists()).toBe(true);
-        expect(wrapper.find('.points').exists()).toBe(true);
+        expect(wrapper.find('tr').classes()).not.toContain('pinned');
     });
 });

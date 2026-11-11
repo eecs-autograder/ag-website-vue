@@ -4,16 +4,24 @@
        role="region"
        aria-label="Mutation test suite results">
     <div id="mutation-test-suites-title">Mutation Testing Suites</div>
-    <div id="mutation-test-suites-header">
-      <div class="column-1"> Suite Name </div>
-      <div class="column-2"> Student Tests </div>
-      <div class="column-3"> Score </div>
-    </div>
+    <table class="results-table">
+      <colgroup>
+        <col class="name-column">
+        <col class="correctness-column">
+        <col class="points-column">
+      </colgroup>
 
-    <div v-for="mutation_test_suite_result of mutation_test_suite_results"
-         :key="mutation_test_suite_result.pk">
+      <thead>
+        <tr>
+          <th scope="col"> Suite Name </th>
+          <th scope="col"> Student Tests </th>
+          <th scope="col"> Score </th>
+        </tr>
+      </thead>
 
       <result-panel
+        v-for="mutation_test_suite_result of mutation_test_suite_results"
+        :key="mutation_test_suite_result.pk"
         ref="mutation_test_suite_detail_panel"
         :name="mutation_test_suite_result.mutation_test_suite_name"
         :correctness_level="mutation_suite_correctness(mutation_test_suite_result)"
@@ -24,7 +32,7 @@
                                :fdbk_category="fdbk_category">
         </mutation-suite-result>
       </result-panel>
-    </div>
+    </table>
   </div>
 </template>
 
@@ -134,13 +142,6 @@ export default class MutationSuiteResults extends Vue {
 
 <style scoped lang="scss">
 @import '@/styles/components/submission_detail.scss';
-
-#mutation-test-suites-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-content: center;
-}
 
 #mutation-test-suites-title {
   font-size: 19px;
