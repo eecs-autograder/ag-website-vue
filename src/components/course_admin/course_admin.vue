@@ -114,7 +114,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Vue } from 'vue-property-decorator';
+import { Component, Inject, Watch } from 'vue-property-decorator';
 
 import { Course, CourseObserver } from 'ag-client-typescript';
 
@@ -128,10 +128,11 @@ import StaffRoster from '@/components/course_admin/roster/staff_roster.vue';
 import StudentRoster from '@/components/course_admin/roster/student_roster.vue';
 import Dropdown from '@/components/dropdown.vue';
 import SandboxImages from '@/components/sandbox_images/sandbox_images.vue';
+import { use_title } from '@/composables/use_title';
 import { CurrentTabMixin } from '@/current_tab_mixin';
 import { handle_global_errors_async } from '@/error_handling';
 import { BeforeDestroy, Mounted } from '@/lifecycle';
-import { get_query_param, safe_assign } from "@/utils";
+import { format_course_name, get_query_param, safe_assign } from "@/utils";
 
 @Component({
   components: {
@@ -144,7 +145,10 @@ import { get_query_param, safe_assign } from "@/utils";
     SandboxImages,
     CourseSettings,
     Dropdown,
-  }
+  },
+  setup() {
+    return { d_title: use_title('Autograder.io') };
+  },
 })
 export default class CourseAdmin extends CurrentTabMixin implements CourseObserver,
                                                                     Mounted,
@@ -163,6 +167,22 @@ export default class CourseAdmin extends CurrentTabMixin implements CourseObserv
   d_course: Course | null = null;
 
   readonly RosterChoice = RosterChoice;
+
+  d_title!: string;
+
+  get page_title() {
+    if (this.d_course === null) {
+      return 'Autograder.io';
+    }
+    let course_title = `${format_course_name(this.d_course)} Admin | Autograder.io`;
+    let tab_label = this.current_tab === null ? undefined : TAB_LABELS[this.current_tab];
+    return tab_label === undefined ? course_title : `${tab_label} – ${course_title}`;
+  }
+
+  @Watch('page_title')
+  on_page_title_change(new_value: string) {
+    this.d_title = new_value;
+  }
 
   @handle_global_errors_async
   async mounted() {
@@ -215,6 +235,17 @@ export enum RosterChoice {
   student = "Student",
   handgrader = "Handgrader"
 }
+
+const TAB_LABELS: {[tab: string]: string} = {
+  settings: 'Settings',
+  [RosterChoice.admin + '_roster']: 'Admin Roster',
+  [RosterChoice.staff + '_roster']: 'Staff Roster',
+  [RosterChoice.student + '_roster']: 'Student Roster',
+  [RosterChoice.handgrader + '_roster']: 'Handgrader Roster',
+  projects: 'Projects',
+  late_days: 'Late Day Tokens',
+  sandbox_images: 'Sandbox Images',
+};
 </script>
 
 <style scoped lang="scss">

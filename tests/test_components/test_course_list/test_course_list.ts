@@ -26,6 +26,11 @@ describe('Create course tests', () => {
         });
     });
 
+    test('Page title', async () => {
+        managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
+        expect(document.title).toMatch(/courses/i);
+    });
+
     test('Create course button hidden', async () => {
         let wrapper = managed_mount(CourseList, {stubs: ['router-link', 'router-view']});
         expect(await wait_for_load(wrapper)).toBe(true);

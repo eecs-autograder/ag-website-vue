@@ -107,7 +107,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Inject, Vue } from 'vue-property-decorator';
+import { Component, Inject, Vue, Watch } from 'vue-property-decorator';
 
 import {
   Course,
@@ -126,8 +126,22 @@ import HandgradingContainer from '@/components/project_view/handgrading/handgrad
 import StudentLookup from '@/components/project_view/student_lookup.vue';
 import Submit from '@/components/project_view/submit.vue';
 import SubmissionList from '@/components/submission_list/submission_list.vue';
+import { use_title } from '@/composables/use_title';
 import { handle_global_errors_async } from '@/error_handling';
-import { assert_not_null, format_datetime, get_query_param } from '@/utils';
+import {
+  assert_not_null,
+  format_course_name,
+  format_datetime,
+  get_query_param,
+} from '@/utils';
+
+const TAB_LABELS: {[tab: string]: string} = {
+  submit: 'Submit',
+  my_submissions: 'My Submissions',
+  student_lookup: 'Student Lookup',
+  handgrading: 'Handgrading',
+  handgrading_result: 'Handgrading Score',
+};
 
 @Component({
   components: {
@@ -137,7 +151,10 @@ import { assert_not_null, format_datetime, get_query_param } from '@/utils';
     StudentLookup,
     SubmissionList,
     Submit,
-  }
+  },
+  setup() {
+    return { d_title: use_title('Autograder.io') };
+  },
 })
 export default class ProjectView extends Vue implements GroupObserver {
   @Inject({from: 'globals'})
@@ -160,6 +177,22 @@ export default class ProjectView extends Vue implements GroupObserver {
   d_loaded_tabs: Set<string> = new Set();
 
   readonly format_datetime = format_datetime;
+
+  d_title!: string;
+
+  get page_title() {
+    if (this.project === null || this.course === null) {
+      return 'Autograder.io';
+    }
+    let project_title = `${this.project.name} – ${format_course_name(this.course)} | Autograder.io`;
+    let tab_label = TAB_LABELS[this.d_current_tab];
+    return tab_label === undefined ? project_title : `${tab_label} – ${project_title}`;
+  }
+
+  @Watch('page_title')
+  on_page_title_change(new_value: string) {
+    this.d_title = new_value;
+  }
 
   @handle_global_errors_async
   async mounted() {

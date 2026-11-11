@@ -9,8 +9,11 @@
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
 import * as FileSaver from "file-saver";
+import { use_title } from "@/composables/use_title";
 import { SYSADMIN_CONTACT } from "@/constants";
 import { get_cookie } from "@/cookie";
+
+use_title("API Token | Autograder.io");
 
 // Computed properties
 const sysadmin_contact = computed(() => {

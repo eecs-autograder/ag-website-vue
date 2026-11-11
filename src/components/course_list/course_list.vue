@@ -76,6 +76,7 @@ import APIErrors from '@/components/api_errors.vue';
 import CourseForm, { CourseFormData } from '@/components/course_admin/course_form.vue';
 import SingleCourse from '@/components/course_list/single_course.vue';
 import Modal from '@/components/modal.vue';
+import { use_title } from '@/composables/use_title';
 import {
   handle_api_errors_async,
   handle_global_errors_async,
@@ -103,7 +104,10 @@ interface TermCourses {
     CourseForm,
     Modal,
     SingleCourse
-  }
+  },
+  setup() {
+    use_title('Courses | Autograder.io');
+  },
 })
 export default class CourseList extends Vue implements CourseObserver {
   @Inject({from: 'globals'})

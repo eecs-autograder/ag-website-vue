@@ -48,13 +48,21 @@ import {
 } from 'ag-client-typescript';
 
 import { GlobalData } from '@/app.vue';
+import { use_title } from '@/composables/use_title';
 import { handle_global_errors_async } from '@/error_handling';
+import { format_course_name } from '@/utils';
 
-@Component
+@Component({
+  setup() {
+    return { d_title: use_title('Autograder.io') };
+  },
+})
 export default class CourseView extends Vue {
   @Inject({from: 'globals'})
   globals!: GlobalData;
   d_globals = this.globals;
+
+  d_title!: string;
 
   private d_course: Course | null = null;
   d_loading = true;
@@ -63,6 +71,7 @@ export default class CourseView extends Vue {
   @handle_global_errors_async
   async created() {
     this.d_course = await Course.get_by_pk(Number(this.$route.params.course_id));
+    this.d_title = `${format_course_name(this.d_course)} | Autograder.io`;
     this.d_projects = await Project.get_all_from_course(this.d_course.pk);
 
     await this.d_globals.set_current_course(this.d_course);

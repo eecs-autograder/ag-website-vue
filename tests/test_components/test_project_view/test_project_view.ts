@@ -470,3 +470,32 @@ describe('Tab selection and lazy loading tests', ()  => {
         expect(wrapper.findComponent({name: 'Handgrading'}).isVisible()).toBe(false);
     });
 });
+
+describe('Page title', () => {
+    function expect_title_matches_page() {
+        expect(document.title).toContain(project.name);
+        expect(document.title).toContain(course.name);
+        expect(document.title).toContain(wrapper.find('.nav-link.active').text());
+    }
+
+    test('Title includes project, course, and active tab label', async () => {
+        wrapper = managed_shallow_mount(ProjectView, {mocks: get_router_mocks()});
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect_title_matches_page();
+
+        await wrapper.findAll('.nav-link').at(1).trigger('click');
+        expect_title_matches_page();
+    });
+
+    test('Title reflects tab requested in query param', async () => {
+        project.has_handgrading_rubric = true;
+        user_roles_stub.resolves(data_ut.make_user_roles({is_staff: true}));
+        handgrading_rubric_stub.resolves(data_ut.make_handgrading_rubric(project.pk));
+
+        wrapper = managed_shallow_mount(ProjectView, {
+            mocks: get_router_mocks({current_tab: 'handgrading'})
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect_title_matches_page();
+    });
+});

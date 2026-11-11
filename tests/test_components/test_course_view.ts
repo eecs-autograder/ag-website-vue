@@ -57,6 +57,17 @@ describe('CourseView tests', () => {
         }
     });
 
+    test('Page title', async () => {
+        wrapper = mount(CourseView, {
+            stubs: ['router-link', 'router-view'],
+            mocks: {
+                $route
+            }
+        });
+        expect(await wait_for_load(wrapper)).toBe(true);
+        expect(document.title).toContain(course.name);
+    });
+
     test('User is NOT an admin for the course whose projects they are viewing', async () => {
         wrapper = mount(CourseView, {
             stubs: ['router-link', 'router-view'],
