@@ -64,7 +64,9 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        # The app under test is built and served by the e2e stack's Docker
+        # image, so this only needs to satisfy Playwright's Node requirement.
+        node-version: [24.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
