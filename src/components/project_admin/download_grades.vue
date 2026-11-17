@@ -6,8 +6,8 @@
   </div>
   <div v-else id="download-grades-component">
     <div id="download-options">
-      <div class="option-container">
-        <div class="download-option-label">What do you want to download?</div>
+      <fieldset class="fieldset option-container">
+        <legend class="download-option-label">What do you want to download?</legend>
         <div class="radio-container">
           <input type="radio" name="grades_or_files_choice"
                   id="grades-choice"
@@ -24,10 +24,10 @@
                   :value="false">
           <label class="label" for="files-choice">Submitted Files</label>
         </div>
-      </div>
+      </fieldset>
 
-      <div class="option-container">
-        <div class="download-option-label">Which submissions?</div>
+      <fieldset class="fieldset option-container">
+        <legend class="download-option-label">Which submissions?</legend>
         <div class="radio-container">
           <input type="radio" name="submissions_choice"
                   id="final-graded-choice"
@@ -44,7 +44,7 @@
                   :value="false">
           <label class="label" for="all-choice">All submissions</label>
         </div>
-      </div>
+      </fieldset>
 
       <div class="option-container">
         <div class="checkbox-input-container">
@@ -313,6 +313,7 @@ export default class DownloadGrades extends Vue implements Created, BeforeDestro
   font-weight: bold;
   font-size: 1rem;
   margin-bottom: .25rem;
+  padding: 0;
 }
 
 .download-button {
