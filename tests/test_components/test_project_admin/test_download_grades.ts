@@ -85,6 +85,18 @@ test('Download tasks fetched, sorted, and displayed', async () => {
         with_error.progress.toString() + '%');
 });
 
+test('Radio groups are labeled by their question', async () => {
+    get_tasks_stub_resolves([]);
+    let wrapper = managed_mount(DownloadGrades, {propsData: {project: project}});
+    expect(await wait_for_load(wrapper)).toBe(true);
+
+    let radios = wrapper.findAll('input[type="radio"]').wrappers;
+    expect(radios.length).toBeGreaterThan(0);
+    for (let radio of radios) {
+        expect(radio.element.closest('fieldset')).toHaveAccessibleName();
+    }
+});
+
 describe('Create task tests', () => {
     let wrapper: Wrapper<DownloadGrades>;
 
