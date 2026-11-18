@@ -1,0 +1,8 @@
+[submodule "ag-client-typescript"]
+	path = ag-client-typescript
+	url = ../ag-client-typescript.git
+	branch = release-2024.08.X
+[submodule "e2e_test_stack/autograder-server"]
+	path = e2e_test_stack/autograder-server
+	url = ../autograder-server.git
+        branch = release-2024.08.X
