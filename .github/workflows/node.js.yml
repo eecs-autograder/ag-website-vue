@@ -60,7 +60,9 @@ jobs:
     # Lint is fast. If we wait for it we guarantee a cache hit on dependencies.
     needs: lint
 
-    runs-on: ubuntu-latest
+    # Pinned: the Playwright version on this branch fails to install
+    # browser deps on ubuntu-latest (26.04).
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
